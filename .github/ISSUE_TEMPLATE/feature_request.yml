@@ -1,0 +1,79 @@
+name: Feature Request
+description: Suggest a new example or improvement
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe your idea below.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of Feature
+      description: What kind of feature are you requesting?
+      options:
+        - New Example
+        - New Guide/Documentation
+        - Improvement to Existing Example
+        - New Utility/Tool
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: category
+    attributes:
+      label: Suggested Category
+      description: Where should this be located? (e.g., "examples/defi", "guides")
+      placeholder: "examples/defi"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe your feature request in detail
+      placeholder: What would you like to see added?
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: Why is this feature valuable? What problem does it solve?
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example/Mockup
+      description: If applicable, provide a code example or mockup
+      render: rust
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered alternative approaches?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Are you willing to contribute this feature?
+      options:
+        - label: I would like to implement this feature
+          required: false
+        - label: I can help with documentation
+          required: false
+        - label: I can help with testing
+          required: false

@@ -1,0 +1,42 @@
+# Rust
+target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# Soroban
+.soroban/
+*.wasm
+*.optimized.wasm
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+
+# Testing
+coverage/
+*.profraw
+
+# Build artifacts
+*.so
+*.dylib
+*.dll
+
+# Documentation
+book/
+docs/_build/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+ROADMAP.md

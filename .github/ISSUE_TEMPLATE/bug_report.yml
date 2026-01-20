@@ -1,0 +1,100 @@
+name: Bug Report
+description: Report a bug in an example or documentation
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What type of issue is this?
+      options:
+        - Smart Contract Bug
+        - Documentation Error
+        - Build/Compilation Issue
+        - Test Failure
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: example
+    attributes:
+      label: Affected Example
+      description: Which example is affected? (e.g., "basics/01-hello-world")
+      placeholder: "examples/basics/01-hello-world"
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear description of the bug
+      placeholder: Tell us what went wrong
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Clone the repository
+        2. Navigate to ...
+        3. Run command ...
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide your environment details
+      value: |
+        - OS: [e.g., macOS 13.0, Ubuntu 22.04]
+        - Rust Version: [output of `rustc --version`]
+        - Soroban CLI Version: [output of `soroban --version`]
+        - Soroban SDK Version: [from Cargo.toml]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Messages / Logs
+      description: Paste any relevant error messages or logs
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+    validations:
+      required: false

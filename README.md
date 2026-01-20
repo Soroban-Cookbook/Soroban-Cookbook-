@@ -1,91 +1,112 @@
-# Soroban-Cookbook-
-**The community-driven smart contract pattern library for Stellar**
+# Soroban Cookbook
 
-## 🌟 Our Mission
+**A comprehensive guide to building smart contracts on Stellar with Soroban**
 
-We're building the go-to resource for Soroban developers—a comprehensive, battle-tested collection of smart contract examples that make building on Stellar faster, safer, and more accessible.
+## 📖 About
 
-## 🎯 What We Do
+The Soroban Cookbook is a developer's guide to building smart contracts on the Stellar network using Soroban. This repository provides clear, well-documented examples and practical patterns for developers at every level—from your first "Hello World" contract to complex DeFi protocols.
 
-Soroban-Cookbook provides production-ready Rust smart contract patterns for developers at every level:
+## 🎯 What You'll Find Here
 
-- **Newcomers** learn blockchain development through annotated, beginner-friendly examples
-- **Ethereum migrants** find clear "Solidity → Soroban" translation guides
-- **Experienced builders** access optimized templates for complex DeFi and governance systems
+### 📚 Examples by Difficulty
 
-## 📚 Our Repositories
+- **[Basics](./examples/basics/)** - Core concepts: storage, auth, events, and data types
+- **[Intermediate](./examples/intermediate/)** - Tokens, NFTs, multi-contract interactions
+- **[Advanced](./examples/advanced/)** - DeFi protocols, governance systems, cross-chain patterns
 
-### [Soroban-Cookbook](https://github.com/soroban-blueprints/soroban-blueprints)
-The main pattern library with atomic snippets, financial primitives, and advanced multi-contract systems.
+### 🏗️ Examples by Use Case
 
+- **[DeFi](./examples/defi/)** - AMMs, lending, vaults, escrow, and yield protocols
+- **[NFTs](./examples/nfts/)** - Minting, marketplaces, and metadata standards
+- **[Governance](./examples/governance/)** - DAOs, voting systems, and proposals
+- **[Tokens](./examples/tokens/)** - Custom tokens, wrappers, and token standards
 
-### [templates](https://github.com/soroban-blueprints/templates)
-Ready-to-fork project starters with CI/CD, testing infrastructure, and deployment scripts pre-configured.
+### 📝 Comprehensive Guides
+
+- **[Getting Started](./guides/getting-started.md)** - Set up your development environment
+- **[Your First Contract](./guides/first-contract.md)** - Write, test, and deploy
+- **[Testing Guide](./guides/testing.md)** - Unit tests, integration tests, and best practices
+- **[Deployment Guide](./guides/deployment.md)** - Deploy to testnet and mainnet
+- **[Migrating from Ethereum](./guides/ethereum-to-soroban.md)** - Solidity → Rust patterns
 
 ## 🚀 Quick Start
 
 ```bash
-# Clone any example
-git clone https://github.com/soroban-blueprints/soroban-blueprints
-cd soroban-blueprints/examples/token-wrapper
+# Clone the repository
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook.git
+cd Soroban-Cookbook
 
-# Test and deploy
+# Install Rust and Soroban CLI (if not already installed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+cargo install --locked soroban-cli
+
+# Try a basic example
+cd examples/basics/01-hello-world
 cargo test
-soroban contract deploy --wasm target/wasm32-unknown-unknown/release/*.wasm --network testnet
+soroban contract build
+
+# Deploy to testnet
+soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/hello_world.wasm \
+  --network testnet
 ```
 
-### Ways to Contribute
+## 📂 Repository Structure
 
-1. **Write Examples** — Create new contract patterns (150-200 pts)
-2. **Improve Docs** — Add tutorials, fix typos, translate content (100-150 pts)
-3. **Maintain Code** — Update dependencies, add tests, ensure SDK compatibility (100 pts)
-4. **Review PRs** — Help maintain quality standards across the library
-
-See [CONTRIBUTING.md](https://github.com/soroban-blueprints/soroban-blueprints/blob/main/CONTRIBUTING.md) for detailed guidelines.
-
-### Current Focus Areas
-
-- ✅ Core primitives (Auth, Storage, Events)
-- 🚧 Financial patterns (Escrow, Vaults, AMMs)
-- 📋 Governance systems (DAOs, Voting, Proposals)
-- 📋 Cross-contract patterns (Composability examples)
-
-
-## 📊 Impact
-
-Our goal is to become the primary learning resource for Soroban development, measured by:
-
-- GitHub stars and forks from ecosystem developers
-- Community adoption in production projects
-- Cross-references from official Stellar documentation
+```
+Soroban-Cookbook/
+├── examples/           # Smart contract examples
+│   ├── basics/        # Beginner-friendly fundamentals
+│   ├── intermediate/  # Common patterns and use cases
+│   ├── advanced/      # Complex systems and protocols
+│   ├── defi/          # DeFi-specific examples
+│   ├── nfts/          # NFT implementations
+│   ├── governance/    # DAO and voting systems
+│   └── tokens/        # Token standards and patterns
+├── guides/            # Step-by-step tutorials
+├── docs/              # Reference documentation
+├── scripts/           # Deployment and testing utilities
+└── .github/           # CI/CD and templates
+```
 
 ## 🛠️ Technical Standards
 
-All patterns in our library:
+Every example in this cookbook:
 
-- ✅ Compile against the latest Soroban SDK
-- ✅ Include comprehensive `cargo test` coverage
-- ✅ Provide one-command deployment scripts
-- ✅ Feature inline documentation explaining design decisions
-- ✅ Pass automated CI/CD quality checks
+- ✅ Compiles with the latest stable Soroban SDK
+- ✅ Includes comprehensive unit and integration tests
+- ✅ Features inline documentation explaining key concepts
+- ✅ Provides deployment scripts for testnet/mainnet
+- ✅ Follows Rust and Soroban best practices
+- ✅ Passes automated CI/CD checks
 
-## 🌐 Community
+## 🤝 Contributing
 
-- **Discord**: [Join our server](https://discord.gg/soroban-blueprints)
-- **Twitter**: [@SorobanBlue](https://twitter.com/sorobanblue)
-- **Forum**: [Stellar Community](https://stellar.org/community)
+We welcome contributions from the community! Whether you're fixing a typo, improving documentation, or adding a new example, your help makes this resource better for everyone.
 
-## 📖 Learn More
+**Ways to contribute:**
 
-- [Soroban Documentation](https://soroban.stellar.org/docs)
+- 📝 Add new contract examples or patterns
+- 📖 Improve documentation and guides
+- 🐛 Report bugs or suggest improvements
+- ✅ Review pull requests
+- 🌍 Translate content to other languages
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
+
+## 📚 Additional Resources
+
+- [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
 - [Stellar Developer Portal](https://developers.stellar.org)
+- [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
+- [Stellar Community Discord](https://discord.gg/stellardev)
 
 ## 📄 License
 
-All repositories are MIT licensed—build freely, attribute generously.
+This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
 
 ---
 
-**Maintained by the community • Powered by Stellar • Built with Rust**
+**Built by the community • Powered by Stellar • Written in Rust**
 
-*Have a pattern idea? [Open an issue](https://github.com/soroban-blueprints/Soroban-Cookbook/issues/new)*
+_Have a suggestion or found an issue? [Open an issue](https://github.com/Soroban-Cookbook/Soroban-Cookbook/issues/new)_
