@@ -38,7 +38,11 @@ fn test_event_count_multiple() {
     client.emit_multiple(&3);
 
     let events = env.events().all();
-    assert_eq!(events.len(), 3, "emit_multiple(3) must emit exactly 3 events");
+    assert_eq!(
+        events.len(),
+        3,
+        "emit_multiple(3) must emit exactly 3 events"
+    );
 }
 
 #[test]
