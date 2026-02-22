@@ -74,9 +74,9 @@ fn test_admin_only_op() {
 
     // It should fail if the invoker is not the expected admin
     let result_fail = client.admin_only_op(&random_admin, &real_admin);
-    assert_eq!(result_fail, false);
+    assert!(!result_fail);
 
     // It should succeed if the invoker IS the expected admin
     let result_success = client.admin_only_op(&real_admin, &real_admin);
-    assert_eq!(result_success, true);
+    assert!(result_success);
 }
