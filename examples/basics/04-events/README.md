@@ -22,29 +22,57 @@ env.events().publish((symbol_short!("transfer"), from, to), amount);
 
 ## 🔍 Contract Overview
 
-This example demonstrates:
+This example demonstrates both simple and structured event patterns:
+
+### Structured Events (Recommended)
 
 ```rust
-// Simple event: single topic, u64 data
+// Transfer event: 4 topics (ns, action, sender, recipient) + custom payload
+pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64)
+
+// Config update event: 3 topics (ns, action, key) + custom payload
+pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64)
+```
+
+### Simple Helpers
+
+```rust
+// Simple event: single topic
 pub fn emit_simple(env: Env, value: u64)
 
-// Tagged event: two topics (name + tag), u64 data
+// Tagged event: two topics (name + tag)
 pub fn emit_tagged(env: Env, tag: Symbol, value: u64)
 
-// Multiple events: emits N events with sequential indices
+// Multiple events: emits N indexed events in a loop
 pub fn emit_multiple(env: Env, count: u32)
 ```
 
 ## 💡 Key Concepts
 
-### Publishing Events
+### Structured Event Payloads
+
+Use `#[contracttype]` to define rich data payloads that are stored in the event's data slot:
 
 ```rust
-// Single-topic event
-env.events().publish((symbol_short!("simple"),), value);
+#[contracttype]
+pub struct TransferEventData {
+    pub amount: i128,
+    pub memo: u64,
+}
+```
 
-// Multi-topic event (topics are indexed for filtering)
-env.events().publish((symbol_short!("tagged"), tag), value);
+### Multiple Topics & Indexing
+
+- **Topics** (up to 4) are indexed and searchable off-chain.
+- **Data** is the rich payload, not indexed but decodable.
+- **Naming Convention**: Use a consistent `(namespace, action, [key...])` layout.
+
+```rust
+// Publishing 4 topics (contract name, action, sender, recipient)
+env.events().publish(
+    (symbol_short!("events"), symbol_short!("transfer"), sender, recipient),
+    TransferEventData { amount, memo }
+);
 ```
 
 ### Topics and Indexing

@@ -8,7 +8,9 @@ on:
 
 env:
   RUST_VERSION: stable
-  SOROBAN_VERSION: 21.7.0
+  # soroban-cli was renamed to stellar-cli at v22.
+  # 22.1.0 is the last release under the soroban protocol 21 era.
+  STELLAR_CLI_VERSION: 22.1.0
 
 jobs:
   fmt:
@@ -45,40 +47,26 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        rust: ["1.74", stable]
+    # Only test on stable. Rust 1.74 cannot compile transitive deps that use
+    # edition 2024 (e.g. base64ct ≥ 1.8) — so we drop the old matrix entry.
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ matrix.rust }}
+          toolchain: ${{ env.RUST_VERSION }}
           target: wasm32-unknown-unknown
 
       - name: Cache cargo registry
         uses: actions/cache@v4
         with:
-          path: ~/.cargo/registry
-          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Cache cargo index
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/git
-          key: ${{ runner.os }}-cargo-git-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Cache target directory
-        uses: actions/cache@v4
-        with:
-          path: target
-          key: ${{ runner.os }}-target-${{ hashFiles('**/Cargo.lock') }}
-
-      - name: Downgrade time crate for rust 1.74
-        if: matrix.rust == '1.74'
-        run: cargo update -p time --precise 0.3.36 && cargo update -p time-core --precise 0.1.2 || echo "No fix needed"
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
       - name: Run tests
         run: cargo test --workspace --all-features
@@ -95,17 +83,21 @@ jobs:
           toolchain: ${{ env.RUST_VERSION }}
           target: wasm32-unknown-unknown
 
-      - name: Install Soroban CLI
-        run: cargo install --locked soroban-cli --version ${{ env.SOROBAN_VERSION }}
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-build-
+
+      - name: Install stellar-cli
+        run: cargo install --locked stellar-cli --version ${{ env.STELLAR_CLI_VERSION }}
 
       - name: Build all contracts
-        run: |
-          for contract in examples/basics/*/; do
-            echo "Building $contract"
-            cd "$contract"
-            soroban contract build
-            cd -
-          done
+        run: cargo build --workspace --target wasm32-unknown-unknown --release
 
   security-audit:
     name: Security Audit
@@ -136,8 +128,18 @@ jobs:
           toolchain: stable
           target: wasm32-unknown-unknown
 
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-coverage-
+
       - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin --locked
 
       - name: Generate coverage
         run: cargo tarpaulin --workspace --all-features --out xml --timeout 300

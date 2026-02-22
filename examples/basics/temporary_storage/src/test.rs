@@ -1,6 +1,6 @@
 #![cfg(test)]
 use super::*;
-use soroban_sdk::{Env, testutils::Ledger};
+use soroban_sdk::{testutils::Ledger, Env};
 
 #[test]
 fn test_temporary_storage_behavior() {
