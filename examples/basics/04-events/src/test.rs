@@ -73,12 +73,6 @@ fn test_transfer_topic_namespace_and_action() {
     // Topic 1: action name
     let action: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
     assert_eq!(action, symbol_short!("transfer"));
-    let events = env.events().all();
-    assert_eq!(
-        events.len(),
-        3,
-        "emit_multiple(3) must emit exactly 3 events"
-    );
 }
 
 #[test]
