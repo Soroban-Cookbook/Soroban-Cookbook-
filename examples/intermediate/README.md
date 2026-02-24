@@ -18,6 +18,7 @@ Intermediate-level examples demonstrating common patterns and real-world use cas
 
 ### Access Control
 
+- **[Multi-Sig Patterns](./multi-sig-patterns/)** - Threshold signatures and multi-party authorization
 - **Role-Based Access** - Implement RBAC (Role-Based Access Control)
 - **Multi-Sig** - Multi-signature authorization
 - **Timelock** - Time-delayed execution for security
