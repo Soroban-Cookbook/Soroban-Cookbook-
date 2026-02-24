@@ -1,5 +1,13 @@
 //! # Structured Event Patterns
 //!
+//! Demonstrates Soroban event emission and query-friendly topic design:
+//!
+//! ## Basics
+//! - Event structure: topics (up to 4) + data payload
+//! - Deterministic event emission for testing
+//! - Multiple event types with distinct topics
+//!
+//! ## Query-Friendly Design Patterns
 //! Demonstrates how to emit well-structured events in Soroban contracts using:
 //!
 //! - **Custom event types** – `#[contracttype]` enums/structs as event data
@@ -62,6 +70,41 @@
 #![no_std]
 
 use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol};
+
+/// Event-emitting contract demonstrating both basic emission and
+/// query-friendly topic design.
+///
+/// Demonstrates how to emit well-structured events in Soroban contracts using:
+///
+/// - **Custom event types** – `#[contracttype]` enums/structs as event data
+/// - **Multiple topics** – up to 4 topic slots (contract address consumes none)
+/// - **Indexed parameters** – placing searchable fields in topics, payload in data
+/// - **Naming conventions** – `(contract_name, action)` as the first two topics
+///
+/// ## Soroban Event Anatomy
+///
+/// ```text
+/// env.events().publish(
+///     (topic_1, topic_2, topic_3, topic_4),  // up to 4 topics; indexed for off-chain search
+///     data_payload,                           // arbitrary SCVal; not indexed
+/// );
+/// ```
+///
+/// **Topics** should contain discrete, filterable identifiers (contract name,
+/// action type, primary key, secondary key).  **Data** holds the rich payload
+/// that off-chain consumers decode after matching on topics.
+///
+/// ## Event Naming Convention
+///
+/// Adopt a consistent `(contract, action, [key...])` topic layout so that
+/// indexers and monitoring tools can build efficient filters:
+///
+/// | Topic slot | Purpose            | Example              |
+/// |------------|--------------------|----------------------|
+/// | 0          | Contract namespace | `"events"`           |
+/// | 1          | Action name        | `"transfer"`         |
+/// | 2          | Primary index      | `sender: Address`    |
+/// | 3          | Secondary index    | `recipient: Address` |
 
 // ---------------------------------------------------------------------------
 // Custom event payload types

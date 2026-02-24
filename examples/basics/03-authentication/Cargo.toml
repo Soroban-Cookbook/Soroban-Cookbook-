@@ -2,7 +2,10 @@
 name = "authentication"
 version.workspace = true
 edition.workspace = true
-rust-version.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
 
 [lib]
 crate-type = ["cdylib"]
