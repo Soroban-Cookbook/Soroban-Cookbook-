@@ -125,7 +125,9 @@ impl InstanceStorageContract {
             .unwrap_or(0)
             + 1;
 
-        env.storage().instance().set(&InstanceKey::TxCounter, &count);
+        env.storage()
+            .instance()
+            .set(&InstanceKey::TxCounter, &count);
 
         // Shared TTL refresh — covers TxCounter AND all Config(…) keys.
         env.storage()

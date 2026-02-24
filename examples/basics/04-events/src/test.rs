@@ -1,5 +1,3 @@
-//! Unit tests for Events contract — basic emission, data validation,
-//! topic verification, and query-friendly pattern validation.
 //! Unit tests for the structured event patterns contract.
 //!
 //! Tests verify:
@@ -309,7 +307,10 @@ fn test_emit_transfer_independent_senders_queryable() {
     let (_id1, topics1, _) = events.get(1).unwrap();
     let sender0: Address = Address::try_from_val(&env, &topics0.get(1).unwrap()).unwrap();
     let sender1: Address = Address::try_from_val(&env, &topics1.get(1).unwrap()).unwrap();
-    assert_ne!(sender0, sender1, "Senders must be distinguishable via topic[1]");
+    assert_ne!(
+        sender0, sender1,
+        "Senders must be distinguishable via topic[1]"
+    );
 }
 
 #[test]
@@ -357,7 +358,11 @@ fn test_emit_status_change_four_topics() {
     assert_eq!(events.len(), 1);
 
     let (_id, topics, data) = events.get(0).unwrap();
-    assert_eq!(topics.len(), 4, "Status-change event must use all 4 topic slots");
+    assert_eq!(
+        topics.len(),
+        4,
+        "Status-change event must use all 4 topic slots"
+    );
 
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -370,4 +375,149 @@ fn test_emit_status_change_four_topics() {
 
     // data holds the ledger sequence for off-chain ordering / deduplication
     let _ledger: u32 = u32::try_from_val(&env, &data).unwrap();
+}
+
+// ---------------------------------------------------------------------------
+// Admin action event tests (3 topics)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_admin_action_emits_one_event() {
+    let (env, _, client) = make_env_and_client();
+
+    let admin = Address::generate(&env);
+    client.admin_action(&admin, &symbol_short!("pause"));
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 1, "admin_action must emit exactly one event");
+}
+
+#[test]
+fn test_admin_action_event_has_three_topics() {
+    let (env, _, client) = make_env_and_client();
+
+    let admin = Address::generate(&env);
+    client.admin_action(&admin, &symbol_short!("pause"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    assert_eq!(topics.len(), 3, "admin_action event must have 3 topics");
+}
+
+#[test]
+fn test_admin_action_topic_namespace_and_category() {
+    let (env, _, client) = make_env_and_client();
+
+    let admin = Address::generate(&env);
+    client.admin_action(&admin, &symbol_short!("upgrade"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+
+    let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    assert_eq!(ns, symbol_short!("events"));
+
+    let category: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(category, symbol_short!("admin"));
+}
+
+#[test]
+fn test_admin_action_indexed_admin_address() {
+    let (env, _, client) = make_env_and_client();
+
+    let admin = Address::generate(&env);
+    client.admin_action(&admin, &symbol_short!("pause"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+
+    let t_admin = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
+    assert_eq!(t_admin, admin);
+}
+
+#[test]
+fn test_admin_action_structured_data_payload() {
+    let (env, _, client) = make_env_and_client();
+
+    let admin = Address::generate(&env);
+    let action = symbol_short!("pause");
+    client.admin_action(&admin, &action);
+
+    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let payload = AdminActionEventData::try_from_val(&env, &data).unwrap();
+
+    assert_eq!(payload.action, action);
+}
+
+// ---------------------------------------------------------------------------
+// Audit trail event tests (4 topics)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_audit_trail_emits_one_event() {
+    let (env, _, client) = make_env_and_client();
+
+    let actor = Address::generate(&env);
+    client.audit_trail(&actor, &symbol_short!("delete"), &symbol_short!("rec_42"));
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 1, "audit_trail must emit exactly one event");
+}
+
+#[test]
+fn test_audit_trail_event_has_four_topics() {
+    let (env, _, client) = make_env_and_client();
+
+    let actor = Address::generate(&env);
+    client.audit_trail(&actor, &symbol_short!("create"), &symbol_short!("item_1"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    assert_eq!(topics.len(), 4, "audit_trail event must have 4 topics");
+}
+
+#[test]
+fn test_audit_trail_topic_namespace_and_category() {
+    let (env, _, client) = make_env_and_client();
+
+    let actor = Address::generate(&env);
+    client.audit_trail(&actor, &symbol_short!("update"), &symbol_short!("cfg_x"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+
+    let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    assert_eq!(ns, symbol_short!("events"));
+
+    let category: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(category, symbol_short!("audit"));
+}
+
+#[test]
+fn test_audit_trail_indexed_actor_and_action() {
+    let (env, _, client) = make_env_and_client();
+
+    let actor = Address::generate(&env);
+    let action = symbol_short!("delete");
+    client.audit_trail(&actor, &action, &symbol_short!("rec_7"));
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+
+    let t_actor = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
+    assert_eq!(t_actor, actor);
+
+    let t_action: Symbol = Symbol::try_from_val(&env, &topics.get(3).unwrap()).unwrap();
+    assert_eq!(t_action, action);
+}
+
+#[test]
+fn test_audit_trail_structured_data_payload() {
+    let (env, _, client) = make_env_and_client();
+
+    let actor = Address::generate(&env);
+    let action = symbol_short!("create");
+    let details = symbol_short!("new_usr");
+    client.audit_trail(&actor, &action, &details);
+
+    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let payload = AuditTrailEventData::try_from_val(&env, &data).unwrap();
+
+    assert_eq!(payload.details, details);
+    assert_eq!(payload.timestamp, env.ledger().timestamp());
+    assert_eq!(payload.sequence, env.ledger().sequence());
 }

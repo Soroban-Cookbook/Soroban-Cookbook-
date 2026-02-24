@@ -18,9 +18,9 @@ Learn how to store and retrieve data in Soroban contracts.
 
 ### [03-authentication](./03-authentication/)
 
-Understand authorization and authentication patterns.
+Build custom authorization logic beyond basic `require_auth()`.
 
-**Concepts:** `require_auth()`, address verification, multi-sig patterns
+**Concepts:** Role-based access control, time-locks, cooldowns, contract state gating
 
 ### [04-events](./04-events/)
 

@@ -45,3 +45,164 @@ To test authentication patterns, use Soroban's test framework. Write unit tests 
 - [Smart Contract Security Resources](https://consensys.github.io/smart-contract-best-practices/)
 
 For more details and code examples, see the contract in `src/lib.rs`.
+# Authentication & Custom Authorization
+
+Learn how to build custom authorization logic in Soroban smart contracts, including role-based access control, time-based restrictions, and state-dependent permissions.
+
+## 📖 What You'll Learn
+
+- Combining `require_auth()` with custom authorization checks
+- Implementing role-based access control (Admin, Moderator, User)
+- Time-locked operations and cooldown periods
+- State-dependent authorization gating (Active / Paused / Frozen)
+- Security best practices for on-chain access control
+
+## 🔍 Contract Overview
+
+This example demonstrates three complementary authorization patterns that work together to form a complete access-control system:
+
+### Role-Based Access Control (RBAC)
+
+```rust
+pub fn initialize(env: Env, admin: Address)
+pub fn grant_role(env: Env, admin: Address, account: Address, role: Role)
+pub fn revoke_role(env: Env, admin: Address, account: Address)
+pub fn get_role(env: Env, account: Address) -> u32
+pub fn has_role(env: Env, account: Address, role: Role) -> bool
+pub fn admin_action(env: Env, caller: Address, value: u64) -> u64
+pub fn moderator_action(env: Env, caller: Address, value: u64) -> u64
+```
+
+### Time-Based Restrictions
+
+```rust
+pub fn set_time_lock(env: Env, admin: Address, unlock_time: u64)
+pub fn time_locked_action(env: Env, caller: Address) -> u64
+pub fn set_cooldown(env: Env, admin: Address, period: u64)
+pub fn cooldown_action(env: Env, caller: Address) -> u64
+```
+
+### State-Based Authorization
+
+```rust
+pub fn set_state(env: Env, admin: Address, state: ContractState)
+pub fn get_state(env: Env) -> u32
+pub fn active_only_action(env: Env, caller: Address) -> u64
+```
+
+## 💡 Key Concepts
+
+### Role Hierarchy
+
+Roles are defined as an enum stored in persistent storage:
+
+```rust
+#[contracttype]
+pub enum Role {
+    Admin = 0,
+    Moderator = 1,
+    User = 2,
+}
+```
+
+- **Admin** — Full access; can grant/revoke roles, configure time-locks, cooldowns, and contract state.
+- **Moderator** — Mid-tier access; can perform moderator-level actions but not admin-only operations.
+- **User** — Basic access; cannot perform privileged actions.
+
+Admins implicitly satisfy moderator-level checks, so `moderator_action` accepts both Admin and Moderator callers.
+
+### Time-Lock Pattern
+
+A global unlock timestamp prevents actions until a future ledger time:
+
+```rust
+let current_time = env.ledger().timestamp();
+let unlock_time = env.storage().instance().get(&DataKey::TimeLock).unwrap();
+if current_time < unlock_time {
+    panic!("Action is time-locked");
+}
+```
+
+Use time-locks for vesting schedules, delayed withdrawals, or governance cool-off periods.
+
+### Cooldown Pattern
+
+Per-address cooldowns enforce a minimum interval between successive calls:
+
+```rust
+let last = env.storage().persistent().get(&DataKey::LastAction(caller.clone()));
+if let Some(last_ts) = last {
+    if current_time < last_ts + cooldown_period {
+        panic!("Cooldown period not elapsed");
+    }
+}
+```
+
+Cooldowns mitigate spam and rate-limit sensitive operations without off-chain infrastructure.
+
+### Contract State Gating
+
+A global state enum controls whether critical operations are allowed:
+
+```rust
+#[contracttype]
+pub enum ContractState {
+    Active = 0,
+    Paused = 1,
+    Frozen = 2,
+}
+```
+
+Only the `Active` state permits normal operations. `Paused` and `Frozen` block `active_only_action`, giving admins an emergency circuit-breaker.
+
+## 🔒 Security Best Practices
+
+1. **Always call `require_auth()` first** — Verify the caller's cryptographic identity before any custom checks.
+2. **Separate auth from business logic** — Keep role checks and time guards in distinct, auditable code paths.
+3. **Use persistent storage for roles** — Instance storage risks loss on contract upgrade; persistent storage survives.
+4. **Minimize admin surface** — Only expose `grant_role`, `revoke_role`, and configuration setters to the admin.
+5. **Test edge cases** — Verify behavior at exact boundary timestamps (unlock time, cooldown expiry).
+6. **Prefer enums over integers** — `Role` and `ContractState` enums prevent invalid values at the type level.
+7. **Fail loudly** — Use `panic!` with descriptive messages so callers and auditors understand rejection reasons.
+
+## 🧪 Testing
+
+```bash
+cargo test
+```
+
+Tests cover:
+
+- **Initialization** — Admin is set, double-init is rejected
+- **Role management** — Grant, revoke, get, and has_role checks
+- **Admin actions** — Authorized admin succeeds, non-admin panics
+- **Moderator actions** — Admin and Moderator succeed, User panics
+- **Time-lock** — Action blocked before unlock, succeeds after
+- **Cooldown** — Second call blocked within period, succeeds after
+- **State gating** — Active allows action; Paused and Frozen block it
+
+## 🚀 Building & Deployment
+
+```bash
+# Build
+cargo build --target wasm32-unknown-unknown --release
+
+# Deploy
+soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/authentication.wasm \
+  --source alice \
+  --network testnet
+```
+
+## 🎓 Next Steps
+
+- [Basics Index](../README.md) - Browse the full basics learning path
+- [Events](../04-events/) - Emit audit-trail events alongside auth checks
+- [Storage Patterns](../02-storage-patterns/) - Understand how roles are persisted
+- [Intermediate Examples](../../intermediate/) - Multi-contract authorization patterns
+
+## 📚 References
+
+- [Soroban Authorization](https://developers.stellar.org/docs/smart-contracts/fundamentals-and-concepts/authorization)
+- [Soroban SDK Auth](https://docs.rs/soroban-sdk/latest/soroban_sdk/auth/index.html)
+- [Custom Account Contracts](https://developers.stellar.org/docs/smart-contracts/guides/custom-accounts)

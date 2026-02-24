@@ -34,6 +34,14 @@ pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, mem
 pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64)
 ```
 
+```rust
+// Admin action event: 3 topics (ns, category, admin) + action data
+pub fn admin_action(env: Env, admin: Address, action: Symbol)
+
+// Audit trail event: 4 topics (ns, category, actor, action) + detailed data
+pub fn audit_trail(env: Env, actor: Address, action: Symbol, details: Symbol)
+```
+
 ### Simple Helpers
 
 ```rust
@@ -75,6 +83,30 @@ env.events().publish(
 );
 ```
 
+### State Change Tracking
+
+Use structured events to create an on-chain audit log that off-chain systems can replay:
+
+- **Admin actions** — Track privileged operations with a 3-topic layout `(namespace, "admin", admin_address)`. The data payload carries the action symbol and ledger timestamp, giving indexers a filterable record of every admin operation.
+- **Audit trails** — Full accountability tracking with a 4-topic layout `(namespace, "audit", actor, action)`. The data payload includes human-readable details, a timestamp, and the ledger sequence number for deterministic ordering.
+
+```rust
+#[contracttype]
+pub struct AdminActionEventData {
+    pub action: Symbol,
+    pub timestamp: u64,
+}
+
+#[contracttype]
+pub struct AuditTrailEventData {
+    pub details: Symbol,
+    pub timestamp: u64,
+    pub sequence: u32,
+}
+```
+
+Choose admin action events when you need a simple record of who did what. Choose audit trail events when you also need to capture why (details) and guarantee ordering (sequence).
+
 ### Topics and Indexing
 
 - Topics are indexed and can be used for off-chain filtering
@@ -95,6 +127,8 @@ Tests cover:
 - **Payload values** — Event data matches emitted values
 - **Action differentiation** — Different actions emit distinct topics
 - **No extra events** — Only expected events are emitted
+- **Admin action events** — Correct topic structure and payload for admin operations
+- **Audit trail events** — Full accountability tracking with actor, action, and details
 
 ## 🚀 Building & Deployment
 
