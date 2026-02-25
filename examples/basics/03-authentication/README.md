@@ -1,6 +1,6 @@
 # Authentication Patterns
 
-This example demonstrates basic address authentication patterns using Soroban's `require_auth()` function, showing how to verify caller identity in smart contracts.
+This example demonstrates basic address authentication patterns using Soroban's `require_auth()` function, showing how to verify caller identity in smart contracts. 
 
 ## Concepts Covered
 
