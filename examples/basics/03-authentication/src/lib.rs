@@ -71,9 +71,9 @@ use soroban_sdk::{
 };
 
 /// Authentication Patterns Contract
-/// 
+///
 /// This contract demonstrates various address authentication patterns using Soroban's require_auth() function.
-/// 
+///
 /// # Context
 /// Address authentication is the foundation of authorization in Soroban. The require_auth() function:
 /// - Verifies that the caller has authorized the transaction
@@ -101,44 +101,44 @@ const ADMIN_KEY: Symbol = symbol_short!("admin");
 #[contractimpl]
 impl AuthContract {
     /// Basic function with address authentication
-    /// 
+    ///
     /// Demonstrates the fundamental pattern of requiring authentication before performing actions.
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `user` - The address of the user calling the function
-    /// 
+    ///
     /// # What require_auth does:
     /// The `require_auth()` function verifies that the transaction has been signed by the given address.
     /// If the address hasn't authorized the transaction, the function will panic and the transaction will fail.
-    /// 
+    ///
     /// # When to use it:
     /// Use `require_auth()` whenever you need to verify that the caller has authorized a specific action,
     /// particularly when the action involves transferring assets, changing state, or accessing sensitive data.
-    /// 
+    ///
     /// # Security implications:
     /// Always call `require_auth()` before making any state changes to prevent unauthorized access.
     pub fn basic_auth(_env: Env, user: Address) -> bool {
         // Require authorization from the user address
         // This ensures that the transaction has been signed by the user
         user.require_auth();
-    
+
         // After successful authentication, perform the authorized action
         // In this case, we just return true to indicate successful authentication
         true
     }
 
     /// Single-address authorization pattern
-    /// 
+    ///
     /// Demonstrates how to require authentication from a specific address for operations
     /// like transferring assets or modifying user-specific data.
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `from` - The address initiating the transfer
     /// * `to` - The destination address
     /// * `amount` - The amount to transfer
-    /// 
+    ///
     /// # How authorization is verified:
     /// The `from.require_auth()` call ensures that the `from` address has authorized this transaction.
     /// This prevents someone else from initiating a transfer from another person's account.
@@ -146,26 +146,26 @@ impl AuthContract {
         // Require authorization from the 'from' address
         // This prevents unauthorized transfers from someone else's account
         from.require_auth();
-    
+
         // Validate inputs
         if amount <= 0 {
             panic!("Amount must be positive");
         }
-    
+
         // Perform the transfer logic here (in a real contract, this would update balances)
         // For demonstration purposes, we just return true
         true
     }
 
     /// Admin-only function pattern
-    /// 
+    ///
     /// Demonstrates how to restrict function access to a specific admin address.
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `admin` - The address claiming to be admin
     /// * `new_admin` - The address to set as new admin
-    /// 
+    ///
     /// # Security considerations:
     /// - Store the admin address in persistent storage
     /// - Only allow the current admin to change the admin
@@ -192,10 +192,10 @@ impl AuthContract {
     }
 
     /// Get the current admin address
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
-    /// 
+    ///
     /// # Returns
     /// The current admin address, if set
     pub fn get_admin(env: Env) -> Option<Address> {
@@ -203,14 +203,14 @@ impl AuthContract {
     }
 
     /// User-specific operations pattern
-    /// 
+    ///
     /// Demonstrates how to perform operations that affect only the authenticated user.
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `user` - The user whose data will be modified
     /// * `data` - The data to store for the user
-    /// 
+    ///
     /// # Pattern:
     /// 1. Require auth from the user who owns the data
     /// 2. Use the authenticated address as a key for user-specific storage
@@ -227,11 +227,11 @@ impl AuthContract {
     }
 
     /// Retrieve user-specific data
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `user` - The user whose data to retrieve
-    /// 
+    ///
     /// # Returns
     /// The data stored for the user, if any
     pub fn get_user_data(env: Env, user: Address) -> Option<Symbol> {
@@ -239,15 +239,15 @@ impl AuthContract {
     }
 
     /// Function demonstrating proper error handling for auth failures
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `user` - The address that should authorize the transaction
     /// * `operation` - The operation identifier
-    /// 
+    ///
     /// # Returns
     /// Result indicating success or specific error type
-    /// 
+    ///
     /// # Proper error handling:
     /// - Clear error messages when auth fails
     /// - Meaningful error codes for different failure types
@@ -273,13 +273,13 @@ impl AuthContract {
     }
 
     /// Demonstration of self-authorization pattern
-    /// 
+    ///
     /// Shows how a contract can authenticate itself when calling other contracts
-    /// 
+    ///
     /// # Parameters
     /// * `env` - The Soroban environment
     /// * `self_address` - The address of this contract
-    /// 
+    ///
     /// # Self-authorization use case:
     /// When a contract needs to authenticate itself to call other contracts
     /// or when implementing contract-to-contract authorization
@@ -287,7 +287,7 @@ impl AuthContract {
         // The contract authenticates itself
         // This is useful when the contract needs to prove its identity to other contracts
         self_address.require_auth();
-    
+
         // In a real scenario, this would be used to call other contracts
         // or to prove the contract's identity for cross-contract operations
         true
@@ -298,256 +298,257 @@ impl AuthContract {
     pub fn secure_action(env: Env, user: Address) {
         // 1. The magic line: checks signature and protects against replays.
         user.require_auth();
-    // ==================== INITIALIZATION ====================
+        // ==================== INITIALIZATION ====================
 
-    /// Initializes the contract with the given admin address.
-    ///
-    /// Must be called exactly once. Panics on repeated calls to prevent
-    /// admin hijacking after deployment.
-    pub fn initialize(env: Env, admin: Address) {
-        if env.storage().instance().has(&DataKey::Admin) {
-            panic!("Already initialized");
-        }
-        env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().extend_ttl(100, 100);
+        /// Initializes the contract with the given admin address.
+        ///
+        /// Must be called exactly once. Panics on repeated calls to prevent
+        /// admin hijacking after deployment.
+        pub fn initialize(env: Env, admin: Address) {
+            if env.storage().instance().has(&DataKey::Admin) {
+                panic!("Already initialized");
+            }
+            env.storage().instance().set(&DataKey::Admin, &admin);
+            env.storage().instance().extend_ttl(100, 100);
 
-        // Grant the Admin role to the initializing address so that
-        // role-gated functions work immediately after deployment.
-        env.storage()
-            .persistent()
-            .set(&DataKey::Role(admin.clone()), &Role::Admin);
-        env.storage()
-            .persistent()
-            .extend_ttl(&DataKey::Role(admin), 100, 100);
-    }
-
-    // ==================== ROLE-BASED ACCESS CONTROL ====================
-
-    /// Grants a role to `account`. Only the stored admin may call this, and
-    /// they must authorize the transaction.
-    pub fn grant_role(env: Env, admin: Address, account: Address, role: Role) {
-        admin.require_auth();
-        Self::require_admin(&env, &admin);
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Role(account.clone()), &role);
-        env.storage()
-            .persistent()
-            .extend_ttl(&DataKey::Role(account.clone()), 100, 100);
-
-        env.events().publish((symbol_short!("role"),), account);
-    }
-
-    /// Revokes any role previously assigned to `account`. Admin-only.
-    pub fn revoke_role(env: Env, admin: Address, account: Address) {
-        admin.require_auth();
-        Self::require_admin(&env, &admin);
-
-        env.storage()
-            .persistent()
-            .remove(&DataKey::Role(account.clone()));
-
-        env.events().publish((symbol_short!("revoke"),), account);
-    }
-
-    /// Returns the role of `account` as a `u32` discriminant
-    /// (0 = Admin, 1 = Moderator, 2 = User).
-    ///
-    /// Panics if no role has been assigned.
-    pub fn get_role(env: Env, account: Address) -> u32 {
-        let role: Role = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Role(account))
-            .unwrap_or_else(|| panic!("No role assigned"));
-        role as u32
-    }
-
-    /// Returns `true` if `account` holds exactly the given `role`.
-    pub fn has_role(env: Env, account: Address, role: Role) -> bool {
-        env.storage()
-            .persistent()
-            .get::<DataKey, Role>(&DataKey::Role(account))
-            == Some(role)
-    }
-
-    // ==================== ROLE-PROTECTED ACTIONS ====================
-
-    /// An action restricted to Admin-role callers.
-    ///
-    /// Demonstrates the two-step pattern: authenticate identity first, then
-    /// check permission via stored role data.
-    pub fn admin_action(env: Env, caller: Address, value: u64) -> u64 {
-        caller.require_auth();
-        Self::require_role(&env, &caller, &[Role::Admin]);
-
-        let result = value * 2;
-        env.events().publish((symbol_short!("admin"),), result);
-        result
-    }
-
-    /// An action available to Admin *or* Moderator callers.
-    pub fn moderator_action(env: Env, caller: Address, value: u64) -> u64 {
-        caller.require_auth();
-        Self::require_role(&env, &caller, &[Role::Admin, Role::Moderator]);
-
-        let result = value + 100;
-        env.events().publish((symbol_short!("mod"),), result);
-        result
-    }
-
-    // ==================== TIME-BASED AUTHORIZATION ====================
-
-    /// Sets a future timestamp before which `time_locked_action` will reject
-    /// all callers. Admin-only.
-    pub fn set_time_lock(env: Env, admin: Address, unlock_time: u64) {
-        admin.require_auth();
-        Self::require_admin(&env, &admin);
-
-        env.storage()
-            .instance()
-            .set(&DataKey::TimeLock, &unlock_time);
-        env.storage().instance().extend_ttl(100, 100);
-
-        env.events()
-            .publish((symbol_short!("timelock"),), unlock_time);
-    }
-
-    /// Executes only after the time-lock has expired.
-    ///
-    /// Compares `env.ledger().timestamp()` against the stored unlock time.
-    /// Returns the current ledger timestamp on success.
-    pub fn time_locked_action(env: Env, caller: Address) -> u64 {
-        caller.require_auth();
-
-        let unlock_time: u64 = env
-            .storage()
-            .instance()
-            .get(&DataKey::TimeLock)
-            .unwrap_or(0);
-
-        if env.ledger().timestamp() < unlock_time {
-            panic!("Action is time-locked");
+            // Grant the Admin role to the initializing address so that
+            // role-gated functions work immediately after deployment.
+            env.storage()
+                .persistent()
+                .set(&DataKey::Role(admin.clone()), &Role::Admin);
+            env.storage()
+                .persistent()
+                .extend_ttl(&DataKey::Role(admin), 100, 100);
         }
 
-        env.ledger().timestamp()
-    }
+        // ==================== ROLE-BASED ACCESS CONTROL ====================
 
-    /// Sets the minimum number of seconds that must elapse between successive
-    /// calls to `cooldown_action` by the same caller. Admin-only.
-    pub fn set_cooldown(env: Env, admin: Address, period: u64) {
-        admin.require_auth();
-        Self::require_admin(&env, &admin);
+        /// Grants a role to `account`. Only the stored admin may call this, and
+        /// they must authorize the transaction.
+        pub fn grant_role(env: Env, admin: Address, account: Address, role: Role) {
+            admin.require_auth();
+            Self::require_admin(&env, &admin);
 
-        env.storage()
-            .instance()
-            .set(&DataKey::CooldownPeriod, &period);
-        env.storage().instance().extend_ttl(100, 100);
+            env.storage()
+                .persistent()
+                .set(&DataKey::Role(account.clone()), &role);
+            env.storage()
+                .persistent()
+                .extend_ttl(&DataKey::Role(account.clone()), 100, 100);
 
-        env.events().publish((symbol_short!("cooldown"),), period);
-    }
-
-    /// Rate-limited action that enforces a per-caller cooldown period.
-    ///
-    /// Tracks each caller's last execution timestamp in persistent storage
-    /// and rejects calls that arrive before the cooldown expires.
-    /// Returns the current ledger timestamp on success.
-    pub fn cooldown_action(env: Env, caller: Address) -> u64 {
-        caller.require_auth();
-
-        let period: u64 = env
-            .storage()
-            .instance()
-            .get(&DataKey::CooldownPeriod)
-            .unwrap_or(0);
-
-        let last_action: u64 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::LastAction(caller.clone()))
-            .unwrap_or(0);
-
-        let now = env.ledger().timestamp();
-        if last_action > 0 && now < last_action + period {
-            panic!("Cooldown period not elapsed");
+            env.events().publish((symbol_short!("role"),), account);
         }
 
-        env.storage()
-            .persistent()
-            .set(&DataKey::LastAction(caller.clone()), &now);
-        env.storage()
-            .persistent()
-            .extend_ttl(&DataKey::LastAction(caller), 100, 100);
+        /// Revokes any role previously assigned to `account`. Admin-only.
+        pub fn revoke_role(env: Env, admin: Address, account: Address) {
+            admin.require_auth();
+            Self::require_admin(&env, &admin);
 
-        now
-    }
+            env.storage()
+                .persistent()
+                .remove(&DataKey::Role(account.clone()));
 
-    // ==================== STATE-BASED AUTHORIZATION ====================
-
-    /// Transitions the contract to a new operational state. Admin-only.
-    ///
-    /// Use `Paused` to temporarily halt user-facing operations or `Frozen`
-    /// for a harder stop (e.g., during an incident response).
-    pub fn set_state(env: Env, admin: Address, state: ContractState) {
-        admin.require_auth();
-        Self::require_admin(&env, &admin);
-
-        env.storage().instance().set(&DataKey::State, &state);
-        env.storage().instance().extend_ttl(100, 100);
-
-        env.events()
-            .publish((symbol_short!("state"),), state as u32);
-    }
-
-    /// Returns the current contract state as a `u32`
-    /// (0 = Active, 1 = Paused, 2 = Frozen). Defaults to Active.
-    pub fn get_state(env: Env) -> u32 {
-        env.storage()
-            .instance()
-            .get::<DataKey, ContractState>(&DataKey::State)
-            .unwrap_or(ContractState::Active) as u32
-    }
-
-    /// An action that only executes when the contract is in the `Active`
-    /// state. Returns the current ledger timestamp.
-    pub fn active_only_action(env: Env, caller: Address) -> u64 {
-        caller.require_auth();
-
-        let state: ContractState = env
-            .storage()
-            .instance()
-            .get(&DataKey::State)
-            .unwrap_or(ContractState::Active);
-
-        if state != ContractState::Active {
-            panic!("Contract is not active");
+            env.events().publish((symbol_short!("revoke"),), account);
         }
 
-        env.ledger().timestamp()
-    }
-
-    // ==================== INTERNAL HELPERS ====================
-
-    fn require_admin(env: &Env, caller: &Address) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-        if *caller != admin {
-            panic!("Not admin");
+        /// Returns the role of `account` as a `u32` discriminant
+        /// (0 = Admin, 1 = Moderator, 2 = User).
+        ///
+        /// Panics if no role has been assigned.
+        pub fn get_role(env: Env, account: Address) -> u32 {
+            let role: Role = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Role(account))
+                .unwrap_or_else(|| panic!("No role assigned"));
+            role as u32
         }
-    }
 
-    fn require_role(env: &Env, caller: &Address, allowed: &[Role]) {
-        let role: Role = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Role(caller.clone()))
-            .unwrap_or_else(|| panic!("No role assigned"));
-        if !allowed.contains(&role) {
-            panic!("Insufficient role");
+        /// Returns `true` if `account` holds exactly the given `role`.
+        pub fn has_role(env: Env, account: Address, role: Role) -> bool {
+            env.storage()
+                .persistent()
+                .get::<DataKey, Role>(&DataKey::Role(account))
+                == Some(role)
+        }
+
+        // ==================== ROLE-PROTECTED ACTIONS ====================
+
+        /// An action restricted to Admin-role callers.
+        ///
+        /// Demonstrates the two-step pattern: authenticate identity first, then
+        /// check permission via stored role data.
+        pub fn admin_action(env: Env, caller: Address, value: u64) -> u64 {
+            caller.require_auth();
+            Self::require_role(&env, &caller, &[Role::Admin]);
+
+            let result = value * 2;
+            env.events().publish((symbol_short!("admin"),), result);
+            result
+        }
+
+        /// An action available to Admin *or* Moderator callers.
+        pub fn moderator_action(env: Env, caller: Address, value: u64) -> u64 {
+            caller.require_auth();
+            Self::require_role(&env, &caller, &[Role::Admin, Role::Moderator]);
+
+            let result = value + 100;
+            env.events().publish((symbol_short!("mod"),), result);
+            result
+        }
+
+        // ==================== TIME-BASED AUTHORIZATION ====================
+
+        /// Sets a future timestamp before which `time_locked_action` will reject
+        /// all callers. Admin-only.
+        pub fn set_time_lock(env: Env, admin: Address, unlock_time: u64) {
+            admin.require_auth();
+            Self::require_admin(&env, &admin);
+
+            env.storage()
+                .instance()
+                .set(&DataKey::TimeLock, &unlock_time);
+            env.storage().instance().extend_ttl(100, 100);
+
+            env.events()
+                .publish((symbol_short!("timelock"),), unlock_time);
+        }
+
+        /// Executes only after the time-lock has expired.
+        ///
+        /// Compares `env.ledger().timestamp()` against the stored unlock time.
+        /// Returns the current ledger timestamp on success.
+        pub fn time_locked_action(env: Env, caller: Address) -> u64 {
+            caller.require_auth();
+
+            let unlock_time: u64 = env
+                .storage()
+                .instance()
+                .get(&DataKey::TimeLock)
+                .unwrap_or(0);
+
+            if env.ledger().timestamp() < unlock_time {
+                panic!("Action is time-locked");
+            }
+
+            env.ledger().timestamp()
+        }
+
+        /// Sets the minimum number of seconds that must elapse between successive
+        /// calls to `cooldown_action` by the same caller. Admin-only.
+        pub fn set_cooldown(env: Env, admin: Address, period: u64) {
+            admin.require_auth();
+            Self::require_admin(&env, &admin);
+
+            env.storage()
+                .instance()
+                .set(&DataKey::CooldownPeriod, &period);
+            env.storage().instance().extend_ttl(100, 100);
+
+            env.events().publish((symbol_short!("cooldown"),), period);
+        }
+
+        /// Rate-limited action that enforces a per-caller cooldown period.
+        ///
+        /// Tracks each caller's last execution timestamp in persistent storage
+        /// and rejects calls that arrive before the cooldown expires.
+        /// Returns the current ledger timestamp on success.
+        pub fn cooldown_action(env: Env, caller: Address) -> u64 {
+            caller.require_auth();
+
+            let period: u64 = env
+                .storage()
+                .instance()
+                .get(&DataKey::CooldownPeriod)
+                .unwrap_or(0);
+
+            let last_action: u64 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::LastAction(caller.clone()))
+                .unwrap_or(0);
+
+            let now = env.ledger().timestamp();
+            if last_action > 0 && now < last_action + period {
+                panic!("Cooldown period not elapsed");
+            }
+
+            env.storage()
+                .persistent()
+                .set(&DataKey::LastAction(caller.clone()), &now);
+            env.storage()
+                .persistent()
+                .extend_ttl(&DataKey::LastAction(caller), 100, 100);
+
+            now
+        }
+
+        // ==================== STATE-BASED AUTHORIZATION ====================
+
+        /// Transitions the contract to a new operational state. Admin-only.
+        ///
+        /// Use `Paused` to temporarily halt user-facing operations or `Frozen`
+        /// for a harder stop (e.g., during an incident response).
+        pub fn set_state(env: Env, admin: Address, state: ContractState) {
+            admin.require_auth();
+            Self::require_admin(&env, &admin);
+
+            env.storage().instance().set(&DataKey::State, &state);
+            env.storage().instance().extend_ttl(100, 100);
+
+            env.events()
+                .publish((symbol_short!("state"),), state as u32);
+        }
+
+        /// Returns the current contract state as a `u32`
+        /// (0 = Active, 1 = Paused, 2 = Frozen). Defaults to Active.
+        pub fn get_state(env: Env) -> u32 {
+            env.storage()
+                .instance()
+                .get::<DataKey, ContractState>(&DataKey::State)
+                .unwrap_or(ContractState::Active) as u32
+        }
+
+        /// An action that only executes when the contract is in the `Active`
+        /// state. Returns the current ledger timestamp.
+        pub fn active_only_action(env: Env, caller: Address) -> u64 {
+            caller.require_auth();
+
+            let state: ContractState = env
+                .storage()
+                .instance()
+                .get(&DataKey::State)
+                .unwrap_or(ContractState::Active);
+
+            if state != ContractState::Active {
+                panic!("Contract is not active");
+            }
+
+            env.ledger().timestamp()
+        }
+
+        // ==================== INTERNAL HELPERS ====================
+
+        fn require_admin(env: &Env, caller: &Address) {
+            let admin: Address = env
+                .storage()
+                .instance()
+                .get(&DataKey::Admin)
+                .unwrap_or_else(|| panic!("Not initialized"));
+            if *caller != admin {
+                panic!("Not admin");
+            }
+        }
+
+        fn require_role(env: &Env, caller: &Address, allowed: &[Role]) {
+            let role: Role = env
+                .storage()
+                .persistent()
+                .get(&DataKey::Role(caller.clone()))
+                .unwrap_or_else(|| panic!("No role assigned"));
+            if !allowed.contains(&role) {
+                panic!("Insufficient role");
+            }
         }
     }
 }
@@ -557,8 +558,8 @@ mod test;
 #[cfg(test)]
 mod smoke_tests {
     use super::*;
-    use soroban_sdk::{symbol_short, Address, Env};
     use soroban_sdk::testutils::Address as _;
+    use soroban_sdk::{symbol_short, Address, Env};
 
     #[test]
     fn test_basic_auth() {
@@ -590,10 +591,10 @@ mod smoke_tests {
 
         // Mock auth for the admin
         env.mock_all_auths();
-        
+
         // Set initial admin
         client.set_admin(&admin, &new_admin);
-        
+
         // Verify admin was set
         let stored_admin = client.get_admin();
         assert_eq!(stored_admin, Some(new_admin));
