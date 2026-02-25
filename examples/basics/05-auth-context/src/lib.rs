@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Vec, Symbol};
+use soroban_sdk::{contract, contractimpl, Address, Env, Vec};
 
 #[contract]
 pub struct AuthContextContract;
@@ -82,7 +82,7 @@ impl ProxyContract {
         // Because the target contract calls `user.require_auth()`, the SDK will
         // verify that the user authorized the entire call chain (User -> Proxy -> Target).
         client.check_nested_auth(&user);
-        
+
         // Return the user address to confirm success
         user
     }
