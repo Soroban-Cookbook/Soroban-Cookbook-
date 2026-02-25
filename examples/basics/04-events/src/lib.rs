@@ -162,6 +162,14 @@ pub struct AuditTrailEventData {
 /// Using a shared namespace lets indexers filter all events from this contract
 /// with a single topic prefix.
 const CONTRACT_NS: Symbol = symbol_short!("events");
+/// Naming convention: `snake_case` action names in topic[1].
+///
+/// Keeping these as constants prevents accidental drift in spelling/order and
+/// makes the event schema explicit for indexers.
+const ACTION_TRANSFER: Symbol = symbol_short!("transfer");
+const ACTION_CONFIG_UPDATE: Symbol = symbol_short!("cfg_upd");
+const ACTION_ADMIN: Symbol = symbol_short!("admin");
+const ACTION_AUDIT: Symbol = symbol_short!("audit");
 
 /// Contract demonstrating structured, multi-topic event patterns.
 #[contract]
@@ -190,7 +198,7 @@ impl EventsContract {
     /// efficiently retrieve all transfers _to_ or _from_ a given address.
     pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64) {
         env.events().publish(
-            (CONTRACT_NS, symbol_short!("transfer"), sender, recipient),
+            (CONTRACT_NS, ACTION_TRANSFER, sender, recipient),
             TransferEventData { amount, memo },
         );
     }
@@ -215,7 +223,7 @@ impl EventsContract {
     /// for a specific parameter (e.g. only `"max_supply"` updates).
     pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64) {
         env.events().publish(
-            (CONTRACT_NS, symbol_short!("cfg_upd"), key),
+            (CONTRACT_NS, ACTION_CONFIG_UPDATE, key),
             ConfigUpdateEventData {
                 old_value,
                 new_value,
@@ -240,7 +248,7 @@ impl EventsContract {
     pub fn admin_action(env: Env, admin: Address, action: Symbol) {
         let timestamp = env.ledger().timestamp();
         env.events().publish(
-            (CONTRACT_NS, symbol_short!("admin"), admin),
+            (CONTRACT_NS, ACTION_ADMIN, admin),
             AdminActionEventData { action, timestamp },
         );
     }
@@ -268,7 +276,7 @@ impl EventsContract {
         let timestamp = env.ledger().timestamp();
         let sequence = env.ledger().sequence();
         env.events().publish(
-            (CONTRACT_NS, symbol_short!("audit"), actor, action),
+            (CONTRACT_NS, ACTION_AUDIT, actor, action),
             AuditTrailEventData {
                 details,
                 timestamp,

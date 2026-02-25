@@ -25,6 +25,42 @@ fn make_env_and_client() -> (Env, Address, EventsContractClient<'static>) {
     (env, contract_id, client)
 }
 
+#[test]
+fn test_naming_convention_namespace_and_action_slots_are_stable() {
+    let (env, _, client) = make_env_and_client();
+
+    let a1 = Address::generate(&env);
+    let a2 = Address::generate(&env);
+
+    // Emit one event per structured API so we can validate a shared convention:
+    // topic[0] = contract namespace, topic[1] = action name.
+    client.transfer(&a1, &a2, &10, &1);
+    client.update_config(&symbol_short!("fee"), &1, &2);
+    client.admin_action(&a1, &symbol_short!("pause"));
+    client.audit_trail(&a2, &symbol_short!("resume"), &symbol_short!("ok"));
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 4);
+
+    for (index, expected_action) in [
+        ACTION_TRANSFER,
+        ACTION_CONFIG_UPDATE,
+        ACTION_ADMIN,
+        ACTION_AUDIT,
+    ]
+    .into_iter()
+    .enumerate()
+    {
+        let (_id, topics, _data) = events.get(index as u32).unwrap();
+
+        let namespace: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+        let action: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+
+        assert_eq!(namespace, CONTRACT_NS);
+        assert_eq!(action, expected_action);
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Structured event 1: transfer (4 topics)
 // ---------------------------------------------------------------------------
