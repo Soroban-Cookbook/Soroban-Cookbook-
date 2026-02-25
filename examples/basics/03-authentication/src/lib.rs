@@ -24,7 +24,7 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, IntoVal, Symbol, Vec};
 
 // ---------------------------------------------------------------------------
 // Types
@@ -65,10 +65,6 @@ pub enum DataKey {
 // ---------------------------------------------------------------------------
 // Contract
 // ---------------------------------------------------------------------------
-
-use soroban_sdk::{
-    contract, contracterror, contractimpl, symbol_short, vec, Address, Env, IntoVal, Symbol, Vec,
-};
 
 /// Authentication Patterns Contract
 /// 
@@ -295,9 +291,11 @@ impl AuthContract {
 
     /// Demonstrates basic address-based authentication.
     /// Only the 'user' can successfully call this function.
-    pub fn secure_action(env: Env, user: Address) {
+    pub fn secure_action(_env: Env, user: Address) {
         // 1. The magic line: checks signature and protects against replays.
         user.require_auth();
+    }
+
     // ==================== INITIALIZATION ====================
 
     /// Initializes the contract with the given admin address.
