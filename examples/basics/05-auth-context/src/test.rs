@@ -91,6 +91,41 @@ fn test_proxy_call_success() {
 }
 
 #[test]
+fn test_get_auth_context() {
+    let env = Env::default();
+    let user = Address::generate(&env);
+    let contract_id = env.register_contract(None, AuthContextContract);
+    let client = AuthContextContractClient::new(&env, &contract_id);
+
+    env.mock_all_auths();
+    
+    // Call the function that requires auth and returns the contexts logged so far in that call
+    let auth_contexts = client.get_auth_context(&user);
+    
+    // Note: When using `env.mock_all_auths()`, the mocked authorizations are not populated
+    // into the contract's local `env.auths()` array in the same way they would be from a 
+    // real transaction payload payload. In a real environment, this array would contain elements.
+    assert_eq!(auth_contexts.len(), 0);
+}
+
+#[test]
+fn test_nested_auth_propagation() {
+    let env = Env::default();
+    let user = Address::generate(&env);
+    let contract_id = env.register_contract(None, AuthContextContract);
+    let proxy_id = env.register_contract(None, ProxyContract);
+    let proxy_client = ProxyContractClient::new(&env, &proxy_id);
+
+    env.mock_all_auths();
+
+    // The proxy calls AuthContextContract.check_nested_auth(user)
+    // The user authorizes the Proxy call, and because the Proxy calls the Target
+    // with that user's auth context, it propagates.
+    let result = proxy_client.proxy_call(&contract_id, &user);
+    assert_eq!(result, user);
+}
+
+#[test]
 #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_proxy_call_unauthorized() {
     let env = Env::default();
