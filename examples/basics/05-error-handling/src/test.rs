@@ -8,6 +8,10 @@
 
 #![cfg(test)]
 use super::*;
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env};
+
+#[test]
+fn test_hello_success_path() {
 use soroban_sdk::Env;
 
 // =========================================================================
@@ -61,6 +65,8 @@ fn test_get_verified_state_boundary_value() {
     let contract_id = env.register_contract(None, ErrorHandlingContract);
     let client = ErrorHandlingContractClient::new(&env, &contract_id);
 
+    // Valid input should pass all internal validation + arithmetic layers.
+    assert_eq!(client.hello(&5), symbol_short!("Hello"));
     // Set boundary value (1000 is the maximum allowed)
     env.as_contract(&contract_id, || {
         env.storage().instance().set(&1u32, &1000u64);
@@ -261,6 +267,7 @@ fn test_error_recovery_with_validation() {
 // =========================================================================
 
 #[test]
+fn test_hello_bubbles_limit_error_with_question_mark() {
 #[should_panic(expected = "invalid amount")]
 fn test_transfer_panic_invalid() {
     ErrorHandlingContract::transfer_panic(0, 100);
@@ -299,6 +306,10 @@ fn test_maximum_values() {
     assert_eq!(result, Ok(max_u64 - 1));
 }
 
+    // `count > 10` fails in `validate_limit`, then bubbles through
+    // `compute_greeting_score` into `hello` via `?`.
+    let result = client.try_hello(&11);
+    assert_eq!(result, Err(Ok(Error::LimitExceeded)));
 #[test]
 fn test_minimum_values() {
     // Test with minimum valid values
@@ -348,4 +359,55 @@ fn test_result_vs_panic_efficiency() {
     // In no_std environment, we can't measure time, but we can verify
     // that both approaches complete without panicking for valid cases
     assert!(true); // Test passes if we get here
+}
+
+#[test]
+fn test_hello_bubbles_invalid_input_error() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ErrorHandlingContract);
+    let client = ErrorHandlingContractClient::new(&env, &contract_id);
+
+    // `count == 0` triggers internal `ValidationError::ZeroCount`.
+    // `From<ValidationError> for Error` converts it to `Error::InvalidInput`.
+    let result = client.try_hello(&0);
+    assert_eq!(result, Err(Ok(Error::InvalidInput)));
+}
+
+#[test]
+fn test_guarded_ratio_success() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ErrorHandlingContract);
+    let client = ErrorHandlingContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+
+    // numerator=6, scaled to 12, divided by 3 => 4
+    assert_eq!(client.guarded_ratio(&admin, &admin, &6, &3), 4);
+}
+
+#[test]
+fn test_guarded_ratio_unauthorized_bubbles_immediately() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ErrorHandlingContract);
+    let client = ErrorHandlingContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    let caller = Address::generate(&env);
+
+    // Authorization failure is returned before validation/arithmetic runs.
+    let result = client.try_guarded_ratio(&caller, &admin, &6, &3);
+    assert_eq!(result, Err(Ok(Error::Unauthorized)));
+}
+
+#[test]
+fn test_guarded_ratio_error_conversion_for_division_by_zero() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ErrorHandlingContract);
+    let client = ErrorHandlingContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+
+    // Internal `MathError::ZeroDivisor` is converted into `Error::DivisionByZero`.
+    let result = client.try_guarded_ratio(&admin, &admin, &8, &0);
+    assert_eq!(result, Err(Ok(Error::DivisionByZero)));
 }

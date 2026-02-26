@@ -1,11 +1,18 @@
-# Events
+# Structured Event Patterns
 
+This example demonstrates production-style Soroban event design with clear schemas for off-chain indexers.
+
+## Acceptance Coverage
 Learn how to design, emit, and structure Soroban events for observability, indexing, analytics, and production integrations.
 
 This example goes beyond basic event emission and demonstrates structured, query-friendly, and audit-ready event patterns suitable for real-world contracts.
 
-## 📖 What You'll Learn
+- Custom event types: `#[contracttype]` payload structs for transfer/config/admin/audit events.
+- Multiple topics: examples using 3 and 4 topic slots.
+- Indexed parameters: searchable identifiers (addresses, keys, action names) in topics.
+- Event naming conventions: stable `(namespace, action, [indexes...])` layout.
 
+## Event Model
 - Core Soroban event model: **topics + data payload**
 - How to design query-friendly topic schemas
 - When to emit events (and when not to)
@@ -17,8 +24,13 @@ This example goes beyond basic event emission and demonstrates structured, query
 - Deterministic event testing patterns
 
 
-## 🔔 Event Concepts
+In Soroban, each event is:
 
+- `topics` (indexed, up to 4): filter keys used by indexers.
+- `data` (not indexed): rich payload decoded after filtering.
+
+```rust
+env.events().publish((topic0, topic1, topic2, topic3), data);
 In Soroban, every event has:
 
 - **Topics** (indexed): up to 4 values used for filtering
@@ -39,6 +51,26 @@ env.events().publish(
 
 - Topic ordering is part of the schema contract
 
+## Naming Convention
+
+Structured contract events in this example use:
+
+- `topic[0]` = namespace (`"events"`)
+- `topic[1]` = action (`"transfer"`, `"cfg_upd"`, `"admin"`, `"audit"`)
+- `topic[2..]` = indexed entities (address/key/action)
+
+Why this matters:
+
+- Consistent filters across event families.
+- Stable schema for indexers and analytics pipelines.
+- Easier backward compatibility when adding new event types.
+
+## Structured APIs
+
+```rust
+pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64)
+pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64)
+pub fn admin_action(env: Env, admin: Address, action: Symbol)
 Think of topics as your query keys and payload as your event body.
 
 ## 🧭 When To Use Events
@@ -157,6 +189,7 @@ AuditTrailEventData { details, timestamp, sequence }
 ```
 Provides:
 
+## Payload Types
 - Who performed the action
 
 - What action was performed
@@ -284,91 +317,33 @@ Use one naming convention for all event types (`snake_case`, short symbols, dete
 
 ## 📡 Monitoring and Filtering Tips
 
-### Off-chain Consumers Should
+Each structured event stores a typed payload in `data`:
 
+- `TransferEventData { amount, memo }`
+- `ConfigUpdateEventData { old_value, new_value }`
+- `AdminActionEventData { action, timestamp }`
+- `AuditTrailEventData { details, timestamp, sequence }`
 - Filter by `topic 0` first (event type)
 - Apply secondary filters by topic position (`topic[1]`, `topic[2]`, ...)
 - Treat payload as schema-bound data for downstream parsing
 - Handle unknown/new event types gracefully
 
-### Practical Pattern
+## Topic Layout Examples
 
-- Use topics for fast selection (`("tagged", tag)`)
-- Use payload for business values (`amount`, struct-like tuples)
+- `transfer`: `(events, transfer, sender, recipient)`
+- `update_config`: `(events, cfg_upd, key)`
+- `admin_action`: `(events, admin, admin_address)`
+- `audit_trail`: `(events, audit, actor, action)`
 
-This keeps index queries efficient and reduces parsing overhead for unrelated events.
-
-## ⛽ Gas and Resource Considerations
-
-Event emission consumes resources. Keep event design intentional:
-
-- More events per call => higher cost
-- More/larger topic values => higher cost
-- Larger payloads => higher cost
-
-Recommendations:
-
-- Emit only meaningful events
-- Prefer compact topic keys
-- Avoid duplicate/noise events
-- Batch only when downstream consumers need each item event
-
-In this example, `emit_multiple` is useful for demonstrating patterns, but production usage should enforce sensible limits on `count`.
-
-## 🧪 Testing Strategy
-
-Run tests:
+## Run Tests
 
 ```bash
-cargo test
+cargo test -p events
 ```
 
-The test suite validates:
+Tests validate:
 
-- Event emission exists
-- Correct event counts (single/multiple/zero)
-- Topic structure and ordering
-- Payload correctness
-- Distinct actions emit distinct event types
-- No unexpected extra events
-- **Event emission** — At least one event is emitted
-- **Event count** — Correct number of events per action
-- **Topic structure** — Topics match expected shape and values
-- **Payload values** — Event data matches emitted values
-- **Action differentiation** — Different actions emit distinct topics
-- **No extra events** — Only expected events are emitted
-- **Admin action events** — Correct topic structure and payload for admin operations
-- **Audit trail events** — Full accountability tracking with actor, action, and details
-
-## 🚀 Build and Deploy
-
-```bash
-# Build
-cargo build --target wasm32-unknown-unknown --release
-
-# Deploy
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/events.wasm \
-  --source alice \
-  --network testnet
-```
-
-## ✅ Event Best Practices Checklist
-
-- Event type in topic 0
-- Topics reserved for filterable identifiers
-- Payload reserved for non-indexed business data
-- Stable schema and topic ordering
-- Event tests for count, structure, and payload
-- Cost-aware emission strategy
-
-## 🎓 Next Steps
-
-- [Basics Index](../README.md) - Continue the fundamentals track
-- [Storage Patterns](../02-storage-patterns/) - Pair state changes with events
-- [Intermediate Examples](../../intermediate/) - Explore multi-contract systems
-
-## 📚 References
-
-- [Soroban Events Docs](https://developers.stellar.org/docs/smart-contracts/fundamentals-and-concepts/logging-events)
-- [Soroban SDK `Events`](https://docs.rs/soroban-sdk/latest/soroban_sdk/struct.Events.html)
+- topic count and order
+- indexed parameter placement
+- payload decoding into custom types
+- naming convention stability
