@@ -67,7 +67,7 @@ pub enum DataKey {
 // ---------------------------------------------------------------------------
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, symbol_short, vec, Address, Env, IntoVal, Symbol, Vec,
+    contracterror, vec, IntoVal, Symbol, Vec,
 };
 
 /// Authentication Patterns Contract
@@ -298,6 +298,8 @@ impl AuthContract {
     pub fn secure_action(env: Env, user: Address) {
         // 1. The magic line: checks signature and protects against replays.
         user.require_auth();
+    }
+
     // ==================== INITIALIZATION ====================
 
     /// Initializes the contract with the given admin address.
@@ -550,7 +552,7 @@ impl AuthContract {
             panic!("Insufficient role");
         }
     }
-}
+} // impl AuthContract
 
 mod test;
 
