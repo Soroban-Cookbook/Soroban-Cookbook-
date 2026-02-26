@@ -548,7 +548,7 @@ impl AuthContract {
             panic!("Insufficient role");
         }
     }
-}
+} // impl AuthContract
 
 mod test;
 
