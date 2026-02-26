@@ -1,0 +1,778 @@
+{
+  "generators": {
+    "address": 1,
+    "nonce": 0
+  },
+  "auth": [
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    [],
+    []
+  ],
+  "ledger": {
+    "protocol_version": 21,
+    "sequence_number": 0,
+    "timestamp": 0,
+    "network_id": "0000000000000000000000000000000000000000000000000000000000000000",
+    "base_reserve": 0,
+    "min_persistent_entry_ttl": 4096,
+    "min_temp_entry_ttl": 16,
+    "max_entry_ttl": 6312000,
+    "ledger_entries": [
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+            "key": {
+              "ledger_key_nonce": {
+                "nonce": 801925984706572462
+              }
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM",
+                "key": {
+                  "ledger_key_nonce": {
+                    "nonce": 801925984706572462
+                  }
+                },
+                "durability": "temporary",
+                "val": "void"
+              }
+            },
+            "ext": "v0"
+          },
+          6311999
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CBKMUZNFQIAL775XBB2W2GP5CNHBM5YGH6C3XB7AY6SUVO2IBU3VYK2V",
+            "key": {
+              "symbol": "testkey"
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CBKMUZNFQIAL775XBB2W2GP5CNHBM5YGH6C3XB7AY6SUVO2IBU3VYK2V",
+                "key": {
+                  "symbol": "testkey"
+                },
+                "durability": "temporary",
+                "val": {
+                  "u64": 200
+                }
+              }
+            },
+            "ext": "v0"
+          },
+          15
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CBKMUZNFQIAL775XBB2W2GP5CNHBM5YGH6C3XB7AY6SUVO2IBU3VYK2V",
+            "key": "ledger_key_contract_instance",
+            "durability": "persistent"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CBKMUZNFQIAL775XBB2W2GP5CNHBM5YGH6C3XB7AY6SUVO2IBU3VYK2V",
+                "key": "ledger_key_contract_instance",
+                "durability": "persistent",
+                "val": {
+                  "contract_instance": {
+                    "executable": {
+                      "wasm": "2c810f95c1e861794a1cdf78419f7ef10dc521fb73ed0e1bf6fc8b607aa26ce9"
+                    },
+                    "storage": [
+                      {
+                        "key": {
+                          "symbol": "testkey"
+                        },
+                        "val": {
+                          "u64": 300
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "ext": "v0"
+          },
+          4095
+        ]
+      ],
+      [
+        {
+          "contract_code": {
+            "hash": "2c810f95c1e861794a1cdf78419f7ef10dc521fb73ed0e1bf6fc8b607aa26ce9"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_code": {
+                "ext": {
+                  "v1": {
+                    "ext": "v0",
+                    "cost_inputs": {
+                      "ext": "v0",
+                      "n_instructions": 476,
+                      "n_functions": 19,
+                      "n_globals": 3,
+                      "n_table_entries": 0,
+                      "n_types": 8,
+                      "n_data_segments": 0,
+                      "n_elem_segments": 0,
+                      "n_imports": 8,
+                      "n_exports": 15,
+                      "n_data_segment_bytes": 0
+                    }
+                  }
+                },
+                "hash": "2c810f95c1e861794a1cdf78419f7ef10dc521fb73ed0e1bf6fc8b607aa26ce9",
+                "code": "0061736d01000000012f0860017e017e60037e7e7e017e60027e7e017e60047e7e7e7e017e60027f7e0060037e7e7e0060027e7e017f600000023108016901300000016c015f00010169015f0000016c01310002016c01320002016c01380002016c01370003016c013000020314130405000006070000000000000002020207070705030100100619037f01418080c0000b7f00418080c0000b7f00418080c0000b07df010f066d656d6f727902000c6765745f696e7374616e6365000b0e6765745f70657273697374656e74000e0d6765745f74656d706f72617279000f0c6861735f696e7374616e636500100e6861735f70657273697374656e7400110d6861735f74656d706f7261727900120f72656d6f76655f696e7374616e636500131172656d6f76655f70657273697374656e7400140c7365745f696e7374616e636500150e7365745f70657273697374656e7400160d7365745f74656d706f726172790017015f001a0a5f5f646174615f656e6403010b5f5f686561705f6261736503020a8209135d02017f017e024002402001a741ff0171220241c000460d00024020024106460d00420121034283908080800121010c020b20014208882101420021030c010b42002103200110808080800021010b20002003370300200020013703080b150020002001108a8080800020021081808080001a0b25000240200042ffffffffffffffff00560d0020004208864206840f0b20001082808080000b820101027f23808080800041106b220124808080800002400240024002402000a741ff01712202410e460d00200241ca00470d010b20004202108c80808000450d0120012000420210838080800010888080800020012802004101470d020b000b108d80808000000b2001290308108a808080002100200141106a24808080800020000b0f00200020011087808080004201510b0900109880808000000b820101027f23808080800041106b220124808080800002400240024002402000a741ff01712202410e460d00200241ca00470d010b20004201108c80808000450d0120012000420110838080800010888080800020012802004101470d020b000b108d80808000000b2001290308108a808080002100200141106a24808080800020000b820101027f23808080800041106b220124808080800002400240024002402000a741ff01712202410e460d00200241ca00470d010b20004200108c80808000450d0120012000420010838080800010888080800020012802004101470d020b000b108d80808000000b2001290308108a808080002100200141106a24808080800020000b2901017f02402000a741ff01712201410e460d00200141ca00460d00000b20004202108c80808000ad0b2901017f02402000a741ff01712201410e460d00200141ca00460d00000b20004201108c80808000ad0b2901017f02402000a741ff01712201410e460d00200141ca00460d00000b20004200108c80808000ad0b2b01017f02402000a741ff01712201410e460d00200141ca00460d00000b200042021084808080001a42020b2b01017f02402000a741ff01712201410e460d00200141ca00460d00000b200042011084808080001a42020b7801027f23808080800041106b2202248080808000024002402000a741ff01712203410e460d00200341ca00470d010b2002200110888080800020022802004101460d002000200229030842021089808080004284808080c00c4284808080c00c1085808080001a200241106a24808080800042020f0b000b7c01027f23808080800041106b2202248080808000024002402000a741ff01712203410e460d00200341ca00470d010b2002200110888080800020022802004101460d00200020022903084201108980808000200042014284808080c00c4284808080c00c1086808080001a200241106a24808080800042020f0b000b6301027f23808080800041106b2202248080808000024002402000a741ff01712203410e460d00200341ca00470d010b2002200110888080800020022802004101460d00200020022903084200108980808000200241106a24808080800042020f0b000b0900109980808000000b0300000b02000b0093100e636f6e7472616374737065637630000000000000006452657472696576657320612076616c75652066726f6d20696e7374616e63652073746f726167652e0a0a232052657475726e730a5468652073746f7265642076616c75652c206f722070616e696373206966206b657920646f65736e27742065786973740000000c6765745f696e7374616e63650000000100000000000000036b657900000000110000000100000006000000000000002b436865636b732069662061206b65792065786973747320696e20696e7374616e63652073746f726167652e000000000c6861735f696e7374616e63650000000100000000000000036b657900000000110000000100000001000000000000013353746f72657320612076616c756520696e20696e7374616e63652073746f726167652e0a496e7374616e63652064617461206c69766573206173206c6f6e672061732074686520636f6e747261637420696e7374616e6365206578697374732e0a0a2320417267756d656e74730a2a20606b657960202d205468652073746f72616765206b65790a2a206076616c756560202d205468652076616c756520746f2073746f72650a0a2320436f73740a4d656469756d20636f73742c2072657175697265732072656e7420286275742063686561706572207468616e2070657273697374656e74290a0a23205573652043617365730a2d20436f6e747261637420636f6e66696775726174696f6e0a2d2041646d696e206164647265737365730a2d20436f6e7472616374206d65746164617461000000000c7365745f696e7374616e63650000000200000000000000036b65790000000011000000000000000576616c75650000000000000600000000000000000000006552657472696576657320612076616c75652066726f6d2074656d706f726172792073746f726167652e0a0a232052657475726e730a5468652073746f7265642076616c75652c206f722070616e696373206966206b657920646f65736e27742065786973740000000000000d6765745f74656d706f726172790000000000000100000000000000036b657900000000110000000100000006000000000000002c436865636b732069662061206b65792065786973747320696e2074656d706f726172792073746f726167652e0000000d6861735f74656d706f726172790000000000000100000000000000036b657900000000110000000100000001000000000000014553746f72657320612076616c756520696e2074656d706f726172792073746f726167652e0a54656d706f726172792064617461206f6e6c792065786973747320666f72207468652063757272656e74206c6564676572202d206368656170657374206f7074696f6e2e0a0a2320417267756d656e74730a2a20606b657960202d205468652073746f72616765206b65790a2a206076616c756560202d205468652076616c756520746f2073746f72650a0a2320436f73740a4c6f7765737420636f73742c206e6f2072656e742072657175697265640a0a23205573652043617365730a2d20496e7465726d6564696174652063616c63756c6174696f6e730a2d205472616e73616374696f6e2d73636f70656420666c6167730a2d2054656d706f726172792073746174652077697468696e20612073696e676c65206f7065726174696f6e0000000000000d7365745f74656d706f726172790000000000000200000000000000036b65790000000011000000000000000576616c75650000000000000600000000000000000000006652657472696576657320612076616c75652066726f6d2070657273697374656e742073746f726167652e0a0a232052657475726e730a5468652073746f7265642076616c75652c206f722070616e696373206966206b657920646f65736e277420657869737400000000000e6765745f70657273697374656e7400000000000100000000000000036b657900000000110000000100000006000000000000002d436865636b732069662061206b65792065786973747320696e2070657273697374656e742073746f726167652e0000000000000e6861735f70657273697374656e7400000000000100000000000000036b65790000000011000000010000000100000000000000f253746f72657320612076616c756520696e2070657273697374656e742073746f726167652e0a50657273697374656e7420646174612072656d61696e7320756e74696c206578706c696369746c792064656c6574656420616e642072657175697265732054544c20657874656e73696f6e2e0a0a2320417267756d656e74730a2a20606b657960202d205468652073746f72616765206b65790a2a206076616c756560202d205468652076616c756520746f2073746f72650a0a2320436f73740a48696768657220777269746520636f73742c2072657175697265732072656e74202854544c206d616e6167656d656e742900000000000e7365745f70657273697374656e7400000000000200000000000000036b65790000000011000000000000000576616c75650000000000000600000000000000000000002652656d6f76657320612076616c75652066726f6d20696e7374616e63652073746f726167652e00000000000f72656d6f76655f696e7374616e6365000000000100000000000000036b6579000000001100000000000000000000002852656d6f76657320612076616c75652066726f6d2070657273697374656e742073746f726167652e0000001172656d6f76655f70657273697374656e740000000000000100000000000000036b6579000000001100000000001e11636f6e7472616374656e766d6574617630000000000000001500000000006f0e636f6e74726163746d65746176300000000000000005727376657200000000000006312e39332e3000000000000000000008727373646b7665720000002f32312e372e37233564613738396335306231386134633262653533333934313338323132666564353666306466633400"
+              }
+            },
+            "ext": "v0"
+          },
+          4095
+        ]
+      ]
+    ]
+  },
+  "events": [
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "set_persistent"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "symbol": "testkey"
+                },
+                {
+                  "u64": 100
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "set_persistent"
+              }
+            ],
+            "data": "void"
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "has_persistent"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "has_persistent"
+              }
+            ],
+            "data": {
+              "bool": true
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "get_persistent"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "get_persistent"
+              }
+            ],
+            "data": {
+              "u64": 100
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "set_temporary"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "symbol": "testkey"
+                },
+                {
+                  "u64": 200
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "set_temporary"
+              }
+            ],
+            "data": "void"
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "has_temporary"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "has_temporary"
+              }
+            ],
+            "data": {
+              "bool": true
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "get_temporary"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "get_temporary"
+              }
+            ],
+            "data": {
+              "u64": 200
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "set_instance"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "symbol": "testkey"
+                },
+                {
+                  "u64": 300
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "set_instance"
+              }
+            ],
+            "data": "void"
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "has_instance"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "has_instance"
+              }
+            ],
+            "data": {
+              "bool": true
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "get_instance"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "get_instance"
+              }
+            ],
+            "data": {
+              "u64": 300
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "get_persistent"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "get_persistent"
+              }
+            ],
+            "data": {
+              "u64": 100
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "remove_persistent"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "remove_persistent"
+              }
+            ],
+            "data": "void"
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c"
+              },
+              {
+                "symbol": "has_persistent"
+              }
+            ],
+            "data": {
+              "symbol": "testkey"
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "54ca65a58200bfffb708756d19fd134e1677063f85bb87e0c7a54abb480d375c",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "has_persistent"
+              }
+            ],
+            "data": {
+              "bool": false
+            }
+          }
+        }
+      },
+      "failed_call": false
+    }
+  ]
+}
