@@ -1,13 +1,15 @@
-# Authentication Patterns
+# Custom Authorization Logic
 
-This example demonstrates basic address authentication patterns using Soroban's `require_auth()` function, showing how to verify caller identity in smart contracts.
+This example demonstrates advanced authorization patterns in Soroban smart contracts that go beyond basic `require_auth()`. While Soroban's built-in auth verifies that a caller *is who they claim to be*, real contracts also need to verify that the caller *is allowed to do what they're trying to do*.
 
 ## Concepts Covered
 
 - **`require_auth()`**: Core function for verifying transaction authorization
-- **Address Verification**: Confirming the caller's identity
-- **Authorization Patterns**: Different ways to implement auth checks
-- **Error Handling**: Proper responses to auth failures
+- **Role-Based Access Control (RBAC)**: Assign Admin, Moderator, or User roles and gate functions by role
+- **Time-Based Restrictions**: Time-locks that prevent actions before a deadline and cooldowns that throttle repeated calls
+- **State-Based Authorization**: Contract-wide state machine (Active, Paused, Frozen) that conditionally disables functionality
+- **Custom Auth Conditions**: Implementing business logic authorization rules
+- **Extensibility Patterns**: Building composable authorization systems
 
 ## Key Functions
 
@@ -38,6 +40,66 @@ pub fn set_admin(env: Env, admin: Address, new_admin: Address) -> Result<(), Aut
     admin.require_auth();  // Admin must authorize the change
     env.storage().instance().set(&ADMIN_KEY, &new_admin);
     Ok(())
+}
+```
+
+### 4. Role-Based Access Control
+```rust
+pub fn admin_action(env: Env, caller: Address, value: u64) -> u64 {
+    caller.require_auth();
+    Self::require_role(&env, &caller, &[Role::Admin]);  // Check role permission
+    let result = value * 2;
+    env.events().publish((symbol_short!("admin"),), result);
+    result
+}
+```
+
+### 5. Time-Based Authorization
+```rust
+pub fn time_locked_action(env: Env, caller: Address) -> u64 {
+    caller.require_auth();
+    
+    let unlock_time: u64 = env.storage().instance().get(&DataKey::TimeLock).unwrap_or(0);
+    if env.ledger().timestamp() < unlock_time {
+        panic!("Action is time-locked");
+    }
+    
+    env.ledger().timestamp()
+}
+```
+
+### 6. Cooldown Protection
+```rust
+pub fn cooldown_action(env: Env, caller: Address) -> u64 {
+    caller.require_auth();
+    
+    let period: u64 = env.storage().instance().get(&DataKey::CooldownPeriod).unwrap_or(0);
+    let last_action: u64 = env.storage().persistent()
+        .get(&DataKey::LastAction(caller.clone())).unwrap_or(0);
+    
+    let now = env.ledger().timestamp();
+    if last_action > 0 && now < last_action + period {
+        panic!("Cooldown period not elapsed");
+    }
+    
+    env.storage().persistent().set(&DataKey::LastAction(caller.clone()), &now);
+    now
+}
+```
+
+### 7. State-Based Authorization
+```rust
+pub fn active_only_action(env: Env, caller: Address) -> u64 {
+    caller.require_auth();
+    
+    let state: ContractState = env.storage().instance()
+        .get(&DataKey::State).unwrap_or(ContractState::Active);
+    
+    if state != ContractState::Active {
+        panic!("Contract is not active");
+    }
+    
+    env.ledger().timestamp()
 }
 ```
 
@@ -308,6 +370,32 @@ soroban contract deploy \
   --source alice \
   --network testnet
 ```
+
+## ✅ Implementation Summary
+
+This example implements comprehensive custom authorization logic covering all major patterns:
+
+### **Custom Auth Conditions**
+- Business logic authorization rules beyond basic `require_auth()`
+- Conditional checks based on contract state, time, and roles
+- Composable authorization patterns
+
+### **Role-Based Access Control (RBAC)**
+- Three-tier role system: Admin, Moderator, User
+- Role assignment and revocation functions
+- Permission-gated functions with role checking
+- Persistent storage of role assignments
+
+### **Time-Based Authorization**
+- **Time Locks**: Prevent actions until a future timestamp
+- **Cooldowns**: Enforce minimum intervals between actions
+- Ledger timestamp integration for temporal controls
+
+### **Extensibility Patterns**
+- Modular authorization helpers (`require_admin`, `require_role`)
+- State-based contract controls (Active/Paused/Frozen)
+- Event emission for authorization changes
+- Storage tier selection (instance vs persistent) based on data lifecycle
 
 ## 🎓 Next Steps
 
