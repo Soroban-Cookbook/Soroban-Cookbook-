@@ -13,24 +13,8 @@
 // have no access to the Rust standard library.
 #![no_std]
 
-// Import the required SDK symbols.
-//
-// `contract`     – attribute that marks a struct as the contract entry-point.
-// `contractimpl` – attribute that exposes an `impl` block's public methods as
-//                  callable contract functions.
-// `Env`          – the gateway to every on-chain capability (storage, events,
-//                  crypto, …).  The host injects it automatically; callers
-//                  never supply it.
-// `String`       – a UTF-8 string managed by the host (not std's String).
-// `Symbol`       – a compact, interned identifier (≤ 32 alphanumeric / '_'
-//                  chars).  Short symbols (≤ 9 chars) are bit-packed into a
-//                  `Val` with zero host allocation.
-// `SymbolStr`    – a zero-alloc `[u8; 32]` stack buffer that stores a symbol's
-//                  characters as plain ASCII, and can be dereferenced as `&str`.
-//                  Available in `no_std` because it lives entirely on the stack.
-// `TryFromVal`   – fallible conversion trait used to materialise a `SymbolStr`
-//                  from a `Symbol` value in the host environment.
-use soroban_sdk::{contract, contractimpl, Env, String, Symbol, SymbolStr, TryFromVal};
+// Import core types and macros from the Soroban SDK
+use soroban_sdk::{contract, contractimpl, vec, Env, String, Vec};
 
 /// The contract type.
 ///
