@@ -16,7 +16,7 @@
 
 use super::*;
 use soroban_sdk::{symbol_short, Address, Env};
-use soroban_sdk::testutils::{Address as _, AuthorizedFunction};
+use soroban_sdk::testutils::Address as _;
 
 #[test]
 fn test_basic_auth_success() {
@@ -260,10 +260,7 @@ fn test_multiple_auth_patterns() {
     let retrieved_data = client.get_user_data(&user1);
     assert_eq!(retrieved_data, Some(data));
 }
-use soroban_sdk::{
-    testutils::{Address as _, Ledger as _},
-    Address, Env,
-};
+use soroban_sdk::testutils::Ledger as _;
 
 // ---------------------------------------------------------------------------
 // Helpers
