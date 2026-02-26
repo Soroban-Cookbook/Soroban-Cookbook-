@@ -142,11 +142,16 @@ jobs:
         run: cargo install cargo-tarpaulin --locked
 
       - name: Generate coverage
-        run: cargo tarpaulin --workspace --all-features --out xml --timeout 300
+        run: cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cobertura-xml
+          path: ./coverage/cobertura.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./cobertura.xml
+          files: ./coverage/cobertura.xml
           fail_ci_if_error: false
