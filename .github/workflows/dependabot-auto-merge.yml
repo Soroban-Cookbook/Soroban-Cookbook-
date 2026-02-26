@@ -25,10 +25,7 @@ jobs:
           steps.metadata.outputs.update-type == 'version-update:semver-patch'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
           gh pr merge --auto --merge "$PR_URL"
         shell: bash
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
