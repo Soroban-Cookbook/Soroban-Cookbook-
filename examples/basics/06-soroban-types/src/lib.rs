@@ -13,7 +13,7 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Bytes, BytesN, Symbol, String, Env, symbol_short};
+use soroban_sdk::{contract, contractimpl, Address, Bytes, BytesN, Symbol, String, Env, symbol_short, Map, Vec};
 
 /// Contract demonstrating Soroban-specific types
 #[contract]
@@ -177,6 +177,53 @@ impl SorobanTypesContract {
     pub fn string_to_symbol(env: Env, text: String) -> Symbol {
         let text_str = text.to_string();
         Symbol::new(&env, &text_str)
+    }
+
+    // -----------------------------------------------------------------------
+    // Collection Types: Vec and Map
+    // -----------------------------------------------------------------------
+
+    /// Store a vector of integers
+    pub fn store_vec(env: Env, data: Vec<u32>) {
+        env.storage().instance().set(&symbol_short!("vec_data"), &data);
+    }
+
+    /// Retrieve stored vector
+    pub fn get_vec(env: Env) -> Vec<u32> {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("vec_data"))
+            .unwrap_or_else(|| Vec::new(&env))
+    }
+
+    /// Demonstrate Vec operations
+    pub fn vec_operations(env: Env) -> Vec<u32> {
+        let mut v = Vec::new(&env);
+        v.push_back(1);
+        v.push_back(2);
+        v.push_back(3);
+        v
+    }
+
+    /// Store a map of symbols to integers
+    pub fn store_map(env: Env, data: Map<Symbol, i32>) {
+        env.storage().instance().set(&symbol_short!("map_data"), &data);
+    }
+
+    /// Retrieve stored map
+    pub fn get_map(env: Env) -> Map<Symbol, i32> {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("map_data"))
+            .unwrap_or_else(|| Map::new(&env))
+    }
+
+    /// Demonstrate Map operations
+    pub fn map_operations(env: Env) -> Map<Symbol, i32> {
+        let mut m = Map::new(&env);
+        m.set(symbol_short!("one"), 1);
+        m.set(symbol_short!("two"), 2);
+        m
     }
 
     // -----------------------------------------------------------------------

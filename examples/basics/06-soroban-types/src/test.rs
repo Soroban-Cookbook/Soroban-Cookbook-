@@ -289,6 +289,75 @@ fn test_string_to_symbol_conversion() {
 }
 
 // ---------------------------------------------------------------------------
+// Collection Type Tests (Vec and Map)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_vec_storage_and_retrieval() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, SorobanTypesContract);
+    let client = SorobanTypesContractClient::new(&env, &contract_id);
+
+    let mut data = Vec::new(&env);
+    data.push_back(10);
+    data.push_back(20);
+    
+    // Store vector
+    client.store_vec(&data);
+    
+    // Retrieve and verify
+    let retrieved = client.get_vec();
+    assert_eq!(retrieved.len(), 2);
+    assert_eq!(retrieved.get(0).unwrap(), 10);
+    assert_eq!(retrieved.get(1).unwrap(), 20);
+}
+
+#[test]
+fn test_vec_operations() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, SorobanTypesContract);
+    let client = SorobanTypesContractClient::new(&env, &contract_id);
+
+    let v = client.vec_operations();
+    assert_eq!(v.len(), 3);
+    assert_eq!(v.get(0).unwrap(), 1);
+    assert_eq!(v.get(1).unwrap(), 2);
+    assert_eq!(v.get(2).unwrap(), 3);
+}
+
+#[test]
+fn test_map_storage_and_retrieval() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, SorobanTypesContract);
+    let client = SorobanTypesContractClient::new(&env, &contract_id);
+
+    let mut data = Map::new(&env);
+    data.set(symbol_short!("key1"), 100);
+    
+    // Store map
+    client.store_map(&data);
+    
+    // Retrieve and verify
+    let retrieved = client.get_map();
+    assert_eq!(retrieved.len(), 1);
+    assert_eq!(retrieved.get(symbol_short!("key1")).unwrap(), 100);
+}
+
+#[test]
+fn test_map_operations() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, SorobanTypesContract);
+    let client = SorobanTypesContractClient::new(&env, &contract_id);
+
+    let m = client.map_operations();
+    assert_eq!(m.len(), 2);
+    assert!(m.has(symbol_short!("one")));
+    assert!(m.has(symbol_short!("two")));
+    assert_eq!(m.get(symbol_short!("one")).unwrap(), 1);
+    assert_eq!(m.get(symbol_short!("two")).unwrap(), 2);
+}
+
+// ---------------------------------------------------------------------------
 // Cross-Type Integration Tests
 // ---------------------------------------------------------------------------
 

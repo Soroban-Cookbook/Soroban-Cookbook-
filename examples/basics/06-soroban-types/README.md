@@ -11,6 +11,8 @@ Soroban provides several specialized types optimized for blockchain use cases:
 - **BytesN** - Fixed-length binary data (ideal for hashes)
 - **Symbol** - Short, efficient string-like identifiers
 - **String** - Standard string handling for longer text
+- **Vec** - Growable ordered collection of values
+- **Map** - Collection of key-value pairs
 
 ## Type Characteristics
 
@@ -44,6 +46,18 @@ Soroban provides several specialized types optimized for blockchain use cases:
 - Supports Unicode characters
 - Use for longer text content
 
+### Vec
+- Growable ordered collection of values
+- Ideal for list-like data structures
+- Supports methods like `push_back`, `get`, `set`
+- All elements must have the same type
+
+### Map
+- Collection of key-value pairs
+- Fast lookups and associations
+- Ideal for metadata, user settings, or dictionary-like data
+- Keys and values must have consistent types
+
 ## Usage Patterns
 
 ### When to Use Each Type
@@ -68,6 +82,14 @@ let address_hash = BytesN::<20>::from_array(&env, &address_bytes);
 // ✅ Use Address for accounts and contracts
 let user = Address::generate(&env);
 let contract_address = env.current_contract_address();
+
+// ✅ Use Vec for ordered collections
+let mut numbers = Vec::new(&env);
+numbers.push_back(1);
+
+// ✅ Use Map for key-value associations
+let mut settings = Map::new(&env);
+settings.set(symbol_short!("theme"), 1);
 ```
 
 ### Performance Considerations
@@ -114,6 +136,19 @@ let status = Symbol::from_str(&env, "active");
 // Longer text (use String)
 let description = String::from_str(&env, "Ethereum cryptocurrency");
 let full_name = String::from_str(&env, "Alice Johnson");
+```
+
+### Collection Handling
+```rust
+// Ordered lists (use Vec)
+let mut list = Vec::new(&env);
+list.push_back(100);
+client.store_vec(&list);
+
+// Key-value pairs (use Map)
+let mut mapping = Map::new(&env);
+mapping.set(symbol_short!("key"), 1);
+client.store_map(&mapping);
 ```
 
 ## Cross-Type Operations
