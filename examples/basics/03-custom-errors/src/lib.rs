@@ -12,7 +12,7 @@
 
 #![no_std]
 
-use soroban_sdk::{ contract, contracterror, contractimpl, symbol_short, Address, Env, Symbol };
+use soroban_sdk::{contract, contracterror, contractimpl, symbol_short, Address, Env, Symbol};
 
 /// Custom error enum with descriptive variants
 /// Each variant represents a specific error condition that can occur
@@ -87,7 +87,7 @@ impl CustomErrorsContract {
     pub fn check_authorization(
         env: Env,
         caller: Address,
-        admin: Address
+        admin: Address,
     ) -> Result<(), ContractError> {
         if caller != admin {
             env.events().publish(symbol_short!("auth_err"), ("Unauthorized access", caller));
@@ -110,7 +110,8 @@ impl CustomErrorsContract {
         if storage.has(&key) {
             Ok(storage.get(&key).unwrap())
         } else {
-            env.events().publish(symbol_short!("not_found"), ("Key not found", key));
+            env.events()
+                .publish(symbol_short!("not_found"), ("Key not found", key));
             Err(ContractError::NotFound)
         }
     }
@@ -153,7 +154,7 @@ impl CustomErrorsContract {
     pub fn perform_operation(
         env: Env,
         is_paused: bool,
-        operation_type: Symbol
+        operation_type: Symbol,
     ) -> Result<(), ContractError> {
         if is_paused {
             env.events().publish(symbol_short!("pause_err"), (
@@ -215,7 +216,7 @@ impl CustomErrorsContract {
         env: Env,
         caller: Address,
         operation_count: u32,
-        max_operations: u32
+        max_operations: u32,
     ) -> Result<(), ContractError> {
         // Check if caller is the contract itself (simplified invalid check)
         let contract_address = env.current_contract_address();
@@ -232,7 +233,10 @@ impl CustomErrorsContract {
             ));
             Err(ContractError::RateLimitExceeded)
         } else {
-            env.events().publish(symbol_short!("rate_ok"), ("Operation allowed", operation_count));
+            env.events().publish(
+                symbol_short!("rate_ok"),
+                ("Operation allowed", operation_count),
+            );
             Ok(())
         }
     }
@@ -252,7 +256,7 @@ impl CustomErrorsContract {
         amount: u64,
         caller: Address,
         admin: Address,
-        is_paused: bool
+        is_paused: bool,
     ) -> Result<(), ContractError> {
         // Step 1: Check if contract is paused
         if is_paused {
