@@ -3,6 +3,7 @@
 #![cfg(test)]
 
 use super::*;
+use soroban_sdk::testutils::Ledger as _;
 use soroban_sdk::{symbol_short, Env};
 
 #[test]
@@ -24,7 +25,7 @@ fn test_persistent_storage() {
     assert!(client.has_persistent(&key));
 
     // Retrieved value should match
-    assert_eq!(client.get_persistent(&key), value);
+    assert_eq!(client.get_persistent(&key), Some(value));
 
     // Remove value
     client.remove_persistent(&key);
@@ -52,7 +53,7 @@ fn test_temporary_storage() {
     assert!(client.has_temporary(&key));
 
     // Retrieved value should match
-    assert_eq!(client.get_temporary(&key), value);
+    assert_eq!(client.get_temporary(&key), Some(value));
 }
 
 #[test]
@@ -74,7 +75,7 @@ fn test_instance_storage() {
     assert!(client.has_instance(&key));
 
     // Retrieved value should match
-    assert_eq!(client.get_instance(&key), value);
+    assert_eq!(client.get_instance(&key), Some(value));
 
     // Remove value
     client.remove_instance(&key);
@@ -97,9 +98,9 @@ fn test_storage_isolation() {
     client.set_instance(&key, &300);
 
     // Each storage type should maintain its own value
-    assert_eq!(client.get_persistent(&key), 100);
-    assert_eq!(client.get_temporary(&key), 200);
-    assert_eq!(client.get_instance(&key), 300);
+    assert_eq!(client.get_persistent(&key), Some(100));
+    assert_eq!(client.get_temporary(&key), Some(200));
+    assert_eq!(client.get_instance(&key), Some(300));
 }
 
 #[test]
@@ -121,7 +122,7 @@ fn test_multiple_keys() {
 
     // Verify all values are correctly stored
     for (i, key) in keys.iter().enumerate() {
-        assert_eq!(client.get_persistent(key), (i as u64) * 100);
+        assert_eq!(client.get_persistent(key), Some((i as u64) * 100));
     }
 }
 
@@ -135,15 +136,15 @@ fn test_update_existing_value() {
 
     // Set initial value
     client.set_persistent(&key, &10);
-    assert_eq!(client.get_persistent(&key), 10);
+    assert_eq!(client.get_persistent(&key), Some(10));
 
     // Update value
     client.set_persistent(&key, &20);
-    assert_eq!(client.get_persistent(&key), 20);
+    assert_eq!(client.get_persistent(&key), Some(20));
 
     // Update again
     client.set_persistent(&key, &30);
-    assert_eq!(client.get_persistent(&key), 30);
+    assert_eq!(client.get_persistent(&key), Some(30));
 }
 
 // -------------------- Additional Comprehensive Tests --------------------
@@ -164,14 +165,13 @@ fn test_persistent_ttl_and_cross_ledger_survives_short_advance() {
     assert!(client.has_persistent(&key));
 
     // Advance ledger by a small amount (should still be alive)
-    env.ledger().with_mut(|li| li.sequence += 50);
+    env.ledger().with_mut(|li| li.sequence_number += 50);
     assert!(client.has_persistent(&key));
-    assert_eq!(client.get_persistent(&key), value);
+    assert_eq!(client.get_persistent(&key), Some(value));
 }
 
 #[test]
-#[should_panic]
-fn test_missing_key_panics_on_get_persistent() {
+fn test_missing_key_returns_none_for_get_persistent() {
     // Validates missing-key behavior: `get` should panic (unwrap) when key is absent
     let env = Env::default();
     let contract_id = env.register_contract(None, StorageContract);
@@ -209,6 +209,9 @@ fn test_temporary_storage_lifecycle_and_performance() {
     let contract_id = env.register_contract(None, StorageContract);
     let client = StorageContractClient::new(&env, &contract_id);
 
+    // Set min_temp_entry_ttl = 1 so entries expire after exactly 1 ledger.
+    env.ledger().with_mut(|li| li.min_temp_entry_ttl = 1);
+
     // Write many temporary keys to validate common workload (basic performance sanity)
     for i in 0..200u64 {
         let k = symbol_short!("t");
@@ -216,11 +219,12 @@ fn test_temporary_storage_lifecycle_and_performance() {
         // reuse same key to test overwrite performance
         client.set_temporary(&k, &i);
         assert!(client.has_temporary(&k));
-        assert_eq!(client.get_temporary(&k), i);
+        assert_eq!(client.get_temporary(&k), Some(i));
     }
 
-    // Advance ledger to simulate new ledger: temporary storage should be cleared
-    env.ledger().with_mut(|li| li.sequence += 1);
+    // Advance ledger by 2: with min_temp_entry_ttl=1 the entry expires at seq+1,
+    // so it is gone once current_ledger >= seq+2.
+    env.ledger().with_mut(|li| li.sequence_number += 2);
 
     let k = symbol_short!("t");
     assert!(!client.has_temporary(&k));
@@ -233,7 +237,7 @@ fn test_cross_storage_overwrite_and_isolation() {
     let contract_id = env.register_contract(None, StorageContract);
     let client = StorageContractClient::new(&env, &contract_id);
 
-    let key = symbol_short!("shared_key");
+    let key = symbol_short!("shrd_key");
 
     // Set values in each storage type
     client.set_persistent(&key, &10u64);
@@ -243,7 +247,7 @@ fn test_cross_storage_overwrite_and_isolation() {
     // Overwrite persistent value and verify it only affects persistent storage
     client.set_persistent(&key, &11u64);
 
-    assert_eq!(client.get_persistent(&key), 11u64);
-    assert_eq!(client.get_temporary(&key), 20u64);
-    assert_eq!(client.get_instance(&key), 30u64);
+    assert_eq!(client.get_persistent(&key), Some(11u64));
+    assert_eq!(client.get_temporary(&key), Some(20u64));
+    assert_eq!(client.get_instance(&key), Some(30u64));
 }

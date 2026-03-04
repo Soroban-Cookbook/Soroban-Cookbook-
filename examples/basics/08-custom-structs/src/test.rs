@@ -1,12 +1,12 @@
 #![cfg(test)]
 use super::*;
-use soroban_sdk::{Env, String, Vec};
 use soroban_sdk::testutils::Address as AddressTest;
+use soroban_sdk::{Env, String, Vec};
 
 #[test]
 fn test_basic_struct_creation() {
     let env = Env::default();
-        let user = <soroban_sdk::Address as AddressTest>::generate(&env);
+    let user = <soroban_sdk::Address as AddressTest>::generate(&env);
     let name = String::from_str(&env, "Alice");
     let email = String::from_str(&env, "alice@example.com");
 
@@ -136,7 +136,10 @@ fn test_nested_structs() {
     // Test nested access
     assert_eq!(extended_profile.profile.name, String::from_str(&env, "Bob"));
     assert_eq!(extended_profile.preferences.theme, Theme::Dark);
-    assert_eq!(extended_profile.preferences.notifications.email_enabled, true);
+    assert_eq!(
+        extended_profile.preferences.notifications.email_enabled,
+        true
+    );
     assert_eq!(extended_profile.statistics.total_transactions, 100);
     assert_eq!(extended_profile.security.two_factor_enabled, true);
 }
@@ -220,8 +223,11 @@ fn test_contract_initialization() {
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
 
     env.as_contract(&contract_id, || {
-        assert_eq!(CustomStructsContract::initialize(env.clone(), admin.clone()), Ok(()));
-        
+        assert_eq!(
+            CustomStructsContract::initialize(env.clone(), admin.clone()),
+            Ok(())
+        );
+
         // Test double initialization
         assert_eq!(
             CustomStructsContract::initialize(env.clone(), admin.clone()),
@@ -248,7 +254,8 @@ fn test_user_profile_management() {
             user.clone(),
             name.clone(),
             Some(email.clone()),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(profile.address, user);
         assert_eq!(profile.name, name);
@@ -257,7 +264,8 @@ fn test_user_profile_management() {
         assert_eq!(profile.verified, false);
 
         // Get user profile
-        let retrieved_profile = CustomStructsContract::get_user_profile(env.clone(), user.clone()).unwrap();
+        let retrieved_profile =
+            CustomStructsContract::get_user_profile(env.clone(), user.clone()).unwrap();
         assert_eq!(profile, retrieved_profile);
 
         // Update user profile
@@ -268,7 +276,8 @@ fn test_user_profile_management() {
             Some(new_name.clone()),
             None,
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(updated_profile.name, new_name);
         assert_eq!(updated_profile.email, Some(email.clone())); // Should remain unchanged
@@ -294,7 +303,8 @@ fn test_portfolio_management() {
             portfolio_name.clone(),
             Some(String::from_str(&env, "A test portfolio")),
             PortfolioType::Balanced,
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(portfolio.owner, owner);
         assert_eq!(portfolio.name, portfolio_name);
@@ -305,7 +315,8 @@ fn test_portfolio_management() {
             env.clone(),
             owner.clone(),
             portfolio_name.clone(),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(portfolio, retrieved_portfolio);
 
@@ -325,15 +336,17 @@ fn test_portfolio_management() {
             portfolio_name.clone(),
             asset,
             100000000, // 1 BTC in satoshis
-            50000,    // $50,000
-        ).unwrap();
+            50000,     // $50,000
+        )
+        .unwrap();
 
         // Verify asset was added
         let updated_portfolio = CustomStructsContract::get_portfolio(
             env.clone(),
             owner.clone(),
             portfolio_name.clone(),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(updated_portfolio.holdings.len(), 1);
     });
@@ -357,17 +370,22 @@ fn test_extended_profile() {
             user.clone(),
             name.clone(),
             language.clone(),
-        ).unwrap();
+        )
+        .unwrap();
 
         assert_eq!(extended_profile.profile.name, name);
         assert_eq!(extended_profile.preferences.language, language);
         assert_eq!(extended_profile.preferences.theme, Theme::Auto);
-        assert_eq!(extended_profile.preferences.notifications.email_enabled, true);
+        assert_eq!(
+            extended_profile.preferences.notifications.email_enabled,
+            true
+        );
         assert_eq!(extended_profile.statistics.total_transactions, 0);
         assert_eq!(extended_profile.security.two_factor_enabled, false);
 
         // Get extended profile
-        let retrieved_profile = CustomStructsContract::get_extended_profile(env.clone(), user.clone()).unwrap();
+        let retrieved_profile =
+            CustomStructsContract::get_extended_profile(env.clone(), user.clone()).unwrap();
         assert_eq!(extended_profile, retrieved_profile);
     });
 }
@@ -393,7 +411,10 @@ fn test_struct_validation() {
             created_at: env.ledger().timestamp(),
         };
 
-        assert_eq!(CustomStructsContract::validate_struct(env.clone(), valid_profile), Ok(true));
+        assert_eq!(
+            CustomStructsContract::validate_struct(env.clone(), valid_profile),
+            Ok(true)
+        );
 
         // Test invalid profile (empty name)
         let invalid_profile = UserProfile {
@@ -474,7 +495,8 @@ fn test_portfolio_value_calculation() {
             portfolio_name.clone(),
             None,
             PortfolioType::Balanced,
-        ).unwrap();
+        )
+        .unwrap();
 
         // Add assets with current values
         let asset1 = AssetInfo {
@@ -492,15 +514,17 @@ fn test_portfolio_value_calculation() {
             portfolio_name.clone(),
             asset1,
             100000000, // 1 BTC
-            50000,    // $50,000 purchase price
-        ).unwrap();
+            50000,     // $50,000 purchase price
+        )
+        .unwrap();
 
         // Calculate portfolio value
         let value = CustomStructsContract::calculate_portfolio_value(
             env.clone(),
             owner.clone(),
             portfolio_name.clone(),
-        ).unwrap();
+        )
+        .unwrap();
 
         // Should equal purchase price since no current value is set
         // 1 BTC * 50000 = 5000000000000 (in satoshis)
@@ -614,9 +638,23 @@ fn test_complex_nested_structures() {
 
     // Test deep nesting access
     assert_eq!(complex_portfolio.holdings.len(), 1);
-    assert_eq!(complex_portfolio.holdings.get(0).unwrap().quantity, 2000000000000000000);
-    assert_eq!(complex_portfolio.holdings.get(0).unwrap().purchase_history.len(), 2);
-    assert_eq!(complex_portfolio.metadata.portfolio_type, PortfolioType::Aggressive);
+    assert_eq!(
+        complex_portfolio.holdings.get(0).unwrap().quantity,
+        2000000000000000000
+    );
+    assert_eq!(
+        complex_portfolio
+            .holdings
+            .get(0)
+            .unwrap()
+            .purchase_history
+            .len(),
+        2
+    );
+    assert_eq!(
+        complex_portfolio.metadata.portfolio_type,
+        PortfolioType::Aggressive
+    );
     assert_eq!(complex_portfolio.metadata.target_allocations.len(), 1);
     assert_eq!(complex_portfolio.metadata.performance.total_return, 100);
 }

@@ -1,7 +1,7 @@
 #![cfg(test)]
 use super::*;
-use soroban_sdk::{Env, String, Vec};
 use soroban_sdk::testutils::{Address as AddressTest, Ledger as LedgerTest};
+use soroban_sdk::{Env, String, Vec};
 
 #[test]
 fn test_parameter_validation() {
@@ -46,7 +46,10 @@ fn test_parameter_validation() {
         Err(ValidationError::StringTooShort)
     );
 
-    let long_string = String::from_str(&env, "This string is way too long and exceeds the maximum length limit");
+    let long_string = String::from_str(
+        &env,
+        "This string is way too long and exceeds the maximum length limit",
+    );
     assert_eq!(
         ValidationContract::validate_string_parameters(long_string.clone(), 1, 50),
         Err(ValidationError::StringTooLong)
@@ -54,10 +57,7 @@ fn test_parameter_validation() {
 
     // Test address validation (should always pass for valid addresses)
     let user1 = <soroban_sdk::Address as AddressTest>::generate(&env);
-    assert_eq!(
-        ValidationContract::validate_address(user1.clone()),
-        Ok(())
-    );
+    assert_eq!(ValidationContract::validate_address(user1.clone()), Ok(()));
 
     // Test array validation
     let valid_array = Vec::from_array(&env, [1i32, 2i32, 3i32, 4i32, 5i32]);
@@ -72,7 +72,12 @@ fn test_parameter_validation() {
         Err(ValidationError::ArrayTooSmall)
     );
 
-    let large_array = Vec::from_array(&env, [1i32, 2i32, 3i32, 4i32, 5i32, 6i32, 7i32, 8i32, 9i32, 10i32, 11i32]);
+    let large_array = Vec::from_array(
+        &env,
+        [
+            1i32, 2i32, 3i32, 4i32, 5i32, 6i32, 7i32, 8i32, 9i32, 10i32, 11i32,
+        ],
+    );
     assert_eq!(
         ValidationContract::validate_array_parameters(large_array.clone(), 1, 10),
         Err(ValidationError::ArrayTooLarge)
@@ -80,7 +85,7 @@ fn test_parameter_validation() {
 
     // Test timestamp validation
     let current_time = env.ledger().timestamp();
-    
+
     // Valid future timestamp
     assert_eq!(
         ValidationContract::validate_timestamp_parameters(&env, current_time + 3600, false, 86400),
@@ -95,13 +100,23 @@ fn test_parameter_validation() {
 
     // Past timestamp (allowed)
     assert_eq!(
-        ValidationContract::validate_timestamp_parameters(&env, current_time.saturating_sub(3600), true, 86400),
+        ValidationContract::validate_timestamp_parameters(
+            &env,
+            current_time.saturating_sub(3600),
+            true,
+            86400
+        ),
         Ok(())
     );
 
     // Too far in future
     assert_eq!(
-        ValidationContract::validate_timestamp_parameters(&env, current_time + 200000, false, 86400),
+        ValidationContract::validate_timestamp_parameters(
+            &env,
+            current_time + 200000,
+            false,
+            86400
+        ),
         Err(ValidationError::TimestampInDistantFuture)
     );
 }
@@ -110,6 +125,8 @@ fn test_parameter_validation() {
 fn test_state_validation() {
     let env = Env::default();
     let contract_id = env.register_contract(None, ValidationContract);
+    let user = <soroban_sdk::Address as AddressTest>::generate(&env);
+    let spender = <soroban_sdk::Address as AddressTest>::generate(&env);
 
     env.as_contract(&contract_id, || {
         // Test uninitialized contract
@@ -121,84 +138,79 @@ fn test_state_validation() {
         // Initialize contract
         let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
         env.storage().instance().set(&DataKey::Owner, &owner);
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
+
+        // Test active contract state
+        assert_eq!(
+            ValidationContract::validate_contract_state(&env, ContractState::Active),
+            Ok(())
+        );
+
+        // Insufficient balance
+        assert_eq!(
+            ValidationContract::validate_balance(&env, user.clone(), 100),
+            Err(ValidationError::InsufficientBalance)
+        );
+
+        // Set balance and test again
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(user.clone()), &200i128);
+        assert_eq!(
+            ValidationContract::validate_balance(&env, user.clone(), 100),
+            Ok(())
+        );
+
+        // Test allowance validation
+        assert_eq!(
+            ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
+            Err(ValidationError::InsufficientAllowance)
+        );
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Allowance(user.clone(), spender.clone()), &200i128);
+        assert_eq!(
+            ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
+            Ok(())
+        );
+
+        // Test cooldown validation — no previous action should pass
+        assert_eq!(
+            ValidationContract::validate_cooldown(&env, user.clone(), 60),
+            Ok(())
+        );
+
+        // Set last action and test cooldown
+        env.storage().persistent().set(
+            &DataKey::LastAction(user.clone()),
+            &env.ledger().timestamp(),
+        );
+        assert_eq!(
+            ValidationContract::validate_cooldown(&env, user.clone(), 60),
+            Err(ValidationError::CooldownActive)
+        );
+
+        // Test paused contract state
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Paused);
+        assert_eq!(
+            ValidationContract::validate_contract_state(&env, ContractState::Active),
+            Err(ValidationError::ContractPaused)
+        );
+
+        // Resume and test again
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
+        assert_eq!(
+            ValidationContract::validate_contract_state(&env, ContractState::Active),
+            Ok(())
+        );
     });
-
-    // Test active contract state
-    assert_eq!(
-        ValidationContract::validate_contract_state(&env, ContractState::Active),
-        Ok(())
-    );
-
-    // Test balance validation
-    let user = <soroban_sdk::Address as AddressTest>::generate(&env);
-    
-    // Insufficient balance
-    assert_eq!(
-        ValidationContract::validate_balance(&env, user.clone(), 100),
-        Err(ValidationError::InsufficientBalance)
-    );
-
-    // Set balance and test again
-    env.as_contract(&contract_id, || {
-        env.storage().persistent().set(&DataKey::Balance(user.clone()), &200);
-    });
-    assert_eq!(
-        ValidationContract::validate_balance(&env, user.clone(), 100),
-        Ok(())
-    );
-
-    // Test allowance validation
-    let spender = <soroban_sdk::Address as AddressTest>::generate(&env);
-    
-    // Insufficient allowance
-    assert_eq!(
-        ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
-        Err(ValidationError::InsufficientAllowance)
-    );
-
-    // Set allowance and test again
-    env.as_contract(&contract_id, || {
-        env.storage().persistent().set(&DataKey::Allowance(user.clone(), spender.clone()), &200);
-    });
-    assert_eq!(
-        ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
-        Ok(())
-    );
-
-    // Test cooldown validation
-    // No previous action should pass
-    assert_eq!(
-        ValidationContract::validate_cooldown(&env, user.clone(), 60),
-        Ok(())
-    );
-
-    // Set last action and test cooldown
-    env.as_contract(&contract_id, || {
-        env.storage().persistent().set(&DataKey::LastAction(user.clone()), &env.ledger().timestamp());
-    });
-    assert_eq!(
-        ValidationContract::validate_cooldown(&env, user.clone(), 60),
-        Err(ValidationError::CooldownActive)
-    );
-
-    // Test paused contract state
-    env.as_contract(&contract_id, || {
-        env.storage().instance().set(&DataKey::State, &ContractState::Paused);
-    });
-    assert_eq!(
-        ValidationContract::validate_contract_state(&env, ContractState::Active),
-        Err(ValidationError::ContractPaused)
-    );
-
-    // Resume and test again
-    env.as_contract(&contract_id, || {
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
-    });
-    assert_eq!(
-        ValidationContract::validate_contract_state(&env, ContractState::Active),
-        Ok(())
-    );
 }
 
 #[test]
@@ -218,10 +230,10 @@ fn test_authorization_validation() {
             Err(ValidationError::InsufficientRole)
         );
 
-        // Set user role
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::UserRole(user.clone()), &UserRole::User);
-        });
+        // Set user role directly (already in contract context)
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(user.clone()), &UserRole::User);
         assert_eq!(
             ValidationContract::validate_role(&env, user.clone(), UserRole::User),
             Ok(())
@@ -233,26 +245,27 @@ fn test_authorization_validation() {
             Err(ValidationError::InsufficientRole)
         );
 
-        // Set moderator role
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::UserRole(moderator.clone()), &UserRole::Moderator);
-        });
+        // Set moderator role directly
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(moderator.clone()), &UserRole::Moderator);
         assert_eq!(
             ValidationContract::validate_role(&env, moderator.clone(), UserRole::User),
             Ok(())
         );
 
-        // Set admin role
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
-            env.storage().instance().set(&DataKey::Admin, &admin);
-        });
+        // Set admin role directly
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
+        env.storage().instance().set(&DataKey::Admin, &admin);
         assert_eq!(
             ValidationContract::validate_role(&env, admin.clone(), UserRole::Moderator),
             Ok(())
         );
 
-        // Test ownership validation
+        // Test ownership validation: set owner first so validate_ownership can find it
+        env.storage().instance().set(&DataKey::Owner, &owner);
         assert_eq!(
             ValidationContract::validate_ownership(&env, owner.clone()),
             Ok(())
@@ -264,143 +277,140 @@ fn test_authorization_validation() {
 fn test_validated_transfer() {
     let env = Env::default();
     let contract_id = env.register_contract(None, ValidationContract);
+    let client = ValidationContractClient::new(&env, &contract_id);
 
+    env.mock_all_auths();
+
+    let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
+    let user = <soroban_sdk::Address as AddressTest>::generate(&env);
+    let recipient = <soroban_sdk::Address as AddressTest>::generate(&env);
+
+    // Setup contract state via direct storage write (no auth conflict inside as_contract)
     env.as_contract(&contract_id, || {
-        // Initialize contract
-        let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
-        let user = <soroban_sdk::Address as AddressTest>::generate(&env);
-        let recipient = <soroban_sdk::Address as AddressTest>::generate(&env);
         env.storage().instance().set(&DataKey::Admin, &owner);
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
-
-        // Set user roles
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::UserRole(user.clone()), &UserRole::User);
-            env.storage().instance().set(&DataKey::UserRole(recipient.clone()), &UserRole::User);
-        });
-
-        // Set initial balance
-        env.as_contract(&contract_id, || {
-            env.storage().persistent().set(&DataKey::Balance(user.clone()), &1000);
-        });
-
-        // Test successful transfer
-        assert_eq!(
-            ValidationContract::validated_transfer(
-                env.clone(),
-                user.clone(),
-                recipient.clone(),
-                100,
-                Some(String::from_str(&env, "Test transfer"))
-            ),
-            Ok(())
-        );
-
-        // Verify balances updated
-        env.as_contract(&contract_id, || {
-            let balance1: i128 = env.storage().persistent().get(&DataKey::Balance(user.clone())).unwrap_or(0);
-            let balance2: i128 = env.storage().persistent().get(&DataKey::Balance(recipient.clone())).unwrap_or(0);
-            assert_eq!(balance1, 900);
-            assert_eq!(balance2, 100);
-        });
-
-        // Test insufficient balance
-        env.as_contract(&contract_id, || {
-            ValidationContract::initialize(env.clone(), owner.clone()).unwrap();
-            
-            // Set user role
-            ValidationContract::set_user_role(env.clone(), owner.clone(), user.clone(), UserRole::User).unwrap();
-            
-            // Test validated transfer
-            assert_eq!(
-                ValidationContract::validated_transfer(env.clone(), user.clone(), recipient.clone(), 1000, None),
-                Err(ValidationError::InsufficientBalance)
-            );
-            
-            // Test transfer with insufficient balance
-            assert_eq!(
-                ValidationContract::validated_transfer(env.clone(), user.clone(), recipient.clone(), 1000000, None),
-                Err(ValidationError::InsufficientBalance)
-            );
-        });
-
-        // Test with paused contract
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::State, &ContractState::Paused);
-        });
-        assert_eq!(
-            ValidationContract::validated_transfer(env.clone(), user.clone(), recipient.clone(), 50, None),
-            Err(ValidationError::ContractPaused)
-        );
-
-        // Resume and test again
-        env.as_contract(&contract_id, || {
-            env.storage().instance().set(&DataKey::State, &ContractState::Active);
-        });
-        
-        // Wait for cooldown to pass
-        env.ledger().set_timestamp(env.ledger().timestamp() + 61);
-        
-        assert_eq!(
-            ValidationContract::validated_transfer(env.clone(), user.clone(), recipient.clone(), 50, None),
-            Ok(())
-        );
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(user.clone()), &UserRole::User);
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(recipient.clone()), &UserRole::User);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(user.clone()), &1000i128);
     });
+
+    // Test successful transfer via client (handles require_auth through invocation path)
+    client.validated_transfer(
+        &user,
+        &recipient,
+        &100i128,
+        &Some(String::from_str(&env, "Test transfer")),
+    );
+
+    // Verify balances updated
+    env.as_contract(&contract_id, || {
+        let balance1: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(user.clone()))
+            .unwrap_or(0);
+        let balance2: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(recipient.clone()))
+            .unwrap_or(0);
+        assert_eq!(balance1, 900);
+        assert_eq!(balance2, 100);
+    });
+
+    // Test insufficient balance
+    let result = client.try_validated_transfer(&user, &recipient, &1000i128, &None);
+    assert_eq!(result, Err(Ok(ValidationError::InsufficientBalance)));
+
+    // Test with paused contract
+    env.as_contract(&contract_id, || {
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Paused);
+    });
+    let result = client.try_validated_transfer(&user, &recipient, &50i128, &None);
+    assert_eq!(result, Err(Ok(ValidationError::ContractPaused)));
+
+    // Resume and wait for cooldown to pass, then transfer again
+    env.as_contract(&contract_id, || {
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
+    });
+    env.ledger().set_timestamp(env.ledger().timestamp() + 61);
+    client.validated_transfer(&user, &recipient, &50i128, &None);
 }
 
 #[test]
 fn test_admin_functions() {
     let env = Env::default();
     let contract_id = env.register_contract(None, ValidationContract);
+    let client = ValidationContractClient::new(&env, &contract_id);
+
+    env.mock_all_auths();
 
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
     let user = <soroban_sdk::Address as AddressTest>::generate(&env);
 
+    // Initialize contract state via direct storage (no require_auth issue)
     env.as_contract(&contract_id, || {
-        // Initialize contract
         let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
         env.storage().instance().set(&DataKey::Owner, &owner);
-        env.storage().instance().set(&DataKey::Admin, &owner);
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
-
-        // Set admin role
-        env.storage().instance().set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
         env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
+    });
 
-        // Test admin setting user role
-        assert_eq!(
-            ValidationContract::set_user_role(env.clone(), admin.clone(), user.clone(), UserRole::Moderator),
-            Ok(())
-        );
+    // Test admin setting user role via client
+    client.set_user_role(&admin, &user, &UserRole::Moderator);
 
-        // Check role was set
-        let role: UserRole = env.storage().instance().get(&DataKey::UserRole(user.clone())).unwrap_or(UserRole::None);
+    // Check role was set
+    env.as_contract(&contract_id, || {
+        let role: UserRole = env
+            .storage()
+            .instance()
+            .get(&DataKey::UserRole(user.clone()))
+            .unwrap_or(UserRole::None);
         assert_eq!(role, UserRole::Moderator);
+    });
 
-        // Test admin pausing contract
-        assert_eq!(
-            ValidationContract::pause_contract(env.clone(), admin.clone()),
-            Ok(())
-        );
-        let state: ContractState = env.storage().instance().get(&DataKey::State).unwrap_or(ContractState::Uninitialized);
+    // Test admin pausing contract
+    client.pause_contract(&admin);
+    env.as_contract(&contract_id, || {
+        let state: ContractState = env
+            .storage()
+            .instance()
+            .get(&DataKey::State)
+            .unwrap_or(ContractState::Uninitialized);
         assert_eq!(state, ContractState::Paused);
+    });
 
-        // Test admin resuming contract
-        assert_eq!(
-            ValidationContract::resume_contract(env.clone(), admin.clone()),
-            Ok(())
-        );
-        let state: ContractState = env.storage().instance().get(&DataKey::State).unwrap_or(ContractState::Uninitialized);
+    // Test admin resuming contract
+    client.resume_contract(&admin);
+    env.as_contract(&contract_id, || {
+        let state: ContractState = env
+            .storage()
+            .instance()
+            .get(&DataKey::State)
+            .unwrap_or(ContractState::Uninitialized);
         assert_eq!(state, ContractState::Active);
     });
 
-    // Test non-admin trying to pause
-    env.as_contract(&contract_id, || {
-        assert_eq!(
-            ValidationContract::pause_contract(env.clone(), user.clone()),
-            Err(ValidationError::NotAdmin)
-        );
-    });
+    // Test non-admin trying to pause (user has Moderator role, not Admin/Owner)
+    let result = client.try_pause_contract(&user);
+    assert_eq!(result, Err(Ok(ValidationError::NotAdmin)));
 }
 
 #[test]
@@ -457,29 +467,55 @@ fn test_error_codes() {
     for error in errors.iter() {
         let code = *error as u32;
         match error {
-            ValidationError::InvalidAmount | ValidationError::AmountTooSmall | 
-            ValidationError::AmountTooLarge | ValidationError::InvalidAddress |
-            ValidationError::InvalidString | ValidationError::StringTooShort |
-            ValidationError::StringTooLong | ValidationError::InvalidEnum |
-            ValidationError::InvalidArray | ValidationError::ArrayTooSmall |
-            ValidationError::ArrayTooLarge | ValidationError::InvalidTimestamp |
-            ValidationError::TimestampInPast | ValidationError::TimestampInDistantFuture => {
-                assert!(code >= 100 && code < 200, "Parameter validation error should be in range 100-199");
+            ValidationError::InvalidAmount
+            | ValidationError::AmountTooSmall
+            | ValidationError::AmountTooLarge
+            | ValidationError::InvalidAddress
+            | ValidationError::InvalidString
+            | ValidationError::StringTooShort
+            | ValidationError::StringTooLong
+            | ValidationError::InvalidEnum
+            | ValidationError::InvalidArray
+            | ValidationError::ArrayTooSmall
+            | ValidationError::ArrayTooLarge
+            | ValidationError::InvalidTimestamp
+            | ValidationError::TimestampInPast
+            | ValidationError::TimestampInDistantFuture => {
+                assert!(
+                    code >= 100 && code < 200,
+                    "Parameter validation error should be in range 100-199"
+                );
             }
-            ValidationError::ContractNotInitialized | ValidationError::ContractPaused |
-            ValidationError::ContractFrozen | ValidationError::InsufficientBalance |
-            ValidationError::InsufficientAllowance | ValidationError::ResourceNotFound |
-            ValidationError::ResourceAlreadyExists | ValidationError::InvalidStateTransition |
-            ValidationError::InvariantViolation | ValidationError::RateLimitExceeded |
-            ValidationError::CooldownActive => {
-                assert!(code >= 200 && code < 300, "State validation error should be in range 200-299");
+            ValidationError::ContractNotInitialized
+            | ValidationError::ContractPaused
+            | ValidationError::ContractFrozen
+            | ValidationError::InsufficientBalance
+            | ValidationError::InsufficientAllowance
+            | ValidationError::ResourceNotFound
+            | ValidationError::ResourceAlreadyExists
+            | ValidationError::InvalidStateTransition
+            | ValidationError::InvariantViolation
+            | ValidationError::RateLimitExceeded
+            | ValidationError::CooldownActive => {
+                assert!(
+                    code >= 200 && code < 300,
+                    "State validation error should be in range 200-299"
+                );
             }
-            ValidationError::Unauthorized | ValidationError::NotAdmin |
-            ValidationError::NotOwner | ValidationError::InsufficientRole |
-            ValidationError::SignatureRequired | ValidationError::MultiSigRequired |
-            ValidationError::InvalidSignature | ValidationError::ExpiredSignature |
-            ValidationError::WrongContract | ValidationError::Blacklisted => {
-                assert!(code >= 300 && code < 400, "Authorization validation error should be in range 300-399");
+            ValidationError::Unauthorized
+            | ValidationError::NotAdmin
+            | ValidationError::NotOwner
+            | ValidationError::InsufficientRole
+            | ValidationError::SignatureRequired
+            | ValidationError::MultiSigRequired
+            | ValidationError::InvalidSignature
+            | ValidationError::ExpiredSignature
+            | ValidationError::WrongContract
+            | ValidationError::Blacklisted => {
+                assert!(
+                    code >= 300 && code < 400,
+                    "Authorization validation error should be in range 300-399"
+                );
             }
         }
     }
@@ -537,7 +573,7 @@ fn test_edge_cases() {
 
     // Test timestamp boundary conditions
     let current_time = env.ledger().timestamp();
-    
+
     // Exactly at the limit
     assert_eq!(
         ValidationContract::validate_timestamp_parameters(&env, current_time + 86400, false, 86400),

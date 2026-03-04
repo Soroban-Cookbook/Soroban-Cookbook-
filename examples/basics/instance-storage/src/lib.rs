@@ -194,4 +194,6 @@ impl InstanceStorageContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

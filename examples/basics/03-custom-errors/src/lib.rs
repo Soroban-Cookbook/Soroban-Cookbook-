@@ -69,7 +69,8 @@ impl CustomErrorsContract {
     /// * `InvalidInput` - If value is 0 or negative
     pub fn validate_input(env: Env, value: i64) -> Result<(), ContractError> {
         if value <= 0 {
-            env.events().publish(symbol_short!("inp_err"), ("Invalid value", value));
+            env.events()
+                .publish((symbol_short!("inp_err"),), ("Invalid value", value));
             Err(ContractError::InvalidInput)
         } else {
             Ok(())
@@ -90,7 +91,10 @@ impl CustomErrorsContract {
         admin: Address,
     ) -> Result<(), ContractError> {
         if caller != admin {
-            env.events().publish(symbol_short!("auth_err"), ("Unauthorized access", caller));
+            env.events().publish(
+                (symbol_short!("auth_err"),),
+                ("Unauthorized access", caller),
+            );
             Err(ContractError::Unauthorized)
         } else {
             Ok(())
@@ -111,7 +115,7 @@ impl CustomErrorsContract {
             Ok(storage.get(&key).unwrap())
         } else {
             env.events()
-                .publish(symbol_short!("not_found"), ("Key not found", key));
+                .publish((symbol_short!("not_found"),), ("Key not found", key));
             Err(ContractError::NotFound)
         }
     }
@@ -127,17 +131,21 @@ impl CustomErrorsContract {
     /// * `InvalidInput` - If amount is zero or negative
     pub fn transfer_tokens(env: Env, from_balance: u64, amount: u64) -> Result<(), ContractError> {
         if amount == 0 {
-            env.events().publish(symbol_short!("xfer_err"), ("Zero amount transfer", amount));
+            env.events().publish(
+                (symbol_short!("xfer_err"),),
+                ("Zero amount transfer", amount),
+            );
             Err(ContractError::InvalidInput)
         } else if from_balance < amount {
-            env.events().publish(symbol_short!("bal_err"), (
-                "Insufficient balance",
-                from_balance,
-            ));
+            env.events().publish(
+                (symbol_short!("bal_err"),),
+                ("Insufficient balance", from_balance),
+            );
             Err(ContractError::InsufficientBalance)
         } else {
             // Simulate successful transfer
-            env.events().publish(symbol_short!("xfer_ok"), ("Amount transferred", amount));
+            env.events()
+                .publish((symbol_short!("xfer_ok"),), ("Amount transferred", amount));
             Ok(())
         }
     }
@@ -157,22 +165,22 @@ impl CustomErrorsContract {
         operation_type: Symbol,
     ) -> Result<(), ContractError> {
         if is_paused {
-            env.events().publish(symbol_short!("pause_err"), (
-                "Contract paused",
-                operation_type,
-            ));
+            env.events().publish(
+                (symbol_short!("pause_err"),),
+                ("Contract paused", operation_type),
+            );
             Err(ContractError::ContractPaused)
         } else if operation_type == symbol_short!("forbidden") {
-            env.events().publish(symbol_short!("forbid"), (
-                "Operation not allowed",
-                operation_type,
-            ));
+            env.events().publish(
+                (symbol_short!("forbid"),),
+                ("Operation not allowed", operation_type),
+            );
             Err(ContractError::OperationNotAllowed)
         } else {
-            env.events().publish(symbol_short!("op_ok"), (
-                "Operation completed",
-                operation_type,
-            ));
+            env.events().publish(
+                (symbol_short!("op_ok"),),
+                ("Operation completed", operation_type),
+            );
             Ok(())
         }
     }
@@ -190,14 +198,19 @@ impl CustomErrorsContract {
         let storage = env.storage().instance();
 
         if value == 0 {
-            env.events().publish(symbol_short!("create_er"), ("Zero value not allowed", value));
+            env.events().publish(
+                (symbol_short!("create_er"),),
+                ("Zero value not allowed", value),
+            );
             Err(ContractError::InvalidInput)
         } else if storage.has(&key) {
-            env.events().publish(symbol_short!("dup_err"), ("Entry already exists", key));
+            env.events()
+                .publish((symbol_short!("dup_err"),), ("Entry already exists", key));
             Err(ContractError::AlreadyExists)
         } else {
             storage.set(&key, &value);
-            env.events().publish(symbol_short!("create_ok"), ("Entry created", key));
+            env.events()
+                .publish((symbol_short!("create_ok"),), ("Entry created", key));
             Ok(())
         }
     }
@@ -221,20 +234,20 @@ impl CustomErrorsContract {
         // Check if caller is the contract itself (simplified invalid check)
         let contract_address = env.current_contract_address();
         if caller == contract_address {
-            env.events().publish(symbol_short!("inv_call"), (
-                "Contract cannot call itself",
-                caller,
-            ));
+            env.events().publish(
+                (symbol_short!("inv_call"),),
+                ("Contract cannot call itself", caller),
+            );
             Err(ContractError::Unauthorized)
         } else if operation_count >= max_operations {
-            env.events().publish(symbol_short!("rate_lim"), (
-                "Rate limit exceeded",
-                operation_count,
-            ));
+            env.events().publish(
+                (symbol_short!("rate_lim"),),
+                ("Rate limit exceeded", operation_count),
+            );
             Err(ContractError::RateLimitExceeded)
         } else {
             env.events().publish(
-                symbol_short!("rate_ok"),
+                (symbol_short!("rate_ok"),),
                 ("Operation allowed", operation_count),
             );
             Ok(())
@@ -280,9 +293,14 @@ impl CustomErrorsContract {
         }
 
         // All checks passed
-        env.events().publish(symbol_short!("cmplx_ok"), ("Operation completed", amount));
+        env.events().publish(
+            (symbol_short!("cmplx_ok"),),
+            ("Operation completed", amount),
+        );
         Ok(())
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

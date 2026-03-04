@@ -3,7 +3,10 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::{Address as _, Ledger}, Address, Bytes, Env};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger},
+    Address, Bytes, Env,
+};
 
 fn setup() -> (Env, Address, TimelockContractClient<'static>) {
     let env = Env::default();

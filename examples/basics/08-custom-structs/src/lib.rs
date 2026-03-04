@@ -26,7 +26,8 @@
 
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, String, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, String,
+    Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -383,7 +384,9 @@ impl CustomStructsContract {
             return Err(ContractError::AlreadyExists);
         }
 
-        env.storage().instance().set(&symbol_short!("admin"), &admin);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("admin"), &admin);
         env.storage().instance().set(&symbol_short!("init"), &true);
         Ok(())
     }
@@ -486,9 +489,10 @@ impl CustomStructsContract {
         };
 
         // Store the portfolio
-        env.storage()
-            .instance()
-            .set(&(symbol_short!("portfolio"), owner.clone(), name.clone()), &portfolio);
+        env.storage().instance().set(
+            &(symbol_short!("portfolio"), owner.clone(), name.clone()),
+            &portfolio,
+        );
 
         Ok(portfolio)
     }
@@ -519,7 +523,11 @@ impl CustomStructsContract {
         let mut portfolio: Portfolio = env
             .storage()
             .instance()
-            .get(&(symbol_short!("portfolio"), owner.clone(), portfolio_name.clone()))
+            .get(&(
+                symbol_short!("portfolio"),
+                owner.clone(),
+                portfolio_name.clone(),
+            ))
             .ok_or(ContractError::PortfolioNotFound)?;
 
         // Create new holding
@@ -544,9 +552,10 @@ impl CustomStructsContract {
         portfolio.last_updated = env.ledger().timestamp();
 
         // Store updated portfolio
-        env.storage()
-            .instance()
-            .set(&(symbol_short!("portfolio"), owner, portfolio_name), &portfolio);
+        env.storage().instance().set(
+            &(symbol_short!("portfolio"), owner, portfolio_name),
+            &portfolio,
+        );
 
         Ok(())
     }
@@ -597,9 +606,10 @@ impl CustomStructsContract {
         };
 
         // Store extended profile
-        env.storage()
-            .instance()
-            .set(&(symbol_short!("ext_prof"), address.clone()), &extended_profile);
+        env.storage().instance().set(
+            &(symbol_short!("ext_prof"), address.clone()),
+            &extended_profile,
+        );
 
         Ok(extended_profile)
     }
@@ -621,21 +631,21 @@ impl CustomStructsContract {
     pub fn serialize_struct(env: Env, profile: UserProfile) -> Result<i32, ContractError> {
         // In Soroban, structs are automatically serialized when stored
         // This function demonstrates the concept by storing and retrieving
-        
+
         // Store the struct
         let temp_key = symbol_short!("temp_ser");
         env.storage().instance().set(&temp_key, &profile);
-        
+
         // Retrieve and convert to bytes (conceptual)
         let _retrieved: UserProfile = env
             .storage()
             .instance()
             .get(&temp_key)
             .ok_or(ContractError::SerializationError)?;
-        
+
         // Clean up
         env.storage().instance().remove(&temp_key);
-        
+
         // Return a simple hash representation (in real implementation, you'd use proper serialization)
         Ok(12345) // Placeholder
     }
@@ -678,9 +688,9 @@ impl CustomStructsContract {
         portfolio_name: String,
     ) -> Result<i128, ContractError> {
         let portfolio: Portfolio = Self::get_portfolio(env.clone(), owner, portfolio_name)?;
-        
+
         let mut total_value = 0i128;
-        
+
         for holding in portfolio.holdings.iter() {
             if let Some(current_value) = holding.current_value {
                 total_value += current_value;
@@ -689,11 +699,12 @@ impl CustomStructsContract {
                 total_value += holding.quantity * holding.avg_purchase_price;
             }
         }
-        
+
         Ok(total_value)
     }
 }
 
 // Pull in the dedicated test module.
+#[cfg(test)]
 #[cfg(test)]
 mod test;

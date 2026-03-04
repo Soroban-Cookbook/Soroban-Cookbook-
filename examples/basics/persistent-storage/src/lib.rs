@@ -28,7 +28,7 @@ impl PersistentStorageContract {
         let key = DataKey::Counter;
         let mut count: u64 = env.storage().persistent().get(&key).unwrap_or(0);
 
-        count += 1;
+        count = count.checked_add(1).expect("counter overflow");
         env.storage().persistent().set(&key, &count);
         env.storage().persistent().extend_ttl(&key, 2000, 10000);
 
@@ -46,4 +46,6 @@ impl PersistentStorageContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

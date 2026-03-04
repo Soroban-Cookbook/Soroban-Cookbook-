@@ -144,11 +144,17 @@ impl EnumContract {
         }
 
         // Set initial state
-        env.storage().instance().set(&symbol_short!("state"), &ContractState::Active);
-        env.storage().instance().set(&symbol_short!("admin"), &admin);
-        
+        env.storage()
+            .instance()
+            .set(&symbol_short!("state"), &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("admin"), &admin);
+
         // Set admin as Owner
-        env.storage().instance().set(&(symbol_short!("user_role"), admin), &UserRole::Owner);
+        env.storage()
+            .instance()
+            .set(&(symbol_short!("user_role"), admin), &UserRole::Owner);
 
         Ok(())
     }
@@ -188,7 +194,9 @@ impl EnumContract {
         }
 
         // Set role
-        env.storage().instance().set(&(symbol_short!("user_role"), user), &role);
+        env.storage()
+            .instance()
+            .set(&(symbol_short!("user_role"), user), &role);
 
         Ok(())
     }
@@ -202,21 +210,11 @@ impl EnumContract {
     ) -> Result<ValidationResult, ContractError> {
         // Pattern match on operation type
         match operation {
-            TransactionType::Transfer => {
-                Self::validate_transfer(env.clone(), amount, to)
-            }
-            TransactionType::Deposit => {
-                Self::validate_deposit(env.clone(), amount, to)
-            }
-            TransactionType::Withdraw => {
-                Self::validate_withdraw(env.clone(), amount, to)
-            }
-            TransactionType::Mint => {
-                Self::validate_mint(env.clone(), amount, to)
-            }
-            TransactionType::Burn => {
-                Self::validate_burn(env.clone(), amount, to)
-            }
+            TransactionType::Transfer => Self::validate_transfer(env.clone(), amount, to),
+            TransactionType::Deposit => Self::validate_deposit(env.clone(), amount, to),
+            TransactionType::Withdraw => Self::validate_withdraw(env.clone(), amount, to),
+            TransactionType::Mint => Self::validate_mint(env.clone(), amount, to),
+            TransactionType::Burn => Self::validate_burn(env.clone(), amount, to),
         }
     }
 
@@ -229,18 +227,14 @@ impl EnumContract {
         match result {
             ValidationResult::Success => {
                 // Mark operation as completed
-                env.storage().instance().set(&symbol_short!("op"), &operation_id);
+                env.storage()
+                    .instance()
+                    .set(&symbol_short!("op"), &operation_id);
                 Ok(())
             }
-            ValidationResult::Failure => {
-                Err(ContractError::ValidationFailed)
-            }
-            ValidationResult::RequiresApproval => {
-                Err(ContractError::InsufficientApprovals)
-            }
-            ValidationResult::Pending => {
-                Err(ContractError::ValidationPending)
-            }
+            ValidationResult::Failure => Err(ContractError::ValidationFailed),
+            ValidationResult::RequiresApproval => Err(ContractError::InsufficientApprovals),
+            ValidationResult::Pending => Err(ContractError::ValidationPending),
         }
     }
 
@@ -362,5 +356,6 @@ impl EnumContract {
 }
 
 // Pull in the dedicated test module.
+#[cfg(test)]
 #[cfg(test)]
 mod test;

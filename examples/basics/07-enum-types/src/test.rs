@@ -1,11 +1,11 @@
 #![cfg(test)]
 use super::*;
-use soroban_sdk::{Env, Vec};
 use soroban_sdk::testutils::Address as AddressTest;
+use soroban_sdk::Env;
 
 #[test]
 fn test_simple_enums() {
-    let env = Env::default();
+    let _env = Env::default();
 
     // Test UserRole enum
     let user_role = UserRole::User;
@@ -65,16 +65,16 @@ fn test_contract_initialization() {
 
     // Test successful initialization
     env.as_contract(&contract_id, || {
-        assert_eq!(
-            EnumContract::initialize(env.clone(), admin.clone()),
-            Ok(())
-        );
+        assert_eq!(EnumContract::initialize(env.clone(), admin.clone()), Ok(()));
     });
 
     // Test state after initialization
     env.as_contract(&contract_id, || {
         assert_eq!(EnumContract::get_state(env.clone()), ContractState::Active);
-        assert_eq!(EnumContract::get_user_role(env.clone(), admin.clone()), UserRole::Owner);
+        assert_eq!(
+            EnumContract::get_user_role(env.clone(), admin.clone()),
+            UserRole::Owner
+        );
     });
 
     // Test double initialization
@@ -108,14 +108,22 @@ fn test_user_role_management() {
 
     // Verify role was set
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::get_user_role(env.clone(), user.clone()), UserRole::User);
+        assert_eq!(
+            EnumContract::get_user_role(env.clone(), user.clone()),
+            UserRole::User
+        );
     });
 
     // Test non-admin trying to set role
     let user2 = <soroban_sdk::Address as AddressTest>::generate(&env);
     env.as_contract(&contract_id, || {
         assert_eq!(
-            EnumContract::set_user_role(env.clone(), user.clone(), user2.clone(), UserRole::Moderator),
+            EnumContract::set_user_role(
+                env.clone(),
+                user.clone(),
+                user2.clone(),
+                UserRole::Moderator
+            ),
             Err(ContractError::InsufficientRole)
         );
     });
@@ -139,55 +147,80 @@ fn test_operation_execution() {
     // Initialize contract
     env.as_contract(&contract_id, || {
         EnumContract::initialize(env.clone(), user1.clone()).unwrap();
-        EnumContract::set_user_role(env.clone(), user1.clone(), user2.clone(), UserRole::User).unwrap();
+        EnumContract::set_user_role(env.clone(), user1.clone(), user2.clone(), UserRole::User)
+            .unwrap();
     });
 
     // Test transfer operation
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Transfer, 100, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Transfer, 100, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Success));
 
     // Test deposit operation
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Deposit, 1000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Deposit, 1000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Success));
 
     // Test withdraw operation
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Withdraw, 5000, user2.clone());
+    let result = EnumContract::execute_operation(
+        env.clone(),
+        TransactionType::Withdraw,
+        5000,
+        user2.clone(),
+    );
     assert_eq!(result, Ok(ValidationResult::Success));
 
     // Test mint operation
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Mint, 500000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Mint, 500000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Success));
 
     // Test burn operation
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Burn, 250000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Burn, 250000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Success));
 
     // Test invalid amount (zero)
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Transfer, 0, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Transfer, 0, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test invalid amount (negative)
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Transfer, -1, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Transfer, -1, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test amount over limit for transfer
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Transfer, 1500, user2.clone());
+    let result = EnumContract::execute_operation(
+        env.clone(),
+        TransactionType::Transfer,
+        1500,
+        user2.clone(),
+    );
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test amount over limit for deposit
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Deposit, 6000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Deposit, 6000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test amount over limit for withdraw
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Withdraw, 15000, user2.clone());
+    let result = EnumContract::execute_operation(
+        env.clone(),
+        TransactionType::Withdraw,
+        15000,
+        user2.clone(),
+    );
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test amount over limit for mint
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Mint, 2000000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Mint, 2000000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Failure));
 
     // Test amount over limit for burn
-    let result = EnumContract::execute_operation(env.clone(), TransactionType::Burn, 750000, user2.clone());
+    let result =
+        EnumContract::execute_operation(env.clone(), TransactionType::Burn, 750000, user2.clone());
     assert_eq!(result, Ok(ValidationResult::Failure));
 }
 
@@ -226,11 +259,26 @@ fn test_enum_comparisons() {
 
     // Test role comparisons
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::Admin, UserRole::User), true);
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::User, UserRole::Admin), false);
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::Owner, UserRole::Owner), true);
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::Moderator, UserRole::User), true);
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::None, UserRole::None), true);
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::Admin, UserRole::User),
+            true
+        );
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::User, UserRole::Admin),
+            false
+        );
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::Owner, UserRole::Owner),
+            true
+        );
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::Moderator, UserRole::User),
+            true
+        );
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::None, UserRole::None),
+            true
+        );
     });
 }
 
@@ -283,15 +331,35 @@ fn test_comprehensive_workflow() {
 
     // Set up user roles
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::set_user_role(env.clone(), admin.clone(), user.clone(), UserRole::User), Ok(()));
-        assert_eq!(EnumContract::set_user_role(env.clone(), admin.clone(), recipient.clone(), UserRole::Moderator), Ok(()));
+        assert_eq!(
+            EnumContract::set_user_role(env.clone(), admin.clone(), user.clone(), UserRole::User),
+            Ok(())
+        );
+        assert_eq!(
+            EnumContract::set_user_role(
+                env.clone(),
+                admin.clone(),
+                recipient.clone(),
+                UserRole::Moderator
+            ),
+            Ok(())
+        );
     });
 
     // Verify roles
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::get_user_role(env.clone(), admin.clone()), UserRole::Owner);
-        assert_eq!(EnumContract::get_user_role(env.clone(), user.clone()), UserRole::User);
-        assert_eq!(EnumContract::get_user_role(env.clone(), recipient.clone()), UserRole::Moderator);
+        assert_eq!(
+            EnumContract::get_user_role(env.clone(), admin.clone()),
+            UserRole::Owner
+        );
+        assert_eq!(
+            EnumContract::get_user_role(env.clone(), user.clone()),
+            UserRole::User
+        );
+        assert_eq!(
+            EnumContract::get_user_role(env.clone(), recipient.clone()),
+            UserRole::Moderator
+        );
     });
 
     // Test various operations
@@ -305,23 +373,43 @@ fn test_comprehensive_workflow() {
     ];
 
     for (op_type, amount, expected) in operations.iter() {
-        let result = EnumContract::execute_operation(env.clone(), op_type, amount, recipient.clone());
+        let result =
+            EnumContract::execute_operation(env.clone(), op_type, amount, recipient.clone());
         assert_eq!(result, Ok(expected));
     }
 
     // Test validation result processing
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::process_validation_result(env.clone(), ValidationResult::Success, 1), Ok(()));
-        assert_eq!(EnumContract::process_validation_result(env.clone(), ValidationResult::Failure, 2), Err(ContractError::ValidationFailed));
-        assert_eq!(EnumContract::process_validation_result(env.clone(), ValidationResult::RequiresApproval, 3), Err(ContractError::InsufficientApprovals));
-        assert_eq!(EnumContract::process_validation_result(env.clone(), ValidationResult::Pending, 4), Err(ContractError::ValidationPending));
+        assert_eq!(
+            EnumContract::process_validation_result(env.clone(), ValidationResult::Success, 1),
+            Ok(())
+        );
+        assert_eq!(
+            EnumContract::process_validation_result(env.clone(), ValidationResult::Failure, 2),
+            Err(ContractError::ValidationFailed)
+        );
+        assert_eq!(
+            EnumContract::process_validation_result(
+                env.clone(),
+                ValidationResult::RequiresApproval,
+                3
+            ),
+            Err(ContractError::InsufficientApprovals)
+        );
+        assert_eq!(
+            EnumContract::process_validation_result(env.clone(), ValidationResult::Pending, 4),
+            Err(ContractError::ValidationPending)
+        );
     });
 
     // Test enum utilities
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::compare_enums(env.clone(), UserRole::Owner, UserRole::User), true);
+        assert_eq!(
+            EnumContract::compare_enums(env.clone(), UserRole::Owner, UserRole::User),
+            true
+        );
         assert_eq!(EnumContract::enum_arithmetic(env.clone()), 4);
-        
+
         let roles = EnumContract::get_all_roles(env.clone());
         assert_eq!(roles.len(), 5);
     });
@@ -337,7 +425,10 @@ fn test_error_scenarios() {
 
     // Test uninitialized contract
     env.as_contract(&contract_id, || {
-        assert_eq!(EnumContract::get_state(env.clone()), ContractState::Uninitialized);
+        assert_eq!(
+            EnumContract::get_state(env.clone()),
+            ContractState::Uninitialized
+        );
     });
 
     // Initialize contract
@@ -348,15 +439,20 @@ fn test_error_scenarios() {
     // Test unauthorized operations
     env.as_contract(&contract_id, || {
         assert_eq!(
-            EnumContract::set_user_role(env.clone(), unauthorized_user.clone(), user.clone(), UserRole::User),
+            EnumContract::set_user_role(
+                env.clone(),
+                unauthorized_user.clone(),
+                user.clone(),
+                UserRole::User
+            ),
             Err(ContractError::InsufficientRole)
         );
-        
+
         assert_eq!(
             EnumContract::set_user_role(env.clone(), admin.clone(), user.clone(), UserRole::Owner),
             Err(ContractError::InvalidInput)
         );
-        
+
         assert_eq!(
             EnumContract::initialize(env.clone(), admin.clone()),
             Err(ContractError::ContractAlreadyInitialized)
@@ -369,12 +465,16 @@ fn test_error_scenarios() {
             EnumContract::process_validation_result(env.clone(), ValidationResult::Failure, 1),
             Err(ContractError::ValidationFailed)
         );
-        
+
         assert_eq!(
-            EnumContract::process_validation_result(env.clone(), ValidationResult::RequiresApproval, 2),
+            EnumContract::process_validation_result(
+                env.clone(),
+                ValidationResult::RequiresApproval,
+                2
+            ),
             Err(ContractError::InsufficientApprovals)
         );
-        
+
         assert_eq!(
             EnumContract::process_validation_result(env.clone(), ValidationResult::Pending, 3),
             Err(ContractError::ValidationPending)

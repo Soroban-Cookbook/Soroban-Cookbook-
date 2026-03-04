@@ -27,9 +27,7 @@
 //! - Panic behavior in release builds
 
 #![no_std]
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Env};
 
 // ---------------------------------------------------------------------------
 // Contract Errors
@@ -99,18 +97,10 @@ impl PrimitiveTypesContract {
         env.storage()
             .instance()
             .set(&DataKey::I64Value, &9223372036854775807i64); // Max i64 value
-        env.storage()
-            .instance()
-            .set(&DataKey::BoolValue, &true);
-        env.storage()
-            .instance()
-            .set(&DataKey::Counter, &0u64);
-        env.storage()
-            .instance()
-            .set(&DataKey::Balance, &1000i128);
-        env.storage()
-            .instance()
-            .set(&DataKey::Flags, &0u32);
+        env.storage().instance().set(&DataKey::BoolValue, &true);
+        env.storage().instance().set(&DataKey::Counter, &0u64);
+        env.storage().instance().set(&DataKey::Balance, &1000i128);
+        env.storage().instance().set(&DataKey::Flags, &0u32);
 
         Ok(())
     }
@@ -120,22 +110,22 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Add two u32 values with overflow checking
-    pub fn add_u32(env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
+    pub fn add_u32(_env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
         a.checked_add(b).ok_or(ContractError::OverflowError)
     }
 
     /// Subtract two u32 values with underflow checking
-    pub fn sub_u32(env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
+    pub fn sub_u32(_env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
         a.checked_sub(b).ok_or(ContractError::UnderflowError)
     }
 
     /// Multiply two u32 values with overflow checking
-    pub fn mul_u32(env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
+    pub fn mul_u32(_env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
         a.checked_mul(b).ok_or(ContractError::OverflowError)
     }
 
     /// Divide two u32 values with division by zero checking
-    pub fn div_u32(env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
+    pub fn div_u32(_env: Env, a: u32, b: u32) -> Result<u32, ContractError> {
         if b == 0 {
             return Err(ContractError::DivisionByZero);
         }
@@ -143,22 +133,22 @@ impl PrimitiveTypesContract {
     }
 
     /// Add two u64 values with overflow checking
-    pub fn add_u64(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn add_u64(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         a.checked_add(b).ok_or(ContractError::OverflowError)
     }
 
     /// Subtract two u64 values with underflow checking
-    pub fn sub_u64(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn sub_u64(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         a.checked_sub(b).ok_or(ContractError::UnderflowError)
     }
 
     /// Multiply two u64 values with overflow checking
-    pub fn mul_u64(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn mul_u64(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         a.checked_mul(b).ok_or(ContractError::OverflowError)
     }
 
     /// Divide two u64 values with division by zero checking
-    pub fn div_u64(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn div_u64(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         if b == 0 {
             return Err(ContractError::DivisionByZero);
         }
@@ -170,22 +160,22 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Add two i32 values with overflow checking
-    pub fn add_i32(env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
+    pub fn add_i32(_env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
         a.checked_add(b).ok_or(ContractError::OverflowError)
     }
 
     /// Subtract two i32 values with overflow checking
-    pub fn sub_i32(env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
+    pub fn sub_i32(_env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
         a.checked_sub(b).ok_or(ContractError::OverflowError)
     }
 
     /// Multiply two i32 values with overflow checking
-    pub fn mul_i32(env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
+    pub fn mul_i32(_env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
         a.checked_mul(b).ok_or(ContractError::OverflowError)
     }
 
     /// Divide two i32 values with division by zero checking
-    pub fn div_i32(env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
+    pub fn div_i32(_env: Env, a: i32, b: i32) -> Result<i32, ContractError> {
         if b == 0 {
             return Err(ContractError::DivisionByZero);
         }
@@ -193,22 +183,22 @@ impl PrimitiveTypesContract {
     }
 
     /// Add two i64 values with overflow checking
-    pub fn add_i64(env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
+    pub fn add_i64(_env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
         a.checked_add(b).ok_or(ContractError::OverflowError)
     }
 
     /// Subtract two i64 values with overflow checking
-    pub fn sub_i64(env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
+    pub fn sub_i64(_env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
         a.checked_sub(b).ok_or(ContractError::OverflowError)
     }
 
     /// Multiply two i64 values with overflow checking
-    pub fn mul_i64(env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
+    pub fn mul_i64(_env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
         a.checked_mul(b).ok_or(ContractError::OverflowError)
     }
 
     /// Divide two i64 values with division by zero checking
-    pub fn div_i64(env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
+    pub fn div_i64(_env: Env, a: i64, b: i64) -> Result<i64, ContractError> {
         if b == 0 {
             return Err(ContractError::DivisionByZero);
         }
@@ -220,22 +210,22 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Logical AND operation
-    pub fn bool_and(env: Env, a: bool, b: bool) -> bool {
+    pub fn bool_and(_env: Env, a: bool, b: bool) -> bool {
         a && b
     }
 
     /// Logical OR operation
-    pub fn bool_or(env: Env, a: bool, b: bool) -> bool {
+    pub fn bool_or(_env: Env, a: bool, b: bool) -> bool {
         a || b
     }
 
     /// Logical NOT operation
-    pub fn bool_not(env: Env, a: bool) -> bool {
+    pub fn bool_not(_env: Env, a: bool) -> bool {
         !a
     }
 
     /// XOR operation (implemented as != for booleans)
-    pub fn bool_xor(env: Env, a: bool, b: bool) -> bool {
+    pub fn bool_xor(_env: Env, a: bool, b: bool) -> bool {
         a != b
     }
 
@@ -258,12 +248,12 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Convert u32 to u64 (always safe)
-    pub fn u32_to_u64(env: Env, value: u32) -> u64 {
+    pub fn u32_to_u64(_env: Env, value: u32) -> u64 {
         value as u64
     }
 
     /// Convert u64 to u32 (may overflow)
-    pub fn u64_to_u32(env: Env, value: u64) -> Result<u32, ContractError> {
+    pub fn u64_to_u32(_env: Env, value: u64) -> Result<u32, ContractError> {
         if value > u32::MAX as u64 {
             return Err(ContractError::ConversionError);
         }
@@ -271,12 +261,12 @@ impl PrimitiveTypesContract {
     }
 
     /// Convert i32 to i64 (always safe)
-    pub fn i32_to_i64(env: Env, value: i32) -> i64 {
+    pub fn i32_to_i64(_env: Env, value: i32) -> i64 {
         value as i64
     }
 
     /// Convert i64 to i32 (may overflow)
-    pub fn i64_to_i32(env: Env, value: i64) -> Result<i32, ContractError> {
+    pub fn i64_to_i32(_env: Env, value: i64) -> Result<i32, ContractError> {
         if value > i32::MAX as i64 || value < i32::MIN as i64 {
             return Err(ContractError::ConversionError);
         }
@@ -284,7 +274,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Convert u32 to i32 (may overflow if value > i32::MAX)
-    pub fn u32_to_i32(env: Env, value: u32) -> Result<i32, ContractError> {
+    pub fn u32_to_i32(_env: Env, value: u32) -> Result<i32, ContractError> {
         if value > i32::MAX as u32 {
             return Err(ContractError::ConversionError);
         }
@@ -292,7 +282,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Convert i32 to u32 (may underflow if value < 0)
-    pub fn i32_to_u32(env: Env, value: i32) -> Result<u32, ContractError> {
+    pub fn i32_to_u32(_env: Env, value: i32) -> Result<u32, ContractError> {
         if value < 0 {
             return Err(ContractError::NegativeValue);
         }
@@ -300,7 +290,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Convert i64 to u64 (may underflow if value < 0)
-    pub fn i64_to_u64(env: Env, value: i64) -> Result<u64, ContractError> {
+    pub fn i64_to_u64(_env: Env, value: i64) -> Result<u64, ContractError> {
         if value < 0 {
             return Err(ContractError::NegativeValue);
         }
@@ -308,7 +298,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Convert u64 to i64 (may overflow if value > i64::MAX)
-    pub fn u64_to_i64(env: Env, value: u64) -> Result<i64, ContractError> {
+    pub fn u64_to_i64(_env: Env, value: u64) -> Result<i64, ContractError> {
         if value > i64::MAX as u64 {
             return Err(ContractError::ConversionError);
         }
@@ -320,7 +310,7 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Safe addition with overflow detection
-    pub fn safe_add(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn safe_add(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         match a.checked_add(b) {
             Some(result) => Ok(result),
             None => Err(ContractError::OverflowError),
@@ -328,17 +318,17 @@ impl PrimitiveTypesContract {
     }
 
     /// Saturating addition (clamps to max value on overflow)
-    pub fn saturating_add(env: Env, a: u64, b: u64) -> u64 {
+    pub fn saturating_add(_env: Env, a: u64, b: u64) -> u64 {
         a.saturating_add(b)
     }
 
     /// Wrapping addition (wraps around on overflow)
-    pub fn wrapping_add(env: Env, a: u64, b: u64) -> u64 {
+    pub fn wrapping_add(_env: Env, a: u64, b: u64) -> u64 {
         a.wrapping_add(b)
     }
 
     /// Safe subtraction with underflow detection
-    pub fn safe_sub(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn safe_sub(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         match a.checked_sub(b) {
             Some(result) => Ok(result),
             None => Err(ContractError::UnderflowError),
@@ -346,17 +336,17 @@ impl PrimitiveTypesContract {
     }
 
     /// Saturating subtraction (clamps to 0 on underflow)
-    pub fn saturating_sub(env: Env, a: u64, b: u64) -> u64 {
+    pub fn saturating_sub(_env: Env, a: u64, b: u64) -> u64 {
         a.saturating_sub(b)
     }
 
     /// Wrapping subtraction (wraps around on underflow)
-    pub fn wrapping_sub(env: Env, a: u64, b: u64) -> u64 {
+    pub fn wrapping_sub(_env: Env, a: u64, b: u64) -> u64 {
         a.wrapping_sub(b)
     }
 
     /// Safe multiplication with overflow detection
-    pub fn safe_mul(env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
+    pub fn safe_mul(_env: Env, a: u64, b: u64) -> Result<u64, ContractError> {
         match a.checked_mul(b) {
             Some(result) => Ok(result),
             None => Err(ContractError::OverflowError),
@@ -364,12 +354,12 @@ impl PrimitiveTypesContract {
     }
 
     /// Saturating multiplication (clamps to max value on overflow)
-    pub fn saturating_mul(env: Env, a: u64, b: u64) -> u64 {
+    pub fn saturating_mul(_env: Env, a: u64, b: u64) -> u64 {
         a.saturating_mul(b)
     }
 
     /// Wrapping multiplication (wraps around on overflow)
-    pub fn wrapping_mul(env: Env, a: u64, b: u64) -> u64 {
+    pub fn wrapping_mul(_env: Env, a: u64, b: u64) -> u64 {
         a.wrapping_mul(b)
     }
 
@@ -379,7 +369,7 @@ impl PrimitiveTypesContract {
 
     /// Calculate interest using i128 for precision
     pub fn calculate_interest(
-        env: Env,
+        _env: Env,
         principal: i128,
         rate: i32, // in basis points (10000 = 100%)
         periods: u32,
@@ -391,23 +381,19 @@ impl PrimitiveTypesContract {
         // Simple interest: principal * rate * periods / 10000
         let rate_i128 = rate as i128;
         let periods_i128 = periods as i128;
-        
+
         match principal.checked_mul(rate_i128) {
-            Some(interest_rate_product) => {
-                match interest_rate_product.checked_mul(periods_i128) {
-                    Some(total_product) => {
-                        Ok(total_product / 10000i128)
-                    }
-                    None => Err(ContractError::OverflowError),
-                }
-            }
+            Some(interest_rate_product) => match interest_rate_product.checked_mul(periods_i128) {
+                Some(total_product) => Ok(total_product / 10000i128),
+                None => Err(ContractError::OverflowError),
+            },
             None => Err(ContractError::OverflowError),
         }
     }
 
     /// Compound interest calculation
     pub fn compound_interest(
-        env: Env,
+        _env: Env,
         principal: i128,
         rate: i32, // in basis points
         periods: u32,
@@ -447,7 +433,9 @@ impl PrimitiveTypesContract {
 
         match current_balance.checked_sub(amount) {
             Some(new_balance) => {
-                env.storage().instance().set(&DataKey::Balance, &new_balance);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::Balance, &new_balance);
                 Ok(new_balance)
             }
             None => Err(ContractError::InsufficientBalance),
@@ -468,7 +456,9 @@ impl PrimitiveTypesContract {
 
         match current_balance.checked_add(amount) {
             Some(new_balance) => {
-                env.storage().instance().set(&DataKey::Balance, &new_balance);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::Balance, &new_balance);
                 Ok(new_balance)
             }
             None => Err(ContractError::OverflowError),
@@ -480,27 +470,27 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Bitwise AND operation
-    pub fn bitwise_and(env: Env, a: u32, b: u32) -> u32 {
+    pub fn bitwise_and(_env: Env, a: u32, b: u32) -> u32 {
         a & b
     }
 
     /// Bitwise OR operation
-    pub fn bitwise_or(env: Env, a: u32, b: u32) -> u32 {
+    pub fn bitwise_or(_env: Env, a: u32, b: u32) -> u32 {
         a | b
     }
 
     /// Bitwise XOR operation
-    pub fn bitwise_xor(env: Env, a: u32, b: u32) -> u32 {
+    pub fn bitwise_xor(_env: Env, a: u32, b: u32) -> u32 {
         a ^ b
     }
 
     /// Bitwise NOT operation
-    pub fn bitwise_not(env: Env, a: u32) -> u32 {
+    pub fn bitwise_not(_env: Env, a: u32) -> u32 {
         !a
     }
 
     /// Left shift operation
-    pub fn left_shift(env: Env, a: u32, shift: u32) -> Result<u32, ContractError> {
+    pub fn left_shift(_env: Env, a: u32, shift: u32) -> Result<u32, ContractError> {
         if shift >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -508,7 +498,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Right shift operation
-    pub fn right_shift(env: Env, a: u32, shift: u32) -> Result<u32, ContractError> {
+    pub fn right_shift(_env: Env, a: u32, shift: u32) -> Result<u32, ContractError> {
         if shift >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -516,7 +506,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Check if bit is set
-    pub fn is_bit_set(env: Env, value: u32, bit: u32) -> Result<bool, ContractError> {
+    pub fn is_bit_set(_env: Env, value: u32, bit: u32) -> Result<bool, ContractError> {
         if bit >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -524,7 +514,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Set bit in value
-    pub fn set_bit(env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
+    pub fn set_bit(_env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
         if bit >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -532,7 +522,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Clear bit in value
-    pub fn clear_bit(env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
+    pub fn clear_bit(_env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
         if bit >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -540,7 +530,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Toggle bit in value
-    pub fn toggle_bit(env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
+    pub fn toggle_bit(_env: Env, value: u32, bit: u32) -> Result<u32, ContractError> {
         if bit >= 32 {
             return Err(ContractError::InvalidInput);
         }
@@ -561,7 +551,9 @@ impl PrimitiveTypesContract {
 
         match counter.checked_add(1) {
             Some(new_counter) => {
-                env.storage().instance().set(&DataKey::Counter, &new_counter);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::Counter, &new_counter);
                 Ok(new_counter)
             }
             None => Err(ContractError::OverflowError),
@@ -578,7 +570,9 @@ impl PrimitiveTypesContract {
 
         match counter.checked_sub(1) {
             Some(new_counter) => {
-                env.storage().instance().set(&DataKey::Counter, &new_counter);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::Counter, &new_counter);
                 Ok(new_counter)
             }
             None => Err(ContractError::UnderflowError),
@@ -647,7 +641,7 @@ impl PrimitiveTypesContract {
     // ---------------------------------------------------------------------------
 
     /// Compare two u32 values
-    pub fn compare_u32(env: Env, a: u32, b: u32) -> i32 {
+    pub fn compare_u32(_env: Env, a: u32, b: u32) -> i32 {
         if a > b {
             1
         } else if a < b {
@@ -658,7 +652,7 @@ impl PrimitiveTypesContract {
     }
 
     /// Compare two i32 values
-    pub fn compare_i32(env: Env, a: i32, b: i32) -> i32 {
+    pub fn compare_i32(_env: Env, a: i32, b: i32) -> i32 {
         if a > b {
             1
         } else if a < b {
@@ -669,22 +663,22 @@ impl PrimitiveTypesContract {
     }
 
     /// Check if value is within range (inclusive)
-    pub fn is_in_range_u32(env: Env, value: u32, min: u32, max: u32) -> bool {
+    pub fn is_in_range_u32(_env: Env, value: u32, min: u32, max: u32) -> bool {
         value >= min && value <= max
     }
 
     /// Check if value is within range (inclusive)
-    pub fn is_in_range_i32(env: Env, value: i32, min: i32, max: i32) -> bool {
+    pub fn is_in_range_i32(_env: Env, value: i32, min: i32, max: i32) -> bool {
         value >= min && value <= max
     }
 
     /// Clamp value to range
-    pub fn clamp_u32(env: Env, value: u32, min: u32, max: u32) -> u32 {
+    pub fn clamp_u32(_env: Env, value: u32, min: u32, max: u32) -> u32 {
         value.clamp(min, max)
     }
 
     /// Clamp value to range
-    pub fn clamp_i32(env: Env, value: i32, min: i32, max: i32) -> i32 {
+    pub fn clamp_i32(_env: Env, value: i32, min: i32, max: i32) -> i32 {
         value.clamp(min, max)
     }
 
@@ -771,5 +765,6 @@ impl PrimitiveTypesContract {
 }
 
 // Pull in the dedicated test module.
+#[cfg(test)]
 #[cfg(test)]
 mod test;

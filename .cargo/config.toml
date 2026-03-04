@@ -1,0 +1,6 @@
+[target.wasm32-unknown-unknown]
+# Soroban's WASM VM validator rejects the padded-LEB128 table-index encoding
+# that LLVM's fat-LTO backend produces when the whole workspace is compiled
+# together. Disabling reference-types prevents LLVM from emitting the
+# extended call_indirect encoding.
+rustflags = ["-C", "target-feature=-reference-types"]

@@ -36,6 +36,9 @@ impl Contract {
             .get(&symbol_short!("num"))
             .unwrap_or(0);
 
+        if num == 0 {
+            panic!("counter underflow");
+        }
         num -= 1;
         env.storage().instance().set(&symbol_short!("num"), &num);
 
@@ -52,4 +55,6 @@ impl Contract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

@@ -67,6 +67,9 @@ impl TimelockContract {
 
         let execute_at = env.ledger().timestamp() + delay;
         env.storage().persistent().set(&key, &execute_at);
+        // Keep the operation alive well beyond MAX_DELAY (7 days >> 24 h).
+        // Without this, the entry could expire before execution time.
+        env.storage().persistent().extend_ttl(&key, 17_280, 120_960);
 
         env.events()
             .publish((Symbol::new(&env, "queued"),), (operation_id, execute_at));
@@ -147,4 +150,6 @@ impl TimelockContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

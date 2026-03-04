@@ -44,9 +44,10 @@ impl StorageContract {
     /// Retrieves a value from persistent storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_persistent(env: Env, key: Symbol) -> u64 {
-        env.storage().persistent().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    /// Prefer this over `unwrap()` so callers can handle the missing-key case.
+    pub fn get_persistent(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().persistent().get(&key)
     }
 
     /// Checks if a key exists in persistent storage.
@@ -88,9 +89,9 @@ impl StorageContract {
     /// Retrieves a value from temporary storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_temporary(env: Env, key: Symbol) -> u64 {
-        env.storage().temporary().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    pub fn get_temporary(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().temporary().get(&key)
     }
 
     /// Checks if a key exists in temporary storage.
@@ -127,9 +128,9 @@ impl StorageContract {
     /// Retrieves a value from instance storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_instance(env: Env, key: Symbol) -> u64 {
-        env.storage().instance().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    pub fn get_instance(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().instance().get(&key)
     }
 
     /// Checks if a key exists in instance storage.
@@ -146,4 +147,6 @@ impl StorageContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

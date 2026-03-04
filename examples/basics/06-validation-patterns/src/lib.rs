@@ -24,9 +24,7 @@
 //! - Permission checks for specific operations
 
 #![no_std]
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Address, Env, String, Vec,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, String, Vec};
 
 // ---------------------------------------------------------------------------
 // Error Types
@@ -121,7 +119,7 @@ pub enum DataKey {
 // ---------------------------------------------------------------------------
 
 /// Validation Patterns Contract
-/// 
+///
 /// This contract demonstrates comprehensive validation patterns for Soroban smart contracts.
 /// It shows how to properly validate inputs, state, and authorization with clear error messages.
 #[contract]
@@ -132,10 +130,10 @@ impl ValidationContract {
     // ==================== INITIALIZATION ====================
 
     /// Initialize the contract with an owner
-    /// 
+    ///
     /// # Arguments
     /// * `owner` - The address that will own the contract
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InvalidAddress` - If owner address is invalid
     /// * `ValidationError::ContractNotInitialized` - If already initialized
@@ -154,7 +152,9 @@ impl ValidationContract {
         // Set initial state
         env.storage().instance().set(&DataKey::Owner, &owner);
         env.storage().instance().set(&DataKey::Admin, &owner);
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
 
         Ok(())
     }
@@ -162,12 +162,12 @@ impl ValidationContract {
     // ==================== PARAMETER VALIDATION EXAMPLES ====================
 
     /// Example of parameter validation with amounts
-    /// 
+    ///
     /// # Arguments
     /// * `amount` - The amount to validate
     /// * `min_amount` - Minimum allowed amount
     /// * `max_amount` - Maximum allowed amount
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InvalidAmount` - If amount is negative
     /// * `ValidationError::AmountTooSmall` - If amount is below minimum
@@ -195,12 +195,12 @@ impl ValidationContract {
     }
 
     /// Example of string parameter validation
-    /// 
+    ///
     /// # Arguments
     /// * `text` - The string to validate
     /// * `min_length` - Minimum required length
     /// * `max_length` - Maximum allowed length
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InvalidString` - If string contains invalid characters
     /// * `ValidationError::StringTooShort` - If string is too short
@@ -230,10 +230,10 @@ impl ValidationContract {
     }
 
     /// Example of address parameter validation
-    /// 
+    ///
     /// # Arguments
     /// * `address` - The address to validate
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InvalidAddress` - If address is invalid
     pub fn validate_address(_address: Address) -> Result<(), ValidationError> {
@@ -244,12 +244,12 @@ impl ValidationContract {
     }
 
     /// Example of array parameter validation
-    /// 
+    ///
     /// # Arguments
     /// * `array` - The array to validate
     /// * `min_size` - Minimum required size
     /// * `max_size` - Maximum allowed size
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::ArrayTooSmall` - If array is too small
     /// * `ValidationError::ArrayTooLarge` - If array is too large
@@ -272,12 +272,12 @@ impl ValidationContract {
     }
 
     /// Example of timestamp parameter validation
-    /// 
+    ///
     /// # Arguments
     /// * `timestamp` - The timestamp to validate
     /// * `allow_past` - Whether past timestamps are allowed
     /// * `max_future_seconds` - Maximum seconds in the future allowed
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InvalidTimestamp` - If timestamp is invalid
     /// * `ValidationError::TimestampInPast` - If timestamp is in the past (when not allowed)
@@ -306,11 +306,11 @@ impl ValidationContract {
     // ==================== STATE VALIDATION EXAMPLES ====================
 
     /// Example of contract state validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `required_state` - The required contract state
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::ContractNotInitialized` - If contract is not initialized
     /// * `ValidationError::ContractPaused` - If contract is paused
@@ -324,11 +324,7 @@ impl ValidationContract {
             return Err(ValidationError::ContractNotInitialized);
         }
 
-        let current_state: ContractState = env
-            .storage()
-            .instance()
-            .get(&DataKey::State)
-            .unwrap();
+        let current_state: ContractState = env.storage().instance().get(&DataKey::State).unwrap();
 
         match current_state {
             ContractState::Uninitialized => {
@@ -352,12 +348,12 @@ impl ValidationContract {
     }
 
     /// Example of balance validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `address` - The address to check balance for
     /// * `required_amount` - The required minimum balance
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InsufficientBalance` - If balance is insufficient
     pub fn validate_balance(
@@ -379,13 +375,13 @@ impl ValidationContract {
     }
 
     /// Example of allowance validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `owner` - The owner address
     /// * `spender` - The spender address
     /// * `required_amount` - The required minimum allowance
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::InsufficientAllowance` - If allowance is insufficient
     pub fn validate_allowance(
@@ -408,12 +404,12 @@ impl ValidationContract {
     }
 
     /// Example of cooldown validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `address` - The address to check cooldown for
     /// * `cooldown_seconds` - The cooldown period in seconds
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::CooldownActive` - If cooldown is still active
     pub fn validate_cooldown(
@@ -421,9 +417,13 @@ impl ValidationContract {
         address: Address,
         cooldown_seconds: u64,
     ) -> Result<(), ValidationError> {
-        if let Some(last_action) = env.storage().persistent().get::<DataKey, u64>(&DataKey::LastAction(address.clone())) {
+        if let Some(last_action) = env
+            .storage()
+            .persistent()
+            .get::<DataKey, u64>(&DataKey::LastAction(address.clone()))
+        {
             let current_time = env.ledger().timestamp();
-            
+
             if current_time < last_action + cooldown_seconds {
                 return Err(ValidationError::CooldownActive);
             }
@@ -435,12 +435,12 @@ impl ValidationContract {
     // ==================== AUTHORIZATION VALIDATION EXAMPLES ====================
 
     /// Example of role-based authorization validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `address` - The address to validate
     /// * `required_role` - The minimum required role
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotAdmin` - If address is not admin
     /// * `ValidationError::NotOwner` - If address is not owner
@@ -452,7 +452,11 @@ impl ValidationContract {
         required_role: UserRole,
     ) -> Result<(), ValidationError> {
         // Check if address is blacklisted
-        if env.storage().instance().has(&DataKey::Blacklist(address.clone())) {
+        if env
+            .storage()
+            .instance()
+            .has(&DataKey::Blacklist(address.clone()))
+        {
             return Err(ValidationError::Blacklisted);
         }
 
@@ -487,11 +491,11 @@ impl ValidationContract {
     }
 
     /// Example of ownership validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `address` - The address claiming to be owner
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotOwner` - If address is not the owner
     pub fn validate_ownership(env: &Env, address: Address) -> Result<(), ValidationError> {
@@ -509,11 +513,11 @@ impl ValidationContract {
     }
 
     /// Example of admin validation
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `address` - The address claiming to be admin
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotAdmin` - If address is not admin
     pub fn validate_admin(env: &Env, address: Address) -> Result<(), ValidationError> {
@@ -533,14 +537,14 @@ impl ValidationContract {
     // ==================== COMBINED VALIDATION EXAMPLES ====================
 
     /// Example of a function that combines all validation types
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `from` - The sender address
     /// * `to` - The recipient address
     /// * `amount` - The amount to transfer
     /// * `message` - Optional transfer message
-    /// 
+    ///
     /// # Errors
     /// Various validation errors depending on the validation that fails
     pub fn validated_transfer(
@@ -554,7 +558,7 @@ impl ValidationContract {
         Self::validate_address(from.clone())?;
         Self::validate_address(to.clone())?;
         Self::validate_amount_parameters(amount, 1, 1000000)?;
-        
+
         if let Some(msg) = &message {
             Self::validate_string_parameters(msg.clone(), 0, 100)?;
         }
@@ -576,18 +580,24 @@ impl ValidationContract {
             .persistent()
             .get(&DataKey::Balance(from.clone()))
             .unwrap_or(0);
-        
+
         let to_balance: i128 = env
             .storage()
             .persistent()
             .get(&DataKey::Balance(to.clone()))
             .unwrap_or(0);
 
-        env.storage().persistent().set(&DataKey::Balance(from.clone()), &(from_balance - amount));
-        env.storage().persistent().set(&DataKey::Balance(to), &(to_balance + amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to), &(to_balance + amount));
 
         // Update last action timestamp
-        env.storage().persistent().set(&DataKey::LastAction(from), &env.ledger().timestamp());
+        env.storage()
+            .persistent()
+            .set(&DataKey::LastAction(from), &env.ledger().timestamp());
 
         Ok(())
     }
@@ -595,13 +605,13 @@ impl ValidationContract {
     // ==================== UTILITY FUNCTIONS ====================
 
     /// Set user role (admin only)
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `admin` - The admin address
     /// * `user` - The user to set role for
     /// * `role` - The role to assign
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotAdmin` - If caller is not admin
     /// * `ValidationError::InvalidEnum` - If role is invalid
@@ -619,41 +629,47 @@ impl ValidationContract {
         Self::validate_address(user.clone())?;
 
         // Set the role
-        env.storage().instance().set(&DataKey::UserRole(user), &role);
+        env.storage()
+            .instance()
+            .set(&DataKey::UserRole(user), &role);
 
         Ok(())
     }
 
     /// Pause contract (admin only)
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `admin` - The admin address
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotAdmin` - If caller is not admin
     pub fn pause_contract(env: Env, admin: Address) -> Result<(), ValidationError> {
         Self::validate_admin(&env, admin.clone())?;
         admin.require_auth();
 
-        env.storage().instance().set(&DataKey::State, &ContractState::Paused);
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Paused);
 
         Ok(())
     }
 
     /// Resume contract (admin only)
-    /// 
+    ///
     /// # Arguments
     /// * `env` - The contract environment
     /// * `admin` - The admin address
-    /// 
+    ///
     /// # Errors
     /// * `ValidationError::NotAdmin` - If caller is not admin
     pub fn resume_contract(env: Env, admin: Address) -> Result<(), ValidationError> {
         Self::validate_admin(&env, admin.clone())?;
         admin.require_auth();
 
-        env.storage().instance().set(&DataKey::State, &ContractState::Active);
+        env.storage()
+            .instance()
+            .set(&DataKey::State, &ContractState::Active);
 
         Ok(())
     }
@@ -683,4 +699,6 @@ impl ValidationContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;

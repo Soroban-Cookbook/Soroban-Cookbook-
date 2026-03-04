@@ -375,4 +375,6 @@ impl EventsContract {
     }
 }
 
+#[cfg(test)]
+#[cfg(test)]
 mod test;
