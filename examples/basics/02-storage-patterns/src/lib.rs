@@ -12,6 +12,7 @@
 use soroban_sdk::{contract, contractimpl, contracttype, Env, Symbol};
 
 #[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DataKey {
     Persistent(Symbol),
     Temporary(Symbol),
