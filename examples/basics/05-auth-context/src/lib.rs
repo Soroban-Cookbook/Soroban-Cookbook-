@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Vec};
+use soroban_sdk::{contract, contractimpl, Address, Env};
 
 #[contract]
 pub struct AuthContextContract;
@@ -21,18 +21,13 @@ impl AuthContextContract {
         env.current_contract_address()
     }
 
-    /// Demonstrates how to use `env.auths()` to inspect the authorization context.
+    /// Demonstrates authorization context by requiring auth and returning the invoker.
     /// This is particularly useful in testing to verify that the correct
     /// authorizations were provided.
-    pub fn get_auth_context(env: Env, invoker: Address) -> Vec<Address> {
+    pub fn get_auth_context(_env: Env, invoker: Address) -> Address {
         invoker.require_auth();
-        // env.auths() returns a list of (Address, AuthorizedInvocation) tuples.
-        // We can simply extract the addresses that have authorized the invocation.
-        let mut results = Vec::new(&env);
-        for auth in env.auths() {
-            results.push_back(auth.0.clone());
-        }
-        results
+        // The invoker has been authenticated by require_auth()
+        invoker
     }
 
     /// An example of an admin-only operation using require_auth directly.

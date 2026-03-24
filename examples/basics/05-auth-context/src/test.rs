@@ -97,13 +97,11 @@ fn test_get_auth_context() {
 
     env.mock_all_auths();
 
-    // Call the function that requires auth and returns the contexts logged so far in that call
-    let auth_contexts = client.get_auth_context(&user);
+    // Call the function that requires auth and returns the authenticated user
+    let auth_context = client.get_auth_context(&user);
 
-    // Note: When using `env.mock_all_auths()`, the mocked authorizations are not populated
-    // into the contract's local `env.auths()` array in the same way they would be from a
-    // real transaction payload payload. In a real environment, this array would contain elements.
-    assert_eq!(auth_contexts.len(), 0);
+    // Verify that the authenticated user is returned
+    assert_eq!(auth_context, user);
 }
 
 #[test]
