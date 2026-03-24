@@ -34,11 +34,17 @@ impl StorageContract {
         // Store in persistent storage
         env.storage().persistent().set(&storage_key, &value);
 
+<<<<<<< HEAD
         // Extend TTL to keep data alive
         // Parameters: (key, threshold_ledgers, extend_to_ledgers)
         // This extends TTL to 100 ledgers when it falls below 100
         env.storage().persistent().extend_ttl(&key, 100, 100);
 
+=======
+        // Temporarily disabled for debugging
+        // env.storage().persistent().extend_ttl(&storage_key, 1000, 10000);
+        
+>>>>>>> 0fee596 (new storage patterns)
         // EVENT: Persistent storage updated
         env.events().publish(
             (symbol_short!("persist"), symbol_short!("set")),
@@ -93,9 +99,15 @@ impl StorageContract {
         let storage_key = DataKey::Instance(key.clone());
         env.storage().instance().set(&storage_key, &value);
 
+<<<<<<< HEAD
         // Extend instance storage TTL
         env.storage().instance().extend_ttl(100, 100);
 
+=======
+        // Temporarily disabled for debugging
+        // env.storage().instance().extend_ttl(1000, 10000);
+        
+>>>>>>> 0fee596 (new storage patterns)
         // EVENT: Instance storage updated
         env.events().publish(
             (symbol_short!("instance"), symbol_short!("set")),
