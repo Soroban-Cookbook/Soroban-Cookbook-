@@ -9,7 +9,14 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Env, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Env, Symbol};
+
+#[contracttype]
+pub enum DataKey {
+    Persistent(Symbol),
+    Temporary(Symbol),
+    Instance(Symbol),
+}
 
 /// Storage contract demonstrating all three storage types
 #[contract]
@@ -29,13 +36,13 @@ impl StorageContract {
     /// # Cost
     /// Higher write cost, requires rent (TTL management)
     pub fn set_persistent(env: Env, key: Symbol, value: u64) {
+        let storage_key = DataKey::Persistent(key);
         // Store in persistent storage
-        env.storage().persistent().set(&key, &value);
+        env.storage().persistent().set(&storage_key, &value);
 
         // Extend TTL to keep data alive
         // Parameters: (key, threshold_ledgers, extend_to_ledgers)
-        // This extends TTL to 100 ledgers when it falls below 100
-        env.storage().persistent().extend_ttl(&key, 100, 100);
+        env.storage().persistent().extend_ttl(&storage_key, 100, 100);
     }
 
     /// Retrieves a value from persistent storage.
@@ -43,17 +50,17 @@ impl StorageContract {
     /// # Returns
     /// The stored value, or panics if key doesn't exist
     pub fn get_persistent(env: Env, key: Symbol) -> u64 {
-        env.storage().persistent().get(&key).unwrap()
+        env.storage().persistent().get(&DataKey::Persistent(key)).unwrap()
     }
 
     /// Checks if a key exists in persistent storage.
     pub fn has_persistent(env: Env, key: Symbol) -> bool {
-        env.storage().persistent().has(&key)
+        env.storage().persistent().has(&DataKey::Persistent(key))
     }
 
     /// Removes a value from persistent storage.
     pub fn remove_persistent(env: Env, key: Symbol) {
-        env.storage().persistent().remove(&key);
+        env.storage().persistent().remove(&DataKey::Persistent(key));
     }
 
     // ==================== TEMPORARY STORAGE ====================
@@ -73,7 +80,7 @@ impl StorageContract {
     /// - Transaction-scoped flags
     /// - Temporary state within a single operation
     pub fn set_temporary(env: Env, key: Symbol, value: u64) {
-        env.storage().temporary().set(&key, &value);
+        env.storage().temporary().set(&DataKey::Temporary(key), &value);
     }
 
     /// Retrieves a value from temporary storage.
@@ -81,12 +88,12 @@ impl StorageContract {
     /// # Returns
     /// The stored value, or panics if key doesn't exist
     pub fn get_temporary(env: Env, key: Symbol) -> u64 {
-        env.storage().temporary().get(&key).unwrap()
+        env.storage().temporary().get(&DataKey::Temporary(key)).unwrap()
     }
 
     /// Checks if a key exists in temporary storage.
     pub fn has_temporary(env: Env, key: Symbol) -> bool {
-        env.storage().temporary().has(&key)
+        env.storage().temporary().has(&DataKey::Temporary(key))
     }
 
     // ==================== INSTANCE STORAGE ====================
@@ -106,7 +113,7 @@ impl StorageContract {
     /// - Admin addresses
     /// - Contract metadata
     pub fn set_instance(env: Env, key: Symbol, value: u64) {
-        env.storage().instance().set(&key, &value);
+        env.storage().instance().set(&DataKey::Instance(key), &value);
 
         // Extend instance storage TTL
         env.storage().instance().extend_ttl(100, 100);
@@ -117,17 +124,17 @@ impl StorageContract {
     /// # Returns
     /// The stored value, or panics if key doesn't exist
     pub fn get_instance(env: Env, key: Symbol) -> u64 {
-        env.storage().instance().get(&key).unwrap()
+        env.storage().instance().get(&DataKey::Instance(key)).unwrap()
     }
 
     /// Checks if a key exists in instance storage.
     pub fn has_instance(env: Env, key: Symbol) -> bool {
-        env.storage().instance().has(&key)
+        env.storage().instance().has(&DataKey::Instance(key))
     }
 
     /// Removes a value from instance storage.
     pub fn remove_instance(env: Env, key: Symbol) {
-        env.storage().instance().remove(&key);
+        env.storage().instance().remove(&DataKey::Instance(key));
     }
 }
 
