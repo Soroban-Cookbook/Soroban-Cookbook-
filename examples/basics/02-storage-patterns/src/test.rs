@@ -176,8 +176,9 @@ fn test_missing_key_returns_none_for_get_persistent() {
     let client = StorageContractClient::new(&env, &contract_id);
 
     let missing = symbol_short!("nope");
-    // This should panic because key was never set and get().unwrap() is used in contract
-    let _ = client.get_persistent(&missing);
+    // This should return None because key was never set (it was failing with MissingValue if get().unwrap() was used)
+    let result = client.get_persistent(&missing);
+    assert_eq!(result, None);
 }
 
 #[test]
