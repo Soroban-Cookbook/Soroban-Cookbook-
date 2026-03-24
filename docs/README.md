@@ -93,7 +93,9 @@ New to Soroban? Start here:
   - [Custom Token](../examples/tokens/)
 
 - **Storage & Data**
-  - [Storage Patterns](../examples/basics/02-storage-patterns/)
+  - [Storage Types](./storage-types.md) - Comparison and usage
+  - [Basic Storage Patterns](../examples/basics/02-storage-patterns/)
+  - [Detailed Instance Storage](../examples/basics/instance-storage/)
   - [Data Structures](../examples/intermediate/)
   - [Efficient Storage](../examples/advanced/)
 
