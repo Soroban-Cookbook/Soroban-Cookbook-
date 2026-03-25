@@ -1,5 +1,9 @@
 use super::*;
-use soroban_sdk::{symbol_short, testutils::Address as _, vec, Env};
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, Ledger},
+    vec, Env,
+};
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -287,4 +291,235 @@ fn test_multi_sig_missing_one_auth() {
     env.mock_auths(&[]);
 
     client.multi_sig_action(&signers, &10);
+// Role-Based Access Control Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_grant_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Moderator);
+    assert_eq!(client.get_role(&user), Role::Moderator as u32);
+}
+
+#[test]
+fn test_revoke_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.get_role(&user), Role::Admin as u32);
+
+    client.revoke_role(&admin, &user);
+    assert_eq!(client.get_role(&user), Role::User as u32);
+}
+
+#[test]
+fn test_has_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Moderator);
+    assert!(client.has_role(&user, &Role::Moderator));
+    assert!(client.has_role(&user, &Role::User));
+    assert!(!client.has_role(&user, &Role::Admin));
+}
+
+#[test]
+fn test_admin_role_action_success() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.admin_role_action(&user, &10), 20);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #8)")]
+fn test_admin_role_action_insufficient_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::User);
+    client.admin_role_action(&user, &10);
+}
+
+#[test]
+fn test_moderator_action_with_moderator() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Moderator);
+    assert_eq!(client.moderator_action(&user, &10), 20);
+}
+
+#[test]
+fn test_moderator_action_with_admin() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.moderator_action(&user, &10), 20);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #8)")]
+fn test_moderator_action_with_user_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::User);
+    client.moderator_action(&user, &10);
+}
+
+// ---------------------------------------------------------------------------
+// Time-Based Restrictions Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_set_time_lock() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    client.set_time_lock(&admin, &1000);
+    // Time lock is set, verified by attempting a time-locked action
+}
+
+#[test]
+fn test_time_locked_action_before_unlock() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 500);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_time_lock(&admin, &1000);
+
+    let result = client.try_time_locked_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::TimeLocked)));
+}
+
+#[test]
+fn test_time_locked_action_after_unlock() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1500);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_time_lock(&admin, &1000);
+    assert_eq!(client.time_locked_action(&user), 1500);
+}
+
+#[test]
+fn test_set_cooldown() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    client.set_cooldown(&admin, &300);
+    // Cooldown is set, verified by attempting a cooldown action
+}
+
+#[test]
+fn test_cooldown_action_first_call() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    assert_eq!(client.cooldown_action(&user), 1000);
+}
+
+#[test]
+fn test_cooldown_action_within_period() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    client.cooldown_action(&user);
+
+    env.ledger().with_mut(|li| li.timestamp = 1200);
+    let result = client.try_cooldown_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::CooldownActive)));
+}
+
+#[test]
+fn test_cooldown_action_after_period() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    client.cooldown_action(&user);
+
+    env.ledger().with_mut(|li| li.timestamp = 1400);
+    assert_eq!(client.cooldown_action(&user), 1400);
+}
+
+// ---------------------------------------------------------------------------
+// State-Based Authorization Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_set_state() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    client.set_state(&admin, &ContractState::Paused);
+    assert_eq!(client.get_state(), ContractState::Paused as u32);
+}
+
+#[test]
+fn test_active_only_action_when_active() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_state(&admin, &ContractState::Active);
+    assert_eq!(client.active_only_action(&user), 1000);
+}
+
+#[test]
+fn test_active_only_action_when_paused() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_state(&admin, &ContractState::Paused);
+    let result = client.try_active_only_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::InvalidState)));
+}
+
+#[test]
+fn test_active_only_action_when_frozen() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_state(&admin, &ContractState::Frozen);
+    let result = client.try_active_only_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::InvalidState)));
+}
+
+#[test]
+fn test_default_state_is_active() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, _admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    assert_eq!(client.get_state(), ContractState::Active as u32);
+    assert_eq!(client.active_only_action(&user), 1000);
 }
