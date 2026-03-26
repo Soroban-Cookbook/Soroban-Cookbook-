@@ -13,3 +13,8 @@ Core concepts and fundamentals for getting started with Soroban smart contracts.
 - **Data Types** - Working with Soroban data types
 
 [View all basic examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/basics)
+
+---
+
+> [!TIP]
+> **Security First**: Before diving into implementation, we recommend reviewing our [Security Fundamentals](../docs/security/fundamentals.md) guide to understand common pitfalls and secure design patterns in Soroban.

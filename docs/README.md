@@ -48,8 +48,7 @@ New to Soroban? Start here:
 
 - **[Quick Reference](./quick-reference.md)** - Cheat sheet
 - **[Best Practices](./best-practices.md)** - Recommended patterns
-- **[Common Pitfalls](./common-pitfalls.md)** - Avoid these mistakes
-- **[Security Guide](./security.md)** - Security checklist
+- **[Security Fundamentals](./security/fundamentals.md)** - Common vulnerabilities and mitigations
 
 ### Technical References
 
@@ -204,7 +203,7 @@ New to Soroban? Start here:
 | From Ethereum     | [Migration](../guides/ethereum-to-soroban.md) |
 | DeFi Examples     | [Directory](../examples/defi/)                |
 | Token Standards   | [Examples](../examples/tokens/)               |
-| Security          | [Guide](./security.md)                        |
+| Security          | [Fundamentals](./security/fundamentals.md)    |
 
 ## 🆕 Latest Additions
 

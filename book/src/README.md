@@ -40,6 +40,7 @@ soroban contract build
 
 ## Additional Resources
 
+- [Security Fundamentals](./docs/security/fundamentals.md)
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
 - [Stellar Developer Portal](https://developers.stellar.org)
 - [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)

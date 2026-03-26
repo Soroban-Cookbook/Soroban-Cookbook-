@@ -22,6 +22,10 @@
 - [Governance](./examples/governance.md)
 - [Tokens](./examples/tokens.md)
 
+# Security
+
+- [Fundamentals](./docs/security/fundamentals.md)
+
 # Reference
 
 - [Quick Reference](./docs/quick-reference.md)

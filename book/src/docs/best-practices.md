@@ -1,6 +1,6 @@
 # Soroban Smart Contract Best Practices
 
-A comprehensive guide to writing secure, efficient, and maintainable Soroban smart contracts.
+A comprehensive guide to writing secure, efficient, and maintainable Soroban smart contracts. For a deeper dive into security specifically, see the [Security Fundamentals](./security/fundamentals.md) guide.
 
 ## 🔒 Security Best Practices
 
