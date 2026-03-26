@@ -3,8 +3,191 @@ extern crate std;
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation},
-    Address, Env, IntoVal, Symbol, Vec,
+    Address, Bytes, Env, IntoVal, Symbol, Vec,
 };
+
+// ---------------------------------------------------------------------------
+// Auth vector: encode / decode / validate tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_encode_decode_roundtrip() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let c = Address::generate(&env);
+    let signers = Vec::from_array(&env, [a.clone(), b.clone(), c.clone()]);
+
+    let encoded = client.encode_auth_vec(&signers);
+    let decoded = client.decode_auth_vec(&encoded);
+
+    // Decoded length must equal number of unique signers.
+    assert_eq!(decoded.len(), 3);
+    // Every original signer must appear in the decoded vector.
+    assert!(decoded.contains(&a));
+    assert!(decoded.contains(&b));
+    assert!(decoded.contains(&c));
+}
+
+#[test]
+fn test_encode_deduplicates() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    // Pass the same address twice.
+    let signers = Vec::from_array(&env, [a.clone(), a.clone()]);
+
+    let encoded = client.encode_auth_vec(&signers);
+    // After dedup only one entry should remain.
+    assert_eq!(client.auth_vec_len(&encoded), 1);
+}
+
+#[test]
+fn test_encode_sorts_canonically() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+
+    // Encode in both orders — the resulting blobs must be identical.
+    let fwd = client.encode_auth_vec(&Vec::from_array(&env, [a.clone(), b.clone()]));
+    let rev = client.encode_auth_vec(&Vec::from_array(&env, [b.clone(), a.clone()]));
+
+    assert_eq!(fwd, rev);
+}
+
+#[test]
+fn test_validate_accepts_well_formed_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a, b]));
+
+    assert!(client.validate_auth_vec(&encoded));
+}
+
+#[test]
+fn test_validate_rejects_empty_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    assert!(!client.validate_auth_vec(&Bytes::new(&env)));
+}
+
+#[test]
+fn test_validate_rejects_truncated_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a]));
+
+    // Truncate by one byte — length no longer matches count.
+    let truncated_len = encoded.len() - 1;
+    let mut bad = Bytes::new(&env);
+    for i in 0..truncated_len {
+        bad.push_back(encoded.get(i).unwrap());
+    }
+    assert!(!client.validate_auth_vec(&bad));
+}
+
+#[test]
+fn test_validate_rejects_zero_count_header() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    // Manually craft a blob with count = 0.
+    let mut bad = Bytes::new(&env);
+    bad.push_back(0); bad.push_back(0); bad.push_back(0); bad.push_back(0);
+    assert!(!client.validate_auth_vec(&bad));
+}
+
+#[test]
+fn test_auth_vec_len() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let signers = Vec::from_array(&env, [
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+    ]);
+    let encoded = client.encode_auth_vec(&signers);
+    assert_eq!(client.auth_vec_len(&encoded), 3);
+}
+
+#[test]
+fn test_auth_vec_contains() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let outsider = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a.clone(), b.clone()]));
+
+    assert!(client.auth_vec_contains(&encoded, &a));
+    assert!(client.auth_vec_contains(&encoded, &b));
+    assert!(!client.auth_vec_contains(&encoded, &outsider));
+}
+
+#[test]
+#[should_panic(expected = "auth vector must not be empty")]
+fn test_encode_empty_panics() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+    client.encode_auth_vec(&Vec::new(&env));
+}
+
+#[test]
+#[should_panic(expected = "auth vector exceeds MAX_SIGNERS")]
+fn test_encode_exceeds_max_signers_panics() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let mut too_many: Vec<Address> = Vec::new(&env);
+    for _ in 0..=MAX_SIGNERS {
+        too_many.push_back(Address::generate(&env));
+    }
+    client.encode_auth_vec(&too_many);
+}
+
+#[test]
+fn test_encoded_transfer_requires_all_auths() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let to = Address::generate(&env);
+
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [s1.clone(), s2.clone()]));
+    // Should not panic — both signers are mocked.
+    client.multi_sig_transfer_encoded(&encoded, &to, &500i128);
+}
+
+// ---------------------------------------------------------------------------
+// Existing multi-party tests (unchanged)
+// ---------------------------------------------------------------------------
 
 #[test]
 fn test_multi_sig_transfer() {
