@@ -247,62 +247,44 @@ impl PrimitiveTypesContract {
     // Type Conversions
     // ---------------------------------------------------------------------------
 
-    /// Convert u32 to u64 (always safe)
+    /// Convert u32 to u64 (always safe — lossless widening via `From`)
     pub fn u32_to_u64(_env: Env, value: u32) -> u64 {
-        value as u64
+        u64::from(value)
     }
 
-    /// Convert u64 to u32 (may overflow)
+    /// Convert u64 to u32 (may overflow — uses `TryFrom` for a checked narrowing cast)
     pub fn u64_to_u32(_env: Env, value: u64) -> Result<u32, ContractError> {
-        if value > u32::MAX as u64 {
-            return Err(ContractError::ConversionError);
-        }
-        Ok(value as u32)
+        u32::try_from(value).map_err(|_| ContractError::ConversionError)
     }
 
-    /// Convert i32 to i64 (always safe)
+    /// Convert i32 to i64 (always safe — lossless widening via `From`)
     pub fn i32_to_i64(_env: Env, value: i32) -> i64 {
-        value as i64
+        i64::from(value)
     }
 
-    /// Convert i64 to i32 (may overflow)
+    /// Convert i64 to i32 (may overflow — uses `TryFrom` for a checked narrowing cast)
     pub fn i64_to_i32(_env: Env, value: i64) -> Result<i32, ContractError> {
-        if value > i32::MAX as i64 || value < i32::MIN as i64 {
-            return Err(ContractError::ConversionError);
-        }
-        Ok(value as i32)
+        i32::try_from(value).map_err(|_| ContractError::ConversionError)
     }
 
-    /// Convert u32 to i32 (may overflow if value > i32::MAX)
+    /// Convert u32 to i32 (may overflow if `value > i32::MAX` — uses `TryFrom`)
     pub fn u32_to_i32(_env: Env, value: u32) -> Result<i32, ContractError> {
-        if value > i32::MAX as u32 {
-            return Err(ContractError::ConversionError);
-        }
-        Ok(value as i32)
+        i32::try_from(value).map_err(|_| ContractError::ConversionError)
     }
 
-    /// Convert i32 to u32 (may underflow if value < 0)
+    /// Convert i32 to u32 (fails if `value < 0` — negative integers cannot be represented as u32)
     pub fn i32_to_u32(_env: Env, value: i32) -> Result<u32, ContractError> {
-        if value < 0 {
-            return Err(ContractError::NegativeValue);
-        }
-        Ok(value as u32)
+        u32::try_from(value).map_err(|_| ContractError::NegativeValue)
     }
 
-    /// Convert i64 to u64 (may underflow if value < 0)
+    /// Convert i64 to u64 (fails if `value < 0` — negative integers cannot be represented as u64)
     pub fn i64_to_u64(_env: Env, value: i64) -> Result<u64, ContractError> {
-        if value < 0 {
-            return Err(ContractError::NegativeValue);
-        }
-        Ok(value as u64)
+        u64::try_from(value).map_err(|_| ContractError::NegativeValue)
     }
 
-    /// Convert u64 to i64 (may overflow if value > i64::MAX)
+    /// Convert u64 to i64 (may overflow if `value > i64::MAX` — uses `TryFrom`)
     pub fn u64_to_i64(_env: Env, value: u64) -> Result<i64, ContractError> {
-        if value > i64::MAX as u64 {
-            return Err(ContractError::ConversionError);
-        }
-        Ok(value as i64)
+        i64::try_from(value).map_err(|_| ContractError::ConversionError)
     }
 
     // ---------------------------------------------------------------------------
