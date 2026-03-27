@@ -56,4 +56,3 @@ book/
 - Themes: Customize in `book.toml`
 
 See [mdBook Book](https://rust-lang.github.io/mdBook/) for advanced usage.
-

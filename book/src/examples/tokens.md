@@ -1,13 +1,29 @@
 # Token Examples
 
-Token standards, custom tokens, and token-related patterns.
+Fungible tokens, standards, wrappers.
 
-## Available Examples
+## 📋 Coming Soon
 
-- Custom token implementations
-- Token wrappers
-- SEP-41 token standard
-- Token utilities
-- Token bridges
+### SEP-41 Token
+**Soroban token interface**.
 
-[View all token examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/tokens)
+**Key Concepts:**
+- Mint/burn controls
+- Transfer/approval
+- Metadata
+
+### Token Wrapper
+**Wrap native assets**.
+
+**Key Concepts:**
+- Deposit/mint
+- Burn/withdraw
+- Pausable emergency
+
+## Placeholder
+`examples/tokens/` directory ready.
+
+## Prerequisites
+- [Basics](../basics.md), [Auth](../basics/03-authentication/)
+
+## End of Examples Section 🎉

@@ -1,13 +1,29 @@
 # NFT Examples
 
-Non-fungible token implementations and NFT-related contracts.
+Non-fungible tokens & marketplaces on Soroban.
 
-## Available Examples
+## 📋 Coming Soon
 
-- NFT minting and management
-- NFT marketplaces
-- Metadata standards
-- Collection management
-- Royalty systems
+### Core NFT Contract
+**Mint, transfer, metadata**.
 
-[View all NFT examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/nfts)
+**Key Concepts:**
+- Unique ID generation
+- Token URI standards
+- Royalty enforcement
+
+### NFT Marketplace
+**Fixed-price & auction listings**.
+
+**Key Concepts:**
+- Escrow patterns
+- Bid management
+- Royalty splits
+
+## Placeholder
+`examples/nfts/` ready for first implementation.
+
+## Prerequisites
+- [Basics](../basics.md)
+
+## Next: [Governance](../governance.md)

@@ -1,13 +1,40 @@
 # Advanced Examples
 
-Complex systems and architectural patterns for sophisticated Soroban applications.
+Complex protocols & optimizations for production systems.
 
-## Topics Covered
+## 📋 Examples (2 currently)
 
-- Design patterns and architecture
-- Performance optimization
-- Resource efficiency
-- Complex state management
-- Advanced security patterns
+### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
+**Advanced multi-party authorization** beyond simple multisig.
 
-[View all advanced examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/advanced)
+**Key Concepts:**
+- Dynamic signer lists
+- Weighted voting
+- Time-bound approvals
+
+---
+
+### [02-timelock](../examples/advanced/02-timelock/)
+**Delayed execution** for governance & security.
+
+**Key Concepts:**
+- Ledger-timestamp gates
+- Queue-based execution
+- Emergency overrides
+
+**Quick Code:**
+```rust
+if env.ledger().timestamp() < unlock_time {
+    return Err(Error::TimeLocked);
+}
+```
+
+**[More coming...]** Factories, bonding curves, merkle proofs.
+
+## ⚠️ Warning
+Advanced patterns increase complexity - audit thoroughly!
+
+## Prerequisites
+- [Basics](../basics.md), [Intermediate](../intermediate.md)
+
+## Next: [DeFi](../defi.md)

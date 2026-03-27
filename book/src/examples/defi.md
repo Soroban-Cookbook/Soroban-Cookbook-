@@ -1,13 +1,43 @@
 # DeFi Examples
 
-Decentralized finance protocols and financial applications on Soroban.
+Decentralized finance on Soroban: AMMs, lending, yield protocols.
 
-## Available Examples
+## 📋 Coming Soon
 
-- Automated Market Makers (AMMs)
-- Lending and borrowing protocols
-- Yield vaults and farming
-- Escrow and payment systems
-- Liquidity pools
+Planned examples:
 
-[View all DeFi examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/defi)
+### Automated Market Maker (AMM)
+**Constant product pools** (x*y=k).
+
+**Key Concepts:**
+- Price curves & liquidity
+- Swap math with slippage
+- LP token mint/burn
+
+### Lending Protocol
+**Over-collateralized loans**.
+
+**Key Concepts:**
+- Oracle price feeds
+- Liquidation thresholds
+- Interest accrual
+
+### Yield Vault
+**Automated yield optimization**.
+
+**Key Concepts:**
+- Strategy rotation
+- Performance fees
+- Emergency withdrawal
+
+## Placeholder Content
+Currently empty `examples/defi/` directory.
+
+## Prerequisites
+- [Basics](../basics.md), [Tokens](../tokens.md)
+
+## Resources
+- [Uniswap V2 Math](https://uniswap.org/whitepaper.pdf)
+- Soroban token standards
+
+## Next: [NFTs](../nfts.md)

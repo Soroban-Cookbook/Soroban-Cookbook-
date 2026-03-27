@@ -1,13 +1,29 @@
 # Governance Examples
 
-DAO implementations, voting systems, and governance mechanisms.
+DAOs, voting, treasury management.
 
-## Available Examples
+## 📋 Coming Soon
 
-- Decentralized Autonomous Organizations (DAOs)
-- Voting and proposal systems
-- Multi-signature governance
-- Timelock mechanisms
-- Treasury management
+### Simple DAO
+**Token-weighted voting**.
 
-[View all governance examples →](https://github.com/Soroban-Cookbook/Soroban-Cookbook/tree/main/examples/governance)
+**Key Concepts:**
+- Proposal creation
+- Quadratic voting option
+- Execution thresholds
+
+### Treasury
+**Multi-sig spending**.
+
+**Key Concepts:**
+- Timelock delays
+- Spending limits
+- Veto mechanisms
+
+## Placeholder
+`examples/governance/` awaiting content.
+
+## Prerequisites
+- [Basics](../basics.md), [Tokens](../tokens.md)
+
+## Next: [Tokens](../tokens.md)

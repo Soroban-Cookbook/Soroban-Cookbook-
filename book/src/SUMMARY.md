@@ -11,22 +11,35 @@
 
 # Examples
 
-- [Basics](./examples/basics.md)
-- [Intermediate](./examples/intermediate.md)
-- [Advanced](./examples/advanced.md)
+## Basics (11 examples)
+- [Overview & listing](./examples/basics.md)
+
+## Intermediate
+- [Multi-sig patterns](./examples/intermediate.md)
+
+## Advanced (2 examples)
+- [Multi-party auth](./examples/advanced.md)
 
 # Use Cases
 
-- [DeFi](./examples/defi.md)
-- [NFTs](./examples/nfts.md)
-- [Governance](./examples/governance.md)
-- [Tokens](./examples/tokens.md)
+## DeFi
+- [Overview & planned](./examples/defi.md)
+
+## NFTs
+- [Overview & planned](./examples/nfts.md)
+
+## Governance
+- [Overview & planned](./examples/governance.md)
+
+## Tokens
+- [Overview & planned](./examples/tokens.md)
 
 # Reference
 
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
 - [Glossary](./docs/glossary.md)
+- [Common Patterns](./docs/common-patterns.md)
 
 # Contributing
 
