@@ -38,7 +38,6 @@
 #![no_std]
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Env};
 
-
 // Contract Errors
 
 /// All error codes the contract can return.
@@ -69,7 +68,6 @@ pub enum ContractError {
     InsufficientBalance = 1202,
 }
 
-
 // Storage Keys
 
 /// Keys used to address values in instance storage.
@@ -90,7 +88,6 @@ pub enum DataKey {
     Flags = 7,
 }
 
-
 // Contract
 
 #[contract]
@@ -103,18 +100,10 @@ impl PrimitiveTypesContract {
     /// Each value is set to the type's maximum/representative constant so that
     /// callers can immediately observe boundary behaviour with `retrieve_*`.
     pub fn initialize(env: Env) -> Result<(), ContractError> {
-        env.storage()
-            .instance()
-            .set(&DataKey::U32Value, &u32::MAX); // 4_294_967_295
-        env.storage()
-            .instance()
-            .set(&DataKey::U64Value, &u64::MAX); // 18_446_744_073_709_551_615
-        env.storage()
-            .instance()
-            .set(&DataKey::I32Value, &i32::MAX); // 2_147_483_647
-        env.storage()
-            .instance()
-            .set(&DataKey::I64Value, &i64::MAX); // 9_223_372_036_854_775_807
+        env.storage().instance().set(&DataKey::U32Value, &u32::MAX); // 4_294_967_295
+        env.storage().instance().set(&DataKey::U64Value, &u64::MAX); // 18_446_744_073_709_551_615
+        env.storage().instance().set(&DataKey::I32Value, &i32::MAX); // 2_147_483_647
+        env.storage().instance().set(&DataKey::I64Value, &i64::MAX); // 9_223_372_036_854_775_807
         env.storage().instance().set(&DataKey::BoolValue, &true);
         env.storage().instance().set(&DataKey::Counter, &0u64);
         env.storage().instance().set(&DataKey::Balance, &1000i128);

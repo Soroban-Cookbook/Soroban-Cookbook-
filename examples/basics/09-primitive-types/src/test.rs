@@ -8,7 +8,6 @@
 use super::*;
 use soroban_sdk::Env;
 
-
 // Section 1 — Unsigned Integer Operations (u32)
 
 #[test]
@@ -84,7 +83,6 @@ fn test_u32_div_by_zero() {
     client.div_u32(&20, &0);
 }
 
-
 // Section 1 — Unsigned Integer Operations (u64)
 
 #[test]
@@ -126,7 +124,6 @@ fn test_u64_div_by_zero() {
 
     client.div_u64(&20, &0);
 }
-
 
 // Section 1 — Signed Integer Operations (i32)
 
@@ -182,7 +179,6 @@ fn test_i32_div_by_zero() {
     client.div_i32(&20, &0);
 }
 
-
 // Section 1 — Signed Integer Operations (i64)
 
 #[test]
@@ -215,7 +211,6 @@ fn test_i64_mul_and_div() {
     assert_eq!(client.mul_i64(&5, &6), 30i64);
     assert_eq!(client.div_i64(&-20, &5), -4i64);
 }
-
 
 // Section 2 — Boolean Operations
 
@@ -256,7 +251,6 @@ fn test_bool_storage_round_trip() {
     client.set_bool(&false);
     assert!(!client.get_bool());
 }
-
 
 // Section 3 — Type Conversions
 
@@ -379,7 +373,6 @@ fn test_i64_to_u64_negative() {
     client.i64_to_u64(&-1i64);
 }
 
-
 // Section 4 — Overflow Handling
 
 #[test]
@@ -462,7 +455,6 @@ fn test_wrapping_arithmetic() {
     );
 }
 
-
 // Section 5a — Financial Calculations (i128)
 
 #[test]
@@ -525,7 +517,6 @@ fn test_deposit_negative_amount() {
     client.deposit(&-100);
 }
 
-
 // Section 5b — Bit Operations
 
 #[test]
@@ -574,7 +565,6 @@ fn test_bit_manipulation() {
     assert_eq!(client.clear_bit(&0b1110, &1), 0b1100u32);
     assert_eq!(client.toggle_bit(&0b1010, &1), 0b1000u32);
 }
-
 
 // Section 5c — Counter and Flag Management
 
@@ -631,7 +621,6 @@ fn test_flag_out_of_range() {
     client.is_flag_set(&32);
 }
 
-
 // Section 5d — Comparisons and Clamping
 
 #[test]
@@ -683,7 +672,6 @@ fn test_clamp() {
     assert_eq!(client.clamp_i32(&4, &5, &15), 5i32);
     assert_eq!(client.clamp_i32(&-100, &-50, &-10), -50i32);
 }
-
 
 // Section 5e — Storage Helpers and Initialization
 
