@@ -100,6 +100,14 @@ Integer types, overflow behaviour, and type conversions.
 
 ---
 
+### [12-error-handling](./12-error-handling/)
+
+Foundational error handling patterns using Result and panic.
+
+**Concepts:** `#[contracterror]`, `Result<T, E>`, error codes, `try_*` client methods, invariant panics
+
+---
+
 ## Supporting Packages
 
 | Package | Path | Purpose |
