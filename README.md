@@ -37,7 +37,7 @@ The Soroban Cookbook is a developer's guide to building smart contracts on the S
 
 ```bash
 # Clone the repository
-git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook.git
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
 cd Soroban-Cookbook
 
 # Install Rust and Soroban CLI (if not already installed)
@@ -104,6 +104,7 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
 - [Stellar Developer Portal](https://developers.stellar.org)
 - [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
 - [Stellar Community Discord](https://discord.gg/stellardev)
+- [Project Roadmap](./ROADMAP.md) - Planned phases, milestones, and KPIs
 
 ## 📄 License
 
