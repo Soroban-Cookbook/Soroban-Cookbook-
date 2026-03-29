@@ -1,5 +1,9 @@
 # Storage Patterns
 
+> **🎬 Video Walkthrough** *(coming soon)*
+> This example is covered from 4:30 – 9:00 in the Getting Started video.
+> Once published, the link will appear here.
+
 Learn how to persist and retrieve data in Soroban smart contracts using the three storage types: **Persistent**, **Instance**, and **Temporary**. This guide helps you understand the trade-offs and choose the right storage type for every situation.
 
 ## 📖 What You'll Learn

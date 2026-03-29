@@ -11,6 +11,13 @@ New to Soroban? Start here:
 3. **[Testing Guide](../guides/testing.md)** - Learn to test effectively
 4. **[Deployment Guide](../guides/deployment.md)** - Deploy to testnet and mainnet
 
+### 🎬 Video Walkthrough
+
+> **Getting Started — Examples 01–03** *(coming soon)*
+> A 10–15 minute video covering Hello World, Storage Patterns, and Custom Errors.
+> Once published it will be linked here and in each example's README.
+> See [`docs/video-script-getting-started.md`](./video-script-getting-started.md) for the full script and YouTube metadata.
+
 ## 🎓 Learning Paths
 
 ### For Beginners

@@ -2,6 +2,12 @@
 
 This is the foundational Soroban example for the cookbook. It is intentionally minimal and meant to be copied as a starting template for later examples.
 
+## 🎬 Video Walkthrough
+
+> **Getting Started — Examples 01–03** *(coming soon)*
+> This example is covered in the first section of the video (0:00 – 4:30).
+> Once published, the link will appear here.
+
 ## Project Structure
 
 ```text

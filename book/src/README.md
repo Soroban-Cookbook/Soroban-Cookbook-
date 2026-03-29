@@ -21,6 +21,15 @@ The Soroban Cookbook is a developer's guide to building smart contracts on the S
 - **Governance** - DAOs, voting systems, and proposals
 - **Tokens** - Custom tokens, wrappers, and token standards
 
+## Video Walkthrough
+
+> **Getting Started — Examples 01–03** *(coming soon)*
+> A 10–15 minute video covering Hello World, Storage Patterns, and Custom Errors.
+> Subscribe to be notified when it's published, or check the
+> [Soroban Cookbook YouTube channel](https://www.youtube.com/@SorobanCookbook) directly.
+>
+> Once published, the link will appear here and in each example's README.
+
 ## Quick Start
 
 ```bash
