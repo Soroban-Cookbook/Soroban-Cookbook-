@@ -13,10 +13,13 @@ fn test_initialize() {
     let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
 
     client.initialize(&2, &signers);
+    
+    // Test re-initialization fails
+    let result = client.try_initialize(&2, &signers);
+    assert_eq!(result, Err(Ok(AuthError::AlreadyInitialized)));
 }
 
 #[test]
-#[should_panic(expected = "Invalid threshold")]
 fn test_initialize_invalid_threshold() {
     let env = Env::default();
     let contract_id = env.register_contract(None, MultiPartyAuth);
@@ -25,7 +28,11 @@ fn test_initialize_invalid_threshold() {
     let signer1 = Address::generate(&env);
     let signers = vec![&env, signer1];
 
-    client.initialize(&0, &signers);
+    let result = client.try_initialize(&0, &signers);
+    assert_eq!(result, Err(Ok(AuthError::InvalidThreshold)));
+    
+    let result = client.try_initialize(&2, &signers);
+    assert_eq!(result, Err(Ok(AuthError::InvalidThreshold)));
 }
 
 #[test]
@@ -55,7 +62,28 @@ fn test_create_and_approve_proposal() {
 }
 
 #[test]
-#[should_panic(expected = "Already approved")]
+fn test_unauthorized_signer() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuth);
+    let client = MultiPartyAuthClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signers = vec![&env, signer1.clone()];
+    client.initialize(&1, &signers);
+
+    let attacker = Address::generate(&env);
+    
+    let result = client.try_create_proposal(&attacker);
+    assert_eq!(result, Err(Ok(AuthError::NotAuthorized)));
+    
+    let proposal_id = client.create_proposal(&signer1);
+    let result = client.try_approve(&proposal_id, &attacker);
+    assert_eq!(result, Err(Ok(AuthError::NotAuthorized)));
+}
+
+#[test]
 fn test_double_approval() {
     let env = Env::default();
     env.mock_all_auths();
@@ -71,7 +99,8 @@ fn test_double_approval() {
     let proposal_id = client.create_proposal(&signer1);
 
     client.approve(&proposal_id, &signer1);
-    client.approve(&proposal_id, &signer1);
+    let result = client.try_approve(&proposal_id, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::AlreadyApproved)));
 }
 
 #[test]
@@ -90,6 +119,10 @@ fn test_execute_with_threshold() {
     client.initialize(&2, &signers);
     let proposal_id = client.create_proposal(&signer1);
 
+    // Test execution before threshold
+    let result = client.try_execute(&proposal_id, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ThresholdNotMet)));
+
     client.approve(&proposal_id, &signer1);
     client.approve(&proposal_id, &signer2);
 
@@ -98,11 +131,14 @@ fn test_execute_with_threshold() {
 
     let proposal = client.get_proposal(&proposal_id);
     assert!(proposal.executed);
+    
+    // Test execution after execution
+    let result = client.try_execute(&proposal_id, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::AlreadyExecuted)));
 }
 
 #[test]
-#[should_panic(expected = "Threshold not met")]
-fn test_execute_without_threshold() {
+fn test_proposal_not_found() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -110,91 +146,9 @@ fn test_execute_without_threshold() {
     let client = MultiPartyAuthClient::new(&env, &contract_id);
 
     let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let signer3 = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
+    let signers = vec![&env, signer1.clone()];
+    client.initialize(&1, &signers);
 
-    client.initialize(&3, &signers);
-    let proposal_id = client.create_proposal(&signer1);
-
-    client.approve(&proposal_id, &signer1);
-    client.approve(&proposal_id, &signer2);
-
-    client.execute(&proposal_id, &signer1);
-}
-
-#[test]
-#[should_panic(expected = "Already executed")]
-fn test_double_execute() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let contract_id = env.register_contract(None, MultiPartyAuth);
-    let client = MultiPartyAuthClient::new(&env, &contract_id);
-
-    let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone()];
-
-    client.initialize(&2, &signers);
-    let proposal_id = client.create_proposal(&signer1);
-
-    client.approve(&proposal_id, &signer1);
-    client.approve(&proposal_id, &signer2);
-
-    client.execute(&proposal_id, &signer1);
-    client.execute(&proposal_id, &signer1);
-}
-
-#[test]
-fn test_multi_auth_action() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let contract_id = env.register_contract(None, MultiPartyAuth);
-    let client = MultiPartyAuthClient::new(&env, &contract_id);
-
-    let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone()];
-
-    let result = client.multi_auth_action(&signers);
-    assert!(result);
-}
-
-#[test]
-fn test_require_all_signers() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let contract_id = env.register_contract(None, MultiPartyAuth);
-    let client = MultiPartyAuthClient::new(&env, &contract_id);
-
-    let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let signer3 = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
-
-    client.initialize(&2, &signers);
-
-    let result = client.require_all_signers();
-    assert!(result);
-}
-
-#[test]
-#[should_panic(expected = "Not an authorized signer")]
-fn test_unauthorized_signer() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let contract_id = env.register_contract(None, MultiPartyAuth);
-    let client = MultiPartyAuthClient::new(&env, &contract_id);
-
-    let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let unauthorized = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone()];
-
-    client.initialize(&2, &signers);
-    client.create_proposal(&unauthorized);
+    let result = client.try_approve(&999, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ProposalNotFound)));
 }
