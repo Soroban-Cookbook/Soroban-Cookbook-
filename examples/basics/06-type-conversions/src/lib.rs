@@ -221,8 +221,12 @@ impl TypeConversionsContract {
         if balance < 0 {
             panic!("NumericOverflow");
         }
-        UserData { id, name, balance, active }
-    }
+        UserData {
+            id,
+            name,
+            balance,
+            active,
+        }
 
     /// Demonstrates `Val` → typed field extraction using a `Map<Symbol, Val>`.
     ///
@@ -263,7 +267,12 @@ impl TypeConversionsContract {
         let features = Vec::<Symbol>::try_from_val(&env, &features_val)
             .unwrap_or_else(|_| panic!("UnsupportedConversion"));
 
-        Config { max_users, fee_rate, admin, features }
+        Config {
+            max_users,
+            fee_rate,
+            admin,
+            features,
+        }
     }
 
     /// Demonstrates `Bytes` → `String` / `Symbol` conversions.
@@ -377,7 +386,10 @@ impl TypeConversionsContract {
                 // checked_mul / checked_add to avoid overflow panics
                 acc = match acc.checked_mul(10).and_then(|v| v.checked_add((b - b'0') as i64)) {
                     Some(v) => v,
-                    None => { valid = false; break; }
+                    None => {
+                        valid = false;
+                        break;
+                    }
                 };
             }
 

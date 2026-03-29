@@ -356,7 +356,7 @@ fn test_topic_verification_data_types() {
     // Verify all topics are Symbols
     for (i, topic_val) in topics.iter().enumerate() {
         let topic: Result<Symbol, _> = Symbol::try_from_val(&env, &topic_val);
-        assert!(topic.is_ok(), "Topic {} should be a Symbol", i);
+        assert!(topic.is_ok(), "Topic {i} should be a Symbol");
     }
 }
 
