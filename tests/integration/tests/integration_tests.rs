@@ -265,14 +265,13 @@ fn test_ajo_factory_lifecycle_integration() {
         Vec::from_array(&env, [admin.clone().into_val(&env)]),
     );
 
-    // Step 2: Initialize Ajo Factory with dummy Wasm hash
-    let wasm_hash = BytesN::from_array(&env, [1u8; 32]);
-    env.deployer().upload_contract_wasm(wasm_hash.clone());
+    // Step 2: Initialize Ajo Factory with Ajo contract WASM
+    let wasm_hash = env.deployer().upload_contract_wasm(ajo_factory::Ajo::WASM);
 
     env.invoke_contract::<()>(
         &factory_id,
         &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [wasm_hash.clone().into_val(&env)]),
+        Vec::from_array(&env, [wasm_hash.into_val(&env)]),
     );
 
     // Step 3: Create Ajo via factory
@@ -320,7 +319,8 @@ fn test_multi_sig_governance_integration() {
         &multisig_id,
         &Symbol::new(&env, "initialize"),
         Vec::from_array(&env, [2u32.into_val(&env), signers.into_val(&env)]),
-    ).unwrap();
+    )
+    .unwrap();
 
     // Step 2: Create a proposal
     let proposal_id: u32 = env.invoke_contract(
@@ -336,13 +336,21 @@ fn test_multi_sig_governance_integration() {
     env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
         &multisig_id,
         &Symbol::new(&env, "approve"),
-        Vec::from_array(&env, [proposal_id.into_val(&env), signer1.clone().into_val(&env)]),
-    ).unwrap();
+        Vec::from_array(
+            &env,
+            [proposal_id.into_val(&env), signer1.clone().into_val(&env)],
+        ),
+    )
+    .unwrap();
     env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
         &multisig_id,
         &Symbol::new(&env, "approve"),
-        Vec::from_array(&env, [proposal_id.into_val(&env), signer2.clone().into_val(&env)]),
-    ).unwrap();
+        Vec::from_array(
+            &env,
+            [proposal_id.into_val(&env), signer2.clone().into_val(&env)],
+        ),
+    )
+    .unwrap();
 
     // Step 5: Execute
     let success: bool = env.invoke_contract(

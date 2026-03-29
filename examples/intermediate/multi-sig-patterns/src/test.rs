@@ -13,7 +13,7 @@ fn test_initialize() {
     let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
 
     client.initialize(&2, &signers);
-    
+
     // Test re-initialization fails
     let result = client.try_initialize(&2, &signers);
     assert_eq!(result, Err(Ok(AuthError::AlreadyInitialized)));
@@ -30,7 +30,7 @@ fn test_initialize_invalid_threshold() {
 
     let result = client.try_initialize(&0, &signers);
     assert_eq!(result, Err(Ok(AuthError::InvalidThreshold)));
-    
+
     let result = client.try_initialize(&2, &signers);
     assert_eq!(result, Err(Ok(AuthError::InvalidThreshold)));
 }
@@ -74,10 +74,10 @@ fn test_unauthorized_signer() {
     client.initialize(&1, &signers);
 
     let attacker = Address::generate(&env);
-    
+
     let result = client.try_create_proposal(&attacker);
     assert_eq!(result, Err(Ok(AuthError::NotAuthorized)));
-    
+
     let proposal_id = client.create_proposal(&signer1);
     let result = client.try_approve(&proposal_id, &attacker);
     assert_eq!(result, Err(Ok(AuthError::NotAuthorized)));
@@ -131,7 +131,7 @@ fn test_execute_with_threshold() {
 
     let proposal = client.get_proposal(&proposal_id);
     assert!(proposal.executed);
-    
+
     // Test execution after execution
     let result = client.try_execute(&proposal_id, &signer1);
     assert_eq!(result, Err(Ok(AuthError::AlreadyExecuted)));

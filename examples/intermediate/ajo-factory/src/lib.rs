@@ -9,7 +9,7 @@
 
 #![no_std]
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, BytesN, Env, Symbol, Vec,
+    contract, contractimpl, contracttype, symbol_short, Address, BytesN, Env, Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -147,4 +147,5 @@ impl AjoFactory {
     }
 }
 
+#[cfg(test)]
 mod test;

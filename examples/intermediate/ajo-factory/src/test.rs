@@ -1,21 +1,13 @@
-#![cfg(test)]
-
 use super::*;
-use soroban_sdk::{testutils::Address as _, Address, Env};
+use soroban_sdk::{testutils::Address as _, Address, BytesN, Env};
 
 #[test]
 fn test_ajo_factory_workflow() {
     let env = Env::default();
     env.mock_all_auths();
 
-    // 1. Setup - In a real scenario, we'd build Ajo separately and get its Wasm hash.
-    // In Soroban tests, we can register the contract implementation with a dummy WASM hash.
-    // For this example, we'll use a 32-byte dummy hash.
-    let wasm_hash = BytesN::from_array(&env, [1u8; 32]);
-    
-    // We register the Ajo contract with this hash so the test environment knows 
-    // what code to run when the factory deploys it.
-    env.deployer().upload_contract_wasm(wasm_hash.clone());
+    // 1. Setup - Upload Ajo contract WASM
+    let wasm_hash = env.deployer().upload_contract_wasm(Ajo::WASM);
 
     // 2. Initialize the Factory
     let factory_id = env.register_contract(None, AjoFactory);
@@ -42,9 +34,9 @@ fn test_ajo_factory_workflow() {
     // 6. Create another Ajo instance with the same creator (different salt)
     let amount2 = 2000i128;
     let ajo_address2 = factory_client.create_ajo(&amount2, &max_members, &creator);
-    
+
     assert_ne!(ajo_address, ajo_address2);
-    
+
     let deployed_ajos2 = factory_client.get_deployed_ajos();
     assert_eq!(deployed_ajos2.len(), 2);
     assert_eq!(deployed_ajos2.get(1).unwrap(), ajo_address2);
@@ -54,7 +46,7 @@ fn test_ajo_factory_workflow() {
 #[should_panic(expected = "Factory already initialized")]
 fn test_factory_cannot_be_reinitialized() {
     let env = Env::default();
-    let wasm_hash = BytesN::from_array(&env, [1u8; 32]);
+    let wasm_hash = env.deployer().upload_contract_wasm(Ajo::WASM);
     let factory_id = env.register_contract(None, AjoFactory);
     let factory_client = AjoFactoryClient::new(&env, &factory_id);
 
@@ -68,8 +60,7 @@ fn test_ajo_cannot_be_reinitialized() {
     let env = Env::default();
     env.mock_all_auths();
 
-    let wasm_hash = BytesN::from_array(&env, [1u8; 32]);
-    env.deployer().upload_contract_wasm(wasm_hash.clone());
+    let wasm_hash = env.deployer().upload_contract_wasm(Ajo::WASM);
 
     let factory_id = env.register_contract(None, AjoFactory);
     let factory_client = AjoFactoryClient::new(&env, &factory_id);
