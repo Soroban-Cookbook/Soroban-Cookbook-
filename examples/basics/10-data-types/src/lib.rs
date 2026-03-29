@@ -395,9 +395,7 @@ impl DataTypesContract {
 
     /// Persist an i128 value and read it back.
     pub fn put_i128(env: Env, value: i128) {
-        env.storage()
-            .instance()
-            .set(&symbol_short!("i128"), &value);
+        env.storage().instance().set(&symbol_short!("i128"), &value);
     }
 
     pub fn get_i128(env: Env) -> i128 {
