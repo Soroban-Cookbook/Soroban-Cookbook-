@@ -19,10 +19,6 @@ use soroban_sdk::{
     Vec,
 };
 
-// Import testutils for Address::generate in tests
-#[cfg(test)]
-use soroban_sdk::testutils::Address as _;
-
 /// The contract type for demonstrating Soroban data types.
 #[contract]
 pub struct DataTypesContract;
@@ -351,7 +347,7 @@ impl DataTypesContract {
         // Copy bytes into the array
         for (i, byte) in array.iter_mut().enumerate() {
             *byte = data.get(i as u32).unwrap_or_else(|| {
-                panic!("Failed to read byte at index {}", i);
+                panic!("Failed to read byte at index {i}");
             });
         }
 
