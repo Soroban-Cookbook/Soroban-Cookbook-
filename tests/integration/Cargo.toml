@@ -11,3 +11,8 @@ storage-patterns = { path = "../../examples/basics/02-storage-patterns" }
 authentication = { path = "../../examples/basics/03-authentication" }
 events-counter = { path = "../../examples/basics/events", package = "events_example" }
 multi-party-auth = { path = "../../examples/advanced/01-multi-party-auth" }
+custom-errors = { path = "../../examples/basics/03-custom-errors" }
+validation-patterns = { path = "../../examples/basics/06-validation-patterns" }
+custom-structs = { path = "../../examples/basics/08-custom-structs" }
+ajo-factory = { path = "../../examples/intermediate/ajo-factory" }
+multi-sig-patterns = { path = "../../examples/intermediate/multi-sig-patterns" }
