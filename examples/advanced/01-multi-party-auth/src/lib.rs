@@ -1,9 +1,39 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 #[contract]
 pub struct MultiPartyAuthContract;
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+/// Payload for an admin-action event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionEventData {
+    /// Identifier of the specific action performed.
+    pub action: Symbol,
+    /// Timestamp when the action was executed.
+    pub timestamp: u64,
+}
+
+/// Payload for an audit-trail event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTrailEventData {
+    /// Free-form description or reference tag.
+    pub details: Symbol,
+    /// Ledger timestamp at emission time.
+    pub timestamp: u64,
+}
+
+/// Namespace symbol used as the first topic of every event this contract emits.
+const CONTRACT_NS: Symbol = symbol_short!("multi");
+/// Naming convention: `snake_case` action names in topic[1].
+const ACTION_ADMIN: Symbol = symbol_short!("admin");
+const ACTION_AUDIT: Symbol = symbol_short!("audit");
 
 /// Example custom types for storage matching.
 #[contracttype]
@@ -31,11 +61,20 @@ impl MultiPartyAuthContract {
     ///
     /// # Gas cost
     /// Scales linearly with the number of authorizations since each signer verification has a cost.
-    pub fn multi_sig_transfer(_env: Env, signers: Vec<Address>, _to: Address, _amount: i128) {
+    pub fn multi_sig_transfer(env: Env, signers: Vec<Address>, _to: Address, _amount: i128) {
         // Require authorization from all signers
         for signer in signers.iter() {
             signer.require_auth();
         }
+
+        // Audit trail for multi-sig action
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT),
+            AuditTrailEventData {
+                details: symbol_short!("msig_trf"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
 
         // Proceed with multi-authorized action (e.g., token transfer)
         // TokenClient::new(&env, &token_id).transfer(&signers.get_unchecked(0), &to, &amount);
@@ -56,7 +95,7 @@ impl MultiPartyAuthContract {
         let valid_signers: Vec<Address> = env
             .storage()
             .instance()
-            .get(&DataKey::Signers(proposal_id))
+            .get(&DataKey::Signers(proposal_id.clone()))
             .unwrap_or_else(|| {
                 // Provide a default empty vector if not configured.
                 // In a real app we'd likely panic if the proposal wasn't initialized.
@@ -84,6 +123,15 @@ impl MultiPartyAuthContract {
             panic!("Threshold not met");
         }
 
+        // Audit trail for proposal approval
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, proposal_id),
+            AuditTrailEventData {
+                details: symbol_short!("prop_app"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+
         // ... Execute proposal
     }
 
@@ -107,6 +155,15 @@ impl MultiPartyAuthContract {
 
             // Move to Step 2
             env.storage().instance().set(&step_key, &2u32);
+
+            // Audit trail for escrow funding
+            env.events().publish(
+                (CONTRACT_NS, ACTION_AUDIT, buyer, seller),
+                AuditTrailEventData {
+                    details: symbol_short!("esc_fund"),
+                    timestamp: env.ledger().timestamp(),
+                },
+            );
         } else if step == 2 {
             // STEP 2: Wait for release
             // In an escrow, usually the buyer authorizes the release when happy,
@@ -122,7 +179,16 @@ impl MultiPartyAuthContract {
             env.storage().instance().set(&step_key, &0u32);
             env.storage()
                 .instance()
-                .set(&DataKey::EscrowBal(buyer, seller), &0i128);
+                .set(&DataKey::EscrowBal(buyer.clone(), seller.clone()), &0i128);
+
+            // Audit trail for escrow release
+            env.events().publish(
+                (CONTRACT_NS, ACTION_AUDIT, buyer, seller),
+                AuditTrailEventData {
+                    details: symbol_short!("esc_rel"),
+                    timestamp: env.ledger().timestamp(),
+                },
+            );
         }
     }
 
@@ -133,7 +199,16 @@ impl MultiPartyAuthContract {
             .set(&DataKey::Threshold(proposal_id.clone()), &threshold);
         env.storage()
             .instance()
-            .set(&DataKey::Signers(proposal_id), &signers);
+            .set(&DataKey::Signers(proposal_id.clone()), &signers);
+
+        // Admin-style setup event
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("prop_set"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 }
 

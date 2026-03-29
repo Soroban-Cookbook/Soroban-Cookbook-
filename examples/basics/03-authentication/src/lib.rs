@@ -108,6 +108,36 @@ pub enum AuthError {
 }
 
 // ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+/// Payload for an admin-action event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionEventData {
+    /// Identifier of the specific action performed.
+    pub action: Symbol,
+    /// Timestamp when the action was executed.
+    pub timestamp: u64,
+}
+
+/// Payload for an audit-trail event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTrailEventData {
+    /// Free-form description or reference tag.
+    pub details: Symbol,
+    /// Ledger timestamp at emission time.
+    pub timestamp: u64,
+}
+
+/// Namespace symbol used as the first topic of every event this contract emits.
+const CONTRACT_NS: Symbol = symbol_short!("auth");
+/// Naming convention: `snake_case` action names in topic[1].
+const ACTION_ADMIN: Symbol = symbol_short!("admin");
+const ACTION_AUDIT: Symbol = symbol_short!("audit");
+
+// ---------------------------------------------------------------------------
 // Contract
 // ---------------------------------------------------------------------------
 
@@ -128,6 +158,16 @@ impl AuthContract {
         }
         admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
+
+        // Audit trail for contract initialization
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, admin),
+            AuditTrailEventData {
+                details: symbol_short!("init"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+
         Ok(())
     }
 
@@ -156,6 +196,15 @@ impl AuthContract {
             return Err(AuthError::NotAdmin);
         }
 
+        // Log admin action
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, admin),
+            AdminActionEventData {
+                action: symbol_short!("action"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+
         Ok(value * 2)
     }
 
@@ -177,9 +226,22 @@ impl AuthContract {
             return Err(AuthError::NotAdmin);
         }
 
+        let old_balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(user.clone()))
+            .unwrap_or(0);
+
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(user), &amount);
+            .set(&DataKey::Balance(user.clone()), &amount);
+
+        // Audit trail for balance change
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, admin, user),
+            (old_balance, amount),
+        );
+
         Ok(())
     }
 
@@ -353,14 +415,19 @@ impl AuthContract {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
 
+        let old_role: Role = env
+            .storage()
+            .persistent()
+            .get(&DataKey::UserRole(account.clone()))
+            .unwrap_or(Role::User);
+
         env.storage()
             .persistent()
             .set(&DataKey::UserRole(account.clone()), &role);
 
-        env.events().publish(
-            (symbol_short!("role"), symbol_short!("grant"), account),
-            role,
-        );
+        // Emit audit event with before/after state
+        env.events()
+            .publish((CONTRACT_NS, ACTION_AUDIT, account), (old_role, role));
 
         Ok(())
     }
@@ -370,14 +437,19 @@ impl AuthContract {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
 
+        let old_role: Role = env
+            .storage()
+            .persistent()
+            .get(&DataKey::UserRole(account.clone()))
+            .unwrap_or(Role::User);
+
         env.storage()
             .persistent()
             .remove(&DataKey::UserRole(account.clone()));
 
-        env.events().publish(
-            (symbol_short!("role"), symbol_short!("revoke"), account),
-            (),
-        );
+        // Emit audit event
+        env.events()
+            .publish((CONTRACT_NS, ACTION_AUDIT, account), (old_role, Role::User));
 
         Ok(())
     }
@@ -406,7 +478,16 @@ impl AuthContract {
         Self::require_role(&env, &caller, &[Role::Admin])?;
 
         let result = value * 2;
-        env.events().publish((symbol_short!("admin"),), result);
+
+        // Log admin role action
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, caller),
+            AdminActionEventData {
+                action: symbol_short!("role_act"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+
         Ok(result)
     }
 
@@ -416,7 +497,16 @@ impl AuthContract {
         Self::require_role(&env, &caller, &[Role::Admin, Role::Moderator])?;
 
         let result = value + 10;
-        env.events().publish((symbol_short!("mod"),), result);
+
+        // Log moderator action (audit trail)
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, caller),
+            AuditTrailEventData {
+                details: symbol_short!("mod_act"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+
         Ok(result)
     }
 
@@ -427,12 +517,19 @@ impl AuthContract {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
 
+        let old_time: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TimeLock)
+            .unwrap_or(0);
+
         env.storage()
             .instance()
             .set(&DataKey::TimeLock, &unlock_time);
 
+        // Audit trail for timelock configuration
         env.events()
-            .publish((symbol_short!("timelock"),), unlock_time);
+            .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_time, unlock_time));
 
         Ok(())
     }
@@ -460,11 +557,19 @@ impl AuthContract {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
 
+        let old_period: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::CooldownPeriod)
+            .unwrap_or(0);
+
         env.storage()
             .instance()
             .set(&DataKey::CooldownPeriod, &period);
 
-        env.events().publish((symbol_short!("cooldown"),), period);
+        // Audit trail for cooldown configuration
+        env.events()
+            .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_period, period));
 
         Ok(())
     }
@@ -505,9 +610,17 @@ impl AuthContract {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
 
+        let old_state: ContractState = env
+            .storage()
+            .instance()
+            .get(&DataKey::State)
+            .unwrap_or(ContractState::Active);
+
         env.storage().instance().set(&DataKey::State, &state);
 
-        env.events().publish((symbol_short!("state"),), state);
+        // Audit trail for state change
+        env.events()
+            .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_state, state));
 
         Ok(())
     }

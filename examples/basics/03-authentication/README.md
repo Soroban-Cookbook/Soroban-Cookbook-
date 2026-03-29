@@ -426,6 +426,7 @@ pub fn proxy_call(env: Env, target: Address, user: Address) -> Address {
 
 ## Running the Tests
 
+Run the comprehensive unit test suite to see these authentication patterns in action:
 ```bash
 cd examples/basics/03-authentication
 cargo test
@@ -446,6 +447,7 @@ The test suite covers:
 
 ## Building for Deployment
 
+Compile the contract to WebAssembly:
 ```bash
 cargo build --target wasm32-unknown-unknown --release
 ```

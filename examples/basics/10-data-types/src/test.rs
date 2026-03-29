@@ -363,3 +363,160 @@ fn test_create_string_from_literal() {
 
     assert_eq!(result, expected);
 }
+
+// ============================================================================
+// STORAGE ROUND-TRIP TESTS
+// ============================================================================
+
+#[test]
+fn test_storage_roundtrip_u32() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    client.put_u32(&99u32);
+    assert_eq!(client.get_u32(), 99u32);
+}
+
+#[test]
+fn test_storage_roundtrip_i128() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    client.put_i128(&-999_999i128);
+    assert_eq!(client.get_i128(), -999_999i128);
+}
+
+#[test]
+fn test_storage_roundtrip_symbol() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    let sym = symbol_short!("USDC");
+    client.put_symbol(&sym);
+    assert_eq!(client.get_symbol(), sym);
+}
+
+#[test]
+fn test_storage_roundtrip_vec() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    let values = vec![&env, 10i128, 20i128, 30i128];
+    client.put_vec(&values);
+    assert_eq!(client.get_vec(), values);
+}
+
+#[test]
+fn test_storage_default_u32_is_zero() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    // Nothing stored yet — should return default 0
+    assert_eq!(client.get_u32(), 0u32);
+}
+
+#[test]
+fn test_storage_overwrite_value() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    client.put_i128(&100i128);
+    client.put_i128(&200i128);
+    assert_eq!(client.get_i128(), 200i128);
+}
+
+// ============================================================================
+// EDGE CASE TESTS
+// ============================================================================
+
+#[test]
+fn test_store_u32_zero() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.store_u32(&0u32), 0u32);
+}
+
+#[test]
+fn test_store_u32_max() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.store_u32(&u32::MAX), u32::MAX);
+}
+
+#[test]
+fn test_store_i128_min() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.store_i128(&i128::MIN), i128::MIN);
+}
+
+#[test]
+fn test_store_i128_max() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.store_i128(&i128::MAX), i128::MAX);
+}
+
+#[test]
+fn test_vec_empty() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    let empty: soroban_sdk::Vec<i128> = vec![&env];
+    assert_eq!(client.vec_length(&empty), 0u32);
+}
+
+#[test]
+fn test_bytes_empty() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    let empty = soroban_sdk::Bytes::new(&env);
+    let result = client.store_bytes(&empty);
+    assert_eq!(result.len(), 0u32);
+}
+
+#[test]
+fn test_safe_add_zero() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.safe_add(&0i128, &0i128), 0i128);
+}
+
+#[test]
+fn test_safe_add_negative() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    assert_eq!(client.safe_add(&-50i128, &-50i128), -100i128);
+}
+
+#[test]
+#[should_panic(expected = "Bytes must be exactly 32 bytes")]
+fn test_bytes_to_bytesn_wrong_size() {
+    let env = Env::default();
+    let id = env.register_contract(None, DataTypesContract);
+    let client = DataTypesContractClient::new(&env, &id);
+
+    let short = soroban_sdk::Bytes::from_slice(&env, &[1u8; 16]);
+    let _ = client.bytes_to_bytesn(&short);
+}
