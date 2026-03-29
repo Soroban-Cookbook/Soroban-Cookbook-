@@ -46,9 +46,10 @@ New to Soroban? Start here:
 
 ### Core Concepts
 
-- **[Quick Reference](./quick-reference.md)** - Cheat sheet
 - **[Common Patterns](./common-patterns.md)** - Extracted patterns with when-to-use guide
-- **[Best Practices](./best-practices.md)** - Recommended patterns
+- **[Best Practices](./best-practices.md)** - Security, storage, and code quality guidelines
+- **[Performance Benchmarks](./benchmarks.md)** - Resource usage comparison and optimization tips
+- **[Quick Reference](./quick-reference.md)** - Cheat sheet for common patterns
 - **[Common Pitfalls](./common-pitfalls.md)** - Avoid these mistakes
 - **[Security Guide](./security.md)** - Security checklist
 
