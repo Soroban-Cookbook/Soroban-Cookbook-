@@ -211,7 +211,7 @@ fn test_error_handling_with_unwrap_or() {
 #[test]
 fn test_error_handling_with_unwrap_or_else() {
     let result = ErrorHandlingContract::transfer(150, 100);
-    let fallback_balance = result.unwrap_or(999);
+    let fallback_balance = result.unwrap_or_else(|_| 999);
     assert_eq!(fallback_balance, 999);
 }
 
