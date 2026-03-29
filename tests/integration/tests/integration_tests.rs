@@ -8,7 +8,12 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec};
+use multi_party_auth::MultiPartyAuthContract;
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation},
+    Address, Env, IntoVal, Symbol, Vec,
+};
 
 // ---------------------------------------------------------------------------
 // Test 1: Multi-Contract Workflow — Hello World + Storage + Events counter
@@ -604,4 +609,360 @@ fn test_coordinated_state_management() {
     let evt_count: u32 =
         env.invoke_contract(&events_id, &Symbol::new(&env, "get_number"), Vec::new(&env));
     assert_eq!(evt_count, 2);
+}
+
+// ---------------------------------------------------------------------------
+// Multi-Party Authorization Integration Tests
+//
+// Setup overview:
+//   - Three signers (signer1, signer2, signer3) are generated for each test.
+//   - `setup_proposal` stores the threshold and the valid-signer list on-chain.
+//   - `env.mock_all_auths()` lets the test environment satisfy every
+//     `require_auth()` call automatically, so we can focus on threshold logic.
+//   - `env.auths()` is used to assert exactly which addresses were required
+//     to authorize a given call.
+//   - For cross-function auth checks a fresh `env.auths()` snapshot is taken
+//     after each call to confirm auth state is not shared between functions.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Test 7: 2-of-3 threshold — exactly two signers meet the threshold
+// ---------------------------------------------------------------------------
+
+/// Verifies that a proposal configured with a 2-of-3 threshold passes when
+/// exactly two valid signers authorize the call.
+#[test]
+fn test_integration_two_of_three_auth_passes() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "integ_2of3");
+
+    // Configure the proposal: threshold = 2, valid signers = all three.
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "setup_proposal"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                2u32.into_val(&env),
+                all_signers.into_val(&env),
+            ],
+        ),
+    );
+
+    // Only signer1 and signer3 approve — threshold of 2 is met.
+    let approvers = Vec::from_array(&env, [signer1.clone(), signer3.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "proposal_approval"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                approvers.clone().into_val(&env),
+            ],
+        ),
+    );
+
+    // Both approvers must have been required to authorize this call.
+    let auths = env.auths();
+    assert!(auths.iter().any(|(addr, _)| addr == signer1));
+    assert!(auths.iter().any(|(addr, _)| addr == signer3));
+    // signer2 was NOT required (only 2-of-3 needed).
+    assert!(!auths.iter().any(|(addr, _)| addr == signer2));
+}
+
+/// Verifies that a 2-of-3 proposal panics when only one signer approves.
+#[test]
+#[should_panic(expected = "Threshold not met")]
+fn test_integration_two_of_three_auth_fails_below_threshold() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "integ_2of3f");
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "setup_proposal"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                2u32.into_val(&env),
+                all_signers.into_val(&env),
+            ],
+        ),
+    );
+
+    // Only one signer — below the threshold of 2.
+    let approvers = Vec::from_array(&env, [signer1.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "proposal_approval"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.into_val(&env),
+                approvers.into_val(&env),
+            ],
+        ),
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 8: 3-of-3 threshold — all three signers must authorize
+// ---------------------------------------------------------------------------
+
+/// Verifies that a 3-of-3 proposal passes only when all three signers approve.
+#[test]
+fn test_integration_three_of_three_auth_passes() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "integ_3of3");
+
+    // Threshold = 3: every signer must approve.
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "setup_proposal"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                3u32.into_val(&env),
+                all_signers.clone().into_val(&env),
+            ],
+        ),
+    );
+
+    let approvers = Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "proposal_approval"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                approvers.clone().into_val(&env),
+            ],
+        ),
+    );
+
+    // All three must appear in the auth record.
+    let auths = env.auths();
+    assert_eq!(
+        auths,
+        std::vec![
+            (
+                signer1.clone(),
+                AuthorizedInvocation {
+                    function: AuthorizedFunction::Contract((
+                        contract_id.clone(),
+                        Symbol::new(&env, "proposal_approval"),
+                        (proposal_id.clone(), approvers.clone()).into_val(&env)
+                    )),
+                    sub_invocations: std::vec![],
+                }
+            ),
+            (
+                signer2.clone(),
+                AuthorizedInvocation {
+                    function: AuthorizedFunction::Contract((
+                        contract_id.clone(),
+                        Symbol::new(&env, "proposal_approval"),
+                        (proposal_id.clone(), approvers.clone()).into_val(&env)
+                    )),
+                    sub_invocations: std::vec![],
+                }
+            ),
+            (
+                signer3.clone(),
+                AuthorizedInvocation {
+                    function: AuthorizedFunction::Contract((
+                        contract_id.clone(),
+                        Symbol::new(&env, "proposal_approval"),
+                        (proposal_id.clone(), approvers.clone()).into_val(&env)
+                    )),
+                    sub_invocations: std::vec![],
+                }
+            ),
+        ]
+    );
+}
+
+/// Verifies that a 3-of-3 proposal panics when only two of three signers approve.
+#[test]
+#[should_panic(expected = "Threshold not met")]
+fn test_integration_three_of_three_auth_fails_when_one_missing() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "integ_3of3f");
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "setup_proposal"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                3u32.into_val(&env),
+                all_signers.into_val(&env),
+            ],
+        ),
+    );
+
+    // signer3 is absent — threshold of 3 is not met.
+    let approvers = Vec::from_array(&env, [signer1.clone(), signer2.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "proposal_approval"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.into_val(&env),
+                approvers.into_val(&env),
+            ],
+        ),
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Test 9: Cross-function auth isolation
+//
+// Authorization granted for one function must NOT carry over to a different
+// function that requires its own independent authorization.  Each call to
+// `env.auths()` returns only the authorizations recorded since the last
+// snapshot, so we verify that each function's auth set is distinct.
+// ---------------------------------------------------------------------------
+
+/// Verifies that `multi_sig_transfer` and `proposal_approval` each require
+/// their own independent authorization and do not share auth state.
+#[test]
+fn test_integration_cross_function_auth_isolation() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    let all_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "integ_xfn");
+
+    // Setup a 2-of-3 proposal.
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "setup_proposal"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                2u32.into_val(&env),
+                all_signers.clone().into_val(&env),
+            ],
+        ),
+    );
+
+    // --- Call 1: multi_sig_transfer (requires ALL three signers) ---
+    let transfer_signers =
+        Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "multi_sig_transfer"),
+        Vec::from_array(
+            &env,
+            [
+                transfer_signers.clone().into_val(&env),
+                recipient.clone().into_val(&env),
+                50i128.into_val(&env),
+            ],
+        ),
+    );
+
+    // Snapshot auth after the transfer call: all three signers required.
+    let transfer_auths = env.auths();
+    assert_eq!(transfer_auths.len(), 3);
+    assert!(transfer_auths.iter().any(|(a, _)| a == signer1));
+    assert!(transfer_auths.iter().any(|(a, _)| a == signer2));
+    assert!(transfer_auths.iter().any(|(a, _)| a == signer3));
+    // Confirm every auth entry names `multi_sig_transfer`.
+    for (_, inv) in &transfer_auths {
+        if let AuthorizedFunction::Contract((_, fn_name, _)) = &inv.function {
+            assert_eq!(fn_name, &Symbol::new(&env, "multi_sig_transfer"));
+        }
+    }
+
+    // --- Call 2: proposal_approval (requires only 2-of-3) ---
+    // Auth state is reset between calls; signer3 is intentionally absent.
+    let approvers = Vec::from_array(&env, [signer1.clone(), signer2.clone()]);
+
+    env.invoke_contract::<()>(
+        &contract_id,
+        &Symbol::new(&env, "proposal_approval"),
+        Vec::from_array(
+            &env,
+            [
+                proposal_id.clone().into_val(&env),
+                approvers.clone().into_val(&env),
+            ],
+        ),
+    );
+
+    // Snapshot auth after the approval call: only two signers required.
+    let approval_auths = env.auths();
+    assert_eq!(approval_auths.len(), 2);
+    assert!(approval_auths.iter().any(|(a, _)| a == signer1));
+    assert!(approval_auths.iter().any(|(a, _)| a == signer2));
+    // signer3 was NOT required for proposal_approval.
+    assert!(!approval_auths.iter().any(|(a, _)| a == signer3));
+    // Confirm every auth entry names `proposal_approval`.
+    for (_, inv) in &approval_auths {
+        if let AuthorizedFunction::Contract((_, fn_name, _)) = &inv.function {
+            assert_eq!(fn_name, &Symbol::new(&env, "proposal_approval"));
+        }
+    }
 }
