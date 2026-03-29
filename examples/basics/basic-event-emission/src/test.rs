@@ -28,7 +28,11 @@ fn test_increment_emits_event() {
     client.increment();
 
     let events = env.events().all();
-    assert_eq!(events.len(), 2, "increment() should emit one additional event");
+    assert_eq!(
+        events.len(),
+        2,
+        "increment() should emit one additional event"
+    );
 }
 
 // ---------------------------------------------------------------------------
