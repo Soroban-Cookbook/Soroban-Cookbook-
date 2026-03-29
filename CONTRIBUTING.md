@@ -2,6 +2,8 @@
 
 Thank you for your interest in contributing to the Soroban Cookbook! This guide will help you get started.
 
+Please also read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating in our community.
+
 ## 🎯 Ways to Contribute
 
 ### 1. Add New Examples

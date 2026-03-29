@@ -178,7 +178,7 @@ The full documentation site is built with [mdBook](https://rust-lang.github.io/m
 
 ## Contributing
 
-Contributions are welcome. Whether you're fixing a typo, improving docs, or adding a new example — see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
+Contributions are welcome. Whether you're fixing a typo, improving docs, or adding a new example — see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines. Please also read our [Code of Conduct](./CODE_OF_CONDUCT.md).
 
 Ways to contribute:
 
