@@ -30,6 +30,18 @@ The integration tests combine multiple basic examples to showcase real-world usa
    - Coordinates state changes across multiple contracts
    - Demonstrates configuration updates with event tracking and audit trails
 
+7. **Validation + Custom Errors Integration** (`test_validation_and_errors_integration`)
+   - Combines `validation-patterns` and `custom-errors`
+   - Demonstrates how to handle different error types in a single workflow
+
+8. **Ajo Factory + Authentication Lifecycle** (`test_ajo_factory_lifecycle_integration`)
+   - Combines `ajo_factory` and `authentication`
+   - Tests the complete lifecycle of a factory-deployed contract with initialization
+
+9. **Multi-Sig Governance + Events Tracking** (`test_multi_sig_governance_integration`)
+   - Combines `multi_sig_patterns` and `events-counter`
+   - Demonstrates proposal-based governance with audit logs in a separate contract
+
 ## Running the Tests
 
 ### Prerequisites

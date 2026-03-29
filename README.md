@@ -171,6 +171,7 @@ Step-by-step tutorials in the [book](./book/src/guides/):
 Reference docs in [docs/](./docs/):
 
 - [Best Practices](./docs/best-practices.md) — Security, storage, and code quality guidelines
+- [Performance Benchmarks](./docs/benchmarks.md) — Resource usage comparison and optimization tips
 - [Quick Reference](./docs/quick-reference.md) — Cheat sheet for common patterns
 - [Glossary](./docs/glossary.md) — Key terms and concepts
 

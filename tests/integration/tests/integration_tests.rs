@@ -8,7 +8,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec};
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, BytesN, Env, IntoVal, Symbol, Vec};
 
 // ---------------------------------------------------------------------------
 // Test 1: Multi-Contract Workflow — Hello World + Storage + Events counter
@@ -197,6 +197,173 @@ fn test_authenticated_storage_workflow() {
         Vec::from_array(&env, [user2.into_val(&env)]),
     );
     assert_eq!(new_bal2, 400);
+}
+
+// ---------------------------------------------------------------------------
+// Test 5: Validation + Custom Errors Integration
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_validation_and_errors_integration() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let validation_id = env.register_contract(None, validation_patterns::ValidationContract);
+    let errors_id = env.register_contract(None, custom_errors::CustomErrorsContract);
+
+    let owner = Address::generate(&env);
+
+    // Step 1: Initialize validation contract
+    let _: Result<(), validation_patterns::ValidationError> = env.invoke_contract(
+        &validation_id,
+        &symbol_short!("initialize"),
+        Vec::from_array(&env, [owner.clone().into_val(&env)]),
+    );
+
+    // Step 2: Test validation parameters (Success)
+    let _: Result<(), validation_patterns::ValidationError> = env.invoke_contract(
+        &validation_id,
+        &Symbol::new(&env, "validate_amount_parameters"),
+        Vec::from_array(
+            &env,
+            [
+                100i128.into_val(&env),
+                50i128.into_val(&env),
+                200i128.into_val(&env),
+            ],
+        ),
+    );
+
+    // Step 3: Test custom errors (Failure)
+    let error_result: Result<(), custom_errors::ContractError> = env.invoke_contract(
+        &errors_id,
+        &Symbol::new(&env, "validate_input"),
+        Vec::from_array(&env, [0i64.into_val(&env)]),
+    );
+    assert!(error_result.is_err());
+}
+
+// ---------------------------------------------------------------------------
+// Test 6: Ajo Factory + Authentication Lifecycle
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_ajo_factory_lifecycle_integration() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let factory_id = env.register_contract(None, ajo_factory::AjoFactory);
+    let auth_id = env.register_contract(None, authentication::AuthContract);
+
+    let admin = Address::generate(&env);
+    let creator = Address::generate(&env);
+
+    // Step 1: Initialize auth contract
+    env.invoke_contract::<()>(
+        &auth_id,
+        &Symbol::new(&env, "initialize"),
+        Vec::from_array(&env, [admin.clone().into_val(&env)]),
+    );
+
+    // Step 2: Initialize Ajo Factory with Ajo contract WASM
+    let wasm_hash = env.deployer().upload_contract_wasm(ajo_factory::Ajo::WASM);
+
+    env.invoke_contract::<Result<(), ajo_factory::FactoryError>>(
+        &factory_id,
+        &Symbol::new(&env, "initialize"),
+        Vec::from_array(&env, [wasm_hash.into_val(&env)]),
+    ).unwrap();
+
+    // Step 3: Create Ajo via factory
+    let ajo_address: Address = env.invoke_contract::<Result<Address, ajo_factory::FactoryError>>(
+        &factory_id,
+        &Symbol::new(&env, "create_ajo"),
+        Vec::from_array(
+            &env,
+            [
+                1000i128.into_val(&env),
+                10u32.into_val(&env),
+                creator.clone().into_val(&env),
+            ],
+        ),
+    ).unwrap();
+
+    // Step 4: Verify Ajo was created and tracked
+    let deployed_ajos: Vec<Address> = env.invoke_contract(
+        &factory_id,
+        &Symbol::new(&env, "get_deployed_ajos"),
+        Vec::new(&env),
+    );
+    assert_eq!(deployed_ajos.len(), 1);
+    assert_eq!(deployed_ajos.get(0).unwrap(), ajo_address);
+}
+
+// ---------------------------------------------------------------------------
+// Test 7: Multi-Sig Governance + Events Tracking
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multi_sig_governance_integration() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let multisig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let events_id = env.register_contract(None, events_counter::Contract);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signers = Vec::from_array(&env, [signer1.clone(), signer2.clone()]);
+
+    // Step 1: Initialize multi-sig
+    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
+        &multisig_id,
+        &Symbol::new(&env, "initialize"),
+        Vec::from_array(&env, [2u32.into_val(&env), signers.into_val(&env)]),
+    )
+    .unwrap();
+
+    // Step 2: Create a proposal
+    let proposal_id: u32 = env.invoke_contract::<Result<u32, multi_sig_patterns::AuthError>>(
+        &multisig_id,
+        &Symbol::new(&env, "create_proposal"),
+        Vec::from_array(&env, [signer1.clone().into_val(&env)]),
+    ).unwrap();
+
+    // Step 3: Track governance action via events counter
+    env.invoke_contract::<()>(&events_id, &symbol_short!("increment"), Vec::new(&env));
+
+    // Step 4: Approve from both signers
+    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
+        &multisig_id,
+        &Symbol::new(&env, "approve"),
+        Vec::from_array(
+            &env,
+            [proposal_id.into_val(&env), signer1.clone().into_val(&env)],
+        ),
+    )
+    .unwrap();
+    env.invoke_contract::<Result<(), multi_sig_patterns::AuthError>>(
+        &multisig_id,
+        &Symbol::new(&env, "approve"),
+        Vec::from_array(
+            &env,
+            [proposal_id.into_val(&env), signer2.clone().into_val(&env)],
+        ),
+    )
+    .unwrap();
+
+    // Step 5: Execute
+    let success: bool = env.invoke_contract::<Result<bool, multi_sig_patterns::AuthError>>(
+        &multisig_id,
+        &Symbol::new(&env, "execute"),
+        Vec::from_array(&env, [proposal_id.into_val(&env), signer1.into_val(&env)]),
+    ).unwrap();
+    assert!(success);
+
+    // Verify events tracking
+    let evt_count: u32 =
+        env.invoke_contract(&events_id, &Symbol::new(&env, "get_number"), Vec::new(&env));
+    assert_eq!(evt_count, 1);
 }
 
 // ---------------------------------------------------------------------------

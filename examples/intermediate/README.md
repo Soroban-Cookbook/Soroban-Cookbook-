@@ -12,7 +12,7 @@ Intermediate-level examples demonstrating common patterns and real-world use cas
 
 ### Cross-Contract Patterns
 
-- **Contract Factory** - Deploy contracts from within a contract
+- **[Ajo Factory](./ajo-factory/)** - Deploy new contract instances from within a contract
 - **Proxy Pattern** - Upgradeable contract pattern
 - **Registry** - Central registry for contract discovery
 

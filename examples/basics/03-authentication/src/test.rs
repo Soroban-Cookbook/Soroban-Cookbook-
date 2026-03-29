@@ -94,6 +94,22 @@ fn test_transfer_updates_balances() {
     assert_eq!(client.get_balance(&user2), 300);
 }
 
+/// Benchmark the transfer function with authentication.
+#[test]
+fn test_transfer_benchmark() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &1000);
+    
+    println!("--- Transfer with Auth Benchmark ---");
+    env.budget().reset_default();
+    client.transfer(&user1, &user2, &100);
+    env.budget().print();
+}
+
 #[test]
 #[should_panic(expected = "Error(Contract, #4)")]
 fn test_transfer_insufficient_balance_fails() {

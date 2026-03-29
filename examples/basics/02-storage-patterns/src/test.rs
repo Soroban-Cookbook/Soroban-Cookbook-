@@ -124,6 +124,35 @@ fn test_instance_storage() {
     assert!(!client.has_instance(&key));
 }
 
+/// Benchmark storage costs for different storage types.
+#[test]
+fn test_storage_costs_benchmark() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&env, &contract_id);
+
+    let key = symbol_short!("test");
+    let value = 100u64;
+
+    // Benchmark Persistent Storage
+    println!("--- Persistent Storage Benchmark ---");
+    env.budget().reset_default();
+    client.set_persistent(&key, &value);
+    env.budget().print();
+
+    // Benchmark Instance Storage
+    println!("--- Instance Storage Benchmark ---");
+    env.budget().reset_default();
+    client.set_instance(&key, &value);
+    env.budget().print();
+
+    // Benchmark Temporary Storage
+    println!("--- Temporary Storage Benchmark ---");
+    env.budget().reset_default();
+    client.set_temporary(&key, &value);
+    env.budget().print();
+}
+
 #[test]
 fn test_storage_isolation() {
     let env = Env::default();
