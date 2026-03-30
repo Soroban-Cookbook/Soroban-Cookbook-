@@ -458,7 +458,7 @@ fn test_error_codes() {
     let mut codes = Vec::new(&env);
     for error in errors.iter() {
         let code = *error as u32;
-        assert!(!codes.contains(code), "Duplicate error code: {}", code);
+        assert!(!codes.contains(code), "Duplicate error code: {code}");
         codes.push_back(code);
     }
 
