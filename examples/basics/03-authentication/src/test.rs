@@ -1,20 +1,5 @@
-//! Unit tests for the Authentication Patterns contract
-//!
-//! These tests demonstrate proper testing of authentication patterns in Soroban contracts.
-//! They include tests for both authorized and unauthorized scenarios.
-//! Unit tests for Authentication & Custom Authorization contract.
-//!
-//! Tests cover:
-//! - Initialization and admin setup
-//! - Role-based access control (grant, revoke, check)
-//! - Admin-only and moderator-level actions
-//! - Time-lock restrictions
-//! - Cooldown enforcement
-//! - Contract state gating (Active / Paused / Frozen)
-
-#![cfg(test)]
-
 use super::*;
+<<<<<<< HEAD
 use soroban_sdk::testutils::{Address as _, AuthorizedFunction};
 use soroban_sdk::{symbol_short, Address, Env};
 
@@ -260,246 +245,443 @@ fn test_multiple_auth_patterns() {
     let retrieved_data = client.get_user_data(&user1);
     assert_eq!(retrieved_data, Some(data));
 }
+=======
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 use soroban_sdk::{
-    testutils::{Address as _, Ledger as _},
-    Address, Env,
+    symbol_short,
+    testutils::{Address as _, Ledger},
+    vec, Env,
 };
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn setup_initialized_contract() -> (Env, Address, Address, AuthContractClient<'static>) {
-    let env = Env::default();
+fn setup_initialized(env: &Env) -> (AuthContractClient<'_>, Address) {
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(env, &contract_id);
+    let admin = Address::generate(env);
     env.mock_all_auths();
+    client.initialize(&admin);
+    (client, admin)
+}
+
+// ---------------------------------------------------------------------------
+// Initialization
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_initialize_sets_admin() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    assert_eq!(client.get_admin(), Some(admin));
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #3)")]
+fn test_initialize_twice_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    client.initialize(&admin);
+}
+
+// ---------------------------------------------------------------------------
+// Admin-only actions
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_admin_action_doubles_value() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    assert_eq!(client.admin_action(&admin, &10), 20);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")]
+fn test_admin_action_non_admin_fails() {
+    let env = Env::default();
+    let (client, _admin) = setup_initialized(&env);
+    let attacker = Address::generate(&env);
+    client.admin_action(&attacker, &10);
+}
+
+#[test]
+fn test_set_balance_admin_only() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+    client.set_balance(&admin, &user, &5000);
+    assert_eq!(client.get_balance(&user), 5000);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")]
+fn test_set_balance_non_admin_fails() {
+    let env = Env::default();
+    let (client, _admin) = setup_initialized(&env);
+    let non_admin = Address::generate(&env);
+    let user = Address::generate(&env);
+    client.set_balance(&non_admin, &user, &5000);
+}
+
+// ---------------------------------------------------------------------------
+// Transfer
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_transfer_updates_balances() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &1000);
+    client.transfer(&user1, &user2, &300);
+
+    assert_eq!(client.get_balance(&user1), 700);
+    assert_eq!(client.get_balance(&user2), 300);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #4)")]
+fn test_transfer_insufficient_balance_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &100);
+    client.transfer(&user1, &user2, &500);
+}
+
+// ---------------------------------------------------------------------------
+// Allowance (approve + transfer_from)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_approve_and_transfer_from() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &500);
+    client.transfer_from(&spender, &owner, &recipient, &200);
+
+    assert_eq!(client.get_balance(&owner), 800);
+    assert_eq!(client.get_balance(&recipient), 200);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #1)")]
+fn test_transfer_from_exceeds_allowance() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &100);
+    client.transfer_from(&spender, &owner, &recipient, &200);
+}
+
+// ---------------------------------------------------------------------------
+// Multi-sig
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multi_sig_adds_signer_count() {
+    let env = Env::default();
     let contract_id = env.register_contract(None, AuthContract);
     let client = AuthContractClient::new(&env, &contract_id);
-    let admin = Address::generate(&env);
-    client.initialize(&admin);
-    (env, contract_id, admin, client)
+    env.mock_all_auths();
+
+    let signers = vec![
+        &env,
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+    ];
+    assert_eq!(client.multi_sig_action(&signers, &10), 13);
 }
 
 // ---------------------------------------------------------------------------
-// 1. Initialization
+// Secure operation
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_initialize() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_secure_operation_success() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(&env, &contract_id);
+    env.mock_all_auths();
 
-    assert_eq!(client.get_role(&admin), 0); // 0 = Admin
-    assert!(client.has_role(&admin, &Role::Admin));
+    let user = Address::generate(&env);
+    let result = client.secure_operation(&user, &symbol_short!("action"));
+    assert_eq!(result.get(0).unwrap(), symbol_short!("success"));
 }
 
 #[test]
-#[should_panic(expected = "Already initialized")]
-fn test_initialize_twice_panics() {
-    let (env, _contract_id, _admin, client) = setup_initialized_contract();
-    let second_admin = Address::generate(&env);
-    client.initialize(&second_admin);
+#[should_panic(expected = "Error(Contract, #1)")]
+fn test_secure_operation_invalid_fails() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(&env, &contract_id);
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    client.secure_operation(&user, &symbol_short!("invalid"));
 }
 
 // ---------------------------------------------------------------------------
-// 2. Role management
+// Emit event
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_grant_and_check_role() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_emit_event() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(&env, &contract_id);
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    // Should not panic.
+    client.emit_event(&user, &symbol_short!("hello"));
+}
+
+// ---------------------------------------------------------------------------
+// Role-Based Access Control Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_grant_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
     let user = Address::generate(&env);
 
     client.grant_role(&admin, &user, &Role::Moderator);
-
-    assert_eq!(client.get_role(&user), 1); // 1 = Moderator
-    assert!(client.has_role(&user, &Role::Moderator));
-    assert!(!client.has_role(&user, &Role::Admin));
+    assert_eq!(client.get_role(&user), Role::Moderator as u32);
 }
 
 #[test]
 fn test_revoke_role() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
     let user = Address::generate(&env);
 
-    client.grant_role(&admin, &user, &Role::User);
-    assert!(client.has_role(&user, &Role::User));
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.get_role(&user), Role::Admin as u32);
 
     client.revoke_role(&admin, &user);
-    assert!(!client.has_role(&user, &Role::User));
-}
-
-// ---------------------------------------------------------------------------
-// 3. Admin actions
-// ---------------------------------------------------------------------------
-
-#[test]
-fn test_admin_action_success() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
-
-    let result = client.admin_action(&admin, &50);
-    assert_eq!(result, 100); // value * 2
+    assert_eq!(client.get_role(&user), Role::User as u32);
 }
 
 #[test]
-#[should_panic(expected = "Insufficient role")]
-fn test_admin_action_non_admin_panics() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_has_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
     let user = Address::generate(&env);
-    client.grant_role(&admin, &user, &Role::User);
 
-    client.admin_action(&user, &50);
-}
-
-// ---------------------------------------------------------------------------
-// 4. Moderator actions
-// ---------------------------------------------------------------------------
-
-#[test]
-fn test_moderator_action_by_admin() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
-
-    let result = client.moderator_action(&admin, &50);
-    assert_eq!(result, 150); // value + 100
+    client.grant_role(&admin, &user, &Role::Moderator);
+    assert!(client.has_role(&user, &Role::Moderator));
+    assert!(client.has_role(&user, &Role::User));
+    assert!(!client.has_role(&user, &Role::Admin));
 }
 
 #[test]
-fn test_moderator_action_by_moderator() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
-    let moderator = Address::generate(&env);
-    client.grant_role(&admin, &moderator, &Role::Moderator);
-
-    let result = client.moderator_action(&moderator, &50);
-    assert_eq!(result, 150); // value + 100
-}
-
-#[test]
-#[should_panic(expected = "Insufficient role")]
-fn test_moderator_action_by_user_panics() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_admin_role_action_success() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
     let user = Address::generate(&env);
-    client.grant_role(&admin, &user, &Role::User);
 
-    client.moderator_action(&user, &50);
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.admin_role_action(&user, &10), 20);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #8)")]
+fn test_admin_role_action_insufficient_role() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::User);
+    client.admin_role_action(&user, &10);
+}
+
+#[test]
+fn test_moderator_action_with_moderator() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Moderator);
+    assert_eq!(client.moderator_action(&user, &10), 20);
+}
+
+#[test]
+fn test_moderator_action_with_admin() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::Admin);
+    assert_eq!(client.moderator_action(&user, &10), 20);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #8)")]
+fn test_moderator_action_with_user_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &user, &Role::User);
+    client.moderator_action(&user, &10);
 }
 
 // ---------------------------------------------------------------------------
-// 5. Time-lock restrictions
+// Time-Based Restrictions Tests
 // ---------------------------------------------------------------------------
 
 #[test]
-#[should_panic(expected = "Action is time-locked")]
-fn test_time_lock_blocks_action() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_set_time_lock() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    client.set_time_lock(&admin, &1000);
+    // Time lock is set, verified by attempting a time-locked action
+}
+
+#[test]
+fn test_time_locked_action_before_unlock() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 500);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
 
     client.set_time_lock(&admin, &1000);
 
-    env.ledger().with_mut(|li| {
-        li.timestamp = 500;
-    });
-
-    client.time_locked_action(&admin);
+    let result = client.try_time_locked_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::TimeLocked)));
 }
 
 #[test]
-fn test_time_lock_allows_after_unlock() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_time_locked_action_after_unlock() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1500);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
 
     client.set_time_lock(&admin, &1000);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 1001;
-    });
-
-    let result = client.time_locked_action(&admin);
-    assert_eq!(result, 1001);
-}
-
-// ---------------------------------------------------------------------------
-// 6. Cooldown enforcement
-// ---------------------------------------------------------------------------
-
-#[test]
-#[should_panic(expected = "Cooldown period not elapsed")]
-fn test_cooldown_enforced() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
-
-    client.set_cooldown(&admin, &100);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 200;
-    });
-    client.cooldown_action(&admin);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 250; // only 50s elapsed, need 100
-    });
-    client.cooldown_action(&admin);
+    assert_eq!(client.time_locked_action(&user), 1500);
 }
 
 #[test]
-fn test_cooldown_allows_after_period() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_set_cooldown() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
 
-    client.set_cooldown(&admin, &100);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 200;
-    });
-    let first = client.cooldown_action(&admin);
-    assert_eq!(first, 200);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 301; // 101s elapsed, cooldown of 100 satisfied
-    });
-    let second = client.cooldown_action(&admin);
-    assert_eq!(second, 301);
-}
-
-// ---------------------------------------------------------------------------
-// 7. Contract state gating
-// ---------------------------------------------------------------------------
-
-#[test]
-fn test_state_active_allows_action() {
-    let (env, _contract_id, admin, client) = setup_initialized_contract();
-
-    client.set_state(&admin, &ContractState::Active);
-
-    env.ledger().with_mut(|li| {
-        li.timestamp = 500;
-    });
-
-    let result = client.active_only_action(&admin);
-    assert_eq!(result, 500);
+    client.set_cooldown(&admin, &300);
+    // Cooldown is set, verified by attempting a cooldown action
 }
 
 #[test]
-fn test_get_state_returns_correct_value() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_cooldown_action_first_call() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    assert_eq!(client.cooldown_action(&user), 1000);
+}
+
+#[test]
+fn test_cooldown_action_within_period() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    client.cooldown_action(&user);
+
+    env.ledger().with_mut(|li| li.timestamp = 1200);
+    let result = client.try_cooldown_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::CooldownActive)));
+}
+
+#[test]
+fn test_cooldown_action_after_period() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    client.set_cooldown(&admin, &300);
+    client.cooldown_action(&user);
+
+    env.ledger().with_mut(|li| li.timestamp = 1400);
+    assert_eq!(client.cooldown_action(&user), 1400);
+}
+
+// ---------------------------------------------------------------------------
+// State-Based Authorization Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_set_state() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
 
     client.set_state(&admin, &ContractState::Paused);
-    assert_eq!(client.get_state(), 1); // 1 = Paused
+    assert_eq!(client.get_state(), ContractState::Paused as u32);
+}
+
+#[test]
+fn test_active_only_action_when_active() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
 
     client.set_state(&admin, &ContractState::Active);
-    assert_eq!(client.get_state(), 0); // 0 = Active
-
-    client.set_state(&admin, &ContractState::Frozen);
-    assert_eq!(client.get_state(), 2); // 2 = Frozen
+    assert_eq!(client.active_only_action(&user), 1000);
 }
 
 #[test]
-#[should_panic(expected = "Contract is not active")]
-fn test_state_paused_blocks_action() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_active_only_action_when_paused() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
 
     client.set_state(&admin, &ContractState::Paused);
-    client.active_only_action(&admin);
+    let result = client.try_active_only_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::InvalidState)));
 }
 
 #[test]
-#[should_panic(expected = "Contract is not active")]
-fn test_state_frozen_blocks_action() {
-    let (_env, _contract_id, admin, client) = setup_initialized_contract();
+fn test_active_only_action_when_frozen() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
 
     client.set_state(&admin, &ContractState::Frozen);
-    client.active_only_action(&admin);
+    let result = client.try_active_only_action(&user);
+    assert_eq!(result, Err(Ok(AuthError::InvalidState)));
+}
+
+#[test]
+fn test_default_state_is_active() {
+    let env = Env::default();
+    env.ledger().with_mut(|li| li.timestamp = 1000);
+    let (client, _admin) = setup_initialized(&env);
+    let user = Address::generate(&env);
+
+    assert_eq!(client.get_state(), ContractState::Active as u32);
+    assert_eq!(client.active_only_action(&user), 1000);
 }

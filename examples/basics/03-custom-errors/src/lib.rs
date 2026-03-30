@@ -70,7 +70,11 @@ impl CustomErrorsContract {
     pub fn validate_input(env: Env, value: i64) -> Result<(), ContractError> {
         if value <= 0 {
             env.events()
+<<<<<<< HEAD
                 .publish(symbol_short!("input_error"), ("Invalid value", value));
+=======
+                .publish((symbol_short!("inp_err"),), ("Invalid value", value));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Err(ContractError::InvalidInput)
         } else {
             Ok(())
@@ -91,8 +95,15 @@ impl CustomErrorsContract {
         admin: Address,
     ) -> Result<(), ContractError> {
         if caller != admin {
+<<<<<<< HEAD
             env.events()
                 .publish(symbol_short!("auth_error"), ("Unauthorized access", caller));
+=======
+            env.events().publish(
+                (symbol_short!("auth_err"),),
+                ("Unauthorized access", caller),
+            );
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Err(ContractError::Unauthorized)
         } else {
             Ok(())
@@ -113,7 +124,11 @@ impl CustomErrorsContract {
             Ok(storage.get(&key).unwrap())
         } else {
             env.events()
+<<<<<<< HEAD
                 .publish(symbol_short!("not_found"), ("Key not found", key));
+=======
+                .publish((symbol_short!("not_found"),), ("Key not found", key));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Err(ContractError::NotFound)
         }
     }
@@ -130,22 +145,35 @@ impl CustomErrorsContract {
     pub fn transfer_tokens(env: Env, from_balance: u64, amount: u64) -> Result<(), ContractError> {
         if amount == 0 {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("transfer_error"),
+=======
+                (symbol_short!("xfer_err"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Zero amount transfer", amount),
             );
             Err(ContractError::InvalidInput)
         } else if from_balance < amount {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("balance_error"),
+=======
+                (symbol_short!("bal_err"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Insufficient balance", from_balance),
             );
             Err(ContractError::InsufficientBalance)
         } else {
             // Simulate successful transfer
+<<<<<<< HEAD
             env.events().publish(
                 symbol_short!("transfer_success"),
                 ("Amount transferred", amount),
             );
+=======
+            env.events()
+                .publish((symbol_short!("xfer_ok"),), ("Amount transferred", amount));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Ok(())
         }
     }
@@ -166,19 +194,31 @@ impl CustomErrorsContract {
     ) -> Result<(), ContractError> {
         if is_paused {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("paused_error"),
+=======
+                (symbol_short!("pause_err"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Contract paused", operation_type),
             );
             Err(ContractError::ContractPaused)
         } else if operation_type == symbol_short!("forbidden") {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("forbidden_error"),
+=======
+                (symbol_short!("forbid"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Operation not allowed", operation_type),
             );
             Err(ContractError::OperationNotAllowed)
         } else {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("operation_success"),
+=======
+                (symbol_short!("op_ok"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Operation completed", operation_type),
             );
             Ok(())
@@ -199,20 +239,33 @@ impl CustomErrorsContract {
 
         if value == 0 {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("create_error"),
+=======
+                (symbol_short!("create_er"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Zero value not allowed", value),
             );
             Err(ContractError::InvalidInput)
         } else if storage.has(&key) {
+<<<<<<< HEAD
             env.events().publish(
                 symbol_short!("duplicate_error"),
                 ("Entry already exists", key),
             );
+=======
+            env.events()
+                .publish((symbol_short!("dup_err"),), ("Entry already exists", key));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Err(ContractError::AlreadyExists)
         } else {
             storage.set(&key, &value);
             env.events()
+<<<<<<< HEAD
                 .publish(symbol_short!("create_success"), ("Entry created", key));
+=======
+                .publish((symbol_short!("create_ok"),), ("Entry created", key));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             Ok(())
         }
     }
@@ -237,19 +290,31 @@ impl CustomErrorsContract {
         let contract_address = env.current_contract_address();
         if caller == contract_address {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("invalid_caller"),
+=======
+                (symbol_short!("inv_call"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Contract cannot call itself", caller),
             );
             Err(ContractError::Unauthorized)
         } else if operation_count >= max_operations {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("rate_limit"),
+=======
+                (symbol_short!("rate_lim"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Rate limit exceeded", operation_count),
             );
             Err(ContractError::RateLimitExceeded)
         } else {
             env.events().publish(
+<<<<<<< HEAD
                 symbol_short!("rate_ok"),
+=======
+                (symbol_short!("rate_ok"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
                 ("Operation allowed", operation_count),
             );
             Ok(())
@@ -296,11 +361,16 @@ impl CustomErrorsContract {
 
         // All checks passed
         env.events().publish(
+<<<<<<< HEAD
             symbol_short!("complex_success"),
+=======
+            (symbol_short!("cmplx_ok"),),
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
             ("Operation completed", amount),
         );
         Ok(())
     }
 }
 
+#[cfg(test)]
 mod test;

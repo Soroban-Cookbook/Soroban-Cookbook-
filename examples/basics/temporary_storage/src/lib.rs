@@ -54,4 +54,5 @@ impl TemporaryStorageContract {
     }
 }
 
+#[cfg(test)]
 mod test;

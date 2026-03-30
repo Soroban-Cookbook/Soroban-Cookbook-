@@ -1,0 +1,12 @@
+[package]
+name = "integration-tests"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
+hello-world = { path = "../../examples/basics/01-hello-world" }
+storage-patterns = { path = "../../examples/basics/02-storage-patterns" }
+authentication = { path = "../../examples/basics/03-authentication" }
+events-counter = { path = "../../examples/basics/events", package = "events_example" }

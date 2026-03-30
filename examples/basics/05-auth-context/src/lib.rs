@@ -21,6 +21,15 @@ impl AuthContextContract {
         env.current_contract_address()
     }
 
+    /// Demonstrates authorization context by requiring auth and returning the invoker.
+    /// This is particularly useful in testing to verify that the correct
+    /// authorizations were provided.
+    pub fn get_auth_context(_env: Env, invoker: Address) -> Address {
+        invoker.require_auth();
+        // The invoker has been authenticated by require_auth()
+        invoker
+    }
+
     /// An example of an admin-only operation using require_auth directly.
     pub fn admin_only_op(_env: Env, invoker: Address, expected_admin: Address) -> bool {
         // Enforce that the provided invoker is indeed the authorized caller
@@ -34,6 +43,15 @@ impl AuthContextContract {
             // In a real contract, this would typically panic or return an error
             false
         }
+    }
+
+    /// Explicitly checks nested authorization.
+    /// This demonstrates that `require_auth` works across the entire call stack.
+    pub fn check_nested_auth(_env: Env, user: Address) -> bool {
+        // This will succeed if 'user' authorized this specific call,
+        // even if it's coming through a proxy contract.
+        user.require_auth();
+        true
     }
 }
 
@@ -58,8 +76,12 @@ impl ProxyContract {
         // When we call the target contract, we pass the user's address.
         // Because the target contract calls `user.require_auth()`, the SDK will
         // verify that the user authorized the entire call chain (User -> Proxy -> Target).
-        client.get_invoker(&user)
+        client.check_nested_auth(&user);
+
+        // Return the user address to confirm success
+        user
     }
 }
 
+#[cfg(test)]
 mod test;
