@@ -87,7 +87,63 @@ jobs:
         run: cargo test --workspace --all-features
 
   # ─────────────────────────────────────────────────────────────────────────
-  # Job 4: Coverage (tarpaulin)
+  # Job 4: Basic examples (fast, per-example feedback)
+  # ─────────────────────────────────────────────────────────────────────────
+  basic-examples:
+    name: Basic Examples CI
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        example:
+          - examples/basics/01-hello-world
+          - examples/basics/02-storage-patterns
+          - examples/basics/03-authentication
+          - examples/basics/03-custom-errors
+          - examples/basics/04-events
+          - examples/basics/05-auth-context
+          - examples/basics/05-error-handling
+          - examples/basics/06-soroban-types
+          - examples/basics/06-type-conversions
+          - examples/basics/06-validation-patterns
+          - examples/basics/07-enum-types
+          - examples/basics/08-custom-structs
+          - examples/basics/09-primitive-types
+          - examples/basics/10-data-types
+          - examples/basics/11-collection-types
+          - examples/basics/11-event-filtering
+          - examples/basics/basic-event-emission
+          - examples/basics/events
+          - examples/basics/instance-storage
+          - examples/basics/persistent-storage
+          - examples/basics/temporary_storage
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain + wasm32 target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          targets: wasm32-unknown-unknown
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-basic-${{ matrix.example }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-basic-
+
+      - name: Run tests for basic example
+        run: cargo test --manifest-path ${{ matrix.example }}/Cargo.toml --all-features
+
+      - name: Build basic example Wasm
+        run: cargo build --manifest-path ${{ matrix.example }}/Cargo.toml --target wasm32-unknown-unknown --release
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job 5: Coverage (tarpaulin)
   # ─────────────────────────────────────────────────────────────────────────
   coverage:
     name: Code Coverage
@@ -123,7 +179,7 @@ jobs:
           fail_ci_if_error: false
 
   # ─────────────────────────────────────────────────────────────────────────
-  # Job 5: Build Wasm
+  # Job 6: Build Wasm
   # ─────────────────────────────────────────────────────────────────────────
   build-wasm:
     name: Build Wasm Targets
@@ -155,3 +211,51 @@ jobs:
       - name: Build all workspace contracts as Wasm
         run: |
           cargo build --workspace --target wasm32-unknown-unknown --release
+
+      - name: Install wasm-opt (Binaryen)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y binaryen
+
+      - name: Optimize wasm and report before/after size
+        run: |
+          set -euo pipefail
+          report="wasm-size-report.txt"
+          echo "Contract WASM size comparison (bytes)" > "$report"
+          echo "file,original,optimized,saved,percent_saved" >> "$report"
+
+          found=0
+          while IFS= read -r wasm; do
+            found=1
+            opt="${wasm%.wasm}.opt.wasm"
+
+            # Some artifacts require bulk-memory to pass Binaryen validation.
+            # Retry with explicit feature enablement to avoid hard-failing CI.
+            if ! wasm-opt -Oz "$wasm" -o "$opt"; then
+              echo "Retrying with --enable-bulk-memory for $wasm"
+              if ! wasm-opt --enable-bulk-memory -Oz "$wasm" -o "$opt"; then
+                echo "$wasm,SKIPPED,SKIPPED,SKIPPED,SKIPPED" >> "$report"
+                echo "Skipping $wasm: wasm-opt failed with/without bulk-memory"
+                continue
+              fi
+            fi
+
+            original=$(stat -c%s "$wasm")
+            optimized=$(stat -c%s "$opt")
+            saved=$((original - optimized))
+            percent_saved=$(awk -v o="$original" -v s="$saved" 'BEGIN { if (o == 0) print "0.00"; else printf "%.2f", (s * 100) / o }')
+
+            echo "$wasm,$original,$optimized,$saved,${percent_saved}%" >> "$report"
+          done < <(find target/wasm32-unknown-unknown/release -type f -name "*.wasm" ! -name "*.opt.wasm" ! -path "*/deps/*" | sort)
+
+          if [ "$found" -eq 0 ]; then
+            echo "No wasm artifacts found after build." >> "$report"
+          fi
+
+          cat "$report"
+
+      - name: Upload wasm size report
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-size-report
+          path: wasm-size-report.txt

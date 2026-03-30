@@ -1,106 +1,62 @@
 # Advanced Examples
 
-Complex smart contract patterns and architectural designs for experienced developers.
+Complex smart contract patterns and architectural designs for experienced developers building production-grade systems on Soroban.
 
-## Examples
+## 📂 Example Categories
 
-### Design Patterns
+### Authorization Patterns
+Advanced methods for securing complex interactions.
+- **[01-multi-party-auth](./01-multi-party-auth/)** - Multi-party authorization beyond simple multisig.
+- **Planned:** Weighted voting, Dynamic signer lists, RBAC with time-bounds.
 
-- **Factory Pattern** - Dynamic contract deployment
-- **Registry Pattern** - Service discovery and contract registration
-- **Diamond Pattern** - Modular contract architecture
-- **Beacon Proxy** - Minimal proxy with upgradeable implementation
-
-### Cross-Chain
-
-- **Bridge Contract** - Asset bridging between chains
-- **Cross-Chain Messaging** - Message passing protocols
-- **Wrapped Assets** - Chain-specific asset wrapping
-
-### Complex Financial
-
-- **Bonding Curves** - Automated price discovery
-- **Dutch Auction** - Descending price auctions
-- **Vesting Schedule** - Token vesting with cliffs and periods
-- **Options Protocol** - Put/call options implementation
+### Security & Time-Based Logic
+Patterns for managing risk and execution windows.
+- **[02-timelock](./02-timelock/)** - Delayed execution for governance and security.
+- **Planned:** Circuit breakers, Emergency stops, Rate limiting.
 
 ### Optimization Patterns
+Techniques for minimizing resource usage and gas costs.
+- **Planned:** Gas optimization, Batch operations, Merkle proofs, Lazy evaluation.
 
-- **Gas Optimization** - Minimize resource usage
-- **Batch Operations** - Efficient bulk processing
-- **Lazy Evaluation** - Deferred computation patterns
-- **Merkle Proofs** - Efficient data verification
+### Complex Financial Patterns
+Building blocks for advanced DeFi and financial systems.
+- **Planned:** Bonding curves, Dutch auctions, Vesting schedules, Options protocols.
+
+## 📋 Planned Examples
+
+- **Factory Pattern** - Dynamic contract deployment.
+- **Registry Pattern** - Service discovery and contract registration.
+- **Diamond Pattern** - Modular contract architecture.
+- **Beacon Proxy** - Minimal proxy with upgradeable implementation.
+- **Merkle Proofs** - Efficient data verification for large datasets.
+- **Bonding Curves** - Automated price discovery mechanisms.
+- **Vesting Schedule** - Token vesting with cliffs and periods.
 
 ## 🎯 Prerequisites
 
 Before exploring advanced examples, ensure mastery of:
-
-- [Basic Examples](../basics/) - Core concepts
-- [Intermediate Examples](../intermediate/) - Common patterns
-- Rust advanced features (traits, generics, lifetimes)
-- Smart contract security principles
+- [Basic Examples](../basics/) - Core concepts.
+- [Intermediate Examples](../intermediate/) - Common patterns.
+- Rust advanced features (traits, generics, lifetimes).
+- Smart contract security principles.
 
 ## 🧠 Advanced Concepts
 
 ### State Management
-
-- Efficient storage layout
-- Gas-optimized data structures
-- Archive and restoration patterns
+- Efficient storage layout and data structure design.
+- Archive and restoration patterns for long-term storage.
 
 ### Security Patterns
-
-- Time-delayed execution
-- Circuit breakers
-- Rate limiting
-- Emergency stops
+- Time-delayed execution and emergency response mechanisms.
+- Risk management through rate limiting and circuit breakers.
 
 ### Scalability
-
-- Off-chain computation
-- State channels
-- Batch processing
-- Minimal on-chain footprint
-
-## ⚠️ Important Notes
-
-These examples demonstrate advanced techniques that:
-
-- May have complex security implications
-- Require thorough testing and auditing
-- Should be used with full understanding
-- May need customization for production use
+- Off-chain computation and Merkle-based state verification.
+- Batch processing to maximize ledger throughput.
 
 ## 🔒 Security First
 
-Advanced patterns increase attack surface:
-
-1. **Audit Everything** - Professional security review required
-2. **Test Extensively** - Unit, integration, and fuzz testing
-3. **Monitor Closely** - Real-time monitoring in production
-4. **Have Response Plans** - Incident response procedures
-5. **Document Thoroughly** - Explain design decisions
-
-## 📚 Learning Approach
-
-1. **Study Each Pattern** - Understand the problem it solves
-2. **Review Trade-offs** - Every pattern has costs and benefits
-3. **Implement Incrementally** - Start simple, add complexity
-4. **Test Rigorously** - Break your own code
-5. **Seek Review** - Multiple eyes catch more issues
-
-## 🤝 Contributing
-
-Have an advanced pattern to share? Ensure it includes:
-
-- Clear problem statement
-- Solution explanation
-- Trade-off analysis
-- Security considerations
-- Comprehensive tests
-
-See [CONTRIBUTING.md](../../CONTRIBUTING.md)
-
----
-
-**Master advanced patterns to build production-grade systems!**
+Advanced patterns increase the attack surface. Always:
+1. **Audit Everything** - Professional security review is mandatory for production.
+2. **Test Extensively** - Unit, integration, and fuzz testing are essential.
+3. **Monitor Closely** - Implement real-time monitoring and incident response plans.

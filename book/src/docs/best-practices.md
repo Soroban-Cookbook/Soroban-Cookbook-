@@ -292,6 +292,26 @@ soroban-sdk = "21.7.0"  # Only what you need
 # Avoid heavy crates if possible
 ```
 
+✅ **DO:** Run `wasm-opt` after release builds and compare size output
+
+```bash
+# Build optimized release wasm
+cargo build --workspace --target wasm32-unknown-unknown --release
+
+# Install wasm-opt (Binaryen)
+sudo apt-get update && sudo apt-get install -y binaryen
+
+# Example optimization for one contract
+wasm-opt -Oz target/wasm32-unknown-unknown/release/hello_world.wasm \
+    -o target/wasm32-unknown-unknown/release/hello_world.opt.wasm
+
+# Before/after comparison
+stat -c "%n %s bytes" target/wasm32-unknown-unknown/release/hello_world.wasm
+stat -c "%n %s bytes" target/wasm32-unknown-unknown/release/hello_world.opt.wasm
+```
+
+Use `-Oz` for smallest output size. Keep both before/after numbers in PR notes when optimizing contracts.
+
 ## 🧪 Testing Best Practices
 
 ### 1. Comprehensive Test Coverage

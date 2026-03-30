@@ -1,97 +1,46 @@
 # DeFi Examples
 
-Decentralized Finance (DeFi) protocol implementations on Soroban.
+Decentralized Finance (DeFi) protocol implementations on Soroban, including automated market makers, lending platforms, and yield optimizers.
 
-## Examples
-
-### Lending & Borrowing
-
-- **Simple Lending** - Basic lending pool with interest
-- **Collateralized Lending** - Over-collateralized loans
-- **Flash Loans** - Uncollateralized loans within a single transaction
+## 📂 Example Categories
 
 ### DEX & AMM
+Automated market makers and token exchange protocols.
+- **Planned:** Constant Product AMM (Uniswap V2 style), Stable Swap AMM (Curve style), Simple Token Swap.
 
-- **Simple Swap** - Basic token swap functionality
-- **Constant Product AMM** - Uniswap V2 style AMM
-- **Stable Swap** - Curve-style stableswap AMM
+### Lending & Borrowing
+Protocols for collateralized and uncollateralized loans.
+- **Planned:** Simple Lending pool, Collateralized Lending with liquidations, Flash Loans.
 
 ### Vaults & Yield
+Automated yield aggregation and reward systems.
+- **Planned:** Yield Vaults, Staking Pools, Liquidity Mining incentives.
 
-- **Yield Vault** - Auto-compounding yield aggregator
-- **Staking Pool** - Stake tokens to earn rewards
-- **Liquidity Mining** - Incentivized liquidity provision
+### Derivatives & Advanced Financials
+Complex financial instruments and stablecoin models.
+- **Planned:** Options protocols, Perpetual Swaps, Synthetic Assets, Collateralized Stablecoins.
 
-### Derivatives
+## 📋 Planned Examples
 
-- **Options Contract** - Basic options implementation
-- **Perpetual Swap** - Perpetual futures contract
-- **Synthetic Assets** - Minting synthetic assets
+- **Constant Product AMM** - Core liquidity pool mechanics (x * y = k).
+- **Simple Lending** - Basic lending and borrowing with interest.
+- **Yield Vault** - Automated yield harvesting and compounding.
+- **Flash Loans** - Uncollateralized borrowing within a single transaction.
+- **Staking Pool** - Rewards for locking up tokens.
+- **Stablecoin** - Collateral-backed stable asset.
 
-### Stablecoins
+## ⚠️ Security First
 
-- **Collateralized Stablecoin** - Over-collateralized stable asset
-- **Algorithmic Stablecoin** - Algorithmic supply adjustment
+DeFi protocols are high-stakes. Before deploying:
+1. **Audit your code** - Have it reviewed by security experts.
+2. **Test extensively** - Simulate extreme market conditions and edge cases.
+3. **Oracle Safety** - Ensure price feeds are secure and resistant to manipulation.
+4. **Safety Checks** - Implement slippage protection and circuit breakers.
 
-## ⚠️ Important Notes
+## 🎯 Prerequisites
 
-### Security Considerations
-
-These examples are for **educational purposes**. Before deploying to mainnet:
-
-1. **Audit your code** - Have it reviewed by security experts
-2. **Test extensively** - Use testnets thoroughly
-3. **Consider edge cases** - Price manipulation, reentrancy, etc.
-4. **Implement safety checks** - Slippage protection, circuit breakers
-5. **Monitor in production** - Have response plans for issues
-
-### Common DeFi Risks
-
-- **Smart Contract Risk** - Bugs in contract logic
-- **Oracle Risk** - Price feed manipulation
-- **Liquidity Risk** - Insufficient liquidity for operations
-- **Market Risk** - Price volatility exposure
-- **Systemic Risk** - Cascading failures across protocols
-
-## 📚 Learning Path
-
-1. **Start Simple** - Begin with basic swap and lending
-2. **Understand AMMs** - Study automated market makers
-3. **Master Oracles** - Learn price feed integration
-4. **Explore Composability** - Build on existing protocols
-5. **Focus on Security** - Study common vulnerabilities
-
-## 🧪 Testing DeFi Contracts
-
-DeFi contracts require extensive testing:
-
-```rust
-#[test]
-fn test_price_manipulation() {
-    // Test resistance to price manipulation
-}
-
-#[test]
-fn test_extreme_volatility() {
-    // Test behavior under extreme price changes
-}
-
-#[test]
-fn test_edge_case_liquidity() {
-    // Test with minimal liquidity
-}
-```
-
-## 🔗 External Resources
-
-- [DeFi Security Best Practices](https://developers.stellar.org/docs/smart-contracts/security)
-- [Oracle Integration Guide](https://developers.stellar.org/docs/smart-contracts/oracles)
-- [Soroban Token Interface](https://developers.stellar.org/docs/tokens/token-interface)
-
-## 🤝 Contributing
-
-Have a DeFi pattern to share? See [CONTRIBUTING.md](../../CONTRIBUTING.md)
-
----
-
-**⚠️ Disclaimer:** These examples are for educational purposes only. Use at your own risk.
+Before diving into DeFi examples, ensure you understand:
+- [Basic Examples](../basics/) - Core concepts.
+- [Token Examples](../tokens/) - Fungible token standards.
+- [Intermediate Patterns](../intermediate/) - Security and access control.
+- [Advanced Patterns](../advanced/) - Complex architectural designs.

@@ -1,11 +1,43 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Bytes, Env, Symbol};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol,
+};
 
 /// Minimum delay (in seconds) that must pass before execution
 const MIN_DELAY: u64 = 60;
 /// Maximum delay (in seconds) allowed when queuing
 const MAX_DELAY: u64 = 86_400; // 24 hours
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+/// Payload for an admin-action event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AdminActionEventData {
+    /// Identifier of the specific action performed.
+    pub action: Symbol,
+    /// Timestamp when the action was executed.
+    pub timestamp: u64,
+}
+
+/// Payload for an audit-trail event.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct AuditTrailEventData {
+    /// Free-form description or reference tag.
+    pub details: Symbol,
+    /// Ledger timestamp at emission time.
+    pub timestamp: u64,
+}
+
+/// Namespace symbol used as the first topic of every event this contract emits.
+const CONTRACT_NS: Symbol = symbol_short!("timelock");
+/// Naming convention: `snake_case` action names in topic[1].
+const ACTION_ADMIN: Symbol = symbol_short!("admin");
+const ACTION_AUDIT: Symbol = symbol_short!("audit");
 
 #[contracttype]
 pub enum DataKey {
@@ -40,6 +72,15 @@ impl TimelockContract {
             panic!("Already initialized");
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
+
+        // Audit trail for initialization
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, admin),
+            AuditTrailEventData {
+                details: symbol_short!("init"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 
     /// Queue an operation for delayed execution.
@@ -71,8 +112,14 @@ impl TimelockContract {
         // Without this, the entry could expire before execution time.
         env.storage().persistent().extend_ttl(&key, 17_280, 120_960);
 
-        env.events()
-            .publish((Symbol::new(&env, "queued"),), (operation_id, execute_at));
+        // Consistent event emission
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, admin, operation_id),
+            AdminActionEventData {
+                action: symbol_short!("queue"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 
     /// Execute a queued operation after its delay has passed.
@@ -102,8 +149,14 @@ impl TimelockContract {
         // Remove so it cannot be replayed
         env.storage().persistent().remove(&key);
 
-        env.events()
-            .publish((Symbol::new(&env, "executed"),), (operation_id, now));
+        // Consistent event emission
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, admin, operation_id),
+            AdminActionEventData {
+                action: symbol_short!("execute"),
+                timestamp: now,
+            },
+        );
     }
 
     /// Cancel a queued operation before it is executed.
@@ -124,8 +177,14 @@ impl TimelockContract {
 
         env.storage().persistent().remove(&key);
 
-        env.events()
-            .publish((Symbol::new(&env, "cancelled"),), operation_id);
+        // Consistent event emission
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, admin, operation_id),
+            AdminActionEventData {
+                action: symbol_short!("cancel"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 
     /// Return the scheduled execution timestamp for an operation, or 0 if not queued.

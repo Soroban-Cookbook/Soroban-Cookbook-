@@ -1,231 +1,93 @@
 # Documentation Index
 
-Welcome to the Soroban Cookbook documentation! This index helps you find the information you need.
+Welcome to the Soroban Cookbook documentation. Use this index to find what you need quickly.
 
-## 📖 Getting Started
+## Quick Links
 
-New to Soroban? Start here:
+| I want to…                  | Go to                                                         |
+| --------------------------- | ------------------------------------------------------------- |
+| Set up my environment       | [Getting Started](../book/src/guides/getting-started.md)     |
+| Write my first contract     | [Hello World](../examples/basics/01-hello-world/)            |
+| Learn to test contracts     | [Testing Guide](../book/src/guides/testing.md)               |
+| Deploy to testnet           | [Deployment Guide](../book/src/guides/deployment.md)         |
+| Migrate from Ethereum       | [Ethereum → Soroban](../book/src/guides/ethereum-to-soroban.md) |
+| Look up a term              | [Glossary](./glossary.md)                                    |
+| See common patterns         | [Common Patterns](./common-patterns.md)                      |
+| Check best practices        | [Best Practices](./best-practices.md)                        |
+| Get a cheat sheet           | [Quick Reference](./quick-reference.md)                      |
 
-1. **[Getting Started Guide](../guides/getting-started.md)** - Set up your development environment
-2. **[Your First Contract](../examples/basics/01-hello-world/)** - Write, test, and deploy
-3. **[Testing Guide](../guides/testing.md)** - Learn to test effectively
-4. **[Deployment Guide](../guides/deployment.md)** - Deploy to testnet and mainnet
+## Reference Documentation
 
-### 🎬 Video Walkthrough
+- [Best Practices](./best-practices.md) — Security, storage, and code quality guidelines
+- [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
+- [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
+- [Glossary](./glossary.md) — Key terms and concepts
 
-> **Getting Started — Examples 01–03** *(coming soon)*
-> A 10–15 minute video covering Hello World, Storage Patterns, and Custom Errors.
-> Once published it will be linked here and in each example's README.
-> See [`docs/video-script-getting-started.md`](./video-script-getting-started.md) for the full script and YouTube metadata.
+### Architecture Decision Records
 
-## 🎓 Learning Paths
+- [ADR-001: Record Architecture Decisions](./adr/001-record-architecture-decisions.md)
+- [ADR Template](./adr/template.md)
 
-### For Beginners
+## Guides
 
-1. [Hello World](../examples/basics/01-hello-world/) - Basic structure
-2. [Storage Patterns](../examples/basics/02-storage-patterns/) - Data persistence
-3. [Authentication](../examples/basics/03-authentication/) - Security basics
-4. [Events](../examples/basics/04-events/) - Event emission
-5. [Error Handling](../examples/basics/05-error-handling/) - Proper errors
-6. [Data Types](../examples/basics/06-data-types/) - Soroban types
+Step-by-step tutorials in [`book/src/guides/`](../book/src/guides/):
 
-### For Ethereum Developers
+1. [Getting Started](../book/src/guides/getting-started.md) — Environment setup
+2. [Testing](../book/src/guides/testing.md) — Unit and integration tests
+3. [Deployment](../book/src/guides/deployment.md) — Testnet and mainnet deployment
+4. [Ethereum to Soroban](../book/src/guides/ethereum-to-soroban.md) — Solidity → Rust translation
 
-- **[Ethereum to Soroban Guide](../guides/ethereum-to-soroban.md)** - Translation guide
-- Solidity → Rust syntax comparison
-- Pattern equivalents (ERC-20, Ownable, etc.)
+## Examples by Category
 
-### For Intermediate Developers
+### By Difficulty
 
-- [Token Interactions](../examples/intermediate/) - Working with tokens
-- [Cross-Contract Patterns](../examples/intermediate/) - Multi-contract systems
-- [Access Control](../examples/intermediate/) - RBAC and multi-sig
-- [Data Structures](../examples/intermediate/) - Efficient storage
-
-### For Advanced Developers
-
-- [Design Patterns](../examples/advanced/) - Architectural patterns
-- [DeFi Protocols](../examples/defi/) - Financial applications
-- [Governance Systems](../examples/governance/) - DAOs and voting
-- [Optimization](../examples/advanced/) - Resource efficiency
-
-## 📚 Reference Documentation
-
-### Core Concepts
-
-- **[Quick Reference](./quick-reference.md)** - Cheat sheet
-- **[Common Patterns](./common-patterns.md)** - Extracted patterns with when-to-use guide
-- **[Best Practices](./best-practices.md)** - Recommended patterns
-- **[Common Pitfalls](./common-pitfalls.md)** - Avoid these mistakes
-- **[Security Guide](./security.md)** - Security checklist
-
-### Technical References
-
-- **[Storage Types](./storage-types.md)** - Persistent, Temporary, Instance
-- **[Authorization](./authorization.md)** - Auth patterns and security
-- **[Events](./events.md)** - Event emission and monitoring
-- **[Error Handling](./error-handling.md)** - Error types and recovery
-- **[Testing](./testing-reference.md)** - Testing utilities and patterns
-
-### Standards & Specifications
-
-- **[SEP-41: Token Standard](https://github.com/stellar/stellar-protocol/blob/master/ecosystem/sep-0041.md)**
-- **[Soroban Protocol](https://developers.stellar.org/docs/smart-contracts)**
-- **[State Archival](https://developers.stellar.org/docs/smart-contracts/state-archival)**
-
-## 🔍 Examples by Category
-
-### By Difficulty Level
-
-- [Basic Examples](../examples/basics/) - Fundamentals
-- [Intermediate Examples](../examples/intermediate/) - Common patterns
-- [Advanced Examples](../examples/advanced/) - Complex systems
+| Level        | Directory                          | Description                  |
+| ------------ | ---------------------------------- | ---------------------------- |
+| Basics       | [examples/basics/](../examples/basics/)           | Core concepts, one at a time |
+| Intermediate | [examples/intermediate/](../examples/intermediate/) | Common patterns and use cases |
+| Advanced     | [examples/advanced/](../examples/advanced/)       | Complex systems              |
 
 ### By Use Case
 
-- [DeFi](../examples/defi/) - Decentralized finance
-- [NFTs](../examples/nfts/) - Non-fungible tokens
-- [Governance](../examples/governance/) - DAOs and voting
-- [Tokens](../examples/tokens/) - Token standards
+| Category   | Directory                              | Description                  |
+| ---------- | -------------------------------------- | ---------------------------- |
+| DeFi       | [examples/defi/](../examples/defi/)           | AMMs, lending, vaults        |
+| NFTs       | [examples/nfts/](../examples/nfts/)           | Minting, marketplaces        |
+| Governance | [examples/governance/](../examples/governance/) | DAOs, voting, proposals      |
+| Tokens     | [examples/tokens/](../examples/tokens/)       | SEP-41, vesting, airdrops    |
 
-### By Feature
+### Basics Examples
 
-- **Authentication & Authorization**
-  - [Basic Auth](../examples/basics/03-authentication/)
-  - [Multi-Sig](../examples/intermediate/)
-  - [Role-Based Access Control](../examples/intermediate/)
+| Example | Concepts |
+| ------- | -------- |
+| [01-hello-world](../examples/basics/01-hello-world/) | Contract struct, `#[contract]`, `#[contractimpl]`, unit tests |
+| [02-storage-patterns](../examples/basics/02-storage-patterns/) | `persistent`, `instance`, `temporary` storage, TTL |
+| [03-authentication](../examples/basics/03-authentication/) | `require_auth()`, admin roles |
+| [03-custom-errors](../examples/basics/03-custom-errors/) | `#[contracterror]`, error codes |
+| [04-events](../examples/basics/04-events/) | `env.events().publish()`, topic design |
+| [05-auth-context](../examples/basics/05-auth-context/) | Cross-contract execution context |
+| [05-error-handling](../examples/basics/05-error-handling/) | Error enums, validation, propagation |
+| [06-soroban-types](../examples/basics/06-soroban-types/) | `Address`, `Symbol`, `Bytes`, `Map`, `Vec` |
+| [06-validation-patterns](../examples/basics/06-validation-patterns/) | Precondition checks, overflow-safe arithmetic |
+| [07-enum-types](../examples/basics/07-enum-types/) | `#[contracttype]` enums, role dispatch |
+| [08-custom-structs](../examples/basics/08-custom-structs/) | `#[contracttype]` structs, nested types |
+| [09-primitive-types](../examples/basics/09-primitive-types/) | `u32`, `u64`, `i128`, arithmetic safety |
 
-- **Token Operations**
-  - [Token Basics](../examples/tokens/)
-  - [Token Wrapper](../examples/intermediate/)
-  - [Custom Token](../examples/tokens/)
-
-- **Storage & Data**
-  - [Storage Patterns](../examples/basics/02-storage-patterns/)
-  - [Data Structures](../examples/intermediate/)
-  - [Efficient Storage](../examples/advanced/)
-
-- **Financial Operations**
-  - [Simple Swap](../examples/defi/)
-  - [Lending Pool](../examples/defi/)
-  - [AMM](../examples/defi/)
-  - [Yield Vault](../examples/defi/)
-
-## 🛠️ Tools & Utilities
-
-### Development Scripts
-
-- **[build.sh](../scripts/build.sh)** - Build contracts
-- **[test.sh](../scripts/test.sh)** - Run tests with options
-- **[deploy.sh](../scripts/deploy.sh)** - Deploy to networks
-
-### Testing Tools
-
-- Mock environments
-- Authorization mocking
-- Time manipulation
-- Event inspection
-
-### Deployment Tools
-
-- Network configuration
-- Identity management
-- Fee estimation
-- Contract verification
-
-## 📖 Guides & Tutorials
-
-### Step-by-Step Guides
-
-1. [Getting Started](../guides/getting-started.md)
-2. [Testing Guide](../guides/testing.md)
-3. [Deployment Guide](../guides/deployment.md)
-4. [Ethereum to Soroban](../guides/ethereum-to-soroban.md)
-
-### Topic-Specific Guides
-
-- Storage optimization
-- Gas efficiency
-- Security auditing
-- Upgrade patterns
-
-## 🤝 Community Resources
-
-### Getting Help
-
-- [Stellar Discord](https://discord.gg/stellardev) - Live chat
-- [Stack Exchange](https://stellar.stackexchange.com/) - Q&A
-- [GitHub Discussions](https://github.com/Soroban-Cookbook/Soroban-Cookbook/discussions)
-- [Forum](https://stellar.org/community)
-
-### Contributing
-
-- [Contributing Guide](../CONTRIBUTING.md) - How to contribute
-- [Code of Conduct](../CODE_OF_CONDUCT.md) - Community guidelines
-- [Issue Templates](../.github/ISSUE_TEMPLATE/) - Report issues
-- [Pull Request Template](../.github/PULL_REQUEST_TEMPLATE.md)
-
-## 🔗 External Resources
-
-### Official Documentation
+## External Resources
 
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
-- [Soroban SDK Docs](https://docs.rs/soroban-sdk/)
-- [Stellar Documentation](https://developers.stellar.org/)
-- [Soroban CLI Reference](https://developers.stellar.org/docs/tools/developer-tools/cli)
-
-### Learning Resources
-
-- [Rust Book](https://doc.rust-lang.org/book/)
-- [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
+- [Soroban Rust SDK](https://docs.rs/soroban-sdk/)
+- [Stellar Developer Portal](https://developers.stellar.org/)
+- [Stellar Discord](https://discord.gg/stellardev)
 - [Soroban Quest](https://quest.stellar.org/)
-- [Stellar Community](https://stellar.org/community)
 
-### Tools
+## Search Tips
 
-- [Stellar Laboratory](https://laboratory.stellar.org/)
-- [Stellar Expert](https://stellar.expert/)
-- [Futurenet](https://futurenet.stellar.org/)
-
-## 🔍 Search Tips
-
-### Finding Examples
-
-- Browse by [difficulty level](../examples/)
-- Search by [use case](../examples/)
-- Filter by [feature](#by-feature)
-
-### Finding Documentation
-
-- Use the sidebar navigation
-- Search this repository
-- Check [official docs](https://developers.stellar.org/)
-
-## 📱 Quick Links
-
-| Topic             | Link                                          |
-| ----------------- | --------------------------------------------- |
-| Setup Environment | [Guide](../guides/getting-started.md)         |
-| First Contract    | [Example](../examples/basics/01-hello-world/) |
-| Testing           | [Guide](../guides/testing.md)                 |
-| Deployment        | [Guide](../guides/deployment.md)              |
-| From Ethereum     | [Migration](../guides/ethereum-to-soroban.md) |
-| DeFi Examples     | [Directory](../examples/defi/)                |
-| Token Standards   | [Examples](../examples/tokens/)               |
-| Security          | [Guide](./security.md)                        |
-
-## 🆕 Latest Additions
-
-Check the [GitHub repository](https://github.com/Soroban-Cookbook/Soroban-Cookbook) for the most recent examples and updates.
-
-## 💡 Suggestions
-
-Missing something? Have an idea for a new example or guide?
-
-- [Open an issue](https://github.com/Soroban-Cookbook/Soroban-Cookbook/issues/new)
-- [Start a discussion](https://github.com/Soroban-Cookbook/Soroban-Cookbook/discussions)
-- [Submit a PR](../CONTRIBUTING.md)
+- **Looking for a pattern?** Check [Common Patterns](./common-patterns.md) or browse [`examples/`](../examples/) by difficulty.
+- **Unfamiliar term?** See the [Glossary](./glossary.md).
+- **Migrating from Solidity?** The [Ethereum to Soroban guide](../book/src/guides/ethereum-to-soroban.md) maps common patterns directly.
+- **Can't find it here?** Search the repository or ask in [Stellar Discord](https://discord.gg/stellardev).
 
 ---
 
-**Happy coding!** 🚀
+Missing something? [Open an issue](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues/new) or [submit a PR](../CONTRIBUTING.md).

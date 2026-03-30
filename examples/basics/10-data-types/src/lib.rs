@@ -339,16 +339,13 @@ impl DataTypesContract {
     pub fn bytes_to_bytesn(env: Env, data: Bytes) -> BytesN<32> {
         // Create a 32-byte array from the Bytes
         let mut array = [0u8; 32];
-        let len = data.len() as usize;
-        if len != 32 {
+        if data.len() as usize != 32 {
             panic!("Bytes must be exactly 32 bytes");
         }
 
         // Copy bytes into the array
         for (i, byte) in array.iter_mut().enumerate() {
-            *byte = data.get(i as u32).unwrap_or_else(|| {
-                panic!("Failed to read byte at index {i}");
-            });
+            *byte = data.get(i as u32).unwrap();
         }
 
         BytesN::<32>::from_array(&env, &array)
@@ -374,6 +371,58 @@ impl DataTypesContract {
     /// A String created from a literal
     pub fn create_string_from_literal(env: Env) -> String {
         String::from_str(&env, "Hello, Soroban!")
+    }
+
+    // ============================================================================
+    // STORAGE ROUND-TRIPS
+    // ============================================================================
+
+    /// Persist a u32 value and read it back.
+    pub fn put_u32(env: Env, value: u32) {
+        env.storage().instance().set(&symbol_short!("u32"), &value);
+    }
+
+    pub fn get_u32(env: Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("u32"))
+            .unwrap_or(0)
+    }
+
+    /// Persist an i128 value and read it back.
+    pub fn put_i128(env: Env, value: i128) {
+        env.storage().instance().set(&symbol_short!("i128"), &value);
+    }
+
+    pub fn get_i128(env: Env) -> i128 {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("i128"))
+            .unwrap_or(0)
+    }
+
+    /// Persist a Symbol and read it back.
+    pub fn put_symbol(env: Env, value: Symbol) {
+        env.storage().instance().set(&symbol_short!("sym"), &value);
+    }
+
+    pub fn get_symbol(env: Env) -> Symbol {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("sym"))
+            .unwrap_or_else(|| symbol_short!("none"))
+    }
+
+    /// Persist a Vec<i128> and read it back.
+    pub fn put_vec(env: Env, value: Vec<i128>) {
+        env.storage().instance().set(&symbol_short!("vec"), &value);
+    }
+
+    pub fn get_vec(env: Env) -> Vec<i128> {
+        env.storage()
+            .instance()
+            .get(&symbol_short!("vec"))
+            .unwrap_or_else(|| vec![&env])
     }
 }
 

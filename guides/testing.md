@@ -259,6 +259,94 @@ fn test_storage_persistence() {
 }
 ```
 
+## 🧩 Shared Test Utilities
+
+For multi-file test suites, keep reusable setup code in `tests/common/mod.rs`.
+
+```rust
+// tests/common/mod.rs
+use soroban_sdk::{Address, Env, testutils::Address as _};
+
+pub fn setup_env() -> Env {
+    let env = Env::default();
+    env.mock_all_auths();
+    env
+}
+
+pub fn test_user(env: &Env) -> Address {
+    Address::generate(env)
+}
+```
+
+```rust
+// tests/integration.rs
+mod common;
+
+#[test]
+fn deposit_updates_balance() {
+    let env = common::setup_env();
+    let user = common::test_user(&env);
+    // ... contract setup + assertions
+}
+```
+
+This pattern keeps contract behavior assertions focused while avoiding duplicated setup logic.
+
+## 📸 Snapshot Testing
+
+Snapshot testing helps lock down serialized outputs, event topics/data, and human-readable responses.
+
+```rust
+#[test]
+fn emits_expected_event_shape() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&env, &contract_id);
+
+    client.create_order(&42);
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 1);
+
+    // Keep snapshots stable by comparing deterministic debug output.
+    let rendered = format!("{events:?}");
+    insta::assert_snapshot!(rendered);
+}
+```
+
+Tips:
+
+- Prefer deterministic inputs (fixed timestamps/amounts) before snapshot assertions.
+- Snapshot only stable values (avoid non-deterministic IDs unless normalized first).
+- Review snapshot diffs in PRs the same way you review code diffs.
+
+Add to dev-dependencies when using `insta`:
+
+```toml
+[dev-dependencies]
+insta = "1"
+```
+
+## 📊 Coverage Tools
+
+The repository CI already uses `cargo-tarpaulin` and uploads Cobertura XML to Codecov.
+
+Run coverage locally:
+
+```bash
+cargo install cargo-tarpaulin --locked
+cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300
+```
+
+Alternative (LLVM-based):
+
+```bash
+cargo install cargo-llvm-cov --locked
+cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+```
+
+Use coverage reports to identify untested error paths, auth branches, and storage edge cases.
+
 ### 5. Test Events
 
 ```rust

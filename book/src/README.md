@@ -47,6 +47,10 @@ cargo test
 soroban contract build
 ```
 
+## Contributing
+
+Contributions are welcome. Whether you're fixing a typo, improving docs, or adding a new example — see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines. Please also read our [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ## Additional Resources
 
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
