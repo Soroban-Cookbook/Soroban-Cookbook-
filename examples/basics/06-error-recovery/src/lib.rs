@@ -223,10 +223,7 @@ impl ErrorRecoveryContract {
 
     // Helper functions for storage
     fn get_balance(env: Env, account: Address) -> i128 {
-        env.storage()
-            .persistent()
-            .get(&account)
-            .unwrap_or(0)
+        env.storage().persistent().get(&account).unwrap_or(0)
     }
 
     fn set_balance(env: Env, account: Address, amount: i128) {
@@ -235,10 +232,7 @@ impl ErrorRecoveryContract {
 
     fn get_last_transfer_time(env: Env, account: Address) -> u64 {
         let key = (account, 1u32); // 1 for timestamp key
-        env.storage()
-            .temporary()
-            .get(&key)
-            .unwrap_or(0)
+        env.storage().temporary().get(&key).unwrap_or(0)
     }
 
     fn set_last_transfer_time(env: Env, account: Address, time: u64) {

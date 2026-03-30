@@ -28,11 +28,14 @@ fn test_try_transfer_success() {
 
     let result = client.try_transfer(&user1, &user2, &500);
 
-    assert_eq!(result, Ok(TransferResult {
-        success: true,
-        amount_transferred: 500,
-        fallback_used: false,
-    }));
+    assert_eq!(
+        result,
+        Ok(TransferResult {
+            success: true,
+            amount_transferred: 500,
+            fallback_used: false,
+        })
+    );
 
     // Verify balances
     let balance1 = client.get_balance_or_default(&user1);
@@ -84,11 +87,14 @@ fn test_fallback_primary_succeeds() {
 
     let result = client.transfer_with_fallback(&user1, &user2, &500, &100);
 
-    assert_eq!(result, Ok(TransferResult {
-        success: true,
-        amount_transferred: 500,
-        fallback_used: false,
-    }));
+    assert_eq!(
+        result,
+        Ok(TransferResult {
+            success: true,
+            amount_transferred: 500,
+            fallback_used: false,
+        })
+    );
 }
 
 #[test]
@@ -101,11 +107,14 @@ fn test_fallback_uses_fallback_amount() {
 
     let result = client.transfer_with_fallback(&user1, &user2, &500, &100);
 
-    assert_eq!(result, Ok(TransferResult {
-        success: true,
-        amount_transferred: 100,
-        fallback_used: true,
-    }));
+    assert_eq!(
+        result,
+        Ok(TransferResult {
+            success: true,
+            amount_transferred: 100,
+            fallback_used: true,
+        })
+    );
 
     let balance2 = client.get_balance_or_default(&user2);
     assert_eq!(balance2, 100);
@@ -186,7 +195,7 @@ fn test_batch_transfer_partial_success() {
     let mut transfers = Vec::new(&env);
     transfers.push_back((recipient1.clone(), 100));
     transfers.push_back((recipient2.clone(), 200)); // This will fail
-    transfers.push_back((recipient3.clone(), 50));  // This will also fail
+    transfers.push_back((recipient3.clone(), 50)); // This will also fail
 
     let results = client.batch_transfer(&user1, &transfers);
 

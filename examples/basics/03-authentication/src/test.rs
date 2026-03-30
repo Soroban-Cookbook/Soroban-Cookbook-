@@ -15,14 +15,14 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{symbol_short, Address, Env};
 use soroban_sdk::testutils::{Address as _, AuthorizedFunction};
+use soroban_sdk::{symbol_short, Address, Env};
 
 #[test]
 fn test_basic_auth_success() {
     // Create a test environment
     let env = Env::default();
-    
+
     // Register the contract in the test environment
     let contract_id = env.register_contract(None, AuthContract);
     let client = AuthContractClient::new(&env, &contract_id);
@@ -35,7 +35,7 @@ fn test_basic_auth_success() {
 
     // Call the basic_auth function - should succeed
     let result = client.basic_auth(&user);
-    
+
     // Verify the function returned true as expected
     assert_eq!(result, true);
 }
@@ -55,7 +55,7 @@ fn test_transfer_success() {
 
     // Call the transfer function - should succeed
     let result = client.transfer(&from, &to, &amount);
-    
+
     // Verify the function returned true as expected
     assert_eq!(result, true);
 }
@@ -117,7 +117,7 @@ fn test_admin_only_access() {
     // Try to change admin with unauthorized user - should fail with AuthError::AdminOnly
     // Since this will cause a panic in the contract, we'll test with the correct admin instead
     let another_new_admin = Address::generate(&env);
-    client.set_admin(&new_admin, &another_new_admin);  // new_admin is now the admin
+    client.set_admin(&new_admin, &another_new_admin); // new_admin is now the admin
 
     // Verify the admin changed correctly
     let current_admin = client.get_admin();
@@ -166,7 +166,7 @@ fn test_secure_operation_valid() {
 
     // Mock authentication for the user
     env.mock_all_auths();
-    
+
     // Call secure operation with valid operation - should succeed
     let result_data = client.secure_operation(&user, &valid_operation);
     // Verify the result contains expected values
@@ -219,7 +219,7 @@ fn test_auth_failure_scenarios() {
 
     // DON'T mock auth - this simulates an unauthorized call
     // This should cause the transaction to fail at the require_auth() call
-    
+
     // Attempting to call basic_auth without proper authorization should panic
     client.basic_auth(&user);
 }
