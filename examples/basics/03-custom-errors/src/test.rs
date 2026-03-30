@@ -4,8 +4,12 @@
 //! Each test validates specific error scenarios and ensures proper error codes
 //! are returned for different failure conditions.
 
+<<<<<<< HEAD
+use soroban_sdk::{symbol_short, Address, Env, Error as StellarError, Symbol};
+=======
 use soroban_sdk::testutils::{Address as _, Events};
 use soroban_sdk::{symbol_short, Address, Env};
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
 use crate::{ContractError, CustomErrorsContract, CustomErrorsContractClient};
 
@@ -17,11 +21,29 @@ fn test_invalid_input_error() {
 
     // Test with invalid input (zero value)
     let result = client.try_validate_input(&0);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InvalidInput
+        ))
+    );
+
+    // Test with negative input
+    let result = client.try_validate_input(&-5);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InvalidInput
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::InvalidInput)));
 
     // Test with negative input
     let result = client.try_validate_input(&-5);
     assert_eq!(result, Err(Ok(ContractError::InvalidInput)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with valid input succeeds
     let result = client.try_validate_input(&42);
@@ -39,7 +61,16 @@ fn test_unauthorized_error() {
 
     // Test with unauthorized user
     let result = client.try_check_authorization(&unauthorized_user, &admin);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::Unauthorized
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::Unauthorized)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with authorized admin
     let result = client.try_check_authorization(&admin, &admin);
@@ -62,7 +93,14 @@ fn test_not_found_error() {
 
     // Test with non-existent key
     let result = client.try_get_value(&non_existent_key);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(ContractError::NotFound))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::NotFound)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with existing key
     let result = client.try_get_value(&existing_key);
@@ -77,11 +115,29 @@ fn test_insufficient_balance_error() {
 
     // Test with insufficient balance
     let result = client.try_transfer_tokens(&50u64, &100u64);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InsufficientBalance
+        ))
+    );
+
+    // Test with zero amount (should also return InvalidInput)
+    let result = client.try_transfer_tokens(&100u64, &0u64);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InvalidInput
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::InsufficientBalance)));
 
     // Test with zero amount (should also return InvalidInput)
     let result = client.try_transfer_tokens(&100u64, &0u64);
     assert_eq!(result, Err(Ok(ContractError::InvalidInput)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with sufficient balance
     let result = client.try_transfer_tokens(&100u64, &50u64);
@@ -99,7 +155,16 @@ fn test_operation_not_allowed_error() {
 
     // Test with forbidden operation
     let result = client.try_perform_operation(&false, &forbidden_operation);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::OperationNotAllowed
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::OperationNotAllowed)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with allowed operation
     let result = client.try_perform_operation(&false, &allowed_operation);
@@ -116,7 +181,16 @@ fn test_contract_paused_error() {
 
     // Test when contract is paused
     let result = client.try_perform_operation(&true, &operation);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::ContractPaused
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::ContractPaused)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test when contract is not paused
     let result = client.try_perform_operation(&false, &operation);
@@ -138,12 +212,30 @@ fn test_already_exists_error() {
 
     // Try to create duplicate entry (should fail)
     let result = client.try_create_entry(&key, &200u64);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::AlreadyExists
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::AlreadyExists)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test with zero value (should return InvalidInput)
     let new_key = symbol_short!("new_key");
     let result = client.try_create_entry(&new_key, &0u64);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InvalidInput
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::InvalidInput)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 }
 
 #[test]
@@ -157,15 +249,36 @@ fn test_rate_limit_exceeded_error() {
 
     // Test with rate limit exceeded
     let result = client.try_check_rate_limit(&caller, &15u32, &max_operations);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::RateLimitExceeded
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::RateLimitExceeded)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test within rate limit
     let result = client.try_check_rate_limit(&caller, &5u32, &max_operations);
     assert_eq!(result.unwrap(), Ok(()));
 
+<<<<<<< HEAD
+    // Test with contract address calling itself (should return Unauthorized)
+    let contract_address = env.current_contract_address();
+    let result = client.try_check_rate_limit(&contract_address, &1u32, &max_operations);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::Unauthorized
+        ))
+    );
+=======
     // Test with the contract's own address (should return Unauthorized)
     let result = client.try_check_rate_limit(&contract_id, &1u32, &max_operations);
     assert_eq!(result, Err(Ok(ContractError::Unauthorized)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 }
 
 #[test]
@@ -179,6 +292,41 @@ fn test_complex_operation_multiple_errors() {
 
     // Test 1: Contract paused (first check)
     let result = client.try_complex_operation(&100u64, &admin, &admin, &true);
+<<<<<<< HEAD
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::ContractPaused
+        ))
+    );
+
+    // Test 2: Invalid input (zero amount)
+    let result = client.try_complex_operation(&0u64, &admin, &admin, &false);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InvalidInput
+        ))
+    );
+
+    // Test 3: Unauthorized access
+    let result = client.try_complex_operation(&100u64, &user, &admin, &false);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::Unauthorized
+        ))
+    );
+
+    // Test 4: Insufficient balance
+    let result = client.try_complex_operation(&2000u64, &admin, &admin, &false);
+    assert_eq!(
+        result,
+        Err(StellarError::from_contract_error(
+            ContractError::InsufficientBalance
+        ))
+    );
+=======
     assert_eq!(result, Err(Ok(ContractError::ContractPaused)));
 
     // Test 2: Invalid input (zero amount)
@@ -192,6 +340,7 @@ fn test_complex_operation_multiple_errors() {
     // Test 4: Insufficient balance
     let result = client.try_complex_operation(&2000u64, &admin, &admin, &false);
     assert_eq!(result, Err(Ok(ContractError::InsufficientBalance)));
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     // Test 5: Successful operation
     let result = client.try_complex_operation(&500u64, &admin, &admin, &false);

@@ -141,11 +141,117 @@ const ACTION_AUDIT: Symbol = symbol_short!("audit");
 // Contract
 // ---------------------------------------------------------------------------
 
+<<<<<<< HEAD
+use soroban_sdk::{
+    contract, contracterror, contractimpl, symbol_short, vec, Address, Env, IntoVal, Symbol, Vec,
+};
+
+/// Authentication Patterns Contract
+///
+/// This contract demonstrates various address authentication patterns using Soroban's require_auth() function.
+///
+/// # Context
+/// Address authentication is the foundation of authorization in Soroban. The require_auth() function:
+/// - Verifies that the caller has authorized the transaction
+/// - Prevents unauthorized access to protected functions
+/// - Works with both user accounts and contract addresses
+/// - Is essential for security in multi-user contracts
+=======
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 #[contract]
 pub struct AuthContract;
 
 #[contractimpl]
 impl AuthContract {
+<<<<<<< HEAD
+    /// Basic function with address authentication
+    ///
+    /// Demonstrates the fundamental pattern of requiring authentication before performing actions.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `user` - The address of the user calling the function
+    ///
+    /// # What require_auth does:
+    /// The `require_auth()` function verifies that the transaction has been signed by the given address.
+    /// If the address hasn't authorized the transaction, the function will panic and the transaction will fail.
+    ///
+    /// # When to use it:
+    /// Use `require_auth()` whenever you need to verify that the caller has authorized a specific action,
+    /// particularly when the action involves transferring assets, changing state, or accessing sensitive data.
+    ///
+    /// # Security implications:
+    /// Always call `require_auth()` before making any state changes to prevent unauthorized access.
+    pub fn basic_auth(_env: Env, user: Address) -> bool {
+        // Require authorization from the user address
+        // This ensures that the transaction has been signed by the user
+        user.require_auth();
+
+        // After successful authentication, perform the authorized action
+        // In this case, we just return true to indicate successful authentication
+        true
+    }
+
+    /// Single-address authorization pattern
+    ///
+    /// Demonstrates how to require authentication from a specific address for operations
+    /// like transferring assets or modifying user-specific data.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `from` - The address initiating the transfer
+    /// * `to` - The destination address
+    /// * `amount` - The amount to transfer
+    ///
+    /// # How authorization is verified:
+    /// The `from.require_auth()` call ensures that the `from` address has authorized this transaction.
+    /// This prevents someone else from initiating a transfer from another person's account.
+    pub fn transfer(_env: Env, from: Address, _to: Address, amount: i128) -> bool {
+        // Require authorization from the 'from' address
+        // This prevents unauthorized transfers from someone else's account
+        from.require_auth();
+
+        // Validate inputs
+        if amount <= 0 {
+            panic!("Amount must be positive");
+        }
+
+        // Perform the transfer logic here (in a real contract, this would update balances)
+        // For demonstration purposes, we just return true
+        true
+    }
+
+    /// Admin-only function pattern
+    ///
+    /// Demonstrates how to restrict function access to a specific admin address.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `admin` - The address claiming to be admin
+    /// * `new_admin` - The address to set as new admin
+    ///
+    /// # Security considerations:
+    /// - Store the admin address in persistent storage
+    /// - Only allow the current admin to change the admin
+    /// - Always verify admin permissions before critical operations
+    pub fn set_admin(env: Env, admin: Address, new_admin: Address) -> Result<(), AuthError> {
+        // First, check if there's already an admin stored
+        if let Some(stored_admin) = env.storage().instance().get::<Symbol, Address>(&ADMIN_KEY) {
+            // If there's a stored admin, verify that the caller is that admin
+            if admin != stored_admin {
+                return Err(AuthError::AdminOnly);
+            }
+            // Require authorization from the current admin
+            admin.require_auth();
+        } else {
+            // If no admin is set yet, anyone can become the initial admin
+            // In a real deployment, this would typically be the contract deployer
+            admin.require_auth();
+        }
+
+        // Set the new admin
+        env.storage().instance().set(&ADMIN_KEY, &new_admin);
+=======
     // ==================== INITIALIZATION ====================
 
     /// Initializes the contract with the given admin address.
@@ -167,16 +273,46 @@ impl AuthContract {
                 timestamp: env.ledger().timestamp(),
             },
         );
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
         Ok(())
     }
 
+<<<<<<< HEAD
+    /// Get the current admin address
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    ///
+    /// # Returns
+    /// The current admin address, if set
+=======
     /// Returns the current admin address, if set.
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
     pub fn get_admin(env: Env) -> Option<Address> {
         env.storage().instance().get(&DataKey::Admin)
     }
 
+<<<<<<< HEAD
+    /// User-specific operations pattern
+    ///
+    /// Demonstrates how to perform operations that affect only the authenticated user.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `user` - The user whose data will be modified
+    /// * `data` - The data to store for the user
+    ///
+    /// # Pattern:
+    /// 1. Require auth from the user who owns the data
+    /// 2. Use the authenticated address as a key for user-specific storage
+    pub fn update_user_data(env: Env, user: Address, data: Symbol) -> bool {
+        // Require authentication from the user
+        // This ensures that only the data owner can update their own data
+        user.require_auth();
+=======
     // ==================== ADMIN-ONLY PATTERNS ====================
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     /// Demonstrates an admin-only gate.
     ///
@@ -208,6 +344,34 @@ impl AuthContract {
         Ok(value * 2)
     }
 
+<<<<<<< HEAD
+    /// Retrieve user-specific data
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `user` - The user whose data to retrieve
+    ///
+    /// # Returns
+    /// The data stored for the user, if any
+    pub fn get_user_data(env: Env, user: Address) -> Option<Symbol> {
+        env.storage().persistent().get(&user)
+    }
+
+    /// Function demonstrating proper error handling for auth failures
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `user` - The address that should authorize the transaction
+    /// * `operation` - The operation identifier
+    ///
+    /// # Returns
+    /// Result indicating success or specific error type
+    ///
+    /// # Proper error handling:
+    /// - Clear error messages when auth fails
+    /// - Meaningful error codes for different failure types
+    /// - Graceful handling of authorization failures
+=======
     /// Admin-only balance setter (e.g. for minting in tests or bootstrapping).
     pub fn set_balance(
         env: Env,
@@ -380,6 +544,7 @@ impl AuthContract {
     /// Demonstrates authenticated operation with typed error return.
     ///
     /// Pattern: auth first, then validate, then execute.
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
     pub fn secure_operation(
         env: Env,
         user: Address,
@@ -394,13 +559,62 @@ impl AuthContract {
         Ok(vec![&env, symbol_short!("success"), operation])
     }
 
+<<<<<<< HEAD
+    /// Demonstration of self-authorization pattern
+    ///
+    /// Shows how a contract can authenticate itself when calling other contracts
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban environment
+    /// * `self_address` - The address of this contract
+    ///
+    /// # Self-authorization use case:
+    /// When a contract needs to authenticate itself to call other contracts
+    /// or when implementing contract-to-contract authorization
+    pub fn self_authenticate(_env: Env, self_address: Address) -> bool {
+        // The contract authenticates itself
+        // This is useful when the contract needs to prove its identity to other contracts
+        self_address.require_auth();
+
+        // In a real scenario, this would be used to call other contracts
+        // or to prove the contract's identity for cross-contract operations
+        true
+    }
+=======
     // ==================== EVENTS WITH AUTH ====================
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 
     /// Emit a named event after verifying the caller.
     pub fn emit_event(env: Env, user: Address, message: Symbol) {
         user.require_auth();
+<<<<<<< HEAD
+    }
+
+    // ==================== INITIALIZATION ====================
+
+    /// Initializes the contract with the given admin address.
+    ///
+    /// Must be called exactly once. Panics on repeated calls to prevent
+    /// admin hijacking after deployment.
+    pub fn initialize(env: Env, admin: Address) {
+        if env.storage().instance().has(&DataKey::Admin) {
+            panic!("Already initialized");
+        }
+        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage().instance().extend_ttl(100, 100);
+
+        // Grant the Admin role to the initializing address so that
+        // role-gated functions work immediately after deployment.
+        env.storage()
+            .persistent()
+            .set(&DataKey::Role(admin.clone()), &Role::Admin);
+        env.storage()
+            .persistent()
+            .extend_ttl(&DataKey::Role(admin), 100, 100);
+=======
         env.events()
             .publish((symbol_short!("event"), user), message);
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
     }
 
     // ==================== ROLE-BASED ACCESS CONTROL ====================
@@ -685,5 +899,8 @@ impl AuthContract {
     }
 }
 
+<<<<<<< HEAD
+=======
 #[cfg(test)]
+>>>>>>> 3800da3163342990d44570d05ec3e367ee657006
 mod test;
