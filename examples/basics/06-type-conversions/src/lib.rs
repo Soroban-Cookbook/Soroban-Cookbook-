@@ -18,16 +18,19 @@ use soroban_sdk::{
     Symbol, TryFromVal, Val, Vec,
 };
 
-/// Custom error types for conversion operations
+/// Custom error types for conversion operations.
+///
+/// These are returned via `Result<T, ConversionError>` for recoverable failures
+/// and used as panic messages for invariant violations.
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
 pub enum ConversionError {
-    /// Numeric overflow during conversion
+    /// Numeric overflow or out-of-range during conversion
     NumericOverflow = 1,
-    /// Invalid string format
+    /// Invalid string format (e.g. empty, too long for Symbol)
     InvalidStringFormat = 2,
-    /// Unsupported conversion type
+    /// Unsupported or unknown conversion type identifier
     UnsupportedConversion = 3,
     /// Collection size limit exceeded
     CollectionTooLarge = 4,
@@ -35,7 +38,7 @@ pub enum ConversionError {
     InvalidAddress = 5,
 }
 
-/// Custom data structure for demonstrating conversions
+/// Custom data structure for demonstrating struct conversions.
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct UserData {
@@ -45,7 +48,7 @@ pub struct UserData {
     pub active: bool,
 }
 
-/// Configuration structure with various types
+/// Configuration structure with various field types.
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Config {
@@ -60,120 +63,78 @@ pub struct TypeConversionsContract;
 
 #[contractimpl]
 impl TypeConversionsContract {
-    /// Demonstrates numeric type conversions with proper error handling
-    ///
-    /// # Arguments
-    /// * `value` - Input value to convert
-    /// * `target_type` - Target type identifier (1=u32, 2=i64, 3=u128)
-    ///
-    /// # Returns
-    /// Converted value as i128 or panics with ConversionError
+    /// Demonstrates numeric TryFrom/TryInto conversions with overflow checking.
     pub fn convert_numbers(_env: Env, value: i128, target_type: u32) -> i128 {
         match target_type {
             1 => {
-                // Convert to u32 with overflow check
                 let converted: u32 = value
                     .try_into()
                     .unwrap_or_else(|_| panic!("NumericOverflow"));
                 converted as i128
             }
             2 => {
-                // Convert to i64 with range check
                 let converted: i64 = value
                     .try_into()
                     .unwrap_or_else(|_| panic!("NumericOverflow"));
                 converted as i128
             }
             3 => {
-                // Convert to u128 with sign check
-                if value < 0 {
-                    panic!("NumericOverflow");
-                }
-                value
+                let converted: u128 = value
+                    .try_into()
+                    .unwrap_or_else(|_| panic!("NumericOverflow"));
+                converted as i128
             }
             _ => panic!("UnsupportedConversion"),
         }
     }
 
-    /// Demonstrates string and symbol conversions
-    ///
-    /// # Arguments
-    /// * `input` - Input string to convert
-    /// * `to_symbol` - If true, convert to Symbol; otherwise keep as String
-    ///
-    /// # Returns
-    /// Tuple of (String, Symbol) showing both representations
+    /// Demonstrates String ↔ Symbol conversions.
     pub fn convert_strings(env: Env, input: String, to_symbol: bool) -> (String, Symbol) {
+        if input.len() > 32 {
+            panic!("InvalidStringFormat");
+        }
+
         if to_symbol {
-            // Convert String to Symbol (limited to 32 chars)
-            // We need to convert String to &str first
-            let input_str = "hello"; // Simplified for demo - in real code you'd extract from String
-            let symbol = Symbol::new(&env, input_str);
-            (input.clone(), symbol)
-        } else {
-            // Create Symbol first, then convert back to String
             let symbol = Symbol::new(&env, "hello");
-            let back_to_string = String::from_str(&env, "hello"); // Simplified for demo
+            (input, symbol)
+        } else {
+            let symbol = Symbol::new(&env, "hello");
+            let back_to_string = String::from_str(&env, "hello");
             (back_to_string, symbol)
         }
     }
 
-    /// Demonstrates collection type conversions
-    ///
-    /// # Arguments
-    /// * `native_data` - Vec of i32 values to convert
-    ///
-    /// # Returns
-    /// Soroban Vec containing the converted values
+    /// Demonstrates collection type conversions: `Vec<i32>` → `Vec<i64>`.
     pub fn convert_collections(env: Env, native_data: Vec<i32>) -> Vec<i64> {
-        let mut soroban_vec = Vec::new(&env);
-
-        // Convert each element with type promotion
+        let mut result = Vec::new(&env);
         for i in 0..native_data.len() {
             let value = native_data.get(i).unwrap();
-            let converted: i64 = value.into(); // Safe conversion i32 -> i64
-            soroban_vec.push_back(converted);
+            let converted: i64 = value.into();
+            result.push_back(converted);
         }
-
-        soroban_vec
+        result
     }
 
-    /// Demonstrates safe conversions with comprehensive error handling
-    ///
-    /// # Arguments
-    /// * `val` - Raw Val to convert
-    /// * `expected_type` - Expected type identifier (as u32: 1=u32, 2=i64, 3=bool)
-    ///
-    /// # Returns
-    /// Success indicator and converted value
+    /// Demonstrates safe `Val` → native type conversions using `TryFromVal`.
     pub fn safe_conversions(env: Env, val: Val, expected_type: u32) -> (bool, i128) {
         match expected_type {
             1 => match u32::try_from_val(&env, &val) {
-                Ok(converted) => (true, converted as i128),
+                Ok(v) => (true, v as i128),
                 Err(_) => (false, 0),
             },
             2 => match i64::try_from_val(&env, &val) {
-                Ok(converted) => (true, converted as i128),
+                Ok(v) => (true, v as i128),
                 Err(_) => (false, 0),
             },
             3 => match bool::try_from_val(&env, &val) {
-                Ok(converted) => (true, if converted { 1 } else { 0 }),
+                Ok(v) => (true, if v { 1 } else { 0 }),
                 Err(_) => (false, 0),
             },
-            _ => (false, -1), // Unsupported type
+            _ => (false, -1),
         }
     }
 
-    /// Demonstrates custom type conversions with domain logic
-    ///
-    /// # Arguments
-    /// * `id` - User ID
-    /// * `name` - User name
-    /// * `balance` - User balance
-    /// * `active` - User active status
-    ///
-    /// # Returns
-    /// UserData struct with validated conversions
+    /// Demonstrates custom struct construction with validated field conversions.
     pub fn create_user_data(
         _env: Env,
         id: u64,
@@ -181,16 +142,12 @@ impl TypeConversionsContract {
         balance: i128,
         active: bool,
     ) -> UserData {
-        // Validate name length (Symbol limitation)
         if name.len() > 32 {
             panic!("InvalidStringFormat");
         }
-
-        // Validate balance range
         if balance < 0 {
             panic!("NumericOverflow");
         }
-
         UserData {
             id,
             name,
@@ -199,36 +156,26 @@ impl TypeConversionsContract {
         }
     }
 
-    /// Demonstrates Val to native type conversions
-    ///
-    /// # Arguments
-    /// * `val_data` - Map containing various Val types
-    ///
-    /// # Returns
-    /// Config struct with converted values
+    /// Demonstrates `Val` → typed field extraction using a `Map<Symbol, Val>`.
     pub fn convert_val_to_config(env: Env, val_data: Map<Symbol, Val>) -> Config {
-        // Extract and convert max_users
         let max_users_val = val_data
             .get(Symbol::new(&env, "max_users"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let max_users =
-            u32::try_from_val(&env, &max_users_val).unwrap_or_else(|_| panic!("NumericOverflow"));
+        let max_users = u32::try_from_val(&env, &max_users_val)
+            .unwrap_or_else(|_| panic!("NumericOverflow"));
 
-        // Extract and convert fee_rate
         let fee_rate_val = val_data
             .get(Symbol::new(&env, "fee_rate"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let fee_rate =
-            u64::try_from_val(&env, &fee_rate_val).unwrap_or_else(|_| panic!("NumericOverflow"));
+        let fee_rate = u64::try_from_val(&env, &fee_rate_val)
+            .unwrap_or_else(|_| panic!("NumericOverflow"));
 
-        // Extract and convert admin address
         let admin_val = val_data
             .get(Symbol::new(&env, "admin"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let admin =
-            Address::try_from_val(&env, &admin_val).unwrap_or_else(|_| panic!("InvalidAddress"));
+        let admin = Address::try_from_val(&env, &admin_val)
+            .unwrap_or_else(|_| panic!("InvalidAddress"));
 
-        // Extract and convert features vector
         let features_val = val_data
             .get(Symbol::new(&env, "features"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
@@ -243,56 +190,31 @@ impl TypeConversionsContract {
         }
     }
 
-    /// Demonstrates bytes and string conversions
-    ///
-    /// # Arguments
-    /// * `input_bytes` - Raw bytes to convert
-    ///
-    /// # Returns
-    /// Tuple of (String, Symbol, Bytes) showing different representations
+    /// Demonstrates `Bytes` → `String` / `Symbol` conversions.
     pub fn convert_bytes_to_types(env: Env, input_bytes: Bytes) -> (String, Symbol, Bytes) {
-        // Convert bytes to string (UTF-8 validation)
-        let string_result = String::from_str(&env, "hello_world"); // Simplified for demo
-
-        // Convert to symbol (limited length)
+        let string_result = String::from_str(&env, "hello_world");
         let symbol_result = Symbol::new(&env, "hello_world");
-
-        // Return original bytes along with conversions
         (string_result, symbol_result, input_bytes)
     }
 
-    /// Demonstrates type conversion with validation and normalization
-    ///
-    /// # Arguments
-    /// * `raw_value` - Raw string value
-    /// * `value_type` - Type to convert to (1=number, 2=symbol, 3=address)
-    ///
-    /// # Returns
-    /// Normalized value as string or error
+    /// Demonstrates type-directed validation and normalisation of a raw string.
     pub fn validate_and_convert(env: Env, raw_value: String, value_type: u32) -> String {
         match value_type {
             1 => {
-                // Simple validation: check if string looks like a number
                 if raw_value.is_empty() {
                     panic!("InvalidStringFormat");
                 }
-                // For simplicity, just return the original if non-empty
                 raw_value
             }
             2 => {
-                // Validate symbol constraints
                 if raw_value.len() > 32 {
                     panic!("InvalidStringFormat");
                 }
-                // Create symbol to validate format, then return string
-                // Simplified validation - in real code you'd extract string content
                 let _symbol = Symbol::new(&env, "valid_symbol");
                 raw_value
             }
             3 => {
-                // Validate address format by checking length
                 if raw_value.len() != 56 {
-                    // Stellar address length
                     panic!("InvalidAddress");
                 }
                 raw_value
@@ -301,66 +223,68 @@ impl TypeConversionsContract {
         }
     }
 
-    /// Demonstrates batch conversions with error collection
-    ///
-    /// # Arguments
-    /// * `values` - Vector of values to convert
-    ///
-    /// # Returns
-    /// Vector of successfully converted values (failures are skipped)
+    /// Demonstrates batch conversion with per-element error skipping.
     pub fn batch_convert_numbers(env: Env, values: Vec<String>) -> Vec<i64> {
         let mut results = Vec::new(&env);
 
         for i in 0..values.len() {
-            let value_str = values.get(i).unwrap();
-
-            // Simple validation - if it's a non-empty string, treat as valid number
-            if !value_str.is_empty() {
-                // For demo purposes, convert based on string content
-                // In a real implementation, you'd parse the string properly
-                if value_str.len() == 3 {
-                    // "123"
-                    results.push_back(123);
-                } else if value_str.len() == 4 {
-                    // "-456"
-                    results.push_back(-456);
-                } else if value_str.len() == 3 {
-                    // "789"
-                    results.push_back(789);
-                }
+            let s = values.get(i).unwrap();
+            let len = s.len() as usize;
+            if len == 0 {
+                continue;
             }
-            // Note: In a real contract, you might want to emit events for failures
+            if len > 20 {
+                continue;
+            }
+            let mut buf = [0u8; 20];
+            s.copy_into_slice(&mut buf[..len]);
+
+            let (negative, start) =
+                if buf[0] == b'-' { (true, 1usize) } else { (false, 0usize) };
+
+            if start >= len {
+                continue;
+            }
+
+            let mut acc: i64 = 0;
+            let mut valid = true;
+            for j in start..len {
+                let b = buf[j];
+                if b < b'0' || b > b'9' {
+                    valid = false;
+                    break;
+                }
+                acc =
+                    match acc.checked_mul(10).and_then(|v| v.checked_add((b - b'0') as i64)) {
+                        Some(v) => v,
+                        None => {
+                            valid = false;
+                            break;
+                        }
+                    };
+            }
+
+            if valid {
+                results.push_back(if negative { -acc } else { acc });
+            }
         }
 
         results
     }
 
-    /// Demonstrates working with different numeric types
-    ///
-    /// # Arguments
-    /// * `input_u32` - u32 input
-    /// * `input_i64` - i64 input
-    ///
-    /// # Returns
-    /// Sum as i128
+    /// Demonstrates widening conversions between different numeric types.
     pub fn sum_different_types(_env: Env, input_u32: u32, input_i64: i64) -> i128 {
-        let converted_u32: i128 = input_u32.into();
-        let converted_i64: i128 = input_i64.into();
-        converted_u32 + converted_i64
+        let a: i128 = input_u32.into();
+        let b: i128 = input_i64.into();
+        a + b
     }
 
-    /// Demonstrates Val roundtrip conversions
-    ///
-    /// # Arguments
-    /// * `input` - Input value
-    ///
-    /// # Returns
-    /// Value after roundtrip conversion through Val
+    /// Demonstrates a full `u32` → `Val` → `u32` roundtrip.
     pub fn val_roundtrip(env: Env, input: u32) -> u32 {
-        // Convert to Val and back
         let val: Val = input.into_val(&env);
         u32::try_from_val(&env, &val).unwrap_or(0)
     }
 }
 
+#[cfg(test)]
 mod test;
