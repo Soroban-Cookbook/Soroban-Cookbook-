@@ -1,34 +1,27 @@
-[workspace]
-resolver = "2"
+[package]
+name        = "error-handling"
+version     = "0.1.0"
+edition     = "2021"
+description = "Soroban Cookbook – panic vs. typed errors example"
 
-members = [
-    "examples/basics/*",
-    "examples/intermediate/*",
-    "examples/advanced/*",
-    "examples/defi/*",
-    "examples/nfts/*",
-    "examples/governance/*",
-    "examples/tokens/*",
-    "tests/integration",
-]
+[lib]
+crate-type = ["cdylib", "rlib"]
 
-[workspace.package]
-version = "0.1.0"
-edition = "2021"
-rust-version = "1.74"
+[dependencies]
+soroban-sdk = { version = "22.0.0", features = ["alloc"] }
 
-[workspace.dependencies]
-soroban-sdk = "21.7.0"
+[dev-dependencies]
+soroban-sdk = { version = "22.0.0", features = ["testutils", "alloc"] }
 
 [profile.release]
-opt-level = "z"
+opt-level     = "z"
 overflow-checks = true
-debug = 0
-strip = "symbols"
+debug         = false
+strip         = "symbols"
 debug-assertions = false
-panic = "abort"
+panic         = "abort"
 codegen-units = 1
-lto = true
+lto           = true
 
 [profile.release-with-logs]
 inherits = "release"
