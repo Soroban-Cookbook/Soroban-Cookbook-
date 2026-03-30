@@ -1,5 +1,3 @@
-#![cfg(test)]
-
 use super::*;
 use soroban_sdk::{testutils::Address as _, Env};
 
@@ -88,6 +86,39 @@ fn test_proxy_call_success() {
     // Wait, the lib says `client.get_invoker(&user)` is called, so it passes user.
     // The target contract `get_invoker` expects `invoker` matches what was passed, which is `user_address`.
     assert_eq!(returned_invoker, user_address);
+}
+
+#[test]
+fn test_get_auth_context() {
+    let env = Env::default();
+    let user = Address::generate(&env);
+    let contract_id = env.register_contract(None, AuthContextContract);
+    let client = AuthContextContractClient::new(&env, &contract_id);
+
+    env.mock_all_auths();
+
+    // Call the function that requires auth and returns the authenticated user
+    let auth_context = client.get_auth_context(&user);
+
+    // Verify that the authenticated user is returned
+    assert_eq!(auth_context, user);
+}
+
+#[test]
+fn test_nested_auth_propagation() {
+    let env = Env::default();
+    let user = Address::generate(&env);
+    let contract_id = env.register_contract(None, AuthContextContract);
+    let proxy_id = env.register_contract(None, ProxyContract);
+    let proxy_client = ProxyContractClient::new(&env, &proxy_id);
+
+    env.mock_all_auths();
+
+    // The proxy calls AuthContextContract.check_nested_auth(user)
+    // The user authorizes the Proxy call, and because the Proxy calls the Target
+    // with that user's auth context, it propagates.
+    let result = proxy_client.proxy_call(&contract_id, &user);
+    assert_eq!(result, user);
 }
 
 #[test]

@@ -1,6 +1,11 @@
+# Dependabot configuration for dependency updates
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
 version: 2
 updates:
-  # Cargo dependencies
+  # ─────────────────────────────────────────────────────────────────────────
+  # Rust (Cargo) ecosystem
+  # ─────────────────────────────────────────────────────────────────────────
   - package-ecosystem: "cargo"
     directory: "/"
     schedule:
@@ -14,8 +19,16 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Optional: group minor and patch updates into a single PR
+    groups:
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
 
-  # GitHub Actions
+  # ─────────────────────────────────────────────────────────────────────────
+  # GitHub Actions workflows and composite actions
+  # ─────────────────────────────────────────────────────────────────────────
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

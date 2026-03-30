@@ -1,323 +1,468 @@
-# Authentication Patterns
+# Authentication Patterns in Soroban
 
-This example demonstrates basic address authentication patterns using Soroban's `require_auth()` function, showing how to verify caller identity in smart contracts.
+This example demonstrates how to authenticate callers and build layered
+authorization logic in Soroban smart contracts. It covers the core
+`require_auth()` primitive, role-based access control, time-based
+restrictions, and state-gated operations — all patterns you will encounter
+in production contracts.
 
-## Concepts Covered
+## Auth Concepts
 
-- **`require_auth()`**: Core function for verifying transaction authorization
-- **Address Verification**: Confirming the caller's identity
-- **Authorization Patterns**: Different ways to implement auth checks
-- **Error Handling**: Proper responses to auth failures
+### What `require_auth()` does
 
-## Key Functions
+`require_auth()` is called on an `Address` value. It instructs the Soroban
+host to verify that the address has cryptographically signed the current
+transaction (or, for contract addresses, that the contract has approved the
+sub-invocation). If the check fails the host aborts the transaction
+immediately — no state is written.
 
-### 1. Basic Authentication Pattern
-```rust
-pub fn basic_auth(env: Env, user: Address) -> bool {
-    user.require_auth();  // Verify the user authorized this transaction
-    true
-}
+```
+User signs tx  ──►  Host verifies signature  ──►  require_auth() passes
+                                                   contract logic runs
 ```
 
-### 2. Transfer Pattern
-```rust
-pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -> bool {
-    from.require_auth();  // Only 'from' address can initiate transfer
-    // Transfer logic...
-    true
-}
-```
+Key properties:
 
-### 3. Admin-Only Pattern
+- Works for both user accounts (ed25519 keypairs) and contract addresses.
+- Replay protection is handled automatically by the host via nonces.
+- A single transaction can carry authorizations for multiple addresses; the
+  host checks each one independently when `require_auth()` is called.
+
+### Authentication vs. Authorization
+
+| Term | Question answered | Soroban mechanism |
+|---|---|---|
+| Authentication | *Is this really Alice?* | `address.require_auth()` |
+| Authorization | *Is Alice allowed to do this?* | Custom logic after `require_auth()` |
+
+`require_auth()` only answers the first question. Everything in this example
+that follows the `require_auth()` call — role checks, time-lock guards,
+state checks — is authorization logic that you write.
+
+### The allowance (delegated auth) pattern
+
+`approve` + `transfer_from` lets an owner delegate spending rights to a
+third party without handing over their private key. The spender calls
+`transfer_from` and must pass `spender.require_auth()`. The owner's
+authorization is captured at `approve` time.
+
 ```rust
-pub fn set_admin(env: Env, admin: Address, new_admin: Address) -> Result<(), AuthError> {
-    // Verify current admin status
-    if admin != stored_admin {
-        return Err(AuthError::AdminOnly);
-    }
-    admin.require_auth();  // Admin must authorize the change
-    env.storage().instance().set(&ADMIN_KEY, &new_admin);
+// Owner grants spender the right to move up to 500 tokens.
+pub fn approve(env: Env, from: Address, spender: Address, amount: i128)
+    -> Result<(), AuthError>
+{
+    from.require_auth();                                    // owner signs
+    env.storage().persistent()
+        .set(&DataKey::Allowance(from, spender), &amount);
+    Ok(())
+}
+
+// Spender exercises the allowance.
+pub fn transfer_from(
+    env: Env, spender: Address, from: Address, to: Address, amount: i128,
+) -> Result<(), AuthError> {
+    spender.require_auth();                                 // spender signs
+    let allowance: i128 = env.storage().persistent()
+        .get(&DataKey::Allowance(from.clone(), spender.clone()))
+        .unwrap_or(0);
+    if allowance < amount { return Err(AuthError::Unauthorized); }
+    // … update balances and reduce allowance …
     Ok(())
 }
 ```
 
-## Security Considerations
+### N-of-N multi-sig
 
-### ✅ Best Practices
-- **Always call `require_auth()` before state changes**
-- **Place auth checks early in function**
-- **Validate inputs after authentication**
-- **Use custom error types for different failure scenarios**
-
-### ❌ Common Mistakes to Avoid
-- **Forgetting to call `require_auth()`**
-- **Calling it after state changes**
-- **Not handling auth failures properly**
-- **Confusing authorization with authentication**
-
-## How Authentication Works
-
-The `require_auth()` function:
-
-1. **Verifies Transaction Signatures**: Ensures the address has signed the current transaction
-2. **Prevents Unauthorized Access**: Stops malicious actors from calling functions on behalf of others
-3. **Enables Secure Operations**: Allows only authorized parties to perform sensitive actions
-4. **Works with Both Accounts and Contracts**: Can authenticate both user accounts and smart contracts
-
-## When to Use `require_auth()`
-
-Use `require_auth()` whenever:
-- Transferring assets or value
-- Modifying user-specific data
-- Changing contract configuration
-- Performing privileged operations
-- Accessing sensitive information
-
-## Error Handling
-
-The example demonstrates proper error handling with custom error types:
+Iterate the signer list and call `require_auth()` on each. The host
+verifies all signatures atomically before the function body executes.
 
 ```rust
-#[contracterror]
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
-#[repr(u32)]
-pub enum AuthError {
-    Unauthorized = 1,
-    AdminOnly = 2,
-    InvalidAddress = 3,
+pub fn multi_sig_action(_env: Env, signers: Vec<Address>, value: u32) -> u32 {
+    for signer in signers.iter() {
+        signer.require_auth();
+    }
+    value + signers.len()
 }
 ```
 
-## Running Tests
+---
 
-To run the tests for this example:
+## `require_auth()` Usage Guide
 
-```bash
-cd examples/basics/03-authentication
-cargo test
+### Basic pattern — single caller
+
+```rust
+pub fn transfer(env: Env, from: Address, to: Address, amount: i128)
+    -> Result<(), AuthError>
+{
+    from.require_auth();          // 1. authenticate
+    // validate …                // 2. validate inputs
+    // mutate storage …          // 3. execute
+    Ok(())
+}
 ```
 
-## Deployment
+Always follow this order: **authenticate → validate → execute**. Placing
+`require_auth()` first ensures that unauthenticated callers are rejected
+before any computation or storage reads occur.
 
-To build for deployment:
+### Admin-only pattern
 
-```bash
-cd examples/basics/03-authentication
-cargo build --target wasm32-unknown-unknown --release
+Store the admin address at initialization and compare on every privileged
+call. The helper `require_admin` encapsulates this check so it is not
+duplicated across functions.
+
+```rust
+pub fn initialize(env: Env, admin: Address) -> Result<(), AuthError> {
+    if env.storage().instance().has(&DataKey::Admin) {
+        return Err(AuthError::AlreadyInitialized);   // idempotency guard
+    }
+    admin.require_auth();
+    env.storage().instance().set(&DataKey::Admin, &admin);
+    Ok(())
+}
+
+fn require_admin(env: &Env, caller: &Address) -> Result<(), AuthError> {
+    let admin: Address = env.storage().instance()
+        .get(&DataKey::Admin)
+        .ok_or(AuthError::NotAdmin)?;
+    if caller != &admin { return Err(AuthError::NotAdmin); }
+    Ok(())
+}
+
+pub fn admin_action(env: Env, admin: Address, value: u32)
+    -> Result<u32, AuthError>
+{
+    admin.require_auth();
+    require_admin(&env, &admin)?;
+    Ok(value * 2)
+}
 ```
 
-The resulting WASM file will be in `target/wasm32-unknown-unknown/release/auth-patterns.wasm`.
+### Role-based access control
 
-## Additional Resources
+Roles are stored in persistent storage so they survive contract upgrades.
+The `require_role` helper accepts a slice of allowed roles, enabling
+functions to be accessible by multiple tiers.
 
-- [Soroban Authentication Guide](https://developers.stellar.org/docs/glossary/authentication)
-- [Authorization Best Practices](https://developers.stellar.org/docs/guides/security-best-practices)
-- [Soroban SDK Documentation](https://docs.rs/soroban-sdk/)
-# Soroban Authentication Example: Comprehensive Guide
+```rust
+pub fn grant_role(env: Env, admin: Address, account: Address, role: Role)
+    -> Result<(), AuthError>
+{
+    admin.require_auth();
+    require_admin(&env, &admin)?;
+    env.storage().persistent()
+        .set(&DataKey::UserRole(account.clone()), &role);
+    Ok(())
+}
 
-## Introduction To Authentication
-Authentication in Soroban smart contracts ensures only authorized users can interact with sensitive functions. Security mistakes can be costly, so understanding and applying best practices is critical.
+fn require_role(env: &Env, caller: &Address, allowed: &[Role])
+    -> Result<(), AuthError>
+{
+    let user_role: Role = env.storage().persistent()
+        .get(&DataKey::UserRole(caller.clone()))
+        .unwrap_or(Role::User);
+    for role in allowed {
+        if user_role as u32 <= *role as u32 { return Ok(()); }
+    }
+    Err(AuthError::InsufficientRole)
+}
 
-## require_auth Basics
-The `require_auth()` method verifies that the caller has authorized the action. Always use it before changing contract state to prevent unauthorized access.
+// Admin-only
+pub fn admin_role_action(env: Env, caller: Address, value: u64)
+    -> Result<u64, AuthError>
+{
+    caller.require_auth();
+    require_role(&env, &caller, &[Role::Admin])?;
+    Ok(value * 2)
+}
 
-## Multi-Party Authorization
-Multi-signature and threshold patterns require multiple parties to approve actions. Use these for high-value operations, like treasury management or governance.
+// Admin or Moderator
+pub fn moderator_action(env: Env, caller: Address, value: u64)
+    -> Result<u64, AuthError>
+{
+    caller.require_auth();
+    require_role(&env, &caller, &[Role::Admin, Role::Moderator])?;
+    Ok(value + 10)
+}
+```
 
-## Authorization Context
-Soroban allows checking not just who called, but also what arguments were authorized. Use `require_auth_for_args()` to ensure the user signed for specific parameters, preventing replay attacks.
+### Time-lock pattern
 
-## Custom Authorization Patterns
-You can implement role-based access, time-based restrictions, or combine multiple checks for advanced security. For example, restrict admin functions to a stored admin address, or require both user and admin signatures for sensitive actions.
+A global unlock timestamp blocks an action until a future ledger time.
+Useful for vesting schedules, governance cool-off periods, and delayed
+withdrawals.
+
+```rust
+pub fn time_locked_action(env: Env, caller: Address)
+    -> Result<u64, AuthError>
+{
+    caller.require_auth();
+    let unlock: u64 = env.storage().instance()
+        .get(&DataKey::TimeLock).unwrap_or(0);
+    if env.ledger().timestamp() < unlock {
+        return Err(AuthError::TimeLocked);
+    }
+    Ok(env.ledger().timestamp())
+}
+```
+
+### Per-address cooldown pattern
+
+Enforces a minimum interval between successive calls from the same address.
+Mitigates spam and rate-limits sensitive operations without off-chain
+infrastructure.
+
+```rust
+pub fn cooldown_action(env: Env, caller: Address)
+    -> Result<u64, AuthError>
+{
+    caller.require_auth();
+    let period: u64 = env.storage().instance()
+        .get(&DataKey::CooldownPeriod).unwrap_or(0);
+    let last: u64 = env.storage().persistent()
+        .get(&DataKey::LastAction(caller.clone())).unwrap_or(0);
+    let now = env.ledger().timestamp();
+    if last > 0 && now < last + period {
+        return Err(AuthError::CooldownActive);
+    }
+    env.storage().persistent()
+        .set(&DataKey::LastAction(caller), &now);
+    Ok(now)
+}
+```
+
+### State-gated pattern
+
+A global `ContractState` enum acts as a circuit-breaker. Admins can pause
+or freeze the contract in an emergency; normal operations check the state
+before proceeding.
+
+```rust
+pub fn active_only_action(env: Env, caller: Address)
+    -> Result<u64, AuthError>
+{
+    caller.require_auth();
+    let state: ContractState = env.storage().instance()
+        .get(&DataKey::State).unwrap_or(ContractState::Active);
+    if state != ContractState::Active {
+        return Err(AuthError::InvalidState);
+    }
+    Ok(env.ledger().timestamp())
+}
+```
+
+---
 
 ## Security Best Practices
-- Always use `require_auth()` or `require_auth_for_args()` before state changes.
-- Validate all inputs and parameters; never trust external data blindly.
-- Use safe arithmetic (e.g., `checked_add`) to prevent overflows.
-- Restrict admin functions to authorized accounts only.
-- Handle errors with clear, custom error types.
 
-## Common Mistakes
-- Forgetting to call `require_auth()` before state changes.
-- Not validating input values, leading to vulnerabilities.
-- Using unchecked arithmetic, causing overflows.
-- Leaving admin functions unprotected.
-- Using generic panics instead of descriptive errors.
+**1. Call `require_auth()` before any other logic.**
+Reject unauthenticated callers at the earliest possible point. Do not read
+storage, emit events, or perform arithmetic before the auth check.
 
-## Real-World Use Cases
-- **Token Transfers:** Only the token owner can approve sending tokens.
-- **Multi-Sig Wallets:** Multiple parties must approve transactions.
-- **DAO Governance:** Only authenticated members can vote or propose changes.
-- **Admin Functions:** Only admins can update contract settings.
-- **Escrow Services:** Funds are released only when all parties have authenticated.
-
-## Testing Authentication
-To test authentication patterns, use Soroban's test framework. Write unit tests to check that unauthorized calls fail and authorized calls succeed. See `src/test.rs` for examples.
-
-## Further Reading
-- [Best Practices Guide](../../../docs/best-practices.md)
-- [Soroban Documentation](https://soroban.stellar.org/docs)
-- [Smart Contract Security Resources](https://consensys.github.io/smart-contract-best-practices/)
-
-For more details and code examples, see the contract in `src/lib.rs`.
-# Authentication & Custom Authorization
-
-Learn how to build custom authorization logic in Soroban smart contracts, including role-based access control, time-based restrictions, and state-dependent permissions.
-
-## 📖 What You'll Learn
-
-- Combining `require_auth()` with custom authorization checks
-- Implementing role-based access control (Admin, Moderator, User)
-- Time-locked operations and cooldown periods
-- State-dependent authorization gating (Active / Paused / Frozen)
-- Security best practices for on-chain access control
-
-## 🔍 Contract Overview
-
-This example demonstrates three complementary authorization patterns that work together to form a complete access-control system:
-
-### Role-Based Access Control (RBAC)
+**2. Never trust the `admin` argument alone.**
+Always load the stored admin and compare. An attacker can pass any address
+they control as the `admin` argument; only the stored value is authoritative.
 
 ```rust
-pub fn initialize(env: Env, admin: Address)
-pub fn grant_role(env: Env, admin: Address, account: Address, role: Role)
-pub fn revoke_role(env: Env, admin: Address, account: Address)
-pub fn get_role(env: Env, account: Address) -> u32
-pub fn has_role(env: Env, account: Address, role: Role) -> bool
-pub fn admin_action(env: Env, caller: Address, value: u64) -> u64
-pub fn moderator_action(env: Env, caller: Address, value: u64) -> u64
+// ✅ correct
+admin.require_auth();
+let stored: Address = env.storage().instance().get(&DataKey::Admin)...;
+if admin != stored { return Err(AuthError::NotAdmin); }
+
+// ❌ wrong — trusts the argument without checking storage
+admin.require_auth();
+// proceeds as if admin is legitimate
 ```
 
-### Time-Based Restrictions
+**3. Guard `initialize()` against re-entrancy.**
+Check for an existing admin before writing. Without this guard a second
+caller can overwrite the admin address after deployment.
+
+**4. Store roles in persistent storage.**
+Instance storage is wiped on contract upgrade. Persistent storage survives,
+so role assignments remain valid across upgrades.
+
+**5. Separate authentication from authorization.**
+`require_auth()` proves identity. Role checks, balance checks, and state
+checks prove permission. Keep them in distinct, auditable code paths.
+
+**6. Use typed errors, not generic panics.**
+`AuthError::NotAdmin` is more informative than `panic!("not admin")` and
+allows callers to handle specific failure modes programmatically.
+
+**7. Emit events on privileged state changes.**
+Role grants/revocations, state transitions, and time-lock updates should
+emit events so off-chain monitors can detect unexpected changes.
+
+---
+
+## Common Pitfalls
+
+### Forgetting `require_auth()` entirely
 
 ```rust
-pub fn set_time_lock(env: Env, admin: Address, unlock_time: u64)
-pub fn time_locked_action(env: Env, caller: Address) -> u64
-pub fn set_cooldown(env: Env, admin: Address, period: u64)
-pub fn cooldown_action(env: Env, caller: Address) -> u64
-```
-
-### State-Based Authorization
-
-```rust
-pub fn set_state(env: Env, admin: Address, state: ContractState)
-pub fn get_state(env: Env) -> u32
-pub fn active_only_action(env: Env, caller: Address) -> u64
-```
-
-## 💡 Key Concepts
-
-### Role Hierarchy
-
-Roles are defined as an enum stored in persistent storage:
-
-```rust
-#[contracttype]
-pub enum Role {
-    Admin = 0,
-    Moderator = 1,
-    User = 2,
+// ❌ anyone can drain balances
+pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
+    let bal: i128 = env.storage().persistent()
+        .get(&DataKey::Balance(from.clone())).unwrap_or(0);
+    env.storage().persistent()
+        .set(&DataKey::Balance(from), &(bal - amount));
 }
 ```
 
-- **Admin** — Full access; can grant/revoke roles, configure time-locks, cooldowns, and contract state.
-- **Moderator** — Mid-tier access; can perform moderator-level actions but not admin-only operations.
-- **User** — Basic access; cannot perform privileged actions.
-
-Admins implicitly satisfy moderator-level checks, so `moderator_action` accepts both Admin and Moderator callers.
-
-### Time-Lock Pattern
-
-A global unlock timestamp prevents actions until a future ledger time:
+### Calling `require_auth()` after state changes
 
 ```rust
-let current_time = env.ledger().timestamp();
-let unlock_time = env.storage().instance().get(&DataKey::TimeLock).unwrap();
-if current_time < unlock_time {
-    panic!("Action is time-locked");
+// ❌ state is mutated before auth is verified
+pub fn bad_transfer(env: Env, from: Address, to: Address, amount: i128) {
+    env.storage().persistent().set(&DataKey::Balance(from.clone()), &0);
+    from.require_auth();   // too late — storage already written
 }
 ```
 
-Use time-locks for vesting schedules, delayed withdrawals, or governance cool-off periods.
-
-### Cooldown Pattern
-
-Per-address cooldowns enforce a minimum interval between successive calls:
+### Checking the wrong address
 
 ```rust
-let last = env.storage().persistent().get(&DataKey::LastAction(caller.clone()));
-if let Some(last_ts) = last {
-    if current_time < last_ts + cooldown_period {
-        panic!("Cooldown period not elapsed");
+// ❌ authenticates `to`, not `from` — the wrong party authorizes the debit
+pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
+    to.require_auth();
+    // …
+}
+```
+
+### Skipping the stored-admin comparison
+
+```rust
+// ❌ any address that signs can claim admin rights
+pub fn admin_action(env: Env, admin: Address, value: u32) -> u32 {
+    admin.require_auth();   // proves identity, not that admin == stored admin
+    value * 2
+}
+```
+
+### Using instance storage for roles
+
+```rust
+// ❌ roles are lost on contract upgrade
+env.storage().instance().set(&DataKey::UserRole(account), &role);
+
+// ✅ roles survive upgrades
+env.storage().persistent().set(&DataKey::UserRole(account), &role);
+```
+
+---
+
+## Real-World Examples
+
+### Token transfer with allowance (ERC-20 style)
+
+```rust
+// 1. Owner approves spender for 500 tokens.
+client.approve(&owner, &spender, &500);
+
+// 2. Spender moves 200 tokens to a recipient.
+client.transfer_from(&spender, &owner, &recipient, &200);
+
+// Result: owner balance −200, recipient balance +200, allowance 300.
+```
+
+### DAO proposal gate
+
+A governance contract can combine role checks with a time-lock so that
+proposals can only be executed after a mandatory review period:
+
+```rust
+pub fn execute_proposal(env: Env, caller: Address) -> Result<(), AuthError> {
+    caller.require_auth();
+    require_role(&env, &caller, &[Role::Admin, Role::Moderator])?;
+
+    let unlock: u64 = env.storage().instance()
+        .get(&DataKey::TimeLock).unwrap_or(0);
+    if env.ledger().timestamp() < unlock {
+        return Err(AuthError::TimeLocked);
     }
+
+    let state: ContractState = env.storage().instance()
+        .get(&DataKey::State).unwrap_or(ContractState::Active);
+    if state != ContractState::Active {
+        return Err(AuthError::InvalidState);
+    }
+
+    // … execute proposal …
+    Ok(())
 }
 ```
 
-Cooldowns mitigate spam and rate-limit sensitive operations without off-chain infrastructure.
-
-### Contract State Gating
-
-A global state enum controls whether critical operations are allowed:
+### Emergency pause
 
 ```rust
-#[contracttype]
-pub enum ContractState {
-    Active = 0,
-    Paused = 1,
-    Frozen = 2,
+// Admin detects an exploit and pauses the contract.
+client.set_state(&admin, &ContractState::Paused);
+
+// All active_only_action calls now return AuthError::InvalidState.
+// Admin can resume later.
+client.set_state(&admin, &ContractState::Active);
+```
+
+### Cross-contract proxy auth
+
+When a proxy contract calls a target contract on behalf of a user, the user
+must authorize the entire call chain. The proxy requires the user's auth
+before making the cross-contract call; the target then calls
+`user.require_auth()` again, and the host verifies the chain atomically.
+
+```rust
+// Proxy
+pub fn proxy_call(env: Env, target: Address, user: Address) -> Address {
+    user.require_auth();                          // user authorizes proxy
+    let client = TargetContractClient::new(&env, &target);
+    client.check_nested_auth(&user);              // target re-checks user
+    user
 }
 ```
 
-Only the `Active` state permits normal operations. `Paused` and `Frozen` block `active_only_action`, giving admins an emergency circuit-breaker.
+---
 
-## 🔒 Security Best Practices
+## Running the Tests
 
-1. **Always call `require_auth()` first** — Verify the caller's cryptographic identity before any custom checks.
-2. **Separate auth from business logic** — Keep role checks and time guards in distinct, auditable code paths.
-3. **Use persistent storage for roles** — Instance storage risks loss on contract upgrade; persistent storage survives.
-4. **Minimize admin surface** — Only expose `grant_role`, `revoke_role`, and configuration setters to the admin.
-5. **Test edge cases** — Verify behavior at exact boundary timestamps (unlock time, cooldown expiry).
-6. **Prefer enums over integers** — `Role` and `ContractState` enums prevent invalid values at the type level.
-7. **Fail loudly** — Use `panic!` with descriptive messages so callers and auditors understand rejection reasons.
-
-## 🧪 Testing
-
+Run the comprehensive unit test suite to see these authentication patterns in action:
 ```bash
+cd examples/basics/03-authentication
 cargo test
 ```
 
-Tests cover:
+The test suite covers:
 
-- **Initialization** — Admin is set, double-init is rejected
-- **Role management** — Grant, revoke, get, and has_role checks
-- **Admin actions** — Authorized admin succeeds, non-admin panics
-- **Moderator actions** — Admin and Moderator succeed, User panics
-- **Time-lock** — Action blocked before unlock, succeeds after
-- **Cooldown** — Second call blocked within period, succeeds after
-- **State gating** — Active allows action; Paused and Frozen block it
+- Initialization and double-init rejection
+- Admin-only actions (authorized and unauthorized)
+- Balance set, transfer, and insufficient-balance rejection
+- Approve and `transfer_from` with allowance enforcement
+- N-of-N multi-sig
+- Role grant, revoke, and `has_role` hierarchy
+- Admin and moderator role actions
+- Time-lock: blocked before unlock, passes after
+- Cooldown: blocked within period, passes after expiry
+- State gating: Active allows, Paused and Frozen block
 
-## 🚀 Building & Deployment
+## Building for Deployment
 
+Compile the contract to WebAssembly:
 ```bash
-# Build
 cargo build --target wasm32-unknown-unknown --release
-
-# Deploy
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/authentication.wasm \
-  --source alice \
-  --network testnet
 ```
 
-## 🎓 Next Steps
+The WASM artifact is written to
+`target/wasm32-unknown-unknown/release/authentication.wasm`.
 
-- [Basics Index](../README.md) - Browse the full basics learning path
-- [Events](../04-events/) - Emit audit-trail events alongside auth checks
-- [Storage Patterns](../02-storage-patterns/) - Understand how roles are persisted
-- [Intermediate Examples](../../intermediate/) - Multi-contract authorization patterns
+## Related Examples
 
-## 📚 References
+- [05-auth-context](../05-auth-context/) — invoker detection and cross-contract call chains
+- [03-custom-errors](../03-custom-errors/) — structured error types used throughout this example
+- [02-storage-patterns](../02-storage-patterns/) — persistent vs. instance storage trade-offs
+
+## References
 
 - [Soroban Authorization](https://developers.stellar.org/docs/smart-contracts/fundamentals-and-concepts/authorization)
-- [Soroban SDK Auth](https://docs.rs/soroban-sdk/latest/soroban_sdk/auth/index.html)
+- [Soroban SDK — `Address::require_auth`](https://docs.rs/soroban-sdk/latest/soroban_sdk/struct.Address.html#method.require_auth)
 - [Custom Account Contracts](https://developers.stellar.org/docs/smart-contracts/guides/custom-accounts)

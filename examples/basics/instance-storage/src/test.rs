@@ -3,8 +3,6 @@
 //! Covers both generic key/value helpers and the two concrete use cases
 //! (transaction counter, cached configuration).
 
-#![cfg(test)]
-
 use super::*;
 use soroban_sdk::{symbol_short, Env};
 

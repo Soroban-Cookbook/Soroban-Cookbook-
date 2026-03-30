@@ -9,6 +9,7 @@ members = [
     "examples/nfts/*",
     "examples/governance/*",
     "examples/tokens/*",
+    "tests/integration",
 ]
 
 [workspace.package]

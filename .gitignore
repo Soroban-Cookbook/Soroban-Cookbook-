@@ -24,6 +24,7 @@ Cargo.lock
 # Testing
 coverage/
 *.profraw
+test_snapshots/
 
 # Build artifacts
 *.so
@@ -31,7 +32,7 @@ coverage/
 *.dll
 
 # Documentation
-book/
+book-output/
 docs/_build/
 
 # Temporary files
@@ -55,6 +56,9 @@ issue-13-requirement.md
 .agent/
 .agents/
 issue.md
+GEMINI.md
 issue.md
 .agent/
 .agents/
+
+.GITHUB_ISSUES_BATCH_REPORT.md

@@ -1,4 +1,4 @@
-# Multi-Party Authorization Patterns
+1# Multi-Party Authorization Patterns
 
 This example demonstrates advanced authorization patterns in Soroban that require multiple parties to authorize an action.
 
@@ -44,6 +44,15 @@ The `sequential_auth_escrow` function shows a multi-step workflow.
 ## Gas Considerations
 - Gas costs scale linearly with the number of authorizations.
 - Each `require_auth()` call involves cryptographic verification of a signature (or contract authorization), which is a relatively expensive operation.
+
+
+## Usage Tip
+
+**Tip:** When integrating these patterns into your own contracts, always validate signer lists and thresholds at contract initialization to avoid accidental misconfiguration or security gaps. Consider providing admin functions to update signers or thresholds securely.
+
+## Clarification
+
+**Note:** The provided examples focus on demonstrating authorization logic and do not perform actual token transfers. In production, you should integrate with token contracts and handle errors and edge cases appropriately.
 
 ## How to run tests
 

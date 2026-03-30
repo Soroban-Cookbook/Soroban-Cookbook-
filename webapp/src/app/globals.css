@@ -1,0 +1,155 @@
+:root {
+  --bg-color: #0c0c0c;
+  --text-color: #33ff33;
+  --text-dim: #1d771d;
+  --ui-accent: #33ff33;
+  --ui-amber: #ffb000;
+  --border-color: #222;
+  --scanline-opacity: 0.1;
+  --glow-opacity: 0.5;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Courier New', Courier, monospace;
+  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Terminal Scanline Effect */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  z-index: 2;
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+}
+
+body::after {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(18, 16, 16, 0.1);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+  0% { opacity: 0.27861; }
+  5% { opacity: 0.34769; }
+  10% { opacity: 0.23604; }
+  15% { opacity: 0.90626; }
+  20% { opacity: 0.18128; }
+  25% { opacity: 0.83891; }
+  30% { opacity: 0.65583; }
+  35% { opacity: 0.57807; }
+  40% { opacity: 0.26593; }
+  45% { opacity: 0.84693; }
+  50% { opacity: 0.96019; }
+  55% { opacity: 0.08523; }
+  60% { opacity: 0.71056; }
+  65% { opacity: 0.73437; }
+  70% { opacity: 0.28574; }
+  75% { opacity: 0.96387; }
+  80% { opacity: 0.61214; }
+  85% { opacity: 0.47957; }
+  90% { opacity: 0.21403; }
+  95% { opacity: 0.77112; }
+  100% { opacity: 0.38073; }
+}
+
+main {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+  padding: 20px;
+}
+
+h1, h2, h3 {
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  text-shadow: 0 0 8px var(--ui-accent);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: transparent;
+  border: 1px solid var(--text-color);
+  color: var(--text-color);
+  padding: 8px 16px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+button:hover {
+  background: var(--text-color);
+  color: var(--bg-color);
+  box-shadow: 0 0 10px var(--ui-accent);
+}
+
+input, select, textarea {
+  background: transparent;
+  border: 1px solid var(--text-dim);
+  color: var(--text-color);
+  padding: 8px;
+  font-family: inherit;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--ui-accent);
+  box-shadow: 0 0 5px var(--ui-accent);
+}
+
+.terminal-card {
+  border: 1px solid var(--border-color);
+  padding: 20px;
+  background: rgba(51, 255, 51, 0.02);
+  margin-bottom: 20px;
+}
+
+.terminal-label {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.glow-text {
+  text-shadow: 0 0 5px var(--ui-accent);
+}
+
+.amber-text {
+  color: var(--ui-amber);
+  text-shadow: 0 0 5px var(--ui-amber);
+}

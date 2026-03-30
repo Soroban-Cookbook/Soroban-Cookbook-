@@ -1,90 +1,152 @@
 # Basic Examples
 
-This directory contains beginner-friendly examples that introduce core Soroban concepts.
+Core Soroban fundamentals, one concept per example. Perfect for beginners starting their journey with Soroban smart contracts.
 
-## Examples
+## 📋 Examples
 
 ### [01-hello-world](./01-hello-world/)
+The simplest possible Soroban contract — a single `hello` function.
+- **Concepts:** `#[contract]`, `#[contractimpl]`, `Symbol`, `Vec`, unit tests.
 
-Your first Soroban contract - learn the basic structure and deployment process.
-
-**Concepts:** Contract structure, functions, symbol types
+---
 
 ### [02-storage-patterns](./02-storage-patterns/)
+All three Soroban storage layers (persistent, instance, temporary) + TTL management.
+- **Concepts:** `persistent`, `instance`, `temporary` storage; TTL extension; data keys.
 
-Learn how to store and retrieve data in Soroban contracts.
-
-**Concepts:** Persistent storage, temporary storage, instance storage
+---
 
 ### [03-authentication](./03-authentication/)
+Address-based authorization using `require_auth()` and role management.
+- **Concepts:** `require_auth()`, admin roles, balances, allowances.
 
-Build custom authorization logic beyond basic `require_auth()`.
+---
 
-**Concepts:** Role-based access control, time-locks, cooldowns, contract state gating
+### [03-custom-errors](./03-custom-errors/)
+Custom error enums and structured error handling.
+- **Concepts:** `#[contracterror]`, error codes, panic vs. graceful errors.
+
+---
 
 ### [04-events](./04-events/)
+Structured event emission with query-friendly topic layouts.
+- **Concepts:** `env.events().publish()`, topic design, indexing.
 
-Emit and handle events for off-chain monitoring.
-
-**Concepts:** Event emission, indexing, event topics
+---
 
 ### [05-auth-context](./05-auth-context/)
+Understanding execution context in cross-contract calls.
+- **Concepts:** `env.current_contract_address()`, invoker detection, proxy calls.
 
-Understand the execution context, invoker vs current address, and proxy patterns.
-
-**Concepts:** `env.invoker()`, `env.current_contract_address()`, proxy calls
+---
 
 ### [05-error-handling](./05-error-handling/)
+Comprehensive error handling patterns and error propagation.
+- **Concepts:** Error enums, contract errors, validation, event logging.
 
-Proper error handling and custom error types.
+---
 
-**Concepts:** Error enums, panic vs graceful errors, error propagation
+### [06-soroban-types](./06-soroban-types/)
+Working with Soroban's built-in type system.
+- **Concepts:** `Address`, `Symbol`, `Bytes`, `Map`, `Vec`, type conversions.
 
-### [06-error-recovery](./06-error-recovery/)
+---
 
-Advanced error recovery patterns including try-catch, fallback logic, and transaction rollback.
+### [06-type-conversions](./06-type-conversions/)
+Converting between different Soroban and Rust types.
+- **Concepts:** `Into`, `From`, `TryInto`, type safety.
 
-**Concepts:** Result types, fallback mechanisms, graceful degradation, atomic operations, validation strategies
+---
 
-### [06-data-types](./06-data-types/)
+### [06-validation-patterns](./06-validation-patterns/)
+Input validation, range checks, and state machine gating.
+- **Concepts:** Precondition checks, overflow-safe arithmetic, state validation.
 
-Working with Soroban data types and conversions.
+---
 
-**Concepts:** Addresses, symbols, bytes, maps, vectors
+### [07-enum-types](./07-enum-types/)
+Contract-level enumerations and their use in storage and logic.
+- **Concepts:** `#[contracttype]` enums, matching, operation dispatch.
 
-## Getting Started
+---
 
-Each example includes:
+### [08-custom-structs](./08-custom-structs/)
+Complex data structures stored on-chain.
+- **Concepts:** `#[contracttype]` structs, nested types, data modeling.
 
-- Complete source code with inline documentation
-- Comprehensive unit tests
-- README with deployment instructions
-- Usage examples
+---
 
-To run any example:
+### [09-primitive-types](./09-primitive-types/)
+Integer types, overflow behaviour, and type conversions.
+- **Concepts:** `u32`, `u64`, `i128`, arithmetic safety, type casting.
+
+---
+
+### [10-data-types](./10-data-types/)
+In-depth exploration of Soroban data types.
+- **Concepts:** Comprehensive type coverage and use cases.
+
+---
+
+### [11-collection-types](./11-collection-types/)
+Working with `Vec` and `Map` collections in Soroban.
+- **Concepts:** Collection operations, iteration, storage efficiency.
+
+---
+
+### [11-event-filtering](./11-event-filtering/)
+Advanced event filtering and indexing patterns.
+- **Concepts:** Multi-topic filters, efficient event retrieval.
+
+---
+
+### [basic-event-emission](./basic-event-emission/)
+Simplified event emission for beginners.
+- **Concepts:** Basic `env.events().publish()` usage.
+
+---
+
+### [events](./events/)
+General event examples and patterns.
+- **Concepts:** Event structure, naming conventions, audit logs.
+
+---
+
+### [instance-storage](./instance-storage/)
+Deep dive into Instance storage layer.
+- **Concepts:** Shared TTL, contract configuration, state management.
+
+---
+
+### [persistent-storage](./persistent-storage/)
+Deep dive into Persistent storage layer.
+- **Concepts:** Per-key TTL, user balances, long-term data.
+
+---
+
+### [temporary_storage](./temporary_storage/)
+Deep dive into Temporary storage layer.
+- **Concepts:** Short-lived caches, cost optimization, TTL management.
+
+## 📋 Planned Examples
+
+- **Iterative Mappings** - Efficient iteration over large data sets.
+- **Batch Processing** - Handling multiple operations in a single call.
+- **State Machine Patterns** - Structured state transitions for complex logic.
+
+## 🎯 Prerequisites
+
+Before diving into these examples, ensure you have:
+- [Set up your development environment](../../guides/getting-started.md)
+- [Read the Testing Guide](../../guides/testing.md)
+- A basic understanding of Rust programming.
+
+## 🧪 Running Tests
 
 ```bash
-cd examples/basics/[example-name]
-cargo test
-cargo build --target wasm32-unknown-unknown --release
+# From the root directory
+cargo test -p [package-name]
+
+# Example:
+cargo test -p hello-world
 ```
-
-## Learning Path
-
-We recommend following the examples in order:
-
-1. Start with Hello World to understand basic structure
-2. Learn storage patterns for data persistence
-3. Master authentication for security
-4. Add events for observability
-5. Learn execution context to write secure proxy and cross-contract calls
-6. Handle errors gracefully and implement recovery patterns
-7. Explore all available data types
-
-## Next Steps
-
-Once comfortable with basics, explore:
-
-- [Intermediate Examples](../intermediate/) - Token interactions, multi-contract patterns
-- [Advanced Examples](../advanced/) - Complex protocols and systems
-- [Use-Case Examples](../defi/) - Real-world DeFi, NFT, and governance implementations

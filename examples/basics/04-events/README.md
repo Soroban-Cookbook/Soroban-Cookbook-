@@ -1,102 +1,257 @@
-# Events
+# Structured Event Patterns
 
-Learn how to design and emit Soroban events for observability, indexing, analytics, and integrations.
+This example demonstrates production-style Soroban event design with clear schemas for off-chain indexers.
 
-This example focuses on practical event patterns you can reuse in production contracts.
+## Acceptance Coverage
+Learn how to design, emit, and structure Soroban events for observability, indexing, analytics, and production integrations.
 
-## 📖 What You'll Learn
+This example goes beyond basic event emission and demonstrates structured, query-friendly, and audit-ready event patterns suitable for real-world contracts.
 
+- Custom event types: `#[contracttype]` payload structs for transfer/config/admin/audit events.
+- Multiple topics: examples using 3 and 4 topic slots.
+- Indexed parameters: searchable identifiers (addresses, keys, action names) in topics.
+- Event naming conventions: stable `(namespace, action, [indexes...])` layout.
+
+## Event Model
 - Core Soroban event model: **topics + data payload**
+- How to design query-friendly topic schemas
 - When to emit events (and when not to)
-- Topic schema design for long-term compatibility
+- Structured event payloads using `#[contracttype]`
+- Multi-topic indexing strategies (up to 4 topics)
+- Namespacing and long-term schema stability
 - Monitoring and filtering patterns for indexers
 - Gas/resource trade-offs when emitting events
-- How to test event behavior deterministically
+- Deterministic event testing patterns
 
-## 🔔 Event Concepts
 
-In Soroban, each event has:
+In Soroban, each event is:
 
-- **Topics** (indexed): up to 4 values used for filtering
-- **Data** (payload): associated event value/body
+- `topics` (indexed, up to 4): filter keys used by indexers.
+- `data` (not indexed): rich payload decoded after filtering.
 
 ```rust
-env.events().publish((symbol_short!("transfer"), from, to), amount);
-```
+env.events().publish((topic0, topic1, topic2, topic3), data);
+In Soroban, every event has:
 
+- **Topics** (indexed): up to 4 values used for filtering
+- **Data** (payload): structured or primitive event body (not indexed)
+
+```rust
+env.events().publish(
+    (topic_0, topic_1, topic_2, topic_3),
+    data_payload,
+);
+```
+## Key Rules
+- Maximum of 4 topics
+
+- Topics are indexed and filterable
+
+- Data is not indexed but can be decoded
+
+- Topic ordering is part of the schema contract
+
+## Naming Convention
+
+Structured contract events in this example use:
+
+- `topic[0]` = namespace (`"events"`)
+- `topic[1]` = action (`"transfer"`, `"cfg_upd"`, `"admin"`, `"audit"`)
+- `topic[2..]` = indexed entities (address/key/action)
+
+Why this matters:
+
+- Consistent filters across event families.
+- Stable schema for indexers and analytics pipelines.
+- Easier backward compatibility when adding new event types.
+
+## Structured APIs
+
+```rust
+pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64)
+pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64)
+pub fn admin_action(env: Env, admin: Address, action: Symbol)
 Think of topics as your query keys and payload as your event body.
 
 ## 🧭 When To Use Events
 
-Use events when state changes matter to systems outside the contract:
+Use events when contract state changes matter to systems outside the contract:
 
 - Wallet and UI updates
+
 - Indexers and analytics pipelines
-- Alerting/monitoring workflows
-- Audit trails for important actions
 
-Avoid events for internal-only computations that no external system needs.
+- Monitoring/alerting systems
 
-## 🔍 Example Contract API
+- Audit trails for governance or admin actions
 
-This contract demonstrates three event patterns:
+- Cross-system integrations
 
+Avoid events for:
+
+- Internal-only computations
+
+- Data that no external consumer needs
+
+- Redundant or noisy state transitions
+
+- Events are for observability, not storage.
+
+## 🔍 Event Patterns Demonstrated in This Contract
+
+This example includes both minimal and production-grade structured patterns.
+
+### Minimal Event
 ```rust
-// Single-topic event
 pub fn emit_simple(env: Env, value: u64)
+```
+### Topics:
+```code
+("simple")
+```
+### Data:
+```code
+value
+```
+Use this for the simplest event case.
 
-// Type + tag in topics
-pub fn emit_tagged(env: Env, tag: Symbol, value: u64)
-
-// Repeated event emission with index topic
-This example demonstrates both simple and structured event patterns:
-
-### Structured Events (Recommended)
-
+### Tagged Event
 ```rust
-// Transfer event: 4 topics (ns, action, sender, recipient) + custom payload
-pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64)
+pub fn emit_tagged(env: Env, tag: Symbol, value: u64)
+```
+### Topics:
+```code
+("tagged", tag)
+```
+Useful when grouping events by dynamic category.
 
-// Config update event: 3 topics (ns, action, key) + custom payload
+### Transfer Event (4 Topics + Structured Payload)
+```rust
+pub fn transfer(env: Env, sender: Address, recipient: Address, amount: i128, memo: u64)
+```
+### Topics:
+```code
+("events", "transfer", sender, recipient)
+```
+### Data:
+```rust
+TransferEventData { amount, memo }
+```
+This enables efficient filtering:
+
+- All transfers
+
+- Transfers from a specific address
+
+- Transfers to a specific address
+
+- Transfers between two specific addresses
+
+### Configuration Update Event
+```rust
 pub fn update_config(env: Env, key: Symbol, old_value: u64, new_value: u64)
 ```
-
+### Topics:
+```code
+("events", "cfg_upd", key)
+```
+### Data:
 ```rust
-// Admin action event: 3 topics (ns, category, admin) + action data
-pub fn admin_action(env: Env, admin: Address, action: Symbol)
+ConfigUpdateEventData { old_value, new_value }
+```
+Allows targeted monitoring of specific configuration keys.
 
-// Audit trail event: 4 topics (ns, category, actor, action) + detailed data
+### Admin Action Event
+```rust
+pub fn admin_action(env: Env, admin: Address, action: Symbol)
+```
+### Topics:
+```code
+("events", "admin", admin)
+```
+### Data:
+```rust
+AdminActionEventData { action, timestamp }
+```
+Tracks privileged operations in a filterable way.
+
+### Audit Trail Event (Full Accountability Pattern)
+```rust
 pub fn audit_trail(env: Env, actor: Address, action: Symbol, details: Symbol)
 ```
-
-### Simple Helpers
-
+### Topics:
+```code
+("events", "audit", actor, action)
+```
+### Data:
 ```rust
-// Simple event: single topic
-pub fn emit_simple(env: Env, value: u64)
+AuditTrailEventData { details, timestamp, sequence }
+```
+Provides:
 
-// Tagged event: two topics (name + tag)
-pub fn emit_tagged(env: Env, tag: Symbol, value: u64)
+## Payload Types
+- Who performed the action
 
-// Multiple events: emits N indexed events in a loop
+- What action was performed
+
+- When it occurred
+
+- Ledger ordering information
+
+This pattern is ideal for compliance, governance, and high-trust systems.
+
+### Multi-Emission Pattern
+```rust
 pub fn emit_multiple(env: Env, count: u32)
 ```
+Emits sequential indexed events inside a loop.
+
+⚠ Production contracts should enforce sensible limits to avoid excessive gas consumption.
+
+### Query-Optimized Transfer Pattern
+```rust
+(topic[0] = "transfer", topic[1] = from, topic[2] = to)
+```
+Off-chain filtering examples:
+
+- All transfers
+`topic[0] == "transfer"`
+
+- Transfers from Alice
+`topic[0] == "transfer" AND topic[1] == Alice`
+
+- Transfers to Bob
+`topic[0] == "transfer" AND topic[2] == Bob`
+
+- Alice → Bob transfers
+All three topics fixed
+
+Design topics intentionally for filtering efficiency.
+
 
 ## 🏷️ Topic Design Guidelines
 
-### 1. Keep Topic 0 as the Event Type
+### 1. Keep Topic 0 as the Event Type or Namespace
 
-Use the first topic as a stable event name:
-
+This contract uses:
 ```rust
-env.events().publish((symbol_short!("simple"),), value);
-env.events().publish((symbol_short!("tagged"), tag), value);
+const CONTRACT_NS: Symbol = symbol_short!("events");
 ```
+This allows indexers to retrieve all contract events using a shared prefix.
 
-### 2. Use Remaining Topics for Filter Keys
+### 2. Index What You Filter
 
-Put high-value filter fields in topics (tags, IDs, addresses, indices).  
-Keep larger or less frequently queried data in the payload.
+Put frequently queried identifiers in topics:
+
+- Addresses
+
+- IDs
+
+- Symbols
+
+- Status values
+
+Keep larger data in the payload.
 
 ### 3. Keep Topic Shape Stable
 
@@ -162,91 +317,33 @@ Use one naming convention for all event types (`snake_case`, short symbols, dete
 
 ## 📡 Monitoring and Filtering Tips
 
-### Off-chain Consumers Should
+Each structured event stores a typed payload in `data`:
 
-- Filter by **topic 0** first (event type)
+- `TransferEventData { amount, memo }`
+- `ConfigUpdateEventData { old_value, new_value }`
+- `AdminActionEventData { action, timestamp }`
+- `AuditTrailEventData { details, timestamp, sequence }`
+- Filter by `topic 0` first (event type)
 - Apply secondary filters by topic position (`topic[1]`, `topic[2]`, ...)
 - Treat payload as schema-bound data for downstream parsing
 - Handle unknown/new event types gracefully
 
-### Practical Pattern
+## Topic Layout Examples
 
-- Use topics for fast selection (`("tagged", tag)`)
-- Use payload for business values (`amount`, struct-like tuples)
+- `transfer`: `(events, transfer, sender, recipient)`
+- `update_config`: `(events, cfg_upd, key)`
+- `admin_action`: `(events, admin, admin_address)`
+- `audit_trail`: `(events, audit, actor, action)`
 
-This keeps index queries efficient and reduces parsing overhead for unrelated events.
-
-## ⛽ Gas and Resource Considerations
-
-Event emission consumes resources. Keep event design intentional:
-
-- More events per call => higher cost
-- More/larger topic values => higher cost
-- Larger payloads => higher cost
-
-Recommendations:
-
-- Emit only meaningful events
-- Prefer compact topic keys
-- Avoid duplicate/noise events
-- Batch only when downstream consumers need each item event
-
-In this example, `emit_multiple` is useful for demonstrating patterns, but production usage should enforce sensible limits on `count`.
-
-## 🧪 Testing Strategy
-
-Run tests:
+## Run Tests
 
 ```bash
-cargo test
+cargo test -p events
 ```
 
-The test suite validates:
+Tests validate:
 
-- Event emission exists
-- Correct event counts (single/multiple/zero)
-- Topic structure and ordering
-- Payload correctness
-- Distinct actions emit distinct event types
-- No unexpected extra events
-- **Event emission** — At least one event is emitted
-- **Event count** — Correct number of events per action
-- **Topic structure** — Topics match expected shape and values
-- **Payload values** — Event data matches emitted values
-- **Action differentiation** — Different actions emit distinct topics
-- **No extra events** — Only expected events are emitted
-- **Admin action events** — Correct topic structure and payload for admin operations
-- **Audit trail events** — Full accountability tracking with actor, action, and details
-
-## 🚀 Build and Deploy
-
-```bash
-# Build
-cargo build --target wasm32-unknown-unknown --release
-
-# Deploy
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/events.wasm \
-  --source alice \
-  --network testnet
-```
-
-## ✅ Event Best Practices Checklist
-
-- Event type in topic 0
-- Topics reserved for filterable identifiers
-- Payload reserved for non-indexed business data
-- Stable schema and topic ordering
-- Event tests for count, structure, and payload
-- Cost-aware emission strategy
-
-## 🎓 Next Steps
-
-- [Basics Index](../README.md) - Continue the fundamentals track
-- [Storage Patterns](../02-storage-patterns/) - Pair state changes with events
-- [Intermediate Examples](../../intermediate/) - Explore multi-contract systems
-
-## 📚 References
-
-- [Soroban Events Docs](https://developers.stellar.org/docs/smart-contracts/fundamentals-and-concepts/logging-events)
-- [Soroban SDK `Events`](https://docs.rs/soroban-sdk/latest/soroban_sdk/struct.Events.html)
+- topic count and order
+- indexed parameter placement
+- payload decoding into custom types
+- naming convention stability

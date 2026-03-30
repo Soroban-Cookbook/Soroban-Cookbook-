@@ -9,7 +9,7 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Env, Symbol};
+use soroban_sdk::{contract, contractimpl, symbol_short, Env, Symbol};
 
 /// Storage contract demonstrating all three storage types
 #[contract]
@@ -36,14 +36,21 @@ impl StorageContract {
         // Parameters: (key, threshold_ledgers, extend_to_ledgers)
         // This extends TTL to 100 ledgers when it falls below 100
         env.storage().persistent().extend_ttl(&key, 100, 100);
+
+        // EVENT: Persistent storage updated
+        env.events().publish(
+            (symbol_short!("persist"), symbol_short!("set")),
+            (key, value),
+        );
     }
 
     /// Retrieves a value from persistent storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_persistent(env: Env, key: Symbol) -> u64 {
-        env.storage().persistent().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    /// Prefer this over `unwrap()` so callers can handle the missing-key case.
+    pub fn get_persistent(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().persistent().get(&key)
     }
 
     /// Checks if a key exists in persistent storage.
@@ -54,6 +61,10 @@ impl StorageContract {
     /// Removes a value from persistent storage.
     pub fn remove_persistent(env: Env, key: Symbol) {
         env.storage().persistent().remove(&key);
+
+        // EVENT: Persistent storage removed
+        env.events()
+            .publish((symbol_short!("persist"), symbol_short!("remove")), key);
     }
 
     // ==================== TEMPORARY STORAGE ====================
@@ -74,14 +85,18 @@ impl StorageContract {
     /// - Temporary state within a single operation
     pub fn set_temporary(env: Env, key: Symbol, value: u64) {
         env.storage().temporary().set(&key, &value);
+
+        // EVENT: Temporary storage updated
+        env.events()
+            .publish((symbol_short!("temp"), symbol_short!("set")), (key, value));
     }
 
     /// Retrieves a value from temporary storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_temporary(env: Env, key: Symbol) -> u64 {
-        env.storage().temporary().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    pub fn get_temporary(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().temporary().get(&key)
     }
 
     /// Checks if a key exists in temporary storage.
@@ -110,14 +125,20 @@ impl StorageContract {
 
         // Extend instance storage TTL
         env.storage().instance().extend_ttl(100, 100);
+
+        // EVENT: Instance storage updated
+        env.events().publish(
+            (symbol_short!("instance"), symbol_short!("set")),
+            (key, value),
+        );
     }
 
     /// Retrieves a value from instance storage.
     ///
     /// # Returns
-    /// The stored value, or panics if key doesn't exist
-    pub fn get_instance(env: Env, key: Symbol) -> u64 {
-        env.storage().instance().get(&key).unwrap()
+    /// `Some(value)` if the key exists, `None` if it doesn't.
+    pub fn get_instance(env: Env, key: Symbol) -> Option<u64> {
+        env.storage().instance().get(&key)
     }
 
     /// Checks if a key exists in instance storage.
@@ -128,7 +149,12 @@ impl StorageContract {
     /// Removes a value from instance storage.
     pub fn remove_instance(env: Env, key: Symbol) {
         env.storage().instance().remove(&key);
+
+        // EVENT: Instance storage removed
+        env.events()
+            .publish((symbol_short!("instance"), symbol_short!("remove")), key);
     }
 }
 
+#[cfg(test)]
 mod test;
