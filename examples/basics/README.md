@@ -40,6 +40,12 @@ Proper error handling and custom error types.
 
 **Concepts:** Error enums, panic vs graceful errors, error propagation
 
+### [06-error-recovery](./06-error-recovery/)
+
+Advanced error recovery patterns including try-catch, fallback logic, and transaction rollback.
+
+**Concepts:** Result types, fallback mechanisms, graceful degradation, atomic operations, validation strategies
+
 ### [06-data-types](./06-data-types/)
 
 Working with Soroban data types and conversions.
@@ -72,8 +78,8 @@ We recommend following the examples in order:
 3. Master authentication for security
 4. Add events for observability
 5. Learn execution context to write secure proxy and cross-contract calls
-6. Handle errors gracefully
-6. Explore all available data types
+6. Handle errors gracefully and implement recovery patterns
+7. Explore all available data types
 
 ## Next Steps
 
