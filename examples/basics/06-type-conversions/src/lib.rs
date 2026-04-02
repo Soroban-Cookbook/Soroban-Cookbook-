@@ -69,6 +69,7 @@ impl TypeConversionsContract {
     /// # Returns
     /// Converted value as i128 or panics with ConversionError
     pub fn convert_numbers(_env: Env, value: i128, target_type: u32) -> i128 {
+        let _ = _env; // Suppress unused parameter warning
         match target_type {
             1 => {
                 // Convert to u32 with overflow check
@@ -181,6 +182,7 @@ impl TypeConversionsContract {
         balance: i128,
         active: bool,
     ) -> UserData {
+        let _ = _env; // Suppress unused parameter warning
         // Validate name length (Symbol limitation)
         if name.len() > 32 {
             panic!("InvalidStringFormat");
@@ -344,6 +346,7 @@ impl TypeConversionsContract {
     /// # Returns
     /// Sum as i128
     pub fn sum_different_types(_env: Env, input_u32: u32, input_i64: i64) -> i128 {
+        let _ = _env; // Suppress unused parameter warning
         let converted_u32: i128 = input_u32.into();
         let converted_i64: i128 = input_i64.into();
         converted_u32 + converted_i64

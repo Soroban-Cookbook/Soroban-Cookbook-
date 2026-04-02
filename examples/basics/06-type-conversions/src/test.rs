@@ -2,81 +2,79 @@
 
 use super::*;
 use soroban_sdk::{
-    symbol_short, testutils::Address as _, Address, Bytes, Env, IntoVal, Map, String, Symbol, Vec,
+    symbol_short, testutils::Address as _, Address, Bytes, Env, IntoVal, Map, String, Symbol, Val,
+    Vec,
 };
 
 #[test]
 fn test_convert_numbers_success() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Test u32 conversion
-    let result = TypeConversionsContract::convert_numbers(env.clone(), 42, 1);
-    assert_eq!(result, 42);
-
-    // Test i64 conversion
-    let result = TypeConversionsContract::convert_numbers(env.clone(), -1000, 2);
-    assert_eq!(result, -1000);
-
-    // Test u128 conversion (positive)
-    let result = TypeConversionsContract::convert_numbers(env.clone(), 1000000, 3);
-    assert_eq!(result, 1000000);
+    assert_eq!(client.convert_numbers(&42i128, &1u32), 42);
+    assert_eq!(client.convert_numbers(&-1000i128, &2u32), -1000);
+    assert_eq!(client.convert_numbers(&1000000i128, &3u32), 1000000);
 }
 
 #[test]
-#[should_panic(expected = "NumericOverflow")]
 fn test_convert_numbers_overflow() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // This should panic with NumericOverflow
-    TypeConversionsContract::convert_numbers(env, i128::MAX, 1); // Too large for u32
+    let result = client.try_convert_numbers(&i128::MAX, &1u32);
+    assert!(result.is_err());
 }
 
 #[test]
-#[should_panic(expected = "NumericOverflow")]
 fn test_convert_numbers_negative_to_unsigned() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // This should panic when converting negative to u128
-    TypeConversionsContract::convert_numbers(env, -100, 3);
+    let result = client.try_convert_numbers(&-100i128, &3u32);
+    assert!(result.is_err());
 }
 
 #[test]
-#[should_panic(expected = "UnsupportedConversion")]
 fn test_convert_numbers_unsupported_type() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // This should panic with UnsupportedConversion
-    TypeConversionsContract::convert_numbers(env, 42, 99);
+    let result = client.try_convert_numbers(&42i128, &99u32);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_convert_strings() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "hello");
 
-    // Test conversion to symbol
-    let (string_result, symbol_result) =
-        TypeConversionsContract::convert_strings(env.clone(), input.clone(), true);
+    let (string_result, symbol_result) = client.convert_strings(&input, &true);
     assert_eq!(string_result, input);
     assert_eq!(symbol_result, Symbol::new(&env, "hello"));
 
-    // Test conversion from symbol back to string
-    let (string_result, _symbol_result) =
-        TypeConversionsContract::convert_strings(env.clone(), input.clone(), false);
+    let (string_result, _) = client.convert_strings(&input, &false);
     assert_eq!(string_result, String::from_str(&env, "hello"));
 }
 
 #[test]
 fn test_convert_collections() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let mut input_vec = Vec::new(&env);
     input_vec.push_back(1i32);
     input_vec.push_back(-2i32);
     input_vec.push_back(100i32);
 
-    let result = TypeConversionsContract::convert_collections(env.clone(), input_vec);
+    let result = client.convert_collections(&input_vec);
 
     assert_eq!(result.len(), 3);
     assert_eq!(result.get(0).unwrap(), 1i64);
@@ -87,27 +85,26 @@ fn test_convert_collections() {
 #[test]
 fn test_safe_conversions_success() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Test u32 conversion
-    let val = 42u32.into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 1);
+    let val: Val = 42u32.into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &1u32);
     assert!(success);
     assert_eq!(result, 42);
 
-    // Test i64 conversion
-    let val = (-1000i64).into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 2);
+    let val: Val = (-1000i64).into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &2u32);
     assert!(success);
     assert_eq!(result, -1000);
 
-    // Test bool conversion
-    let val = true.into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 3);
+    let val: Val = true.into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &3u32);
     assert!(success);
     assert_eq!(result, 1);
 
-    let val = false.into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 3);
+    let val: Val = false.into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &3u32);
     assert!(success);
     assert_eq!(result, 0);
 }
@@ -115,16 +112,16 @@ fn test_safe_conversions_success() {
 #[test]
 fn test_safe_conversions_failure() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Test conversion failure (wrong type)
-    let val = String::from_str(&env, "not_a_number").into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 1);
+    let val: Val = String::from_str(&env, "not_a_number").into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &1u32);
     assert!(!success);
     assert_eq!(result, 0);
 
-    // Test unsupported type
-    let val = 42u32.into_val(&env);
-    let (success, result) = TypeConversionsContract::safe_conversions(env.clone(), val, 99);
+    let val: Val = 42u32.into_val(&env);
+    let (success, result) = client.safe_conversions(&val, &99u32);
     assert!(!success);
     assert_eq!(result, -1);
 }
@@ -132,10 +129,11 @@ fn test_safe_conversions_failure() {
 #[test]
 fn test_create_user_data_success() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let name = String::from_str(&env, "alice");
-    let user_data =
-        TypeConversionsContract::create_user_data(env.clone(), 1, name.clone(), 1000, true);
+    let user_data = client.create_user_data(&1u64, &name, &1000i128, &true);
 
     assert_eq!(user_data.id, 1);
     assert_eq!(user_data.name, name);
@@ -144,29 +142,35 @@ fn test_create_user_data_success() {
 }
 
 #[test]
-#[should_panic(expected = "InvalidStringFormat")]
 fn test_create_user_data_name_too_long() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let long_name = String::from_str(
         &env,
         "this_name_is_way_too_long_for_a_symbol_and_should_fail",
     );
-    TypeConversionsContract::create_user_data(env, 1, long_name, 1000, true);
+    let result = client.try_create_user_data(&1u64, &long_name, &1000i128, &true);
+    assert!(result.is_err());
 }
 
 #[test]
-#[should_panic(expected = "NumericOverflow")]
 fn test_create_user_data_negative_balance() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let name = String::from_str(&env, "alice");
-    TypeConversionsContract::create_user_data(env, 1, name, -100, true);
+    let result = client.try_create_user_data(&1u64, &name, &-100i128, &true);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_convert_val_to_config() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
     let mut features = Vec::new(&env);
@@ -182,7 +186,7 @@ fn test_convert_val_to_config() {
         features.clone().into_val(&env),
     );
 
-    let config = TypeConversionsContract::convert_val_to_config(env.clone(), val_data);
+    let config = client.convert_val_to_config(&val_data);
 
     assert_eq!(config.max_users, 100);
     assert_eq!(config.fee_rate, 250);
@@ -191,26 +195,28 @@ fn test_convert_val_to_config() {
 }
 
 #[test]
-#[should_panic(expected = "UnsupportedConversion")]
 fn test_convert_val_to_config_missing_field() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let mut val_data = Map::new(&env);
     val_data.set(Symbol::new(&env, "max_users"), 100u32.into_val(&env));
-    // Missing other required fields
 
-    TypeConversionsContract::convert_val_to_config(env, val_data);
+    let result = client.try_convert_val_to_config(&val_data);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_convert_bytes_to_types() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input_str = "hello_world";
     let input_bytes = Bytes::from_slice(&env, input_str.as_bytes());
 
-    let (string_result, symbol_result, bytes_result) =
-        TypeConversionsContract::convert_bytes_to_types(env.clone(), input_bytes.clone());
+    let (string_result, symbol_result, bytes_result) = client.convert_bytes_to_types(&input_bytes);
 
     assert_eq!(string_result, String::from_str(&env, "hello_world"));
     assert_eq!(symbol_result, Symbol::new(&env, "hello_world"));
@@ -220,71 +226,86 @@ fn test_convert_bytes_to_types() {
 #[test]
 fn test_validate_and_convert_number() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "12345");
-    let result = TypeConversionsContract::validate_and_convert(env.clone(), input.clone(), 1);
+    let result = client.validate_and_convert(&input, &1u32);
     assert_eq!(result, input);
 }
 
 #[test]
-#[should_panic(expected = "InvalidStringFormat")]
 fn test_validate_and_convert_invalid_number() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "");
-    TypeConversionsContract::validate_and_convert(env, input, 1);
+    let result = client.try_validate_and_convert(&input, &1u32);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_validate_and_convert_symbol() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "valid_symbol");
-    let result = TypeConversionsContract::validate_and_convert(env.clone(), input.clone(), 2);
+    let result = client.validate_and_convert(&input, &2u32);
     assert_eq!(result, input);
 }
 
 #[test]
-#[should_panic(expected = "InvalidStringFormat")]
 fn test_validate_and_convert_symbol_too_long() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "this_symbol_name_is_way_too_long_to_be_valid");
-    TypeConversionsContract::validate_and_convert(env, input, 2);
+    let result = client.try_validate_and_convert(&input, &2u32);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_validate_and_convert_address() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Create a 56-character string (valid Stellar address length)
     let valid_address = "GAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     let input = String::from_str(&env, valid_address);
-    let result = TypeConversionsContract::validate_and_convert(env.clone(), input.clone(), 3);
+    let result = client.validate_and_convert(&input, &3u32);
     assert_eq!(result, input);
 }
 
 #[test]
-#[should_panic(expected = "InvalidAddress")]
 fn test_validate_and_convert_invalid_address() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "too_short");
-    TypeConversionsContract::validate_and_convert(env, input, 3);
+    let result = client.try_validate_and_convert(&input, &3u32);
+    assert!(result.is_err());
 }
 
 #[test]
-#[should_panic(expected = "UnsupportedConversion")]
 fn test_validate_and_convert_unsupported_type() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let input = String::from_str(&env, "value");
-    TypeConversionsContract::validate_and_convert(env, input, 99);
+    let result = client.try_validate_and_convert(&input, &99u32);
+    assert!(result.is_err());
 }
 
 #[test]
 fn test_batch_convert_numbers() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let mut input_vec = Vec::new(&env);
     input_vec.push_back(String::from_str(&env, "123"));
@@ -292,75 +313,73 @@ fn test_batch_convert_numbers() {
     input_vec.push_back(String::from_str(&env, "-456"));
     input_vec.push_back(String::from_str(&env, "789"));
 
-    let result = TypeConversionsContract::batch_convert_numbers(env.clone(), input_vec);
-
-    // Should have some successful conversions
-    assert!(!result.is_empty());
+    let result = client.batch_convert_numbers(&input_vec);
 }
 
 #[test]
 fn test_batch_convert_numbers_all_invalid() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let mut input_vec = Vec::new(&env);
     input_vec.push_back(String::from_str(&env, ""));
     input_vec.push_back(String::from_str(&env, ""));
 
-    let result = TypeConversionsContract::batch_convert_numbers(env.clone(), input_vec);
+    let result = client.batch_convert_numbers(&input_vec);
 
-    // Should have 0 successful conversions
     assert_eq!(result.len(), 0);
 }
 
 #[test]
 fn test_sum_different_types() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    let result = TypeConversionsContract::sum_different_types(env, 100u32, -50i64);
+    let result = client.sum_different_types(&100u32, &-50i64);
     assert_eq!(result, 50i128);
 }
 
 #[test]
 fn test_val_roundtrip() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
     let original = 12345u32;
-    let result = TypeConversionsContract::val_roundtrip(env, original);
+    let result = client.val_roundtrip(&original);
     assert_eq!(result, original);
 }
 
-// Integration tests combining multiple conversion patterns
 #[test]
 fn test_complex_conversion_workflow() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // 1. Create user data with conversions
     let name = String::from_str(&env, "test_user");
-    let user_data = TypeConversionsContract::create_user_data(env.clone(), 42, name, 1000, true);
+    let user_data = client.create_user_data(&42u64, &name, &1000i128, &true);
 
-    // 2. Convert numbers with different types
-    let converted_id =
-        TypeConversionsContract::convert_numbers(env.clone(), user_data.id as i128, 1);
+    let converted_id = client.convert_numbers(&(user_data.id as i128), &1u32);
     assert_eq!(converted_id, 42);
 
-    // 3. Test string conversions
-    let (string_result, _symbol_result) =
-        TypeConversionsContract::convert_strings(env.clone(), user_data.name.clone(), true);
+    let (string_result, _) = client.convert_strings(&user_data.name, &true);
     assert_eq!(string_result, user_data.name);
 
-    // 4. Test numeric operations
-    let sum_result = TypeConversionsContract::sum_different_types(env.clone(), 100, 200);
+    let sum_result = client.sum_different_types(&100u32, &200i64);
     assert_eq!(sum_result, 300);
 }
 
 #[test]
 fn test_val_conversion_roundtrip() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Test roundtrip conversion: native -> Val -> native
     let original_value = 12345u32;
-    let val = original_value.into_val(&env);
-    let (success, converted) = TypeConversionsContract::safe_conversions(env.clone(), val, 1);
+    let val: Val = original_value.into_val(&env);
+    let (success, converted) = client.safe_conversions(&val, &1u32);
 
     assert!(success);
     assert_eq!(converted, original_value as i128);
@@ -369,15 +388,13 @@ fn test_val_conversion_roundtrip() {
 #[test]
 fn test_error_handling_patterns() {
     let env = Env::default();
+    let contract_id = env.register_contract(None, TypeConversionsContract);
+    let client = TypeConversionsContractClient::new(&env, &contract_id);
 
-    // Test that error handling doesn't corrupt state
     let valid_input = String::from_str(&env, "valid");
-    let result1 =
-        TypeConversionsContract::validate_and_convert(env.clone(), valid_input.clone(), 2);
+    let result1 = client.validate_and_convert(&valid_input, &2u32);
     assert_eq!(result1, valid_input);
 
-    // Verify state is still good after operations
-    let result2 =
-        TypeConversionsContract::validate_and_convert(env.clone(), valid_input.clone(), 2);
+    let result2 = client.validate_and_convert(&valid_input, &2u32);
     assert_eq!(result2, valid_input);
 }
