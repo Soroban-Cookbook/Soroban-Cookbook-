@@ -88,9 +88,21 @@ In-depth exploration of Soroban data types.
 
 ---
 
+
+### [12-error-handling](./12-error-handling/)
+
+Foundational error handling patterns using Result and panic.
+
+**Concepts:** `#[contracterror]`, `Result<T, E>`, error codes, `try_*` client methods, invariant panics
+
+---
+
+## Supporting Packages
+
 ### [11-collection-types](./11-collection-types/)
 Working with `Vec` and `Map` collections in Soroban.
 - **Concepts:** Collection operations, iteration, storage efficiency.
+
 
 ---
 

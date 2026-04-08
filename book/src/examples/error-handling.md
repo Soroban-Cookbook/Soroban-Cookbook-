@@ -48,6 +48,11 @@ pub fn transfer(env: Env, amount: u64) -> Result<(), Error> {
 - Good/bad patterns
 - `transfer()` vs `transfer_panic()`
 
+**[Foundational: 12-error-handling](../examples/basics/12-error-handling/)**
+- Clean implementation of `Result` vs `panic!`
+- Explicit error codes and division logic
+- Comprehensive `try_` client testing
+
 ## 🧪 Testing Errors
 
 ```rust
