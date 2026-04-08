@@ -8,6 +8,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
+use multi_party_auth;
 use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec};
 
 // ---------------------------------------------------------------------------
@@ -604,4 +605,127 @@ fn test_coordinated_state_management() {
     let evt_count: u32 =
         env.invoke_contract(&events_id, &Symbol::new(&env, "get_number"), Vec::new(&env));
     assert_eq!(evt_count, 2);
+}
+
+// ---------------------------------------------------------------------------
+// Test 7: Multi-Party Auth — 2-of-3 proposal approval
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multi_party_auth_2_of_3() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, multi_party_auth::MultiPartyAuthContract);
+    let client = multi_party_auth::MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        soroban_sdk::Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "prop_2of3");
+
+    // Setup 2-of-3 threshold
+    client.setup_proposal(&proposal_id, &2u32, &all_signers);
+
+    // Only signer1 and signer2 approve — threshold met
+    let approvers = soroban_sdk::Vec::from_array(&env, [signer1.clone(), signer2.clone()]);
+    client.proposal_approval(&proposal_id, &approvers);
+
+    // Verify both signers were required to authorize
+    let auths = env.auths();
+    let auth_addresses: std::vec::Vec<Address> =
+        auths.iter().map(|(addr, _)| addr.clone()).collect();
+    assert!(auth_addresses.contains(&signer1));
+    assert!(auth_addresses.contains(&signer2));
+    assert!(!auth_addresses.contains(&signer3));
+}
+
+// ---------------------------------------------------------------------------
+// Test 8: Multi-Party Auth — 3-of-3 proposal approval
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multi_party_auth_3_of_3() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, multi_party_auth::MultiPartyAuthContract);
+    let client = multi_party_auth::MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    let all_signers =
+        soroban_sdk::Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "prop_3of3");
+
+    // Setup 3-of-3 threshold — all must approve
+    client.setup_proposal(&proposal_id, &3u32, &all_signers);
+
+    let approvers =
+        soroban_sdk::Vec::from_array(&env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+    client.proposal_approval(&proposal_id, &approvers);
+
+    let auths = env.auths();
+    let auth_addresses: std::vec::Vec<Address> =
+        auths.iter().map(|(addr, _)| addr.clone()).collect();
+    assert!(auth_addresses.contains(&signer1));
+    assert!(auth_addresses.contains(&signer2));
+    assert!(auth_addresses.contains(&signer3));
+}
+
+// ---------------------------------------------------------------------------
+// Test 9: Multi-Party Auth — cross-function auth check (escrow + proposal)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multi_party_auth_cross_function() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, multi_party_auth::MultiPartyAuthContract);
+    let client = multi_party_auth::MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let buyer = Address::generate(&env);
+    let seller = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+
+    // --- Escrow flow ---
+    // Step 1: buyer funds escrow (requires buyer auth)
+    client.sequential_auth_escrow(&buyer, &seller, &500i128);
+
+    let step_key = multi_party_auth::DataKey::EscrowStep(buyer.clone(), seller.clone());
+    let step: u32 = env.as_contract(&contract_id, || {
+        env.storage().instance().get(&step_key).unwrap_or(0)
+    });
+    assert_eq!(step, 2);
+
+    // Step 2: joint release (requires both buyer and seller auth)
+    client.sequential_auth_escrow(&buyer, &seller, &500i128);
+
+    let step_after: u32 = env.as_contract(&contract_id, || {
+        env.storage().instance().get(&step_key).unwrap_or(0)
+    });
+    assert_eq!(step_after, 0);
+
+    // --- Proposal flow on the same contract instance ---
+    let all_signers =
+        soroban_sdk::Vec::from_array(&env, [buyer.clone(), seller.clone(), signer3.clone()]);
+    let proposal_id = Symbol::new(&env, "cross_prop");
+
+    client.setup_proposal(&proposal_id, &2u32, &all_signers);
+
+    // buyer and seller (who just completed escrow) now co-approve a proposal
+    let approvers = soroban_sdk::Vec::from_array(&env, [buyer.clone(), seller.clone()]);
+    client.proposal_approval(&proposal_id, &approvers);
+
+    let auths = env.auths();
+    let auth_addresses: std::vec::Vec<Address> =
+        auths.iter().map(|(addr, _)| addr.clone()).collect();
+    assert!(auth_addresses.contains(&buyer));
+    assert!(auth_addresses.contains(&seller));
 }
