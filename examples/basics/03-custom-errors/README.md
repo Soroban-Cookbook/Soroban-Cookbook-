@@ -1,5 +1,9 @@
 # Custom Errors in Soroban
 
+> **🎬 Video Walkthrough** *(coming soon)*
+> This example is covered from 9:00 – 13:00 in the Getting Started video.
+> Once published, the link will appear here.
+
 This example demonstrates comprehensive custom error handling in Soroban smart contracts using the `contracterror` attribute.
 
 ## Overview
