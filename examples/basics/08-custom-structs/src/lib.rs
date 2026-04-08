@@ -499,11 +499,11 @@ impl CustomStructsContract {
 
     /// Get portfolio
     pub fn get_portfolio(
-        _env: Env,
+        env: Env,
         owner: Address,
         name: String,
     ) -> Result<Portfolio, ContractError> {
-        let portfolio: Portfolio = _env
+        let portfolio: Portfolio = env
             .storage()
             .instance()
             .get(&(symbol_short!("portfolio"), owner, name))

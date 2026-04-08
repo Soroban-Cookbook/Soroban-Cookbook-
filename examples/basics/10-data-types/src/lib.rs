@@ -19,10 +19,6 @@ use soroban_sdk::{
     Vec,
 };
 
-// Import testutils for Address::generate in tests
-#[cfg(test)]
-use soroban_sdk::testutils::Address as _;
-
 /// The contract type for demonstrating Soroban data types.
 #[contract]
 pub struct DataTypesContract;
