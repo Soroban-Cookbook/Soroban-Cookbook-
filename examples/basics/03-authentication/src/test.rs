@@ -205,6 +205,87 @@ fn test_emit_event() {
 }
 
 // ---------------------------------------------------------------------------
+// Negative Authentication Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let from = Address::generate(&env);
+    let to = Address::generate(&env);
+
+    client.set_balance(&admin, &from, &1000);
+    // Disable all-auth-mocking and provide nothing, forcing an auth failure
+    env.mock_auths(&[]);
+    client.transfer(&from, &to, &300);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_approve_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+    client.approve(&owner, &spender, &500);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_from_missing_spender_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &500);
+
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+
+    // This requires `spender.require_auth()`
+    client.transfer_from(&spender, &owner, &recipient, &200);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_admin_action_missing_auth() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+
+    // Disable all-auth-mocking
+    env.mock_auths(&[]);
+
+    // This requires `admin.require_auth()`
+    client.admin_action(&admin, &10);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_multi_sig_missing_one_auth() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AuthContract);
+    let client = AuthContractClient::new(&env, &contract_id);
+    let signers = vec![
+        &env,
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+        Address::generate(&env),
+    ];
+
+    // Setting mock auths to empty causes any require_auth to panic
+    env.mock_auths(&[]);
+
+    client.multi_sig_action(&signers, &10);
 // Role-Based Access Control Tests
 // ---------------------------------------------------------------------------
 
