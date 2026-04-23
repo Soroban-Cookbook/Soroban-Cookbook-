@@ -10,8 +10,7 @@
 
 ## Table of Contents
 
-- [About](#about)
-- [Project Goals](#project-goals)
+- [Project Overview and Goals](#project-overview-and-goals)
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Repository Structure](#repository-structure)
@@ -23,7 +22,7 @@
 - [Additional Resources](#additional-resources)
 - [License](#license)
 
-## About
+## Project Overview and Goals
 
 The Soroban Cookbook is a community-driven developer resource for building smart contracts on the [Stellar](https://stellar.org) network using [Soroban](https://developers.stellar.org/docs/smart-contracts). It provides clear, well-documented examples and practical patterns for developers at every level — from a first "Hello World" contract to production-grade DeFi protocols
 
@@ -42,6 +41,12 @@ Every example in this cookbook:
 - Features inline documentation explaining key concepts
 - Follows Rust and Soroban best practices
 - Passes all automated CI/CD checks
+
+**Project Goals:**
+- **Education:** Provide clear, production-ready, and secure examples for Soroban developers.
+- **Acceleration:** Speed up the onboarding process for the Stellar/Soroban ecosystem.
+- **Standardization:** Establish and document best practices for smart contract architecture on Stellar.
+- **Community:** Foster a collaborative environment for developers to share patterns and solutions.
 
 ## Quick Start
 
@@ -232,7 +237,6 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 - [Stellar Developer Portal](https://developers.stellar.org)
 - [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
 - [Stellar Community Discord](https://discord.gg/stellardev)
-- [Project Roadmap](./ROADMAP.md) - Planned phases, milestones, and KPIs
 
 ## License
 
