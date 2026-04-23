@@ -28,6 +28,10 @@ Build smart contracts to optimized WASM.
 ./scripts/build.sh examples/basics/01-hello-world
 ```
 
+**Arguments:**
+
+1. `example-path` *(optional)* — Path to a specific contract directory. Omit to build all examples.
+
 **Features:**
 
 - Compiles to optimized WASM (release mode)
