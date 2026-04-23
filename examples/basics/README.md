@@ -1,22 +1,7 @@
 # Basic Examples
 
-Core Soroban fundamentals, one concept per example. Perfect for beginners starting their journey with Soroban smart contracts.
+Core Soroban fundamentals, one concept per example. Perfect for beginners starting their journey with Soroban smart contract development.
 
-<<<<<<< HEAD
-## 🚀 Suggested Learning Path
-
-Follow these examples in order to build a solid foundation in Soroban development:
-
-1.  **The Basics**: Start with [01-hello-world](./01-hello-world/) and [09-primitive-types](./09-primitive-types/) to understand contract structure and basic Rust types.
-2.  **Data Modeling**: Explore [06-soroban-types](./06-soroban-types/), [07-enum-types](./07-enum-types/), and [08-custom-structs](./08-custom-structs/) to learn how to represent data.
-3.  **Storage Layers**: Dive into [instance-storage](./instance-storage/), [persistent-storage](./persistent-storage/), and [temporary_storage](./temporary_storage/) to understand how data persists on-chain.
-4.  **Interactivity**: Learn about [basic-event-emission](./basic-event-emission/) and [03-custom-errors](./03-custom-errors/) to communicate with the outside world and handle failures.
-5.  **Advanced Fundamentals**: Master [03-authentication](./03-authentication/) and [06-validation-patterns](./06-validation-patterns/) to build secure and robust contracts.
-
----
-
-## 📋 Example Index
-=======
 ## 🎯 Learning Path
 
 Follow this recommended sequence to build your understanding progressively:
@@ -85,7 +70,6 @@ Focused deep dive into persistent storage — the highest-durability tier with p
 Focused deep dive into temporary storage — the cheapest, ephemeral tier.
 - **Concepts:** Short-lived TTL, reentrancy guards, intra-transaction caching, gas cost trade-offs
 - **Best for:** Flags, intermediate computation results, short-lived caches
->>>>>>> d9af754 (docs(basics): update README with all examples, difficulty ratings, and learning path)
 
 | # | Example | Difficulty | Description | Key Concepts |
 |:---:|:---|:---:|:---|:---|
@@ -294,3 +278,8 @@ Focused deep dive into persistent storage — the highest-durability tier with p
 Focused deep dive into temporary storage — the cheapest, ephemeral tier.
 - **Concepts:** Short-lived TTL, reentrancy guards, intra-transaction caching, gas cost trade-offs
 - **Best for:** Flags, intermediate computation results, short-lived caches
+=======
+- `10-cross-contract-calls`: A simple example of one contract calling another.
+- `11-data-structures`: Demonstrations of `Vec` and `Map` usage.
+- `12-testing-with-mocks`: How to use `mock_all_auths` and other test utilities.
+>>>>>>> c564f7b (readme for each examples category)
