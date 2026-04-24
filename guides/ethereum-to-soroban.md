@@ -391,10 +391,10 @@ npx hardhat run scripts/deploy.js --network mainnet
 **Soroban:**
 
 ```bash
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
-  --source alice \
-  --network mainnet
+stellar contract deploy \
+  --wasm target/wasm32v1-none/release/my_contract.wasm \
+  --source-account alice \
+  --network testnet
 ```
 
 ## 📚 Common Patterns Translation
