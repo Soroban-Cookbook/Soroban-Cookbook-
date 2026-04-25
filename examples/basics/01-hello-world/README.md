@@ -80,6 +80,49 @@ Tests live in `src/test.rs` and cover:
     └── test.rs      # unit tests
 ```
 
+## Common Pitfalls
+
+### Missing `&env` in `vec![]`
+
+```rust
+// Wrong — does not compile
+vec![symbol_short!("Hello"), to]
+
+// Correct — &env is always the first argument
+vec![&env, symbol_short!("Hello"), to]
+```
+
+The `vec!` macro allocates in host memory and requires `&env` as its first argument. Forgetting it produces a compile-time error.
+
+### Using `std` types or macros
+
+```rust
+// Wrong — std is not available in no_std Wasm
+let s = format!("Hello, {}!", to);
+let v = std::vec!["Hello"];
+
+// Correct — use Soroban SDK equivalents
+let v = vec![&env, symbol_short!("Hello"), to];
+```
+
+`#![no_std]` is mandatory for all Soroban contracts. The Rust standard library is not available in the Wasm sandbox — use Soroban SDK types (`Symbol`, `Vec`, `String`, `Bytes`) instead.
+
+### Adding state fields to the contract struct
+
+```rust
+// Wrong — struct fields are not contract storage
+#[contract]
+pub struct HelloContract {
+    greeting: Symbol,  // this field is never persisted on-chain
+}
+
+// Correct — use env.storage() for any state that must survive calls
+#[contract]
+pub struct HelloContract;
+```
+
+The contract struct is a zero-sized marker type. On-chain state must be written and read through `env.storage()`, not as struct fields.
+
 ## Next Steps
 
 - [02-storage-patterns](../02-storage-patterns/) — persist data between invocations
