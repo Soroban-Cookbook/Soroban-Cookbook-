@@ -15,13 +15,14 @@
 //! Provides patterns and utilities for validating user permissions and access controls.
 
 #![no_std]
-use soroban_sdk::{Address, Env, String, Vec};
+use soroban_sdk::{Address, Env, String, Vec, contracterror};
 
 // ---------------------------------------------------------------------------
 // Error Types
 // ---------------------------------------------------------------------------
 
 /// Comprehensive validation error types for Soroban contracts
+#[contracterror]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[repr(u32)]
 pub enum ValidationError {
@@ -214,20 +215,18 @@ pub fn validate_timestamp(
 ///
 /// # Arguments
 /// * `env` - The contract environment
-/// * `storage` - The storage instance to check
 /// * `key` - The key to check for existence
 ///
 /// # Errors
 /// * `ValidationError::ContractNotInitialized` - If the key doesn't exist
-pub fn require_initialized<T>(
+pub fn require_initialized<K>(
     env: &Env,
-    storage: &impl soroban_sdk::storage::Storage,
-    key: &T,
+    key: &K,
 ) -> Result<(), ValidationError>
 where
-    T: soroban_sdk::storage::StorageType,
+    K: soroban_sdk::TryFromVal<Env, soroban_sdk::Val> + soroban_sdk::IntoVal<Env, soroban_sdk::Val>,
 {
-    if !storage.has(key) {
+    if !env.storage().instance().has(key) {
         return Err(ValidationError::ContractNotInitialized);
     }
     Ok(())

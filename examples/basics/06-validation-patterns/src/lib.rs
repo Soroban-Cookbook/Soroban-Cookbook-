@@ -24,58 +24,8 @@
 //! - Permission checks for specific operations
 
 #![no_std]
-use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, String, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String, Vec};
 use soroban_validation::*;
-
-// ---------------------------------------------------------------------------
-// Error Types
-// ---------------------------------------------------------------------------
-
-#[contracterror]
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-#[repr(u32)]
-pub enum ValidationError {
-    // Parameter validation errors (100-199)
-    InvalidAmount = 100,
-    AmountTooSmall = 101,
-    AmountTooLarge = 102,
-    InvalidAddress = 103,
-    InvalidString = 104,
-    StringTooShort = 105,
-    StringTooLong = 106,
-    InvalidEnum = 107,
-    InvalidArray = 108,
-    ArrayTooSmall = 109,
-    ArrayTooLarge = 110,
-    InvalidTimestamp = 111,
-    TimestampInPast = 112,
-    TimestampInDistantFuture = 113,
-
-    // State validation errors (200-299)
-    ContractNotInitialized = 200,
-    ContractPaused = 201,
-    ContractFrozen = 202,
-    InsufficientBalance = 203,
-    InsufficientAllowance = 204,
-    ResourceNotFound = 205,
-    ResourceAlreadyExists = 206,
-    InvalidStateTransition = 207,
-    InvariantViolation = 208,
-    RateLimitExceeded = 209,
-    CooldownActive = 210,
-
-    // Authorization validation errors (300-399)
-    Unauthorized = 300,
-    NotAdmin = 301,
-    NotOwner = 302,
-    InsufficientRole = 303,
-    SignatureRequired = 304,
-    MultiSigRequired = 305,
-    InvalidSignature = 306,
-    ExpiredSignature = 307,
-    WrongContract = 308,
-    Blacklisted = 309,
-}
 
 // ---------------------------------------------------------------------------
 // Data Types
