@@ -23,7 +23,7 @@
 
 ## About
 
-The Soroban Cookbook is a community-driven developer resource for building smart contracts on the [Stellar](https://stellar.org) network using [Soroban](https://developers.stellar.org/docs/smart-contracts). It provides clear, well-documented examples and practical patterns for developers at every level — from a first "Hello World" contract to production-grade DeFi protocols.
+The Soroban Cookbook is a community-driven developer resource for building smart contracts on the [Stellar](https://stellar.org) network using [Soroban](https://developers.stellar.org/docs/smart-contracts). It provides clear, well-documented examples and practical patterns for developers at every level — from a first "Hello World" contract to production-grade DeFi protocols
 
 Every example in this cookbook:
 
