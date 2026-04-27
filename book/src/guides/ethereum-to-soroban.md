@@ -456,11 +456,27 @@ fn require_admin(env: &Env) -> Address {
 }
 ```
 
-## 🎓 Learning Resources
+## ⚠️ Gotchas and Differences
+
+- **No implicit `msg.sender`**: In Solidity, caller context is available through `msg.sender`. In Soroban, every function must explicitly require authorization for the caller address using `Address::require_auth()`.
+- **No contract inheritance or modifiers**: Soroban uses traits, helper functions, and composition instead of Solidity `contract` inheritance and `modifier`s.
+- **Explicit storage model**: Solidity state variables are automatically persisted. Soroban requires explicit use of `env.storage().persistent()`, `env.storage().instance()`, or `env.storage().temporary()`.
+- **No fallback/receive functions**: Soroban contracts expose explicit entrypoints only. There is no equivalent of Solidity's fallback/receive functions.
+- **Type conversions are explicit**: Rust does not automatically convert between integer types. Use `as` casts or checked arithmetic when translating Solidity numeric logic.
+- **Overflow behavior differs**: Solidity 0.8+ reverts on overflow by default. Soroban checks overflow in debug builds, but release builds require explicit checked math to avoid silent overflow.
+- **Events use typed topics**: Soroban events are published through `env.events().publish()` with tuple topics; there is no `indexed` keyword.
+- **Error handling is explicit**: Solidity `revert` and `require` are replaced with `panic!`, `Result<T, E>`, or contract errors via `#[contracterror]` in Soroban.
+- **Deployment and ABI**: Soroban contracts compile to WASM and deploy via the `stellar`/`soroban` CLI stack, not via EVM bytecode or Hardhat.
+
+## 📚 Resource References
 
 - [Rust Book](https://doc.rust-lang.org/book/) - Essential Rust learning
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
 - [Soroban by Example](https://developers.stellar.org/docs/smart-contracts/example-contracts)
+- [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
+- [Stellar Developer Portal](https://developers.stellar.org)
+- [Soroban CLI Docs](https://developers.stellar.org/docs/tools/developer-tools/cli)
+- [Stellar Discord](https://discord.gg/stellardev)
 - [Rust vs Solidity](https://arxiv.org/abs/2106.12848)
 
 ## 💡 Tips for Ethereum Developers
