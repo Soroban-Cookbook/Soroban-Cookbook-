@@ -435,6 +435,6 @@ Stellar Ecosystem Proposal 41 - The token interface standard for Soroban, simila
 - **Stellar Discord:** https://discord.gg/stellardev
 - **This Cookbook:** Check our comprehensive guides and examples
 
-## Contributing
+## Contributing.
 
 Found a term that's missing or needs clarification? Please open an issue or submit a PR to help improve this glossary!

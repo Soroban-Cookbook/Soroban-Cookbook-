@@ -2,7 +2,7 @@
 
 Welcome to the Soroban Cookbook documentation. Use this index to find what you need quickly.
 
-## Quick Links
+## Quick Links.
 
 | I want to…                  | Go to                                                         |
 | --------------------------- | ------------------------------------------------------------- |
