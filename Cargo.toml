@@ -2,6 +2,7 @@
 resolver = "2"
 
 members = [
+    "shared",
     "examples/basics/*",
     "examples/intermediate/*",
     "examples/advanced/*",
