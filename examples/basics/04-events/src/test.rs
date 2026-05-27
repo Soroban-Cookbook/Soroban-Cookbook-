@@ -146,6 +146,60 @@ fn test_transfer_structured_data_payload() {
     assert_eq!(payload.memo, memo);
 }
 
+#[test]
+fn test_transfer_payload_regression_allows_negative_amount() {
+    let (env, _, client) = make_env_and_client();
+
+    let sender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    let amount: i128 = -1;
+    let memo: u64 = 0;
+
+    client.transfer(&sender, &recipient, &amount, &memo);
+
+    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let payload = TransferEventData::try_from_val(&env, &data).unwrap();
+    assert_eq!(payload.amount, amount);
+    assert_eq!(payload.memo, memo);
+}
+
+#[test]
+fn test_transfer_payload_regression_supports_max_memo() {
+    let (env, _, client) = make_env_and_client();
+
+    let sender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    let amount: i128 = 987_654_321;
+    let memo: u64 = u64::MAX;
+
+    client.transfer(&sender, &recipient, &amount, &memo);
+
+    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let payload = TransferEventData::try_from_val(&env, &data).unwrap();
+    assert_eq!(payload.amount, amount);
+    assert_eq!(payload.memo, memo);
+}
+
+#[test]
+fn test_transfer_topic_order_regression_is_stable() {
+    let (env, _, client) = make_env_and_client();
+
+    let sender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    client.transfer(&sender, &recipient, &77, &123);
+
+    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let topic_0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let topic_1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    let topic_2: Address = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
+    let topic_3: Address = Address::try_from_val(&env, &topics.get(3).unwrap()).unwrap();
+
+    assert_eq!(topic_0, symbol_short!("events"));
+    assert_eq!(topic_1, symbol_short!("transfer"));
+    assert_eq!(topic_2, sender);
+    assert_eq!(topic_3, recipient);
+}
+
 // ---------------------------------------------------------------------------
 // Structured event 2: config update (3 topics)
 // ---------------------------------------------------------------------------

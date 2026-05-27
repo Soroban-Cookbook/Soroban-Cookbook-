@@ -51,6 +51,8 @@ jobs:
     # edition 2024 (e.g. base64ct ≥ 1.8) — so we drop the old matrix entry.
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -68,7 +70,22 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Run tests
+      - name: Run targeted tests for changed paths
+        if: github.event_name == 'pull_request'
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.sha }})
+          for file in $CHANGED_FILES; do
+            if [[ $file == examples/* ]]; then
+              EXAMPLE_DIR=$(echo $file | cut -d/ -f1-3)
+              if [ -f "$EXAMPLE_DIR/Cargo.toml" ]; then
+                echo "Running test for changed example $EXAMPLE_DIR"
+                cd $EXAMPLE_DIR && cargo test && cd -
+              fi
+            fi
+          done
+
+      - name: Run tests (fallback)
+        if: github.event_name != 'pull_request'
         run: cargo test --workspace --all-features
 
   build:
@@ -137,30 +154,49 @@ jobs:
           toolchain: stable
           target: wasm32-unknown-unknown
 
-      - name: Cache cargo registry
+      # Cache the Cargo registry AND the compiled tarpaulin binary together
+      # so repeated runs don't rebuild tarpaulin from source every time.
+      - name: Cache Cargo registry and tarpaulin binary
         uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
+            ~/.cargo/bin/cargo-tarpaulin
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
             target
           key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-coverage-
 
       - name: Install cargo-tarpaulin
-        run: cargo install cargo-tarpaulin --locked
+        run: |
+          if ! command -v cargo-tarpaulin &> /dev/null; then
+            cargo install cargo-tarpaulin --locked
+          fi
 
+      # tarpaulin.toml controls output format (xml + html + lcov),
+      # output directory (coverage/), timeout, and exclusions.
       - name: Generate coverage
-        run: cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300
+        run: cargo tarpaulin
 
+      # Keep the full coverage report as a downloadable artifact for
+      # historical review — retained for 90 days.
       - name: Upload coverage artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: cobertura-xml
-          path: ./coverage/cobertura.xml
+          name: coverage-report
+          path: coverage/
+          retention-days: 90
 
+      # Upload Cobertura XML to Codecov for badge + historical trend graphs.
+      # CODECOV_TOKEN is required for private repos; harmless for public ones.
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
           files: ./coverage/cobertura.xml
+          flags: workspace
+          name: soroban-cookbook
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}

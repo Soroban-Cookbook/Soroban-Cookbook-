@@ -58,7 +58,7 @@ pub enum DataKey {
 
 /// Possible states of an operation
 #[contracttype]
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum OperationState {
     /// Not found in storage
     Unknown,
@@ -195,7 +195,7 @@ impl TimelockContract {
             .expect("Not initialized");
         admin.require_auth();
 
-        let key = DataKey::Operation(operation_id.clone());
+        let key = DataKey::Operation(operation_id);
         if !env.storage().persistent().has(&key) {
             panic!("Operation not found");
         }

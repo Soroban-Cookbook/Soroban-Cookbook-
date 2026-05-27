@@ -1,15 +1,19 @@
 # Soroban Quick Reference
 
-A quick reference guide for Soroban smart contract development.
+A quick reference for common Soroban smart contract patterns.
 
-## 📦 Project Setup
+---
+
+## Project Setup
 
 ```bash
-# Create new project
+# Create new contract project
 cargo new --lib my-contract
 cd my-contract
+```
 
-# Add to Cargo.toml
+`Cargo.toml`:
+```toml
 [lib]
 crate-type = ["cdylib"]
 
@@ -20,7 +24,7 @@ soroban-sdk = "21.7.0"
 soroban-sdk = { version = "21.7.0", features = ["testutils"] }
 ```
 
-## 🏗️ Basic Contract Structure
+## Basic Contract Structure
 
 ```rust
 #![no_std]
@@ -31,328 +35,414 @@ pub struct MyContract;
 
 #[contractimpl]
 impl MyContract {
-    pub fn my_function(env: Env, arg: u64) -> u64 {
-        arg * 2
+    pub fn hello(env: Env, name: soroban_sdk::String) -> soroban_sdk::String {
+        soroban_sdk::String::from_str(&env, "Hello!")
     }
 }
 ```
 
-## 💾 Storage Operations
+---
 
-### Persistent Storage
+## Common Types and Conversions
 
-```rust
-// Set
-env.storage().persistent().set(&key, &value);
-
-// Get
-let value: u64 = env.storage().persistent().get(&key).unwrap();
-
-// Has
-let exists: bool = env.storage().persistent().has(&key);
-
-// Remove
-env.storage().persistent().remove(&key);
-
-// Extend TTL
-env.storage().persistent().extend_ttl(&key, 100, 100);
-```
-
-### Temporary Storage
+### Primitive Types
 
 ```rust
-env.storage().temporary().set(&key, &value);
-let value: u64 = env.storage().temporary().get(&key).unwrap();
-```
-
-### Instance Storage
-
-```rust
-env.storage().instance().set(&key, &value);
-let value: u64 = env.storage().instance().get(&key).unwrap();
-env.storage().instance().extend_ttl(100, 100);
-```
-
-## 🔐 Authorization
-
-```rust
-// Require authorization from an address
-address.require_auth();
-
-// Require authorization with specific arguments
-address.require_auth_for_args(args);
-
-// In tests - mock all auths
-env.mock_all_auths();
-```
-
-## 📢 Events
-
-```rust
-// Simple event
-env.events().publish((symbol_short!("event"),), value);
-
-// Event with topics (up to 4)
-env.events().publish(
-    (symbol_short!("transfer"), from.clone(), to.clone()),
-    amount
-);
-
-// In tests - get events
-let events = env.events().all();
-```
-
-## ❌ Error Handling
-
-### Define Errors
-
-```rust
-#[contracterror]
-#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
-#[repr(u32)]
-pub enum Error {
-    InvalidAmount = 1,
-    Unauthorized = 2,
-    AlreadyInitialized = 3,
-}
-```
-
-### Use Errors
-
-```rust
-// Return Result
-pub fn transfer(env: Env, amount: i128) -> Result<(), Error> {
-    if amount <= 0 {
-        return Err(Error::InvalidAmount);
-    }
-    Ok(())
-}
-
-// Or panic
-if amount <= 0 {
-    panic!("Invalid amount");
-}
-```
-
-## 🧪 Testing
-
-```rust
-#[cfg(test)]
-mod test {
-    use super::*;
-    use soroban_sdk::{Env, testutils::Address as _};
-
-    #[test]
-    fn test_function() {
-        let env = Env::default();
-        env.mock_all_auths();
-
-        let contract_id = env.register_contract(None, MyContract);
-        let client = MyContractClient::new(&env, &contract_id);
-
-        let result = client.my_function(&42);
-        assert_eq!(result, 84);
-    }
-}
-```
-
-## 📊 Common Data Types
-
-### Primitives
-
-```rust
-let a: u32 = 100;
-let b: u64 = 1000;
+let a: u32  = 100;
+let b: u64  = 1_000_000;
 let c: i128 = -500;
 let d: bool = true;
 ```
 
-### Soroban Types
+### Soroban-Specific Types
 
 ```rust
-use soroban_sdk::{Address, Symbol, String, Bytes, BytesN, Vec, Map};
+use soroban_sdk::{Address, Bytes, BytesN, Map, String, Symbol, Vec};
 
-// Address
-let addr = Address::from_string(&String::from_str(&env, "G..."));
+// Address — a Stellar account or contract address
+let addr: Address = Address::from_string(&String::from_str(&env, "GABC...XYZ"));
 
-// Symbol
-let sym = symbol_short!("HELLO");  // Up to 9 chars
-let sym = Symbol::new(&env, "long_symbol");  // > 9 chars
+// Symbol — short identifiers (≤9 chars use the macro)
+let short = symbol_short!("transfer");          // up to 9 chars
+let long  = Symbol::new(&env, "long_key_name"); // any length
 
 // String
-let s = String::from_str(&env, "Hello, World!");
+let s = String::from_str(&env, "Hello, Soroban!");
 
-// Bytes
-let b = Bytes::from_slice(&env, &[1, 2, 3]);
+// Bytes (variable length)
+let b = Bytes::from_slice(&env, &[0x01, 0x02, 0x03]);
 
-// BytesN (fixed size)
+// BytesN (fixed length, e.g. 32-byte hash)
 let hash: BytesN<32> = BytesN::from_array(&env, &[0u8; 32]);
 
 // Vec
-let v = vec![&env, 1, 2, 3];
+let v: Vec<u64> = vec![&env, 1, 2, 3];
 
 // Map
-let mut m = Map::new(&env);
-m.set(key, value);
+let mut m: Map<Symbol, u64> = Map::new(&env);
+m.set(symbol_short!("key"), 42u64);
+let val = m.get(symbol_short!("key")).unwrap();
 ```
 
-## 🔢 Math Operations
+### Type Conversions
 
 ```rust
-// Checked operations (recommended)
-let sum = a.checked_add(b).expect("Overflow");
-let diff = a.checked_sub(b).expect("Underflow");
-let prod = a.checked_mul(b).expect("Overflow");
-let quot = a.checked_div(b).expect("Division by zero");
+// u32 <-> u64
+let x: u64 = 42u32 as u64;
+let y: u32 = 42u64 as u32;
 
-// Saturating operations
-let sum = a.saturating_add(b);  // Clamps at max value
+// i128 arithmetic (common for token amounts)
+let amount: i128 = 1_000_000_000; // 100 XLM in stroops
+
+// Address to/from String
+let addr_str = String::from_str(&env, "GABC...XYZ");
+let addr = Address::from_string(&addr_str);
+
+// Bytes to BytesN
+let fixed: BytesN<4> = BytesN::from_array(&env, &[1, 2, 3, 4]);
 ```
 
-## ⏰ Time & Ledger
+### Math (use checked ops to avoid panics)
 
 ```rust
-// Current timestamp
-let time = env.ledger().timestamp();
+let sum  = a.checked_add(b).expect("overflow");
+let diff = a.checked_sub(b).expect("underflow");
+let prod = a.checked_mul(b).expect("overflow");
+let quot = a.checked_div(b).expect("division by zero");
 
-// Current ledger sequence
-let seq = env.ledger().sequence();
-
-// In tests - set time
-env.ledger().with_mut(|li| {
-    li.timestamp = 1640000000;
-    li.sequence = 1000;
-});
+// Saturating (clamps instead of panicking)
+let clamped = a.saturating_add(u64::MAX);
 ```
 
-## 🔄 Contract Interactions
+---
+
+## Storage Patterns
+
+Soroban has three storage tiers with different TTL (time-to-live) behaviors.
+
+### Persistent Storage
+
+Use for long-lived data (balances, ownership records).
 
 ```rust
-// Call another contract
-let other_contract = OtherContractClient::new(&env, &contract_id);
-let result = other_contract.some_function(&arg);
+// Write
+env.storage().persistent().set(&DataKey::Balance(addr.clone()), &amount);
 
-// Get current contract address
-let this = env.current_contract_address();
+// Read
+let balance: i128 = env.storage().persistent()
+    .get(&DataKey::Balance(addr.clone()))
+    .unwrap_or(0);
+
+// Check existence
+let exists = env.storage().persistent().has(&DataKey::Balance(addr.clone()));
+
+// Delete
+env.storage().persistent().remove(&DataKey::Balance(addr.clone()));
+
+// Extend TTL (threshold, extend_to in ledgers)
+env.storage().persistent().extend_ttl(&DataKey::Balance(addr.clone()), 100, 500);
 ```
 
-## 🚀 Build & Deploy
+### Instance Storage
 
-```bash
-# Build
-cargo build --target wasm32-unknown-unknown --release
+Use for contract-level config (admin, settings). TTL is tied to the contract instance.
 
-# Or with Soroban CLI
-soroban contract build
+```rust
+env.storage().instance().set(&symbol_short!("admin"), &admin_addr);
 
-# Deploy
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
-  --source alice \
-  --network testnet
+let admin: Address = env.storage().instance()
+    .get(&symbol_short!("admin"))
+    .unwrap();
 
-# Invoke
-soroban contract invoke \
-  --id <CONTRACT_ID> \
-  --source alice \
-  --network testnet \
-  -- \
-  function_name \
-  --arg value
+// Extend the contract instance TTL
+env.storage().instance().extend_ttl(100, 500);
 ```
 
-## 📝 Common Patterns
+### Temporary Storage
 
-### Initialization
+Use for short-lived data (nonces, session state). Automatically archived after TTL.
+
+```rust
+env.storage().temporary().set(&symbol_short!("nonce"), &nonce_val);
+
+let nonce: u64 = env.storage().temporary()
+    .get(&symbol_short!("nonce"))
+    .unwrap_or(0);
+
+env.storage().temporary().extend_ttl(&symbol_short!("nonce"), 50, 100);
+```
+
+### Common Storage Key Pattern
+
+```rust
+#[contracttype]
+pub enum DataKey {
+    Admin,
+    Balance(Address),
+    Allowance(Address, Address),
+}
+```
+
+---
+
+## Authentication Patterns
+
+### Require Auth from an Address
+
+```rust
+// Caller must sign the transaction authorizing this call
+pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
+    from.require_auth();
+    // ... transfer logic
+}
+```
+
+### Require Auth with Specific Arguments
+
+```rust
+use soroban_sdk::auth::ContractContext;
+
+pub fn approve(env: Env, owner: Address, spender: Address, amount: i128) {
+    owner.require_auth_for_args((spender.clone(), amount).into_val(&env));
+    // ... approval logic
+}
+```
+
+### Admin-Only Functions
+
+```rust
+fn require_admin(env: &Env) -> Address {
+    let admin: Address = env.storage().instance()
+        .get(&symbol_short!("admin"))
+        .expect("not initialized");
+    admin.require_auth();
+    admin
+}
+
+pub fn set_fee(env: Env, new_fee: u32) {
+    require_admin(&env);
+    env.storage().instance().set(&symbol_short!("fee"), &new_fee);
+}
+```
+
+### Initialization Guard
 
 ```rust
 pub fn initialize(env: Env, admin: Address) {
     if env.storage().instance().has(&symbol_short!("init")) {
-        panic!("Already initialized");
+        panic!("already initialized");
     }
     env.storage().instance().set(&symbol_short!("admin"), &admin);
     env.storage().instance().set(&symbol_short!("init"), &true);
 }
 ```
 
-### Admin Check
+### Testing Auth
 
 ```rust
-fn require_admin(env: &Env, caller: &Address) {
-    let admin: Address = env.storage().instance()
-        .get(&symbol_short!("admin"))
-        .unwrap();
-    if caller != &admin {
-        panic!("Unauthorized");
+#[test]
+fn test_admin_only() {
+    let env = Env::default();
+    env.mock_all_auths(); // auto-approve all auth checks in tests
+
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&env, &contract_id);
+
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
+    client.set_fee(&admin, &50u32);
+}
+```
+
+---
+
+## Event Patterns
+
+### Emit a Simple Event
+
+```rust
+// topic tuple + data value
+env.events().publish(
+    (symbol_short!("transfer"),),
+    amount,
+);
+```
+
+### Emit with Multiple Topics
+
+```rust
+// Up to 4 topics; topics are indexed for filtering
+env.events().publish(
+    (symbol_short!("transfer"), from.clone(), to.clone()),
+    amount,
+);
+```
+
+### Structured Event Data
+
+```rust
+#[contracttype]
+pub struct TransferEvent {
+    pub from: Address,
+    pub to: Address,
+    pub amount: i128,
+}
+
+env.events().publish(
+    (symbol_short!("transfer"),),
+    TransferEvent { from, to, amount },
+);
+```
+
+### Reading Events in Tests
+
+```rust
+#[test]
+fn test_events() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&env, &contract_id);
+
+    client.transfer(&from, &to, &1000i128);
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 1);
+
+    // Inspect the event
+    let (topics, data): (soroban_sdk::Vec<soroban_sdk::Val>, soroban_sdk::Val) =
+        events.first().unwrap();
+}
+```
+
+### Querying Events On-Chain (CLI)
+
+```bash
+soroban events \
+  --start-ledger <LEDGER> \
+  --id <CONTRACT_ID> \
+  --network testnet
+```
+
+---
+
+## Error Handling
+
+### Define Contract Errors
+
+```rust
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum Error {
+    NotInitialized   = 1,
+    AlreadyExists    = 2,
+    InvalidAmount    = 3,
+    Unauthorized     = 4,
+    InsufficientFunds = 5,
+}
+```
+
+### Return Results
+
+```rust
+pub fn transfer(env: Env, from: Address, amount: i128) -> Result<(), Error> {
+    if amount <= 0 {
+        return Err(Error::InvalidAmount);
     }
-    admin.require_auth();
+    let balance = get_balance(&env, &from);
+    if balance < amount {
+        return Err(Error::InsufficientFunds);
+    }
+    // ...
+    Ok(())
 }
 ```
 
-### Balance Operations
+---
 
-```rust
-fn get_balance(env: &Env, addr: &Address) -> i128 {
-    env.storage().persistent()
-        .get(&DataKey::Balance(addr.clone()))
-        .unwrap_or(0)
-}
-
-fn set_balance(env: &Env, addr: &Address, amount: i128) {
-    env.storage().persistent()
-        .set(&DataKey::Balance(addr.clone()), &amount);
-}
-
-fn add_balance(env: &Env, addr: &Address, amount: i128) {
-    let balance = get_balance(env, addr);
-    set_balance(env, addr, balance + amount);
-}
-```
-
-## 🔍 Debugging
+## Testing
 
 ```rust
 #[cfg(test)]
 mod test {
+    use super::*;
+    use soroban_sdk::{testutils::Address as _, Env};
+
     #[test]
-    fn debug_test() {
+    fn test_transfer() {
         let env = Env::default();
+        env.mock_all_auths();
 
-        // Enable logging
-        env.logs().enable();
+        let contract_id = env.register_contract(None, MyContract);
+        let client = MyContractClient::new(&env, &contract_id);
 
-        // Your test code
+        let alice = Address::generate(&env);
+        let bob   = Address::generate(&env);
 
-        // Print logs
-        println!("{:?}", env.logs().all());
+        client.initialize(&alice);
+        client.mint(&alice, &1000i128);
+        client.transfer(&alice, &bob, &500i128);
+
+        assert_eq!(client.balance(&bob), 500i128);
     }
 }
 ```
 
-## 📦 Useful Macros
+### Manipulate Ledger Time in Tests
 
 ```rust
-// Symbol macros
-symbol_short!("short")    // ≤ 9 characters
-symbol!("long_symbol")    // > 9 characters
-
-// Vector macro
-vec![&env, 1, 2, 3]
-
-// Bytes macro
-bytes![&env, 0x01, 0x02, 0x03]
-
-// Map construction
-map![&env, (key1, val1), (key2, val2)]
+env.ledger().with_mut(|li| {
+    li.timestamp = 1_700_000_000;
+    li.sequence  = 1000;
+});
 ```
-
-## 🔗 Resources
-
-- [Full Documentation](https://developers.stellar.org/docs/smart-contracts)
-- [SDK Reference](https://docs.rs/soroban-sdk/)
-- [Examples](../examples/)
-- [Discord](https://discord.gg/stellardev)
 
 ---
 
-**Keep this handy while coding!** 📚
+## Build & Deploy
+
+```bash
+# Build
+soroban contract build
+
+# Deploy to testnet
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
+  --source alice \
+  --network testnet)
+
+# Invoke
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  transfer \
+  --from $(soroban keys address alice) \
+  --to GDEST... \
+  --amount 1000
+```
+
+---
+
+## Useful Macros
+
+```rust
+symbol_short!("short")          // Symbol ≤ 9 chars
+Symbol::new(&env, "long_name")  // Symbol any length
+vec![&env, 1u64, 2, 3]         // Vec<u64>
+bytes![&env, 0x01, 0x02]        // Bytes
+map![&env, (k1, v1), (k2, v2)] // Map
+```
+
+---
+
+## Resources
+
+- [Soroban Developer Docs](https://developers.stellar.org/docs/smart-contracts)
+- [soroban-sdk API Reference](https://docs.rs/soroban-sdk/)
+- [Examples](../examples/)
+- [Deployment Guide](../guides/deployment.md)
+- [Stellar Discord](https://discord.gg/stellardev)

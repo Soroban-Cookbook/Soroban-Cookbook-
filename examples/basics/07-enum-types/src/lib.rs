@@ -234,7 +234,7 @@ impl EnumContract {
         role: UserRole,
     ) -> Result<(), ContractError> {
         // Validate admin role
-        let admin_role = Self::get_user_role(env.clone(), admin.clone());
+        let admin_role = Self::get_user_role(env.clone(), admin);
         if admin_role != UserRole::Owner && admin_role != UserRole::Admin {
             return Err(ContractError::InsufficientRole);
         }
@@ -265,7 +265,7 @@ impl EnumContract {
             TransactionType::Deposit => Self::validate_deposit(env.clone(), amount, to),
             TransactionType::Withdraw => Self::validate_withdraw(env.clone(), amount, to),
             TransactionType::Mint => Self::validate_mint(env.clone(), amount, to),
-            TransactionType::Burn => Self::validate_burn(env.clone(), amount, to),
+            TransactionType::Burn => Self::validate_burn(env, amount, to),
         }
     }
 

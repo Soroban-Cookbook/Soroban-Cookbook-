@@ -1,20 +1,47 @@
+# Codecov configuration
+# https://docs.codecov.com/docs/codecovyml-reference
+
 coverage:
+  # Minimum precision for coverage percentages (2 decimal places)
+  precision: 2
+  round: down
+  range: "70...100"
+
   status:
+    # Overall project coverage — informational only so CI never hard-fails
+    # on coverage drops (coverage is a signal, not a gate, for this project)
     project:
       default:
         informational: true
+        threshold: "1%"   # allow up to 1% drop before flagging
+    # Per-PR patch coverage — warn if new code is under-tested
     patch:
       default:
         informational: true
+        target: "80%"     # aim for 80% coverage on new/changed lines
 
+# Pull request comment layout
 comment:
-  layout: "reach, diff, flags, files"
+  layout: "reach, diff, flags, files, footer"
   behavior: default
-  require_changes: false
+  require_changes: true   # only comment when coverage actually changes
+  require_base: false
+  require_head: true
 
-# Ensure files that are not relevant to coverage metrics don't skew results
+# Flag management enables historical tracking per component.
+# Each flag corresponds to a named upload in the CI workflow.
+flag_management:
+  default_rules:
+    carryforward: true    # carry forward coverage from the previous run
+                          # when a flag is not uploaded (e.g. skipped job)
+
+# Ignore paths that are not meaningful for coverage metrics
 ignore:
   - "**/test_snapshots/**"
   - "**/target/**"
   - "**/.github/**"
   - "**/scripts/**"
+  - "tarpaulin.toml"
+  - "codecov.yml"
+  - "book/**"
+  - "docs/**"

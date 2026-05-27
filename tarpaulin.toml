@@ -1,0 +1,40 @@
+# cargo-tarpaulin configuration
+# https://github.com/xd009642/tarpaulin#configuration-file
+#
+# Run locally with: cargo tarpaulin
+# This config is also used by CI — see .github/workflows/ci.yml (coverage job).
+
+[default]
+# Measure coverage for the entire workspace
+workspace = true
+
+# Enable all feature flags so conditional code paths are included
+all-features = true
+
+# Output formats:
+#   xml  → Cobertura XML, consumed by Codecov
+#   html → human-readable report for local review
+#   lcov → standard format supported by many editors / tools
+out = ["xml", "html", "lcov"]
+
+# Write all reports into a dedicated directory to keep the repo root clean
+output-dir = "coverage"
+
+# Kill a test binary that runs longer than 5 minutes (prevents CI hangs)
+timeout = "300s"
+
+# Exclude files that don't need coverage measurement
+exclude-files = [
+    "*/test.rs",          # test modules themselves
+    "target/*",           # build artifacts
+    ".github/*",          # CI config
+]
+
+# Count each line only once even if hit by multiple test binaries
+count = false
+
+# Don't fail if a test binary produces no coverage data (e.g. build scripts)
+ignore-panics = true
+
+# Follow symbolic links when discovering source files
+follow-exec = true

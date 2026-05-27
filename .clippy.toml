@@ -1,0 +1,15 @@
+# Clippy configuration for the Soroban Cookbook workspace.
+# Applied automatically when `cargo clippy` is run.
+# CI enforces these alongside the -D warnings flag in .github/workflows/ci.yml.
+
+# Maximum cyclomatic complexity allowed per function before clippy warns.
+# Clippy default: 25. Tighten this value over time as the codebase matures.
+cognitive-complexity-threshold = 25
+
+# Warn when a public function takes more than this many arguments.
+# Clippy default: 7. Prefer grouping related parameters into a struct.
+too-many-arguments-threshold = 7
+
+# Warn when a function body exceeds this many lines.
+# Clippy default: 100.
+too-many-lines-threshold = 100

@@ -1,7 +1,7 @@
 //! Unit tests for the Hello World contract.
 
 use super::*;
-use soroban_sdk::{symbol_short, vec, Env};
+use soroban_sdk::{symbol_short, vec, Env, Symbol};
 
 /// Basic greeting test: the returned Vec should be ["Hello", "World"].
 #[test]
@@ -43,6 +43,18 @@ fn test_hello_second_element_is_name() {
     assert_eq!(result.get(1).unwrap(), name);
 }
 
+/// Benchmark the hello function.
+#[test]
+fn test_hello_benchmark() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    env.budget().reset_default();
+    let _result = client.hello(&symbol_short!("World"));
+    env.budget().print();
+}
+
 /// The greeting with different valid symbol names.
 #[test]
 fn test_hello_with_different_names() {
@@ -60,4 +72,32 @@ fn test_hello_with_different_names() {
         assert_eq!(result.get(0).unwrap(), symbol_short!("Hello"));
         assert_eq!(result.get(1).unwrap(), name);
     }
+}
+
+/// Edge case: allow dynamic symbols beyond `symbol_short!` length limits.
+#[test]
+fn test_hello_with_long_symbol_input() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    let long_name = Symbol::new(&env, "LongerName12345");
+    let result = client.hello(&long_name);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result.get(0).unwrap(), symbol_short!("Hello"));
+    assert_eq!(result.get(1).unwrap(), long_name);
+}
+
+/// Edge case: single-character names should still preserve payload shape/content.
+#[test]
+fn test_hello_with_single_character_name() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    let name = symbol_short!("A");
+    let result = client.hello(&name);
+
+    assert_eq!(result, vec![&env, symbol_short!("Hello"), name]);
 }

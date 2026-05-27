@@ -157,6 +157,15 @@ pub fn hello(env: Env, to: Symbol) -> Vec<Symbol> {
 
 ---
 
+### [12-error-handling](../examples/basics/12-error-handling/)
+**Foundational error handling** using Result and panic.
+
+**Key Concepts:**
+- `#[contracterror]`, `Result<T, E>`, error codes
+- `try_*` client methods, invariant panics
+
+---
+
 **Supporting:** events/, instance-storage/, persistent-storage/, temporary_storage/
 
 ## 🚀 Quick Start

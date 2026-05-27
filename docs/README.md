@@ -2,7 +2,7 @@
 
 Welcome to the Soroban Cookbook documentation. Use this index to find what you need quickly.
 
-## Quick Links
+## Quick Links.
 
 | I want to…                  | Go to                                                         |
 | --------------------------- | ------------------------------------------------------------- |
@@ -11,17 +11,21 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 | Learn to test contracts     | [Testing Guide](../book/src/guides/testing.md)               |
 | Deploy to testnet           | [Deployment Guide](../book/src/guides/deployment.md)         |
 | Migrate from Ethereum       | [Ethereum → Soroban](../book/src/guides/ethereum-to-soroban.md) |
+| Fix a build or test error   | [Troubleshooting](./troubleshooting.md)                      |
 | Look up a term              | [Glossary](./glossary.md)                                    |
 | See common patterns         | [Common Patterns](./common-patterns.md)                      |
 | Check best practices        | [Best Practices](./best-practices.md)                        |
+| Follow style guide          | [Style Guide](./style-guide.md)                              |
 | Get a cheat sheet           | [Quick Reference](./quick-reference.md)                      |
 
 ## Reference Documentation
 
 - [Best Practices](./best-practices.md) — Security, storage, and code quality guidelines
+- [Style Guide](./style-guide.md) — Naming, documentation, and testing standards
 - [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
 - [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
 - [Glossary](./glossary.md) — Key terms and concepts
+- [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds
 
 ### Architecture Decision Records
 

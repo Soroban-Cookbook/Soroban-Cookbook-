@@ -3,7 +3,7 @@ title = "Soroban Cookbook"
 authors = ["Soroban Cookbook Contributors"]
 description = "A comprehensive guide to building smart contracts on Stellar with Soroban"
 language = "en"
-src = "book/src"
+src = "src"
 
 [build]
 build-dir = "book-output"

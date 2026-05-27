@@ -1,0 +1,83 @@
+name: Security Audit
+
+on:
+  # Run on pushes/PRs to main when dependency files change
+  push:
+    branches: ["main"]
+    paths:
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "**/Cargo.toml"
+      - "**/Cargo.lock"
+  # Weekly scheduled run — every Monday at 08:00 UTC
+  schedule:
+    - cron: "0 8 * * 1"
+  # Allow manual triggering from the Actions tab
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_VERSION: "stable"
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────────────
+  # Job: cargo audit
+  # Checks all workspace dependencies against the RustSec Advisory Database.
+  # Fails on any vulnerability with HIGH or CRITICAL severity.
+  # ─────────────────────────────────────────────────────────────────────────
+  audit:
+    name: Dependency Security Audit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+
+      # Cache both the Cargo registry and the compiled cargo-audit binary so
+      # repeated runs don't rebuild it from source every time.
+      - name: Cache Cargo registry and tools
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/cargo-audit
+            ~/.cargo/.crates.toml
+            ~/.cargo/.crates2.json
+          key: ${{ runner.os }}-cargo-audit-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-audit-
+
+      - name: Install cargo-audit
+        run: |
+          if ! command -v cargo-audit &> /dev/null; then
+            cargo install cargo-audit --locked
+          fi
+
+      # --deny warnings  → fail on any advisory (vulnerability or warning)
+      # --deny unsound   → fail on unsound code advisories
+      # The exit code is non-zero when any denial rule is triggered, which
+      # causes the job — and therefore the workflow — to fail.
+      - name: Run security audit
+        run: cargo audit --deny warnings --deny unsound
+
+      # Upload the full audit report as an artifact so it can be reviewed
+      # even after the job has failed.
+      - name: Generate audit report (JSON)
+        if: always()
+        run: cargo audit --json > audit-report.json || true
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: audit-report.json
+          retention-days: 30

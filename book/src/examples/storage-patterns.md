@@ -60,6 +60,7 @@ env.storage().temporary().set(&key, &value);
 - Isolation demo (same key in all 3 types)
 - Unit tests
 - Deployment instructions
+- Focused follow-up examples for [instance storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/instance-storage), [persistent storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/persistent-storage), and [temporary storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/temporary_storage)
 
 ```
 cd examples/basics/02-storage-patterns

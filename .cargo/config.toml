@@ -4,3 +4,8 @@
 # together. Disabling reference-types prevents LLVM from emitting the
 # extended call_indirect encoding.
 rustflags = ["-C", "target-feature=-reference-types"]
+
+[build]
+# Default build target for WASM contract compilation.
+# Override per-invocation with --target if needed (e.g. for host-native tests).
+target = "wasm32-unknown-unknown"

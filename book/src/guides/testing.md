@@ -10,6 +10,8 @@ Testing is crucial for smart contract development. This guide covers:
 - Integration testing multi-contract interactions
 - Test organization and best practices
 - Advanced testing techniques
+- Snapshot testing and coverage tools
+- Common testing patterns and anti-patterns
 
 ## 🧪 Test Types
 
@@ -180,7 +182,168 @@ fn test_auth() {
 
 ## ✅ Best Practices
 
-### 1. Test Edge Cases
+### 1. Use Descriptive Test Names
+
+Test names should clearly describe what is being tested and the expected outcome.
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_transfer_succeeds_with_sufficient_balance() { }
+
+#[test]
+fn test_transfer_fails_with_insufficient_balance() { }
+
+#[test]
+fn test_transfer_fails_when_sender_not_authorized() { }
+```
+
+❌ **DON'T:**
+
+```rust
+#[test]
+fn test_transfer() { }
+
+#[test]
+fn test_1() { }
+
+#[test]
+fn test_error() { }
+```
+
+### 2. Test Both Happy Path and Error Cases
+
+Every function should have tests for success and failure scenarios.
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_withdraw_succeeds_with_sufficient_balance() {
+    // ... test successful withdrawal
+}
+
+#[test]
+#[should_panic(expected = "insufficient balance")]
+fn test_withdraw_fails_with_insufficient_balance() {
+    // ... test withdrawal failure
+}
+```
+
+### 3. Use Assertions with Descriptive Messages
+
+Include context in assertion messages to aid debugging.
+
+✅ **DO:**
+
+```rust
+assert_eq!(
+    balance,
+    expected_balance,
+    "Balance should be {} after transfer, got {}",
+    expected_balance,
+    balance
+);
+```
+
+### 4. Keep Tests Focused and Independent
+
+Each test should verify one behavior. Tests should not depend on other tests.
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_increment_increases_counter_by_one() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, Counter);
+    let client = CounterClient::new(&env, &contract_id);
+
+    assert_eq!(client.value(), 0);
+    client.increment();
+    assert_eq!(client.value(), 1);
+}
+```
+
+### 5. Mock Authorization Appropriately
+
+Use `env.mock_all_auths()` for unit tests, but test authorization logic explicitly when needed.
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_transfer_logic_with_mocked_auth() {
+    let env = Env::default();
+    env.mock_all_auths();  // Focus on transfer logic
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // Test transfer logic
+}
+
+#[test]
+fn test_transfer_requires_sender_authorization() {
+    let env = Env::default();
+    // Don't mock auth - test authorization explicitly
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // Test that unauthorized transfers fail
+}
+```
+
+### 6. Test Edge Cases
+
+Include tests for boundary conditions and edge cases.
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_transfer_zero_amount() {
+    // Test edge case: zero transfer
+}
+
+#[test]
+fn test_transfer_max_u64_amount() {
+    // Test edge case: maximum value
+}
+
+#[test]
+fn test_transfer_to_self() {
+    // Test edge case: self-transfer
+}
+```
+
+### 7. Use Fixtures for Common Setup
+
+Create helper functions to reduce test boilerplate.
+
+✅ **DO:**
+
+```rust
+fn setup_test_env() -> (Env, Address, Address) {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    (env, user1, user2)
+}
+
+#[test]
+fn test_transfer() {
+    let (env, user1, user2) = setup_test_env();
+    // ... test logic
+}
+```
+
+### 8. Test Edge Cases (Existing)
 
 ```rust
 #[test]
@@ -200,7 +363,7 @@ fn test_edge_cases() {
 }
 ```
 
-### 2. Test Error Conditions
+### 9. Test Error Conditions
 
 ```rust
 #[test]
@@ -217,7 +380,7 @@ fn test_insufficient_balance() {
 }
 ```
 
-### 3. Use Descriptive Test Names
+### 10. Use Descriptive Test Names (Existing)
 
 ```rust
 // Good ✅
@@ -238,7 +401,7 @@ fn test1() { }
 fn transfer() { }
 ```
 
-### 4. Test Storage Behavior
+### 11. Test Storage Behavior
 
 ```rust
 #[test]
@@ -256,6 +419,149 @@ fn test_storage_persistence() {
     // Update value
     client.set_value(&100);
     assert_eq!(client.get_value(), 100);
+}
+```
+
+### 12. Test Events
+
+```rust
+#[test]
+fn test_events() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&env, &contract_id);
+
+    client.transfer(&from, &to, &100);
+
+    // Get emitted events
+    let events = env.events().all();
+
+    // Verify event was emitted
+    assert_eq!(events.len(), 1);
+    // ... verify event data
+}
+```
+
+## ⚠️ Common Testing Pitfalls
+
+### 1. Forgetting to Mock Authorization
+
+❌ **DON'T:**
+
+```rust
+#[test]
+fn test_transfer() {
+    let env = Env::default();
+    // Forgot env.mock_all_auths()!
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // This will fail due to missing authorization
+    client.transfer(&from, &to, &100);
+}
+```
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_transfer() {
+    let env = Env::default();
+    env.mock_all_auths();  // Always mock auth for unit tests
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    client.transfer(&from, &to, &100);
+}
+```
+
+### 2. Not Extending TTL for Persistent Storage
+
+❌ **DON'T:**
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&key, &1000);
+    // Forgot to extend TTL!
+
+    let value: u64 = env.storage().persistent().get(&key).unwrap();
+    assert_eq!(value, 1000);
+}
+```
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&key, &1000);
+    env.storage().persistent().extend_ttl(&key, 100, 100);  // Extend TTL
+
+    let value: u64 = env.storage().persistent().get(&key).unwrap();
+    assert_eq!(value, 1000);
+}
+```
+
+### 3. Testing Multiple Behaviors in One Test
+
+❌ **DON'T:**
+
+```rust
+#[test]
+fn test_everything() {
+    // Tests initialization, transfer, and withdrawal in one test
+    // Hard to debug when it fails
+}
+```
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_initialization() { }
+
+#[test]
+fn test_transfer() { }
+
+#[test]
+fn test_withdrawal() { }
+```
+
+### 4. Ignoring Error Cases
+
+❌ **DON'T:**
+
+```rust
+#[test]
+fn test_transfer() {
+    // Only test the happy path
+    client.transfer(&from, &to, &100);
+    assert_eq!(client.balance(&to), 100);
+}
+```
+
+✅ **DO:**
+
+```rust
+#[test]
+fn test_transfer_succeeds() {
+    client.transfer(&from, &to, &100);
+    assert_eq!(client.balance(&to), 100);
+}
+
+#[test]
+#[should_panic]
+fn test_transfer_fails_with_insufficient_balance() {
+    client.transfer(&from, &to, &1000000);
 }
 ```
 
@@ -314,7 +620,14 @@ fn emits_expected_event_shape() {
 }
 ```
 
-Tips:
+**When to use:**
+
+- Testing complex data structures
+- Verifying serialization/deserialization
+- Regression testing for output changes
+- Testing event emissions
+
+**Tips:**
 
 - Prefer deterministic inputs (fixed timestamps/amounts) before snapshot assertions.
 - Snapshot only stable values (avoid non-deterministic IDs unless normalized first).
@@ -331,19 +644,41 @@ insta = "1"
 
 The repository CI already uses `cargo-tarpaulin` and uploads Cobertura XML to Codecov.
 
-Run coverage locally:
+### Cargo Tarpaulin
+
+**Installation:**
 
 ```bash
 cargo install cargo-tarpaulin --locked
-cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300
 ```
 
-Alternative (LLVM-based):
+**Usage:**
+
+```bash
+# Generate HTML coverage report
+cargo tarpaulin --workspace --all-features --out Html --output-dir ./coverage --timeout 300
+
+# Generate Cobertura XML for CI/CD
+cargo tarpaulin --workspace --all-features --out Xml --output-dir ./coverage --timeout 300
+
+# Exclude specific files
+cargo tarpaulin --exclude-files tests/* --workspace
+```
+
+### Alternative: LLVM-based Coverage
 
 ```bash
 cargo install cargo-llvm-cov --locked
 cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
 ```
+
+### Coverage Goals
+
+- **Minimum:** >80% line coverage
+- **Target:** >90% line coverage
+- **Ideal:** >95% line coverage
+
+Focus on covering critical paths and error conditions, not just achieving high percentages.
 
 Use coverage reports to identify untested error paths, auth branches, and storage edge cases.
 

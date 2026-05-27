@@ -1,205 +1,321 @@
 # Deployment Guide
 
-Complete guide to deploying Soroban smart contracts to testnet and mainnet.
+Complete guide for deploying Soroban smart contracts to Testnet and Mainnet.
 
-## 📋 Prerequisites
+## Prerequisites
 
-- Soroban CLI installed (`cargo install soroban-cli`)
-- Contract built and tested
-- Funded account with XLM (for testnet: use friendbot, for mainnet: purchase)
-
-## 🌐 Network Configuration
-
-### Testnet Setup
+- Rust installed with `wasm32-unknown-unknown` target
+- Soroban CLI installed: `cargo install --locked soroban-cli`
+- A funded Stellar account (testnet: friendbot; mainnet: purchase XLM)
 
 ```bash
-# Add testnet network
+# Add the WASM target if not already present
+rustup target add wasm32-unknown-unknown
+
+# Verify Soroban CLI installation
+soroban --version
+```
+
+---
+
+## Network Configuration
+
+### Testnet
+
+```bash
+# Add testnet network configuration
 soroban network add \
   --global testnet \
   --rpc-url https://soroban-testnet.stellar.org:443 \
   --network-passphrase "Test SDF Network ; September 2015"
 
-# Verify network was added
+# Verify
 soroban network ls
 ```
 
-### Mainnet Setup
+### Mainnet
 
 ```bash
-# Add mainnet network
+# Add mainnet network configuration
 soroban network add \
   --global mainnet \
   --rpc-url https://soroban-mainnet.stellar.org:443 \
   --network-passphrase "Public Global Stellar Network ; September 2015"
+
+# Verify
+soroban network ls
 ```
 
-## 🔑 Identity Management
+---
+
+## Identity Management
 
 ### Create an Identity
 
 ```bash
-# Generate a new identity
+# Generate a new keypair and store it locally
 soroban keys generate alice --network testnet
 
 # View the public key
 soroban keys address alice
 
-# List all identities
+# List all stored identities
 soroban keys ls
 ```
 
 ### Security Best Practices
 
-⚠️ **Important:** Never commit private keys to version control!
+> Never commit private keys to version control.
 
 ```bash
-# Add to .gitignore
+# Ensure local key storage is gitignored
 echo ".soroban/" >> .gitignore
 echo "*.key" >> .gitignore
 ```
 
-For mainnet:
-
-- Store keys securely (hardware wallet, encrypted storage)
-- Use separate keys for different purposes
+For mainnet deployments:
+- Use a hardware wallet or encrypted key storage
+- Keep separate keys for deployment vs. admin operations
 - Implement key rotation policies
-- Consider multi-signature setups
+- Consider multi-signature setups for high-value contracts
 
-## 💰 Funding Your Account
+---
 
-### Testnet Funding
+## Funding Your Account
+
+### Testnet (Friendbot)
 
 ```bash
-# Fund account from friendbot (testnet only)
+# Fund your testnet account via friendbot
 soroban keys fund alice --network testnet
 
-# Verify balance
+# Check balance
 soroban keys balance alice --network testnet
 ```
 
-### Mainnet Funding
+You can also fund via the web: `https://friendbot.stellar.org?addr=<YOUR_PUBLIC_KEY>`
 
-For mainnet, you need to acquire XLM:
+### Mainnet
 
 1. Purchase XLM from an exchange
-2. Send to your Stellar address
-3. Keep enough for transaction fees and rent
+2. Send to your Stellar address (`soroban keys address alice`)
+3. Maintain enough XLM for transaction fees and storage rent
 
-## 🏗️ Building Your Contract
+---
 
-### Standard Build
+## Building Your Contract
 
 ```bash
-# Navigate to your contract directory
-cd my-contract
+# From your contract directory
+soroban contract build
 
-# Build for WASM
+# Or manually with cargo
 cargo build --target wasm32-unknown-unknown --release
+```
 
-# Or use Soroban CLI
+The compiled WASM will be at:
+`target/wasm32-unknown-unknown/release/<contract_name>.wasm`
+
+---
+
+## Testnet Deployment Steps
+
+### Step 1: Build
+
+```bash
 soroban contract build
 ```
 
-### Optimized Build
+### Step 2: Deploy
 
 ```bash
-# Install optimization tools
-cargo install cargo-wasm-opt
-
-# Build with optimizations
-cargo build --target wasm32-unknown-unknown --release
-cargo wasm-opt -- -Oz -o output.wasm target/wasm32-unknown-unknown/release/input.wasm
-```
-
-## 🚀 Deployment
-
-### Deploy to Testnet
-
-```bash
-# Basic deployment
-soroban contract deploy \
+CONTRACT_ID=$(soroban contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
   --source alice \
-  --network testnet
+  --network testnet)
 
-# Save the returned contract ID
-# Example output: CA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAXE
+echo "Deployed contract ID: $CONTRACT_ID"
 ```
 
-### Deploy with Specific Contract ID
+### Step 3: Verify
 
 ```bash
-# Install the contract with a specific ID
-soroban contract install \
-  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
-  --source alice \
+# Fetch contract info
+soroban contract info \
+  --id $CONTRACT_ID \
   --network testnet
 ```
 
-### Deploy to Mainnet
+### Step 4: Initialize (if required)
 
 ```bash
-# ⚠️ CAUTION: This deploys to production!
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  initialize \
+  --admin $(soroban keys address alice)
+```
 
-# Ensure you're ready:
-# - Contract is thoroughly tested
-# - Security audit completed
-# - Sufficient XLM balance
-# - Emergency response plan in place
+### Step 5: Invoke Functions
 
-soroban contract deploy \
+```bash
+# Call a read function (no fee required)
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --network testnet \
+  -- \
+  get_balance \
+  --address $(soroban keys address alice)
+
+# Call a write function
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  transfer \
+  --from $(soroban keys address alice) \
+  --to GDEST... \
+  --amount 1000
+```
+
+---
+
+## Mainnet Deployment Steps
+
+> Ensure your contract is thoroughly tested on testnet before proceeding.
+
+### Pre-deployment Checklist
+
+- [ ] All tests passing (`cargo test`)
+- [ ] Security audit completed
+- [ ] Code reviewed by multiple developers
+- [ ] Upgrade/emergency mechanism tested
+- [ ] Sufficient XLM balance confirmed
+- [ ] Monitoring plan in place
+
+### Step 1: Build (optimized)
+
+```bash
+soroban contract build
+```
+
+### Step 2: Deploy
+
+```bash
+# CAUTION: This deploys to production
+CONTRACT_ID=$(soroban contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
-  --source mainnet-key \
+  --source mainnet-deployer \
+  --network mainnet)
+
+echo "Mainnet contract ID: $CONTRACT_ID"
+# Save this ID — it cannot be recovered if lost
+```
+
+### Step 3: Verify on Mainnet
+
+```bash
+soroban contract info \
+  --id $CONTRACT_ID \
   --network mainnet
 ```
 
-## ✅ Verify Deployment
-
-### Check Contract Info
+### Step 4: Initialize
 
 ```bash
-# Get contract details
-soroban contract info \
-  --id <CONTRACT_ID> \
-  --network testnet
-
-# Fetch contract WASM
-soroban contract fetch \
-  --id <CONTRACT_ID> \
-  --network testnet \
-  --out-file fetched.wasm
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source mainnet-deployer \
+  --network mainnet \
+  -- \
+  initialize \
+  --admin $(soroban keys address mainnet-deployer)
 ```
 
-### Test Contract Functions
+### Step 5: Invoke and Validate
 
 ```bash
-# Invoke a contract function
+# Verify a read function returns expected state
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --network mainnet \
+  -- \
+  get_admin
+```
+
+---
+
+## Contract Invocation Examples
+
+### Basic Invocation
+
+```bash
 soroban contract invoke \
   --id <CONTRACT_ID> \
   --source alice \
   --network testnet \
   -- \
-  function_name \
-  --arg1 value1 \
-  --arg2 value2
+  <function_name> \
+  --param_name value
 ```
 
-## 🔄 Contract Upgrades
+### Passing Different Argument Types
 
-### Upgradeable Contracts
+```bash
+# u64 / i128
+soroban contract invoke ... -- my_fn --amount 1000000
 
-Soroban supports contract upgrades through a proxy pattern:
+# Address
+soroban contract invoke ... -- my_fn --recipient GABC...XYZ
+
+# Boolean
+soroban contract invoke ... -- my_fn --enabled true
+
+# String
+soroban contract invoke ... -- my_fn --label "hello"
+
+# Bytes (hex-encoded)
+soroban contract invoke ... -- my_fn --data 0xdeadbeef
+```
+
+### Simulating Without Submitting
+
+```bash
+# Dry-run to estimate fees and check for errors
+soroban contract invoke \
+  --id <CONTRACT_ID> \
+  --source alice \
+  --network testnet \
+  --send no \
+  -- \
+  transfer \
+  --amount 500
+```
+
+### Reading Events After Invocation
+
+```bash
+soroban events \
+  --start-ledger <LEDGER_NUMBER> \
+  --id <CONTRACT_ID> \
+  --network testnet
+```
+
+---
+
+## Contract Upgrades
+
+### Upgradeable Contract Pattern
 
 ```rust
-// In your upgradeable contract
 pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
-    // Check authorization
     let admin: Address = env.storage().instance()
         .get(&symbol_short!("admin"))
         .unwrap();
     admin.require_auth();
-
-    // Update contract code
     env.deployer().update_current_contract_wasm(new_wasm_hash);
 }
 ```
@@ -207,98 +323,48 @@ pub fn upgrade(env: Env, new_wasm_hash: BytesN<32>) {
 ### Upgrade Process
 
 ```bash
-# 1. Install new WASM
-NEW_WASM_HASH=$(soroban contract install \
-  --wasm target/wasm32-unknown-unknown/release/new_version.wasm \
+# 1. Install the new WASM and capture its hash
+NEW_HASH=$(soroban contract install \
+  --wasm target/wasm32-unknown-unknown/release/my_contract_v2.wasm \
   --source alice \
   --network testnet)
 
-# 2. Call upgrade function
+# 2. Call the upgrade function on the existing contract
 soroban contract invoke \
-  --id <CONTRACT_ID> \
+  --id $CONTRACT_ID \
   --source alice \
   --network testnet \
   -- \
   upgrade \
-  --new_wasm_hash $NEW_WASM_HASH
+  --new_wasm_hash $NEW_HASH
 ```
 
-## 📊 Cost Estimation
+---
 
-### Estimating Fees
+## Fee Estimation
 
 ```bash
-# Simulate a transaction to see costs
+# Simulate to see resource usage and fees
 soroban contract invoke \
   --id <CONTRACT_ID> \
   --source alice \
   --network testnet \
+  --send no \
   -- \
   my_function \
   --arg 123
 ```
 
-### Fee Components
+Fee components:
+- Network fee: base transaction fee
+- Resource fee: CPU, memory, and I/O costs
+- Rent: storage TTL extension costs
 
-Soroban fees include:
+---
 
-- **Network Fee**: Base transaction fee
-- **Resource Fee**: CPU, memory, storage costs
-- **Rent**: Storage persistence (TTL extensions)
+## Emergency Procedures
 
-```bash
-# View detailed fee breakdown
-soroban contract invoke \
-  --id <CONTRACT_ID> \
-  --source alice \
-  --network testnet \
-  --fee 1000000 \
-  -- \
-  my_function
-```
-
-## 🔍 Monitoring
-
-### View Transaction History
-
-```bash
-# Get recent transactions for an address
-stellar-cli events \
-  --start-ledger <LEDGER> \
-  --id <CONTRACT_ID> \
-  --network testnet
-```
-
-### Event Monitoring
-
-```bash
-# Subscribe to contract events
-soroban events \
-  --start-ledger <LEDGER> \
-  --id <CONTRACT_ID> \
-  --network testnet
-```
-
-## 🛡️ Security Checklist
-
-Before mainnet deployment:
-
-- [ ] All tests passing
-- [ ] Security audit completed
-- [ ] Code review by multiple developers
-- [ ] Upgrade mechanism tested (if applicable)
-- [ ] Emergency pause/stop mechanism (if needed)
-- [ ] Documentation complete
-- [ ] Monitoring and alerts configured
-- [ ] Backup and recovery plan
-- [ ] Legal compliance reviewed
-- [ ] Bug bounty program considered
-
-## 🚨 Emergency Procedures
-
-### Pause Contract
-
-Implement a pause function:
+### Pause / Unpause Pattern
 
 ```rust
 pub fn pause(env: Env) {
@@ -310,29 +376,20 @@ pub fn unpause(env: Env) {
     require_admin(&env);
     env.storage().instance().remove(&symbol_short!("paused"));
 }
+
+fn check_not_paused(env: &Env) {
+    if env.storage().instance().has(&symbol_short!("paused")) {
+        panic!("Contract is paused");
+    }
+}
 ```
 
-### Emergency Contact
+---
 
-Have a plan for:
-
-- User communication (Discord, Twitter, email)
-- Incident response team
-- Coordinated disclosure process
-
-## 📚 Additional Resources
+## Additional Resources
 
 - [Soroban CLI Reference](https://developers.stellar.org/docs/tools/developer-tools/cli)
 - [Network Configuration](https://developers.stellar.org/docs/networks)
 - [Fee Documentation](https://developers.stellar.org/docs/smart-contracts/fees)
-- [State Archival](https://developers.stellar.org/docs/smart-contracts/state-archival)
-
-## 🤝 Getting Help
-
+- [State Archival & TTL](https://developers.stellar.org/docs/smart-contracts/state-archival)
 - [Stellar Discord](https://discord.gg/stellardev)
-- [Developer Documentation](https://developers.stellar.org)
-- [GitHub Issues](https://github.com/stellar/soroban-cli/issues)
-
----
-
-**Deploy with confidence!** Test thoroughly on testnet before moving to mainnet.

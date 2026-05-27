@@ -20,7 +20,7 @@ mdbook serve  # http://localhost:2345
 
 ```bash
 ./scripts/build.sh  # Builds contracts + mdbook
-mdbook build       # Docs only
+cd book && mdbook build       # Docs only
 ```
 
 ## Structure
