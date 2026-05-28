@@ -9,10 +9,11 @@
 #![cfg(test)]
 
 use multi_party_auth;
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec};
 use soroban_sdk::{
-    testutils::IssuerFlags,
+    symbol_short,
+    testutils::{Address as _, IssuerFlags},
     token::{StellarAssetClient, TokenClient},
+    Address, Env, IntoVal, Symbol, Vec,
 };
 use token_wrapper;
 
