@@ -111,7 +111,10 @@ fn test_validate_rejects_zero_count_header() {
 
     // Manually craft a blob with count = 0.
     let mut bad = Bytes::new(&env);
-    bad.push_back(0); bad.push_back(0); bad.push_back(0); bad.push_back(0);
+    bad.push_back(0);
+    bad.push_back(0);
+    bad.push_back(0);
+    bad.push_back(0);
     assert!(!client.validate_auth_vec(&bad));
 }
 
@@ -121,11 +124,14 @@ fn test_auth_vec_len() {
     let contract_id = env.register_contract(None, MultiPartyAuthContract);
     let client = MultiPartyAuthContractClient::new(&env, &contract_id);
 
-    let signers = Vec::from_array(&env, [
-        Address::generate(&env),
-        Address::generate(&env),
-        Address::generate(&env),
-    ]);
+    let signers = Vec::from_array(
+        &env,
+        [
+            Address::generate(&env),
+            Address::generate(&env),
+            Address::generate(&env),
+        ],
+    );
     let encoded = client.encode_auth_vec(&signers);
     assert_eq!(client.auth_vec_len(&encoded), 3);
 }

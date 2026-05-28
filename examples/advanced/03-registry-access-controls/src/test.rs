@@ -54,7 +54,6 @@ fn test_fee_enforcement() {
 
     // Initialize without whitelist-only and fee = 10
     client.init(&owner, &false, &10i128);
-
 }
 
 #[test]

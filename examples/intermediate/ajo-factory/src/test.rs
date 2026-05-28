@@ -19,7 +19,9 @@ fn test_ajo_factory_workflow() {
     let amount = 1000i128;
     let max_members = 10u32;
 
-    let ajo_address = factory_client.create_ajo(&amount, &max_members, &creator).unwrap();
+    let ajo_address = factory_client
+        .create_ajo(&amount, &max_members, &creator)
+        .unwrap();
 
     // 4. Verify the new Ajo instance
     let ajo_client = AjoClient::new(&env, &ajo_address);
@@ -33,7 +35,9 @@ fn test_ajo_factory_workflow() {
 
     // 6. Create another Ajo instance with the same creator (different salt)
     let amount2 = 2000i128;
-    let ajo_address2 = factory_client.create_ajo(&amount2, &max_members, &creator).unwrap();
+    let ajo_address2 = factory_client
+        .create_ajo(&amount2, &max_members, &creator)
+        .unwrap();
 
     assert_ne!(ajo_address, ajo_address2);
 

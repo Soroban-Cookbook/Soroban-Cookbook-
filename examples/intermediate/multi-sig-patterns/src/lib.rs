@@ -50,13 +50,13 @@ impl MultiPartyAuth {
         if threshold == 0 || threshold > signers.len() {
             return Err(AuthError::InvalidThreshold);
         }
-        
+
         env.storage()
             .instance()
             .set(&DataKey::Threshold, &threshold);
         env.storage().instance().set(&DataKey::Signers, &signers);
         env.storage().instance().set(&DataKey::ProposalCount, &0u32);
-        
+
         Ok(())
     }
 
@@ -64,10 +64,12 @@ impl MultiPartyAuth {
     pub fn create_proposal(env: Env, proposer: Address) -> Result<u32, AuthError> {
         proposer.require_auth();
 
-        let signers: Vec<Address> = env.storage().instance()
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
             .get(&DataKey::Signers)
             .ok_or(AuthError::NotAuthorized)?;
-            
+
         if !signers.contains(&proposer) {
             return Err(AuthError::NotAuthorized);
         }
@@ -98,10 +100,12 @@ impl MultiPartyAuth {
     pub fn approve(env: Env, proposal_id: u32, signer: Address) -> Result<(), AuthError> {
         signer.require_auth();
 
-        let signers: Vec<Address> = env.storage().instance()
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
             .get(&DataKey::Signers)
             .ok_or(AuthError::NotAuthorized)?;
-            
+
         if !signers.contains(&signer) {
             return Err(AuthError::NotAuthorized);
         }
@@ -124,7 +128,7 @@ impl MultiPartyAuth {
         env.storage()
             .persistent()
             .set(&DataKey::Proposal(proposal_id), &proposal);
-            
+
         Ok(())
     }
 
@@ -132,10 +136,12 @@ impl MultiPartyAuth {
     pub fn execute(env: Env, proposal_id: u32, executor: Address) -> Result<bool, AuthError> {
         executor.require_auth();
 
-        let threshold: u32 = env.storage().instance()
+        let threshold: u32 = env
+            .storage()
+            .instance()
             .get(&DataKey::Threshold)
             .ok_or(AuthError::NotAuthorized)?;
-            
+
         let mut proposal: Proposal = env
             .storage()
             .persistent()
@@ -176,10 +182,12 @@ impl MultiPartyAuth {
 
     /// Require authorization from all configured signers
     pub fn require_all_signers(env: Env) -> Result<bool, AuthError> {
-        let signers: Vec<Address> = env.storage().instance()
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
             .get(&DataKey::Signers)
             .ok_or(AuthError::NotAuthorized)?;
-            
+
         for signer in signers.iter() {
             signer.require_auth();
         }

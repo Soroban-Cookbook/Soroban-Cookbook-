@@ -38,7 +38,7 @@ fn test_client_try_divide_error() {
 
     // Use try_ methods to capture errors without panicking
     let result = client.try_divide(&100, &0);
-    
+
     // The result is an InvokeError which can be compared with the custom error
     assert_eq!(result, Err(Ok(Error::ZeroInput)));
 }
@@ -50,8 +50,14 @@ fn test_check_positive_success() {
 
 #[test]
 fn test_check_positive_error() {
-    assert_eq!(ErrorHandlingContract::check_positive(0), Err(Error::ZeroInput));
-    assert_eq!(ErrorHandlingContract::check_positive(-1), Err(Error::ZeroInput));
+    assert_eq!(
+        ErrorHandlingContract::check_positive(0),
+        Err(Error::ZeroInput)
+    );
+    assert_eq!(
+        ErrorHandlingContract::check_positive(-1),
+        Err(Error::ZeroInput)
+    );
 }
 
 #[test]

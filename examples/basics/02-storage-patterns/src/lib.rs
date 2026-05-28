@@ -1,9 +1,11 @@
-//! Storage Patterns Contract
+//! # Storage Patterns Contract
 //!
 //! Demonstrates the three types of storage available in Soroban:
-//! - Persistent: Data that lives long-term and requires TTL management
+//! - Persistent: Data that lives permanently (requires TTL management)
 //! - Temporary: Data that only exists for the current ledger
-//! - Instance: Data tied to the contract instance lifetime (shared TTL)
+//! - Instance: Data tied to the contract instance lifetime
+//!
+//! Each storage type has different cost and lifetime characteristics.
 
 #![no_std]
 
@@ -25,18 +27,27 @@ pub struct StorageContract;
 impl StorageContract {
     // ==================== PERSISTENT STORAGE ====================
 
-    /// Stores a value in persistent storage and extends its TTL.
+    /// Stores a value in persistent storage.
+    /// Persistent data remains until explicitly deleted and requires TTL extension.
     pub fn set_persistent(env: Env, key: Symbol, value: u64) {
         let storage_key = DataKey::Persistent(key.clone());
+        // Store in persistent storage
         env.storage().persistent().set(&storage_key, &value);
-        // Extend TTL so data survives ledger advances in tests
-        env.storage().persistent().extend_ttl(&storage_key, 100, 1000);
-        env.events()
-            .publish((symbol_short!("persist"), symbol_short!("set")), (key, value));
+
+        // Extend TTL to keep data alive
+        // Parameters: (key, threshold_ledgers, extend_to_ledgers)
+        env.storage()
+            .persistent()
+            .extend_ttl(&storage_key, 1000, 10000);
+
+        // EVENT: Persistent storage updated
+        env.events().publish(
+            (symbol_short!("persist"), symbol_short!("set")),
+            (key, value),
+        );
     }
 
     /// Retrieves a value from persistent storage.
-    /// Returns `Some(value)` if present, or `None`.
     pub fn get_persistent(env: Env, key: Symbol) -> Option<u64> {
         env.storage().persistent().get(&DataKey::Persistent(key))
     }
@@ -46,9 +57,13 @@ impl StorageContract {
         env.storage().persistent().has(&DataKey::Persistent(key))
     }
 
-    /// Removes a value from persistent storage and emits an event.
+    /// Removes a value from persistent storage.
     pub fn remove_persistent(env: Env, key: Symbol) {
-        env.storage().persistent().remove(&DataKey::Persistent(key.clone()));
+        env.storage()
+            .persistent()
+            .remove(&DataKey::Persistent(key.clone()));
+
+        // EVENT: Persistent storage removed
         env.events()
             .publish((symbol_short!("persist"), symbol_short!("remove")), key);
     }
@@ -57,13 +72,16 @@ impl StorageContract {
 
     /// Stores a value in temporary storage.
     pub fn set_temporary(env: Env, key: Symbol, value: u64) {
-        env.storage().temporary().set(&DataKey::Temporary(key.clone()), &value);
+        env.storage()
+            .temporary()
+            .set(&DataKey::Temporary(key.clone()), &value);
+
+        // EVENT: Temporary storage updated
         env.events()
             .publish((symbol_short!("temp"), symbol_short!("set")), (key, value));
     }
 
     /// Retrieves a value from temporary storage.
-    /// Returns `Some(value)` if present, or `None`.
     pub fn get_temporary(env: Env, key: Symbol) -> Option<u64> {
         env.storage().temporary().get(&DataKey::Temporary(key))
     }
@@ -75,16 +93,22 @@ impl StorageContract {
 
     // ==================== INSTANCE STORAGE ====================
 
-    /// Stores a value in instance storage and extends the instance TTL.
+    /// Stores a value in instance storage.
     pub fn set_instance(env: Env, key: Symbol, value: u64) {
-        env.storage().instance().set(&DataKey::Instance(key.clone()), &value);
+        let storage_key = DataKey::Instance(key.clone());
+        env.storage().instance().set(&storage_key, &value);
+
+        // Extend instance storage TTL
         env.storage().instance().extend_ttl(1000, 10000);
-        env.events()
-            .publish((symbol_short!("instance"), symbol_short!("set")), (key, value));
+
+        // EVENT: Instance storage updated
+        env.events().publish(
+            (symbol_short!("instance"), symbol_short!("set")),
+            (key, value),
+        );
     }
 
     /// Retrieves a value from instance storage.
-    /// Returns `Some(value)` if present, or `None`.
     pub fn get_instance(env: Env, key: Symbol) -> Option<u64> {
         env.storage().instance().get(&DataKey::Instance(key))
     }
@@ -94,9 +118,13 @@ impl StorageContract {
         env.storage().instance().has(&DataKey::Instance(key))
     }
 
-    /// Removes a value from instance storage and emits an event.
+    /// Removes a value from instance storage.
     pub fn remove_instance(env: Env, key: Symbol) {
-        env.storage().instance().remove(&DataKey::Instance(key.clone()));
+        env.storage()
+            .instance()
+            .remove(&DataKey::Instance(key.clone()));
+
+        // EVENT: Instance storage removed
         env.events()
             .publish((symbol_short!("instance"), symbol_short!("remove")), key);
     }

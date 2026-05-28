@@ -25,7 +25,9 @@ impl RegistryContract {
         if already.is_some() {
             panic!("already initialized");
         }
-        env.storage().instance().set(&DataKey::Owner, &owner.clone());
+        env.storage()
+            .instance()
+            .set(&DataKey::Owner, &owner.clone());
         env.storage()
             .instance()
             .set(&DataKey::WhitelistOnly, &whitelist_only);
@@ -40,7 +42,9 @@ impl RegistryContract {
             .get(&DataKey::Owner)
             .expect("not initialized");
         owner.require_auth();
-        env.storage().instance().set(&DataKey::Whitelist(addr), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::Whitelist(addr), &true);
     }
 
     // Owner-only: remove from whitelist
@@ -90,7 +94,10 @@ impl RegistryContract {
             .unwrap_or(false);
 
         if whitelist_only {
-            let allowed: Option<bool> = env.storage().instance().get(&DataKey::Whitelist(who.clone()));
+            let allowed: Option<bool> = env
+                .storage()
+                .instance()
+                .get(&DataKey::Whitelist(who.clone()));
             if allowed != Some(true) {
                 panic!("not whitelisted");
             }
@@ -101,14 +108,19 @@ impl RegistryContract {
             panic!("insufficient fee");
         }
 
-        env.storage().instance().set(&DataKey::Registered(who), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::Registered(who), &true);
     }
 
     // Anyone can file a removal request (a dispute) against a registered address.
     pub fn request_removal(env: Env, reporter: Address, target: Address, _reason: Symbol) {
         reporter.require_auth();
         // only record a removal request if the target is currently registered
-        let is_reg: Option<bool> = env.storage().instance().get(&DataKey::Registered(target.clone()));
+        let is_reg: Option<bool> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Registered(target.clone()));
         if is_reg == Some(true) {
             env.storage()
                 .instance()
@@ -126,14 +138,21 @@ impl RegistryContract {
         owner.require_auth();
 
         // must have a pending removal request
-        let pending: Option<Address> = env.storage().instance().get(&DataKey::RemovalRequest(target.clone()));
+        let pending: Option<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::RemovalRequest(target.clone()));
         if pending.is_none() {
             panic!("no pending removal");
         }
 
-        env.storage().instance().remove(&DataKey::RemovalRequest(target.clone()));
+        env.storage()
+            .instance()
+            .remove(&DataKey::RemovalRequest(target.clone()));
         if approve {
-            env.storage().instance().remove(&DataKey::Registered(target.clone()));
+            env.storage()
+                .instance()
+                .remove(&DataKey::Registered(target.clone()));
             env.storage().instance().remove(&DataKey::Whitelist(target));
         }
     }

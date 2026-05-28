@@ -347,17 +347,17 @@ impl ValidationContract {
         required_role: UserRole,
     ) -> Result<(), ValidationError> {
         // Check if address is blacklisted
-        let is_blacklisted = env
-            .storage()
-            .instance()
-            .has(&DataKey::Blacklist(address.clone()));
-        require_not_blacklisted(is_blacklisted)?;
+        let is_blacklisted = env.storage().instance().has(&DataKey::Blacklist(address));
+
+        if is_blacklisted {
+            return Err(ValidationError::Blacklisted);
+        }
 
         // Get user role
         let user_role: UserRole = env
             .storage()
             .instance()
-            .get(&DataKey::UserRole(address.clone()))
+            .get(&DataKey::UserRole(address))
             .unwrap_or(UserRole::None);
 
         // Use shared validation pattern for role comparison

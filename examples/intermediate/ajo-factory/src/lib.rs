@@ -9,7 +9,8 @@
 
 #![no_std]
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env, IntoVal, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env,
+    IntoVal, Vec,
 };
 
 #[contracterror]
@@ -39,7 +40,12 @@ pub enum AjoDataKey {
 #[contractimpl]
 impl Ajo {
     /// Initialize a new Ajo instance.
-    pub fn initialize(env: Env, amount: i128, max_members: u32, creator: Address) -> Result<(), FactoryError> {
+    pub fn initialize(
+        env: Env,
+        amount: i128,
+        max_members: u32,
+        creator: Address,
+    ) -> Result<(), FactoryError> {
         // Prevent re-initialization
         if env.storage().instance().has(&AjoDataKey::Creator) {
             return Err(FactoryError::AlreadyInitialized);
@@ -50,7 +56,7 @@ impl Ajo {
             .instance()
             .set(&AjoDataKey::MaxMembers, &max_members);
         env.storage().instance().set(&AjoDataKey::Creator, &creator);
-        
+
         Ok(())
     }
 
@@ -93,18 +99,23 @@ impl AjoFactory {
         env.storage()
             .instance()
             .set(&FactoryDataKey::WasmHash, &wasm_hash);
-        
+
         // Initialize an empty list of deployed Ajos
         let ajos: Vec<Address> = Vec::new(&env);
         env.storage()
             .instance()
             .set(&FactoryDataKey::DeployedAjos, &ajos);
-            
+
         Ok(())
     }
 
     /// Create a new Ajo instance.
-    pub fn create_ajo(env: Env, amount: i128, max_members: u32, creator: Address) -> Result<Address, FactoryError> {
+    pub fn create_ajo(
+        env: Env,
+        amount: i128,
+        max_members: u32,
+        creator: Address,
+    ) -> Result<Address, FactoryError> {
         creator.require_auth();
 
         // Get the Wasm hash
@@ -125,10 +136,7 @@ impl AjoFactory {
         let salt = env.crypto().sha256(&(&creator, ajos.len()).into_val(&env));
 
         // Deploy the contract
-        let deployed_address = env
-            .deployer()
-            .with_current_contract(salt)
-            .deploy(wasm_hash);
+        let deployed_address = env.deployer().with_current_contract(salt).deploy(wasm_hash);
 
         // Initialize the new Ajo instance
         let ajo_client = AjoClient::new(&env, &deployed_address);
