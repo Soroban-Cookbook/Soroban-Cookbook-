@@ -310,12 +310,7 @@ impl MultiPartyAuthContract {
     /// Requires authorization from `caller`, who must already be a member of
     /// the current signer set.  Panics if `new_signer` is already present or
     /// if adding them would exceed `MAX_SIGNERS`.
-    pub fn add_signer(
-        env: Env,
-        caller: Address,
-        proposal_id: Symbol,
-        new_signer: Address,
-    ) {
+    pub fn add_signer(env: Env, caller: Address, proposal_id: Symbol, new_signer: Address) {
         caller.require_auth();
 
         let key = DataKey::Signers(proposal_id.clone());
@@ -406,12 +401,7 @@ impl MultiPartyAuthContract {
     ///
     /// Requires authorization from `caller`, who must be a current signer.
     /// The new threshold must be ≥ 1 and ≤ the current number of signers.
-    pub fn set_threshold(
-        env: Env,
-        caller: Address,
-        proposal_id: Symbol,
-        new_threshold: u32,
-    ) {
+    pub fn set_threshold(env: Env, caller: Address, proposal_id: Symbol, new_threshold: u32) {
         caller.require_auth();
 
         let signers: Vec<Address> = env

@@ -583,7 +583,13 @@ fn test_set_threshold_success() {
     let s3 = Address::generate(&env);
     let proposal_id = Symbol::new(&env, "mgmt7");
 
-    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone(), s2.clone(), s3.clone()]);
+    setup_multisig(
+        &env,
+        &client,
+        &proposal_id,
+        1,
+        &[s1.clone(), s2.clone(), s3.clone()],
+    );
 
     client.set_threshold(&s1, &proposal_id, &3u32);
     assert_eq!(client.get_threshold(&proposal_id), 3);
