@@ -213,3 +213,13 @@ fn test_ajo_cannot_be_reinitialized() {
     let result = ajo_client.try_init_ajo(&100, &10, &creator);
     assert_eq!(result, Err(Ok(FactoryError::AlreadyInitialized)));
 }
+
+#[test]
+fn test_create_ajo_benchmark() {
+    let mut f = setup();
+    let creator = Address::generate(&f.env);
+
+    f.env.budget().reset_default();
+    let _ajo_address = f.factory.create_ajo(&1_000, &10, &creator);
+    f.env.budget().print();
+}

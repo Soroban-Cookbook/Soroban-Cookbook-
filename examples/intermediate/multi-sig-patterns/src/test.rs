@@ -138,6 +138,29 @@ fn test_execute_with_threshold() {
 }
 
 #[test]
+fn test_execute_benchmark() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuth);
+    let client = MultiPartyAuthClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
+
+    client.initialize(&2, &signers);
+    let proposal_id = client.create_proposal(&signer1);
+    client.approve(&proposal_id, &signer1);
+    client.approve(&proposal_id, &signer2);
+
+    env.budget().reset_default();
+    let _result = client.execute(&proposal_id, &signer1);
+    env.budget().print();
+}
+
+#[test]
 fn test_proposal_not_found() {
     let env = Env::default();
     env.mock_all_auths();

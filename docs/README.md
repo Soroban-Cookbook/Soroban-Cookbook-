@@ -17,6 +17,7 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 | Check best practices        | [Best Practices](./best-practices.md)                        |
 | Follow style guide          | [Style Guide](./style-guide.md)                              |
 | Get a cheat sheet           | [Quick Reference](./quick-reference.md)                      |
+| Compare example gas costs   | [Gas Benchmarks](./gas-benchmarks.md)                      |
 
 ## Reference Documentation
 
