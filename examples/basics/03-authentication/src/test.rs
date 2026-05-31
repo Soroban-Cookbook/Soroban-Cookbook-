@@ -103,7 +103,7 @@ fn test_transfer_benchmark() {
     let user2 = Address::generate(&env);
 
     client.set_balance(&admin, &user1, &1000);
-    
+
     println!("--- Transfer with Auth Benchmark ---");
     env.budget().reset_default();
     client.transfer(&user1, &user2, &100);
@@ -302,6 +302,8 @@ fn test_multi_sig_missing_one_auth() {
     env.mock_auths(&[]);
 
     client.multi_sig_action(&signers, &10);
+}
+
 // Role-Based Access Control Tests
 // ---------------------------------------------------------------------------
 

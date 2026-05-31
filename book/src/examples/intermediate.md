@@ -43,6 +43,24 @@ let address = env.deployer()
 AjoClient::new(&env, &address).initialize(...);
 ```
 
+### Storage Migration [./storage-migration/](../examples/intermediate/storage-migration/)
+**Versioned storage upgrades.** Stage migrations, transform legacy storage, and execute in safe batches.
+
+**Key Concepts:**
+- Explicit version tracking
+- Prepared migration state
+- Chunked batch execution
+- Safe rollback/cancellation
+
+### Event History [./event-history/](../examples/intermediate/event-history/)
+**On-chain audit history.** Record event entries persistently and query them with pagination and time filters.
+
+**Key Concepts:**
+- Append-only audit entries
+- Queryable pagination
+- Time-based filtering
+- Storage cap trimming
+
 ---
 
 ## Prerequisites

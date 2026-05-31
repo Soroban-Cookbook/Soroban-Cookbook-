@@ -1,4 +1,5 @@
-[target.wasm32-unknown-unknown]
+# Use the wasm32v1-none target for Soroban-compatible WASM builds.
+[target.wasm32v1-none]
 # Soroban's WASM VM validator rejects the padded-LEB128 table-index encoding
 # that LLVM's fat-LTO backend produces when the whole workspace is compiled
 # together. Disabling reference-types prevents LLVM from emitting the
@@ -8,4 +9,4 @@ rustflags = ["-C", "target-feature=-reference-types"]
 [build]
 # Default build target for WASM contract compilation.
 # Override per-invocation with --target if needed (e.g. for host-native tests).
-target = "wasm32-unknown-unknown"
+target = "wasm32v1-none"

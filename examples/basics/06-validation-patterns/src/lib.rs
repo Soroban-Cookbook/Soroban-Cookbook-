@@ -350,8 +350,9 @@ impl ValidationContract {
         let is_blacklisted = env
             .storage()
             .instance()
-            .has(&DataKey::Blacklist(address))
-        {
+            .has(&DataKey::Blacklist(address));
+        
+        if is_blacklisted {
             return Err(ValidationError::Blacklisted);
         }
 

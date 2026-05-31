@@ -5,6 +5,7 @@
 # Getting Started
 
 - [Setup Environment](./guides/getting-started.md)
+- [macOS Setup Guide](./guides/macos-setup.md)
 - [Testing Guide](./guides/testing.md)
 - [Deployment Guide](./guides/deployment.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)

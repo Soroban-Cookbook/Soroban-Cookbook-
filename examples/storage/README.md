@@ -92,6 +92,7 @@ Explore these practical implementations to see these patterns in action:
 - **[Instance Storage Deep Dive](../basics/instance-storage/)**: Focus on contract-wide configuration and shared TTLs.
 - **[Persistent Storage Deep Dive](../basics/persistent-storage/)**: Focus on per-user data and independent TTLs.
 - **[Temporary Storage Deep Dive](../basics/temporary_storage/)**: Focus on ephemeral state and cost optimization.
+- **[Lazy Cache Patterns](../basics/lazy-cache/)**: Demonstrates lazy loading, temporary caching, eviction, and invalidation for large data sets.
 
 ---
 

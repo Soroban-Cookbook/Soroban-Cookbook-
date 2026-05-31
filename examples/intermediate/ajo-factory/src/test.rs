@@ -12,7 +12,7 @@ struct Fixture {
 fn setup() -> Fixture {
     let env = Env::default();
     env.mock_all_auths();
-
+A
     let template_wasm = [0u8; 0];
     let ajo_hash = env
         .deployer()
@@ -212,4 +212,14 @@ fn test_ajo_cannot_be_reinitialized() {
     ajo_client.init_ajo(&100, &10, &creator);
     let result = ajo_client.try_init_ajo(&100, &10, &creator);
     assert_eq!(result, Err(Ok(FactoryError::AlreadyInitialized)));
+}
+
+#[test]
+fn test_create_ajo_benchmark() {
+    let mut f = setup();
+    let creator = Address::generate(&f.env);
+
+    f.env.budget().reset_default();
+    let _ajo_address = f.factory.create_ajo(&1_000, &10, &creator);
+    f.env.budget().print();
 }

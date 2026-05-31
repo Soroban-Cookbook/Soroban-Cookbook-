@@ -35,6 +35,7 @@ Based on our benchmarks and Soroban best practices, here are several ways to opt
 - **Batch Operations**: Instead of calling `env.storage().persistent().set()` multiple times in a loop, try to consolidate data into a single `Map` or `Vec` if possible.
 - **Choose the Right Type**: Use `Temporary` storage for data that doesn't need to persist indefinitely (e.g., nonces, temporary locks). It is significantly cheaper than `Persistent` storage.
 - **Instance Storage for Config**: Use `Instance` storage for shared contract configuration. It's more efficient than `Persistent` for data that is frequently read but rarely changed.
+- **Batch transfer consolidation**: For multi-recipient transfers, read the sender balance once and write it once instead of repeating the same sender update per recipient.
 
 ### 2. Computational Efficiency
 - **Avoid Large Loops**: Gas costs scale linearly with the number of iterations. For large datasets, consider using pagination or off-chain indexing.

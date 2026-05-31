@@ -2,7 +2,7 @@
 
 Core Soroban fundamentals, one concept per example. Perfect for beginners.
 
-## 📋 Examples (11 total)
+## 📋 Examples (12 total)
 
 ### [01-hello-world](../examples/basics/01-hello-world/)
 **Basic contract structure.** Simplest possible contract - a `hello` function returning greeting.
@@ -46,6 +46,19 @@ pub fn hello(env: Env, to: Symbol) -> Vec<Symbol> {
 **Pro Tip:** Forget TTL extension → data archives!
 
 **Test:** `cargo test -p storage-patterns`
+
+---
+
+### [13-compressed-storage](../examples/basics/13-compressed-storage/)
+**Compress bytes before storage.** Compare raw vs compressed payload size and learn when compression saves ledger bytes.
+
+**Key Concepts:**
+- `Bytes` compression helper functions
+- Run-length encoding (RLE) for repeated payloads
+- Stored size comparison for raw/compressed data
+- When compression helps and when it hurts
+
+**Test:** `cargo test -p compressed-storage`
 
 ---
 

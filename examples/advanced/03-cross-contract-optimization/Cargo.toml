@@ -1,8 +1,14 @@
 [package]
-name = "cross_contract_optimization_placeholder"
+name = "cross-contract-optimization"
 version = "0.1.0"
 edition = "2021"
 publish = false
 
 [lib]
-path = "lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

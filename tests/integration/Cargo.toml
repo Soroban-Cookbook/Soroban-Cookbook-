@@ -11,4 +11,5 @@ storage-patterns = { path = "../../examples/basics/02-storage-patterns" }
 authentication = { path = "../../examples/basics/03-authentication" }
 events-counter = { path = "../../examples/basics/events", package = "events_example" }
 multi-party-auth = { path = "../../examples/advanced/01-multi-party-auth" }
+timelock = { path = "../../examples/advanced/02-timelock" }
 token-wrapper = { path = "../../examples/tokens/token-wrapper" }
