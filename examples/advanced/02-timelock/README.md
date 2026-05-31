@@ -1,83 +1,66 @@
-# Timelock
+# Timelock Contract
 
-A time-delayed execution pattern for Soroban smart contracts. Operations are queued with a mandatory waiting period before they can be executed, providing a safety window for review or cancellation.
+A secure timelock implementation with admin controls for delayed execution of operations.
 
-## 📖 What You'll Learn
+## Features
 
-- How to implement a queue → wait → execute workflow on-chain
-- Using persistent storage to track scheduled operations
-- Enforcing minimum and maximum delays with ledger timestamps
-- Emitting structured events for each lifecycle stage
+### Core Functionality
+- **Queue Operations**: Schedule operations for future execution with configurable delays
+- **Execute Operations**: Execute queued operations after the delay period
+- **Cancel Operations**: Cancel queued operations before execution
 
-## 🎯 Overview
+### Admin Controls
+- **Bounded Delay Updates**: Admin can update min/max delay bounds within absolute limits (30s - 7 days)
+- **Emergency Pause**: Admin can pause/unpause all contract operations
+- **Audit Events**: All admin actions emit audit trail events for transparency
 
-The timelock pattern is a core building block for governance and security-critical contracts. It prevents instant execution of sensitive actions by requiring a delay between scheduling and execution.
+## Usage
 
+### Initialize
+```rust
+client.initialize(&admin_address);
 ```
-Admin queues operation  →  delay passes  →  Admin executes
-         ↓                                        ↑
-    Admin can cancel ──────────────────────────────
-```
-
-**Constants:**
-- `MIN_DELAY`: 60 seconds
-- `MAX_DELAY`: 86,400 seconds (24 hours)
-
-## 🔑 Key Concepts
 
 ### Queue an Operation
-
 ```rust
-pub fn queue(env: Env, operation_id: Bytes, delay: u64) {
-    // delay must be within MIN_DELAY..=MAX_DELAY
-    let execute_at = env.ledger().timestamp() + delay;
-    env.storage().persistent().set(&DataKey::Operation(operation_id), &execute_at);
-}
+client.queue(&operation_id, &delay_seconds);
 ```
 
-### Execute After Delay
-
+### Execute an Operation
 ```rust
-pub fn execute(env: Env, operation_id: Bytes) {
-    let execute_at: u64 = env.storage().persistent().get(&key).expect("not found");
-    if env.ledger().timestamp() < execute_at {
-        panic!("Too early");
-    }
-    env.storage().persistent().remove(&key); // prevents replay
-}
+client.execute(&operation_id);
 ```
 
-### Cancel Before Execution
-
+### Admin Controls
 ```rust
-pub fn cancel(env: Env, operation_id: Bytes) {
-    env.storage().persistent().remove(&DataKey::Operation(operation_id));
-}
+// Update delay bounds (within 30s - 7 days)
+client.update_delay_bounds(&new_min_delay, &new_max_delay);
+
+// Emergency pause
+client.set_pause(&true);  // pause
+client.set_pause(&false); // unpause
+
+// Check current settings
+let (min_delay, max_delay) = client.get_delay_bounds();
+let is_paused = client.is_paused();
 ```
 
-### Operation States
+## Security Features
 
-| State     | Meaning                                      |
-|-----------|----------------------------------------------|
-| `Unknown` | Not queued                                   |
-| `Pending` | Queued, delay not yet passed                 |
-| `Ready`   | Delay passed, can be executed                |
-| `Done`    | Executed and removed from storage            |
+- **Authentication**: All operations require admin authorization
+- **Bounded Configuration**: Delay bounds are constrained to safe ranges
+- **Emergency Controls**: Pause functionality for incident response
+- **Audit Trail**: All admin actions are logged with timestamps
+- **Replay Protection**: Operations are removed after execution
 
-## 🔒 Security Notes
+## Testing
 
-- Only the admin can queue, execute, or cancel operations
-- Operations are removed after execution to prevent replay attacks
-- TTL is extended to `120,960` ledgers (~7 days) to ensure operations don't expire before `MAX_DELAY` passes
-
-## 🚀 Running Tests
-
+Run the test suite:
 ```bash
-cargo test -p timelock
+cargo test
 ```
 
-## 📚 Related Examples
-
-- [01-multi-party-auth](../01-multi-party-auth/) — Multi-party authorization patterns
-- [Governance Examples](../../governance/) — DAOs and voting systems that use timelocks
-- [Advanced Examples](../) — Other complex patterns
+Build as WASM:
+```bash
+cargo build --target wasm32-unknown-unknown --release
+```

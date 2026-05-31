@@ -54,7 +54,7 @@ impl ErrorHandlingContract {
     ///
     /// In Soroban, `panic!` should be reserved for states that should be impossible
     /// if the contract is functioning correctly.
-    pub fn invariant_check(env: Env, value: u32) {
+    pub fn invariant_check(_env: Env, value: u32) {
         // Assume some internal state is retrieved
         // let state = env.storage().instance().get(&key).unwrap_or(0);
 

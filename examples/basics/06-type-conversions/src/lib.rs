@@ -1,5 +1,5 @@
 #![no_std]
-use soroban_sdk::{contract, contractimpl, contracterror, Env, String, TryFromVal, Val};
+use soroban_sdk::{contract, contracterror, contractimpl, Env, String, TryFromVal, Val};
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, Address, Bytes, Env, IntoVal, Map, String,
@@ -50,7 +50,7 @@ pub struct Config {
 pub struct ConversionContract;
 
 #[contractimpl]
-impl TypeConversionsContract {
+impl ConversionContract {
     /// Demonstrates numeric TryFrom/TryInto conversions with overflow checking.
     ///
     /// Uses Rust's standard `TryInto` trait — the same trait that powers
@@ -205,7 +205,7 @@ impl TypeConversionsContract {
         active: bool,
     ) -> UserData {
         let _ = _env; // Suppress unused parameter warning
-        // Validate name length (Symbol limitation)
+                      // Validate name length (Symbol limitation)
         if name.len() > 32 {
             panic!("InvalidStringFormat");
         }
@@ -218,6 +218,7 @@ impl TypeConversionsContract {
             balance,
             active,
         }
+    }
 
     /// Demonstrates `Val` → typed field extraction using a `Map<Symbol, Val>`.
     ///
@@ -237,20 +238,20 @@ impl TypeConversionsContract {
         let max_users_val = val_data
             .get(Symbol::new(&env, "max_users"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let max_users = u32::try_from_val(&env, &max_users_val)
-            .unwrap_or_else(|_| panic!("NumericOverflow"));
+        let max_users =
+            u32::try_from_val(&env, &max_users_val).unwrap_or_else(|_| panic!("NumericOverflow"));
 
         let fee_rate_val = val_data
             .get(Symbol::new(&env, "fee_rate"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let fee_rate = u64::try_from_val(&env, &fee_rate_val)
-            .unwrap_or_else(|_| panic!("NumericOverflow"));
+        let fee_rate =
+            u64::try_from_val(&env, &fee_rate_val).unwrap_or_else(|_| panic!("NumericOverflow"));
 
         let admin_val = val_data
             .get(Symbol::new(&env, "admin"))
             .unwrap_or_else(|| panic!("UnsupportedConversion"));
-        let admin = Address::try_from_val(&env, &admin_val)
-            .unwrap_or_else(|_| panic!("InvalidAddress"));
+        let admin =
+            Address::try_from_val(&env, &admin_val).unwrap_or_else(|_| panic!("InvalidAddress"));
 
         let features_val = val_data
             .get(Symbol::new(&env, "features"))
@@ -360,7 +361,11 @@ impl TypeConversionsContract {
             let mut buf = [0u8; 20];
             s.copy_into_slice(&mut buf[..len]);
 
-            let (negative, start) = if buf[0] == b'-' { (true, 1usize) } else { (false, 0usize) };
+            let (negative, start) = if buf[0] == b'-' {
+                (true, 1usize)
+            } else {
+                (false, 0usize)
+            };
 
             if start >= len {
                 continue; // bare "-" is invalid
@@ -375,7 +380,10 @@ impl TypeConversionsContract {
                     break;
                 }
                 // checked_mul / checked_add to avoid overflow panics
-                acc = match acc.checked_mul(10).and_then(|v| v.checked_add((b - b'0') as i64)) {
+                acc = match acc
+                    .checked_mul(10)
+                    .and_then(|v| v.checked_add((b - b'0') as i64))
+                {
                     Some(v) => v,
                     None => {
                         valid = false;

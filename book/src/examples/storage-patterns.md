@@ -49,6 +49,7 @@ env.storage().temporary().set(&key, &value);
 2. **Use enums for keys**: `#[contracttype] enum DataKey { Balance(Address) }`
 3. **Instance = small config only** (loads all keys together)
 4. **Threshold != 0** in extend_ttl (avoid redundant extensions)
+5. **Compress only when helpful**: compare raw and compressed storage sizes before storing large byte payloads. Compression can reduce rent for repetitive data, but may add cost for small or random payloads.
 
 ## 🔬 Full Example
 
@@ -61,6 +62,7 @@ env.storage().temporary().set(&key, &value);
 - Unit tests
 - Deployment instructions
 - Focused follow-up examples for [instance storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/instance-storage), [persistent storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/persistent-storage), and [temporary storage](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/temporary_storage)
+- Compressed storage examples for comparing raw vs encoded bytes
 
 ```
 cd examples/basics/02-storage-patterns

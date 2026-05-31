@@ -144,7 +144,6 @@ impl MultiPartyAuthContract {
         for signer in signers.iter() {
             signer.require_auth();
         }
-    }
 
         // Audit trail for multi-sig action
         env.events().publish(

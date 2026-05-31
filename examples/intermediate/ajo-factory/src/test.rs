@@ -12,7 +12,7 @@ struct Fixture {
 fn setup() -> Fixture {
     let env = Env::default();
     env.mock_all_auths();
-
+A
     let template_wasm = [0u8; 0];
     let ajo_hash = env
         .deployer()

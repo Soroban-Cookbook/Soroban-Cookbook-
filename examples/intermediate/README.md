@@ -9,9 +9,9 @@ This category contains examples that demonstrate common, real-world design patte
 - **Token Interactions**: Learn how to create contracts that interact with or wrap standard tokens.
 - **Advanced Data Structures**: Examples of iterable maps, queues, and other complex data structures.
 
-## Planned Examples
+## Included Examples
 
-- `02-role-based-access-control`: An RBAC implementation for managing permissions.
-- `03-factory-pattern`: A contract that deploys instances of another contract.
-- `04-token-wrapper`: A contract that wraps a standard token to add new functionality.
-- `05-upgradable-proxy`: A basic proxy pattern for contract upgradability.
+- `ajo-factory/` — Deploying new contract instances with template versioning and registry discovery.
+- `multi-sig-patterns/` — Multi-party authorization with proposal and approval workflows.
+- `storage-migration/` — Versioned storage upgrades with explicit staging and batch execution.
+- `event-history/` — On-chain audit history storage with pagination, filtering, and capacity management.
