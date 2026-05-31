@@ -522,11 +522,7 @@ impl CustomStructsContract {
         let mut portfolio: Portfolio = env
             .storage()
             .instance()
-            .get(&(
-                symbol_short!("portfolio"),
-                owner.clone(),
-                portfolio_name.clone(),
-            ))
+            .get(&(symbol_short!("portfolio"), owner, &portfolio_name))
             .ok_or(ContractError::PortfolioNotFound)?;
 
         // Create new holding

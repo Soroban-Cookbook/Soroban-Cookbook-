@@ -1,7 +1,7 @@
 //! # Error Handling Contract
 //!
 //! This example demonstrates foundational error handling patterns in Soroban,
-//! focusing on the `Result<T, E>` pattern for recoverable errors and `panic!` 
+//! focusing on the `Result<T, E>` pattern for recoverable errors and `panic!`
 //! for irrecoverable invariants.
 //!
 //! Key concepts:
@@ -33,7 +33,7 @@ pub struct ErrorHandlingContract;
 #[contractimpl]
 impl ErrorHandlingContract {
     /// Demonstrates graceful error handling with `Result`.
-    /// 
+    ///
     /// Returns `Ok(a / b)` if `b != 0`, otherwise returns `Err(Error::ZeroInput)`.
     pub fn divide(a: i128, b: i128) -> Result<i128, Error> {
         if b == 0 {
@@ -52,12 +52,12 @@ impl ErrorHandlingContract {
 
     /// Demonstrates an irrecoverable panic for an internal invariant violation.
     ///
-    /// In Soroban, `panic!` should be reserved for states that should be impossible 
+    /// In Soroban, `panic!` should be reserved for states that should be impossible
     /// if the contract is functioning correctly.
     pub fn invariant_check(_env: Env, value: u32) {
         // Assume some internal state is retrieved
         // let state = env.storage().instance().get(&key).unwrap_or(0);
-        
+
         // If state is corrupted, we panic as it's not a user error
         if value > 100 {
             panic!("internal invariant violated: state exceeds maximum allowed value");

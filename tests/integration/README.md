@@ -42,6 +42,10 @@ The integration tests combine multiple basic examples to showcase real-world usa
    - Combines `multi_sig_patterns` and `events-counter`
    - Demonstrates proposal-based governance with audit logs in a separate contract
 
+10. **Token Wrapper End-to-End Flow** (`test_token_wrapper_multi_user_flow`)
+   - Combines the token wrapper with a Stellar asset token
+   - Demonstrates multi-user wrapping, transfer, unwrapping, and backing checks
+
 ## Running the Tests
 
 ### Prerequisites

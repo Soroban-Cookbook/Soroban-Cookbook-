@@ -15,7 +15,7 @@
 //! Provides patterns and utilities for validating user permissions and access controls.
 
 #![no_std]
-use soroban_sdk::{Address, Env, String, Vec, contracterror};
+use soroban_sdk::{contracterror, Address, Env, String, Vec};
 
 // ---------------------------------------------------------------------------
 // Error Types
@@ -360,10 +360,22 @@ mod tests {
         assert!(validate_amount(1000, 1, 1000).is_ok());
 
         // Invalid amounts
-        assert_eq!(validate_amount(0, 1, 1000), Err(ValidationError::InvalidAmount));
-        assert_eq!(validate_amount(-1, 1, 1000), Err(ValidationError::InvalidAmount));
-        assert_eq!(validate_amount(100, 1, 50), Err(ValidationError::AmountTooLarge));
-        assert_eq!(validate_amount(100, 200, 1000), Err(ValidationError::AmountTooSmall));
+        assert_eq!(
+            validate_amount(0, 1, 1000),
+            Err(ValidationError::InvalidAmount)
+        );
+        assert_eq!(
+            validate_amount(-1, 1, 1000),
+            Err(ValidationError::InvalidAmount)
+        );
+        assert_eq!(
+            validate_amount(100, 1, 50),
+            Err(ValidationError::AmountTooLarge)
+        );
+        assert_eq!(
+            validate_amount(100, 200, 1000),
+            Err(ValidationError::AmountTooSmall)
+        );
     }
 
     #[test]
@@ -379,11 +391,17 @@ mod tests {
 
         // Invalid strings
         let empty = String::from_str(&env, "");
-        assert_eq!(validate_string(empty.clone(), 1, 10), Err(ValidationError::StringTooShort));
+        assert_eq!(
+            validate_string(empty.clone(), 1, 10),
+            Err(ValidationError::StringTooShort)
+        );
         assert_eq!(validate_string(empty, 0, 10), Ok(()));
 
         let too_long = String::from_str(&env, "this string is way too long for the limit");
-        assert_eq!(validate_string(too_long, 0, 10), Err(ValidationError::StringTooLong));
+        assert_eq!(
+            validate_string(too_long, 0, 10),
+            Err(ValidationError::StringTooLong)
+        );
     }
 
     #[test]
@@ -408,9 +426,15 @@ mod tests {
 
         // Invalid arrays
         let too_small = Vec::from_array(&env, [1]);
-        assert_eq!(validate_array(too_small, 2, 10), Err(ValidationError::ArrayTooSmall));
+        assert_eq!(
+            validate_array(too_small, 2, 10),
+            Err(ValidationError::ArrayTooSmall)
+        );
 
         let too_large = Vec::from_array(&env, [1, 2, 3, 4, 5, 6]);
-        assert_eq!(validate_array(too_large, 1, 3), Err(ValidationError::ArrayTooLarge));
+        assert_eq!(
+            validate_array(too_large, 1, 3),
+            Err(ValidationError::ArrayTooLarge)
+        );
     }
 }

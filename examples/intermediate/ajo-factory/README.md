@@ -1,60 +1,90 @@
-# Ajo Factory Pattern
+# Factory Templates Pattern
 
-This example demonstrates how to implement a **Contract Factory** in Soroban. A factory contract allows you to dynamically deploy and initialize new contract instances from within another contract.
+This example demonstrates how to build a Soroban factory that manages versioned deployment templates. A factory can register multiple template IDs, validate template-specific parameters, deploy an instance from the registered Wasm hash, and keep metadata for every created instance.
 
-This is the Soroban equivalent of the Ethereum **EIP-1167 Minimal Proxy** pattern (often referred to as "clones").
+The example keeps the original `create_ajo(amount, max_members, creator)` helper, then adds a generic `create_instance(template_id, params, creator)` flow for multiple templates.
 
-## 📋 Features
+## Features
 
-- **Wasm Hash Deployment**: Spawns multiple instances of the same contract code using its unique Wasm hash.
-- **Initialization Guard**: Automatically initializes the new instance immediately after deployment to prevent unauthorized setup.
-- **Salted Addresses**: Uses unique salts (deterministic generation) to ensure each instance has its own address.
-- **Tracking**: Maintains a registry of all deployed instances.
-- **Gas Efficiency**: Uploading the Wasm code once and deploying multiple instances is significantly cheaper than uploading the same code multiple times.
+- Versioned template metadata with `TemplateMetadata`
+- Template registry keyed by `Symbol` IDs such as `ajo`, `savings`, and `escrow`
+- Generic deployment through `create_instance(template_id, params, creator)`
+- Template-specific parameter validation before deployment
+- Instance tracking with template ID, version, deployed address, and creator
+- Backwards-compatible `create_ajo` helper for the original Ajo workflow
 
-## 🧠 Key Concepts
+## Template IDs
 
-### 1. `env.deployer()`
+| Template | Parameter Variant | Validation |
+| --- | --- | --- |
+| `ajo` | `TemplateParams::Ajo(AjoParams)` | `amount > 0`, `max_members >= 2` |
+| `savings` | `TemplateParams::Savings(SavingsParams)` | `target_amount > 0`, `deadline > 0` |
+| `escrow` | `TemplateParams::Escrow(EscrowParams)` | `amount > 0` |
 
-The `deployer()` host function provides the interface for creating new contracts. In this example, we use `with_current_contract(salt)` to specify the salt for address derivation.
+## Register a Template
 
-```rust
-let deployed_address = env
-    .deployer()
-    .with_current_contract(salt)
-    .deploy(wasm_hash);
-```
-
-### 2. Wasm Hash
-
-In Soroban, code is separated from state. You upload the contract's Wasm binary once to the network, which returns a `BytesN<32>` Wasm hash. Any contract can then use this hash to create new instances.
-
-### 3. Initialization Pattern
-
-Because Soroban contracts don't have a traditional constructor that runs during deployment (the WASM is immutable), we use an `initialize` method. The factory calls this method immediately after deployment:
+Upload the template contract Wasm once, then register the hash with an ID and version:
 
 ```rust
-let ajo_client = AjoClient::new(&env, &deployed_address);
-ajo_client.initialize(&amount, &max_members, &creator);
+let wasm_hash = env.deployer().upload_contract_wasm(template_wasm);
+
+factory_client.register_template(
+    &symbol_short!("savings"),
+    &wasm_hash,
+    &symbol_short!("v1"),
+);
 ```
 
-## 🛠️ Usage
+The factory stores:
 
-### Build the Contract
+```rust
+pub struct TemplateMetadata {
+    pub template_id: Symbol,
+    pub version: Symbol,
+    pub wasm_hash: BytesN<32>,
+}
+```
+
+## Create an Instance
+
+```rust
+let address = factory_client.create_instance(
+    &symbol_short!("savings"),
+    &TemplateParams::Savings(SavingsParams {
+        target_amount: 5_000,
+        deadline: 1_800_000_000,
+    }),
+    &creator,
+);
+```
+
+The factory checks that:
+
+- The template ID is registered
+- The supplied parameter variant matches the template ID
+- The parameters satisfy that template's validation rules
+
+If validation succeeds, the factory deploys the registered Wasm hash and records the new instance.
+
+## Add a New Template
+
+1. Define a new template ID constant, for example `pub const TEMPLATE_VAULT: Symbol = symbol_short!("vault");`.
+2. Add a `#[contracttype]` params struct for that template.
+3. Add a new `TemplateParams` enum variant wrapping the params struct.
+4. Extend `validate_template_params` with the new template ID and validation rules.
+5. Register the new template hash with `register_template(template_id, wasm_hash, version)`.
+6. Add tests for successful creation, metadata lookup, parameter validation, and mismatched parameter variants.
+
+## Run Tests
+
+The workspace defaults to the Wasm target for contract builds. Unit tests that use `soroban-sdk/testutils` must run on a native target:
 
 ```bash
-cargo build --target wasm32-unknown-unknown --release
+cargo test -p ajo-factory --target aarch64-apple-darwin
 ```
 
-### Run Tests
+For contract build validation:
 
 ```bash
-cargo test
+cargo build -p ajo-factory
 ```
-
-## 🎯 When to use this?
-
-- **SPV (Special Purpose Vehicles)**: Like the "Ajo" savings groups where each group needs its own isolated state and logic.
-- **DAO Governance**: Deploying a new governance structure for each proposal or sub-DAO.
-- **Marketplaces**: Creating individual escrow or listing contracts for each transaction.
-- **Multi-tenant Applications**: Isolating user data into separate contracts for maximum security and independent TTL (Time To Live) management.

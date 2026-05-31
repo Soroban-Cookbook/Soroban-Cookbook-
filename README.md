@@ -133,6 +133,7 @@ Core Soroban concepts, one at a time.
 
 | Example | Concepts |
 | --- | --- |
+| [hello-world](./examples/hello-world/) | Minimal contract struct, `#[contractimpl]`, returning vectors |
 | [01-hello-world](./examples/basics/01-hello-world/) | Contract struct, `#[contract]` / `#[contractimpl]`, unit tests |
 | [02-storage-patterns](./examples/basics/02-storage-patterns/) | `persistent`, `instance`, `temporary` storage, TTL |
 | [03-authentication](./examples/basics/03-authentication/) | `require_auth()`, admin roles, balances |

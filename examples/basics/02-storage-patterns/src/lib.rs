@@ -36,7 +36,9 @@ impl StorageContract {
 
         // Extend TTL to keep data alive
         // Parameters: (key, threshold_ledgers, extend_to_ledgers)
-        env.storage().persistent().extend_ttl(&storage_key, 1000, 10000);
+        env.storage()
+            .persistent()
+            .extend_ttl(&storage_key, 1000, 10000);
 
         // EVENT: Persistent storage updated
         env.events().publish(
@@ -57,7 +59,9 @@ impl StorageContract {
 
     /// Removes a value from persistent storage.
     pub fn remove_persistent(env: Env, key: Symbol) {
-        env.storage().persistent().remove(&DataKey::Persistent(key.clone()));
+        env.storage()
+            .persistent()
+            .remove(&DataKey::Persistent(key.clone()));
 
         // EVENT: Persistent storage removed
         env.events()
@@ -68,7 +72,9 @@ impl StorageContract {
 
     /// Stores a value in temporary storage.
     pub fn set_temporary(env: Env, key: Symbol, value: u64) {
-        env.storage().temporary().set(&DataKey::Temporary(key.clone()), &value);
+        env.storage()
+            .temporary()
+            .set(&DataKey::Temporary(key.clone()), &value);
 
         // EVENT: Temporary storage updated
         env.events()
@@ -114,7 +120,9 @@ impl StorageContract {
 
     /// Removes a value from instance storage.
     pub fn remove_instance(env: Env, key: Symbol) {
-        env.storage().instance().remove(&DataKey::Instance(key.clone()));
+        env.storage()
+            .instance()
+            .remove(&DataKey::Instance(key.clone()));
 
         // EVENT: Instance storage removed
         env.events()

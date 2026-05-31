@@ -1,114 +1,126 @@
 # Getting Started with Soroban
 
-Welcome to Soroban smart contract development! This guide will help you set up your development environment and deploy your first contract.
+This guide walks you through everything you need to write, test, and deploy your first Soroban smart contract from a fresh machine to a live contract on testnet.
 
-## 📋 Prerequisites
+## Prerequisites
 
-- Basic knowledge of Rust programming
-- Familiarity with blockchain concepts (helpful but not required)
-- Command line comfort
+Before you start, make sure you have:
 
-## 🛠️ Installation
+- A Unix-like terminal (macOS, Linux, or WSL2 on Windows)
+- Basic familiarity with the command line
+- No prior Rust experience required, but the [Rust Book](https://doc.rust-lang.org/book/) is a great companion
 
-### 1. Install Rust
+## Step 1: Install Rust
 
-If you don't have Rust installed:
+Soroban contracts are written in Rust and compiled to WebAssembly. Install the Rust toolchain via `rustup`:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Verify installation:
+Follow the on-screen prompts (the default installation is fine). Then reload your shell:
+
+```bash
+source "$HOME/.cargo/env"
+```
+
+Verify the installation:
 
 ```bash
 rustc --version
 cargo --version
 ```
 
-### 2. Add WASM Target
+Soroban requires Rust 1.74 or later. Run `rustup update stable` if your version is older.
 
-Soroban contracts compile to WebAssembly:
+## Step 2: Add the WebAssembly Target
+
+Soroban contracts compile to WebAssembly (WASM). Add the target:
 
 ```bash
 rustup target add wasm32-unknown-unknown
 ```
 
-### 3. Install Soroban CLI
-
-The Soroban CLI is essential for building, testing, and deploying contracts:
+Verify it was added:
 
 ```bash
-cargo install --locked soroban-cli --features opt
+rustup target list --installed | grep wasm32
 ```
 
-Verify installation:
+## Step 3: Install the Soroban CLI
+
+The Soroban CLI handles building, testing, deploying, and invoking contracts:
 
 ```bash
-soroban --version
+cargo install --locked stellar-cli --features opt
 ```
 
-### 4. Configure Your Editor (Optional but Recommended)
+The package is now published as `stellar-cli` (which includes the `soroban` functionality). If you have an older `soroban-cli` installed, uninstall it first:
 
-#### VS Code
+```bash
+cargo uninstall soroban-cli
+```
 
-Install the [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) extension for excellent Rust support.
+Verify the installation:
 
-#### IntelliJ IDEA / CLion
+```bash
+stellar --version
+stellar contract --help
+```
+
+## Step 4: Configure Your Editor (Recommended)
+
+### VS Code
+
+Install [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer) for inline type hints, auto-complete, and error highlighting.
+
+### JetBrains IDEs (IntelliJ / CLion / RustRover)
 
 Install the [Rust plugin](https://plugins.jetbrains.com/plugin/8182-rust).
 
-## 🌐 Network Configuration
+## Step 5: Set Up a Testnet Identity
 
-### Testnet Setup
+You need a funded account to deploy contracts.
 
-1. Add the testnet network:
+### Add the testnet network
 
 ```bash
-soroban network add \
+stellar network add \
   --global testnet \
   --rpc-url https://soroban-testnet.stellar.org:443 \
   --network-passphrase "Test SDF Network ; September 2015"
 ```
 
-2. Create an identity (wallet):
+### Generate a keypair
 
 ```bash
-soroban keys generate alice --network testnet
+stellar keys generate alice --network testnet
 ```
 
-3. Get your public key:
+### Print your public key
 
 ```bash
-soroban keys address alice
+stellar keys address alice
 ```
 
-4. Fund your account (testnet only):
+### Fund the account (testnet only)
 
 ```bash
-soroban keys fund alice --network testnet
+stellar keys fund alice --network testnet
 ```
 
-### Mainnet Setup (When Ready)
+## Step 6: Your First Contract
 
-```bash
-soroban network add \
-  --global mainnet \
-  --rpc-url https://soroban-mainnet.stellar.org:443 \
-  --network-passphrase "Public Global Stellar Network ; September 2015"
-```
-
-⚠️ **Warning:** Never commit your mainnet keys to version control!
-
-## 🚀 Your First Contract
-
-### 1. Create a New Project
+### 6.1 Create the project
 
 ```bash
 cargo new --lib my-first-contract
 cd my-first-contract
 ```
 
-### 2. Update Cargo.toml
+### 6.2 Configure `Cargo.toml`
+
+Replace the generated `Cargo.toml` with:
 
 ```toml
 [package]
@@ -117,7 +129,7 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = "21.7.0"
@@ -136,12 +148,13 @@ codegen-units = 1
 lto = true
 ```
 
-### 3. Write Your Contract
+### 6.3 Write the contract
 
-Edit `src/lib.rs`:
+Replace `src/lib.rs` with:
 
 ```rust
 #![no_std]
+
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
 
 #[contract]
@@ -158,62 +171,64 @@ impl HelloContract {
 mod test;
 ```
 
-### 4. Add Tests
+### 6.4 Write the tests
 
 Create `src/test.rs`:
 
 ```rust
 #![cfg(test)]
+
 use super::*;
-use soroban_sdk::{symbol_short, Env};
+use soroban_sdk::{symbol_short, vec, Env};
 
 #[test]
-fn test() {
+fn test_hello_returns_greeting() {
     let env = Env::default();
     let contract_id = env.register_contract(None, HelloContract);
     let client = HelloContractClient::new(&env, &contract_id);
 
-    let words = client.hello(&symbol_short!("World"));
+    let result = client.hello(&symbol_short!("World"));
+
     assert_eq!(
-        words,
+        result,
         vec![&env, symbol_short!("Hello"), symbol_short!("World")]
     );
 }
 ```
 
-### 5. Test Your Contract
+### 6.5 Run the tests
 
 ```bash
 cargo test
 ```
 
-### 6. Build Your Contract
+### 6.6 Build the contract
 
 ```bash
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-Or use Soroban CLI:
+Or use the CLI:
 
 ```bash
-soroban contract build
+stellar contract build
 ```
 
-### 7. Deploy to Testnet
+### 6.7 Deploy to testnet
 
 ```bash
-soroban contract deploy \
+stellar contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_first_contract.wasm \
   --source alice \
   --network testnet
 ```
 
-Save the contract ID that's returned!
+Save the returned contract ID.
 
-### 8. Invoke Your Contract
+### 6.8 Invoke the deployed contract
 
 ```bash
-soroban contract invoke \
+stellar contract invoke \
   --id <CONTRACT_ID> \
   --source alice \
   --network testnet \
@@ -223,64 +238,117 @@ soroban contract invoke \
 
 Expected output:
 
+```json
+["Hello","World"]
 ```
-["Hello", "World"]
-```
 
-## 🎉 Success!
+## Next Steps
 
-You've just deployed and invoked your first Soroban smart contract!
+1. Explore [01-hello-world](../examples/basics/01-hello-world/)
+2. Explore [02-storage-patterns](../examples/basics/02-storage-patterns/)
+3. Explore [03-authentication](../examples/basics/03-authentication/)
+4. Read the [Testing Guide](./testing.md)
+5. Read the [Deployment Guide](./deployment.md)
+6. Read the [Ethereum to Soroban Guide](./ethereum-to-soroban.md)
 
-## 📚 Next Steps
+## Troubleshooting
 
-1. **Explore Examples** - Check out the [examples](../examples/) directory
-   - [Hello World](../examples/basics/01-hello-world/) - Understand the basics
-   - [Storage Patterns](../examples/basics/02-storage-patterns/) - Learn data persistence
-   - [Authentication](../examples/basics/03-authentication/) - Secure your contracts
-
-2. **Learn Testing** - Read the [Testing Guide](./testing.md)
-
-3. **Master Deployment** - Study the [Deployment Guide](./deployment.md)
-
-4. **From Ethereum?** - Check the [Migration Guide](./ethereum-to-soroban.md)
-
-## 🔧 Troubleshooting
-
-### Common Issues
-
-**Error: "error: linker `rust-lld` not found"**
+### `error: linker 'rust-lld' not found`
 
 ```bash
 rustup component add llvm-tools-preview
 ```
 
-**Error: "cannot find -lsoroban-env-host"**
+### `error[E0463]: can't find crate for 'std'`
+
+```bash
+rustup target add wasm32-unknown-unknown
+```
+
+### `error: no such command: 'soroban'`
+
+Reload your shell or add Cargo binaries to your path:
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+If needed, reinstall CLI as `stellar-cli`:
+
+```bash
+cargo uninstall soroban-cli
+cargo install --locked stellar-cli --features opt
+```
+
+### CLI install fails during compilation
+
+```bash
+cargo clean
+cargo install --locked stellar-cli --features opt
+```
+
+If OpenSSL headers are missing:
+
+```bash
+# Ubuntu / Debian
+sudo apt-get install pkg-config libssl-dev
+
+# macOS (Homebrew)
+brew install openssl
+export OPENSSL_DIR=$(brew --prefix openssl)
+```
+
+### Network timeout or RPC error
+
+- Check your internet connection.
+- Retry after a short wait.
+- Use a specific RPC URL with `--rpc-url`.
+- Check [Stellar status](https://status.stellar.org).
+
+### `error: account not found` during deploy
+
+```bash
+stellar keys fund alice --network testnet
+```
+
+### `error: transaction simulation failed: HostError: Error(Value, InvalidInput)`
+
+Ensure you keep the `--` separator before contract function arguments:
+
+```bash
+stellar contract invoke --id <ID> --source alice --network testnet \
+  -- hello --to World
+```
+
+### `wasm validation error: reference-types not supported`
+
+Create `.cargo/config.toml` in your project:
+
+```toml
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "target-feature=-reference-types"]
+```
+
+Then rebuild:
 
 ```bash
 cargo clean
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-**Network timeout**
+### Tests compile but generated client type is missing
 
-- Check your internet connection
-- Try a different RPC endpoint
-- Use `--rpc-url` flag to specify alternate RPC server
+Ensure `Cargo.toml` includes:
 
-### Getting Help
+```toml
+[lib]
+crate-type = ["cdylib", "rlib"]
+```
 
-- [Stellar Discord](https://discord.gg/stellardev) - Active community
-- [Official Documentation](https://developers.stellar.org/docs/smart-contracts)
-- [Stack Exchange](https://stellar.stackexchange.com/) - Q&A
+## Getting Help
+
+- [Stellar Discord](https://discord.gg/stellardev) (`#soroban-dev`)
+- [Stack Exchange](https://stellar.stackexchange.com/) (tagged `soroban`)
 - [GitHub Discussions](https://github.com/Soroban-Cookbook/Soroban-Cookbook/discussions)
-
-## 📖 Additional Resources
-
-- [Soroban SDK Documentation](https://docs.rs/soroban-sdk)
-- [Rust Book](https://doc.rust-lang.org/book/) - Learn Rust
-- [Soroban by Example](https://soroban.stellar.org/docs/examples)
 - [Official Soroban Docs](https://developers.stellar.org/docs/smart-contracts)
-
----
-
-**Ready to build?** Start with the [Hello World example](../examples/basics/01-hello-world/)!
+- [Soroban SDK API Reference](https://docs.rs/soroban-sdk/21.7.0/soroban_sdk/)
