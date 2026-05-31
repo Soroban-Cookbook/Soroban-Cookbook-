@@ -5,6 +5,7 @@ This category contains examples related to fungible tokens, including implementa
 ## What's Inside?
 
 - **Token Standards**: Implementations of official Stellar token standards like SEP-41.
+- **[Mint/Burn Token](./mint-burn/)**: Admin-controlled minting and user burn flows with supply cap handling.
 - **[Token Wrapper](./token-wrapper/)**: A 1:1 wrapper around an existing token with deposit, withdraw, backing checks, and invariant tests.
 - **Distribution Patterns**: Examples of vesting schedules and airdrop contracts.
 
