@@ -28,4 +28,4 @@ Before diving into intermediate examples, make sure you've completed:
 - `ajo-factory/` — Deploying new contract instances with template versioning and registry discovery.
 - `multi-sig-patterns/` — Multi-party authorization with proposal and approval workflows.
 - `storage-migration/` — Versioned storage upgrades with explicit staging and batch execution.
-- `event-history/` — On-chain audit history storage with pagination, filtering, and capacity management.
+- `event-history/` — On-chain audit history storage with cursor-based pagination, filtering, and capacity management.

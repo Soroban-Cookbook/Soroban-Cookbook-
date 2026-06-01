@@ -35,6 +35,19 @@ pub struct HistoryStats {
     pub max_entries: u32,
 }
 
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HistoryCursor {
+    pub index: u32,
+}
+
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct HistoryPage {
+    pub entries: Vec<AuditEntry>,
+    pub next_cursor: Option<HistoryCursor>,
+}
+
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
@@ -44,6 +57,7 @@ pub enum HistoryError {
     Unauthorized = 3,
     InvalidCapacity = 4,
     InvalidPagination = 5,
+    InvalidCursor = 6,
 }
 
 const EVENT_AUDIT: Symbol = symbol_short!("audit");
@@ -133,6 +147,62 @@ impl EventHistory {
         }
 
         result
+    }
+
+    /// Return a page of events using an opaque cursor.
+    ///
+    /// The cursor is a stable absolute storage index. It may be reused across
+    /// requests as long as the history window has not advanced past it.
+    /// If the contract has trimmed older entries due to capacity limits, an
+    /// expired cursor is rejected with `InvalidCursor`.
+    pub fn get_events_page(
+        env: Env,
+        cursor: Option<HistoryCursor>,
+        limit: u32,
+    ) -> Result<HistoryPage, HistoryError> {
+        if limit == 0 {
+            return Ok(HistoryPage {
+                entries: Vec::new(&env),
+                next_cursor: None,
+            });
+        }
+
+        let start_index = read_start_index(&env);
+        let next_index = read_next_index(&env);
+        let start = cursor.map_or(start_index, |c| c.index);
+
+        if start < start_index || start > next_index {
+            return Err(HistoryError::InvalidCursor);
+        }
+
+        if start >= next_index {
+            return Ok(HistoryPage {
+                entries: Vec::new(&env),
+                next_cursor: None,
+            });
+        }
+
+        let end = (start + limit).min(next_index);
+        let mut result = Vec::new(&env);
+        let mut index = start;
+
+        while index < end {
+            if let Some(entry) = env.storage().persistent().get(&DataKey::Entry(index)) {
+                result.push_back(entry);
+            }
+            index += 1;
+        }
+
+        let next_cursor = if end >= next_index {
+            None
+        } else {
+            Some(HistoryCursor { index: end })
+        };
+
+        Ok(HistoryPage {
+            entries: result,
+            next_cursor,
+        })
     }
 
     pub fn query_by_time(

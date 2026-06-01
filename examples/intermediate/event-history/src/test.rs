@@ -43,6 +43,46 @@ fn test_append_and_paginate_history_entries() {
 }
 
 #[test]
+fn test_get_events_page_returns_cursor_and_next_page() {
+    let (mut env, _admin, client) = setup();
+    env.mock_all_auths();
+
+    let actor = Address::generate(&env);
+    let action = symbol_short!("create");
+
+    client.append_event(&actor, &action, &symbol_short!("a")).unwrap();
+    client.append_event(&actor, &action, &symbol_short!("b")).unwrap();
+    client.append_event(&actor, &action, &symbol_short!("c")).unwrap();
+
+    let page1 = client.get_events_page(&None, &2).unwrap();
+    assert_eq!(page1.entries.len(), 2);
+    assert!(page1.next_cursor.is_some());
+    assert_eq!(page1.entries.get(0).unwrap().details, symbol_short!("a"));
+
+    let page2 = client.get_events_page(&page1.next_cursor, &2).unwrap();
+    assert_eq!(page2.entries.len(), 1);
+    assert!(page2.next_cursor.is_none());
+    assert_eq!(page2.entries.get(0).unwrap().details, symbol_short!("c"));
+}
+
+#[test]
+fn test_get_events_page_rejects_expired_cursor() {
+    let (mut env, _admin, client) = setup();
+    env.mock_all_auths();
+
+    let actor = Address::generate(&env);
+    let action = symbol_short!("write");
+
+    client.append_event(&actor, &action, &symbol_short!("first")).unwrap();
+    client.append_event(&actor, &action, &symbol_short!("second")).unwrap();
+    client.append_event(&actor, &action, &symbol_short!("third")).unwrap();
+
+    let cursor = HistoryCursor { index: 0 };
+    let result = client.get_events_page(&Some(cursor), &2);
+    assert!(matches!(result, Err(HistoryError::InvalidCursor)));
+}
+
+#[test]
 fn test_storage_limit_trims_oldest_entries() {
     let (mut env, _admin, client) = setup();
     env.mock_all_auths();
