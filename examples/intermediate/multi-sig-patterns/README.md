@@ -6,8 +6,7 @@ This example demonstrates patterns for requiring multiple parties to authorize a
 
 - **Threshold Signatures**: Require N-of-M signers to approve actions
 - **Proposal-Based Approvals**: Sequential approval workflow for multi-party decisions
-- **Authorization Vectors**: Require multiple addresses in a single transaction
-- **Multi-Sig Patterns**: Common use cases for multi-party authorization
+- **Authorization Vectors**: Require multiple addresses in a single transaction- ✅ Proposal cancellation: Abort a proposal before execution- **Multi-Sig Patterns**: Common use cases for multi-party authorization
 
 ## 🔍 Contract Overview
 
@@ -16,14 +15,15 @@ The contract implements three complementary multi-party authorization patterns:
 ### 1. Proposal-Based Multi-Sig (Threshold Pattern)
 
 ```rust
-pub fn initialize(env: Env, threshold: u32, signers: Vec<Address>)
-pub fn create_proposal(env: Env, proposer: Address) -> u32
-pub fn approve(env: Env, proposal_id: u32, signer: Address)
-pub fn execute(env: Env, proposal_id: u32, executor: Address) -> bool
-pub fn get_proposal(env: Env, proposal_id: u32) -> Proposal
+pub fn initialize(env: Env, threshold: u32, signers: Vec<Address>) -> Result<(), AuthError>
+pub fn create_proposal(env: Env, proposer: Address) -> Result<u32, AuthError>
+pub fn approve(env: Env, proposal_id: u32, signer: Address) -> Result<(), AuthError>
+pub fn cancel(env: Env, proposal_id: u32, canceller: Address) -> Result<(), AuthError>
+pub fn execute(env: Env, proposal_id: u32, executor: Address) -> Result<bool, AuthError>
+pub fn get_proposal(env: Env, proposal_id: u32) -> Result<Proposal, AuthError>
 ```
 
-This pattern allows signers to approve proposals over multiple transactions. Once the threshold is met, anyone can execute the proposal.
+This pattern allows signers to approve proposals over multiple transactions. Once the threshold is met, anyone can execute the proposal. Proposals can also be cancelled by an authorized signer before execution, preventing further approvals or execution.
 
 **Use Cases:**
 - Multi-sig wallets
@@ -47,7 +47,7 @@ Requires all specified addresses to authorize within a single transaction. All s
 ### 3. All-Signers Required
 
 ```rust
-pub fn require_all_signers(env: Env) -> bool
+pub fn require_all_signers(env: Env) -> Result<bool, AuthError>
 ```
 
 Requires authorization from all configured signers in the contract. Useful for critical operations that need unanimous consent.
@@ -69,14 +69,14 @@ let signers = vec![&env, alice, bob, charlie];
 client.initialize(&2, &signers);
 
 // Create proposal
-let proposal_id = client.create_proposal(&alice);
+let proposal_id = client.create_proposal(&alice).unwrap();
 
 // Collect approvals (need 2)
-client.approve(&proposal_id, &alice);
-client.approve(&proposal_id, &bob);
+client.approve(&proposal_id, &alice).unwrap();
+client.approve(&proposal_id, &bob).unwrap();
 
 // Execute once threshold is met
-client.execute(&proposal_id, &alice);
+client.execute(&proposal_id, &alice).unwrap();
 ```
 
 ### Authorization Vectors

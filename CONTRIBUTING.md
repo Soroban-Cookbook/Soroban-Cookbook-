@@ -165,3 +165,7 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 [ ] Documentation (README, guides, SUMMARY.md) is updated.
 
 [ ] PR is linked to relevant issues.
+### CI Testing Strategy
+
+- We run targeted tests for changed paths on pull requests to enable fast feedback.
+- For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.

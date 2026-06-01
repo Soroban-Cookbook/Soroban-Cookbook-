@@ -84,48 +84,45 @@ ValidationError::Blacklisted = 309,
 
 ```rust
 // Validate amount with min/max bounds
-validate_amount_parameters(amount, min_amount, max_amount)
+soroban_validation::validate_amount(amount, min_amount, max_amount)
 
 // Validate string length and content
-validate_string_parameters(text, min_length, max_length)
+soroban_validation::validate_string(text, min_length, max_length)
 
 // Validate address format
-validate_address(address)
+soroban_validation::validate_address(address)
 
 // Validate array size
-validate_array_parameters(array, min_size, max_size)
+soroban_validation::validate_array(array, min_size, max_size)
 
 // Validate timestamp range
-validate_timestamp_parameters(env, timestamp, allow_past, max_future_seconds)
+soroban_validation::validate_timestamp(env, timestamp, allow_past, max_future_seconds)
 ```
 
 ### State Validation Functions
 
 ```rust
-// Validate contract is in required state
-validate_contract_state(env, required_state)
-
 // Validate sufficient balance
-validate_balance(env, address, required_amount)
-
-// Validate sufficient allowance
-validate_allowance(env, owner, spender, required_amount)
+soroban_validation::require_sufficient_balance(current_balance, required_amount)
 
 // Validate cooldown period
-validate_cooldown(env, address, cooldown_seconds)
+soroban_validation::require_cooldown_expired(env, last_action_time, cooldown_seconds)
 ```
 
 ### Authorization Validation Functions
 
 ```rust
-// Validate user has sufficient role
-validate_role(env, address, required_role)
-
 // Validate ownership
-validate_ownership(env, address)
+soroban_validation::require_owner(stored_owner, claimed_owner)
 
 // Validate admin permissions
-validate_admin(env, address)
+soroban_validation::require_admin(stored_admin, claimed_admin)
+
+// Validate role hierarchy
+soroban_validation::require_role(user_role, required_role)
+
+// Validate blacklist status
+soroban_validation::require_not_blacklisted(is_blacklisted)
 ```
 
 ## Usage Examples
@@ -133,6 +130,8 @@ validate_admin(env, address)
 ### Basic Transfer with Full Validation
 
 ```rust
+use soroban_validation::*;
+
 let result = client.validated_transfer(
     &from_address,
     &to_address,
@@ -145,6 +144,40 @@ match result {
     Err(ValidationError::InsufficientBalance) => println!("Insufficient balance"),
     Err(ValidationError::CooldownActive) => println!("Please wait before transferring again"),
     Err(e) => println!("Validation failed: {:?}", e),
+}
+```
+
+### Using Shared Validators in Contract Functions
+
+```rust
+use soroban_sdk::*;
+use soroban_validation::*;
+
+#[contractimpl]
+impl MyContract {
+    pub fn transfer_with_validation(
+        env: Env,
+        from: Address,
+        to: Address,
+        amount: i128
+    ) -> Result<(), ValidationError> {
+        from.require_auth();
+
+        // Parameter validation
+        validate_amount(amount, 1, 1000000)?;
+        validate_address(from.clone())?;
+        validate_address(to.clone())?;
+
+        // State validation
+        let balance = get_balance(&env, from.clone());
+        require_sufficient_balance(balance, amount)?;
+
+        // Authorization validation (if needed)
+        // require_owner(stored_owner, from.clone())?;
+
+        // Execute transfer logic...
+        Ok(())
+    }
 }
 ```
 

@@ -2,7 +2,7 @@
 
 Welcome to the Soroban Cookbook documentation. Use this index to find what you need quickly.
 
-## Quick Links
+## Quick Links.
 
 | I want to…                  | Go to                                                         |
 | --------------------------- | ------------------------------------------------------------- |
@@ -14,9 +14,11 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 | Fix a build or test error   | [Troubleshooting](./troubleshooting.md)                      |
 | Look up a term              | [Glossary](./glossary.md)                                    |
 | See common patterns         | [Common Patterns](./common-patterns.md)                      |
+| Design multi-contract apps  | [Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md) |
 | Check best practices        | [Best Practices](./best-practices.md)                        |
 | Follow style guide          | [Style Guide](./style-guide.md)                              |
 | Get a cheat sheet           | [Quick Reference](./quick-reference.md)                      |
+| Compare example gas costs   | [Gas Benchmarks](./gas-benchmarks.md)                      |
 
 ## Reference Documentation
 
@@ -24,6 +26,7 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 - [Style Guide](./style-guide.md) — Naming, documentation, and testing standards
 - [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
 - [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
+- [Governance & Authorization Patterns](./governance-rbac-multisig-timelock.md) — RBAC, multisig, and timelock guidance for secure deployments
 - [Glossary](./glossary.md) — Key terms and concepts
 - [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds
 

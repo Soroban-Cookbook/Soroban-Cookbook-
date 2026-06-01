@@ -1,12 +1,10 @@
-//! Tests for instance-storage contract.
+//! Tests for the instance-storage contract.
 //!
-//! Covers both generic key/value helpers and the two concrete use cases
-//! (transaction counter, cached configuration).
+//! Covers generic key/value helpers and two concrete use cases: a transaction
+//! counter and runtime configuration.
 
 use super::*;
 use soroban_sdk::{symbol_short, Env};
-
-// ── Generic set_instance / get_instance ───────────────────────────────────
 
 #[test]
 fn test_set_and_get_instance() {
@@ -49,8 +47,6 @@ fn test_different_keys_independent() {
     assert_eq!(client.get_instance(&k2), Some(20));
 }
 
-// ── Use case 1: Transaction counter ───────────────────────────────────────
-
 #[test]
 fn test_counter_starts_at_zero() {
     let env = Env::default();
@@ -74,19 +70,16 @@ fn test_counter_increments() {
 
 #[test]
 fn test_counter_persists_across_calls() {
-    // Instance storage survives across invocations within the same instance.
     let env = Env::default();
     let id = env.register_contract(None, InstanceStorageContract);
     let client = InstanceStorageContractClient::new(&env, &id);
 
     client.increment_counter();
     client.increment_counter();
-    // A fresh client pointing to the same contract id must see the same value.
+
     let client2 = InstanceStorageContractClient::new(&env, &id);
     assert_eq!(client2.get_counter(), 2);
 }
-
-// ── Use case 2: Cached / runtime configuration ────────────────────────────
 
 #[test]
 fn test_config_unset_returns_none() {
@@ -122,15 +115,12 @@ fn test_config_update() {
 
     let key = symbol_short!("fee_bps");
     client.set_config(&key, &30);
-    client.set_config(&key, &50); // operator raises the fee
+    client.set_config(&key, &50);
     assert_eq!(client.get_config(&key), Some(50));
 }
 
-// ── TTL management ─────────────────────────────────────────────────────────
-
 #[test]
 fn test_extend_ttl_does_not_corrupt_data() {
-    // Ensure that calling extend_ttl doesn't clear or corrupt stored data.
     let env = Env::default();
     let id = env.register_contract(None, InstanceStorageContract);
     let client = InstanceStorageContractClient::new(&env, &id);
@@ -138,13 +128,11 @@ fn test_extend_ttl_does_not_corrupt_data() {
     client.increment_counter();
     client.set_config(&symbol_short!("fee_bps"), &25);
 
-    client.extend_ttl(); // explicit keep-alive call
+    client.extend_ttl();
 
     assert_eq!(client.get_counter(), 1);
     assert_eq!(client.get_config(&symbol_short!("fee_bps")), Some(25));
 }
-
-// ── Counter and config coexist independently ──────────────────────────────
 
 #[test]
 fn test_counter_and_config_coexist() {
@@ -152,14 +140,12 @@ fn test_counter_and_config_coexist() {
     let id = env.register_contract(None, InstanceStorageContract);
     let client = InstanceStorageContractClient::new(&env, &id);
 
-    // Interleave counter increments and config updates.
     client.increment_counter();
     client.set_config(&symbol_short!("rate"), &5);
     client.increment_counter();
     client.set_config(&symbol_short!("rate"), &10);
     client.increment_counter();
 
-    // Neither should interfere with the other.
     assert_eq!(client.get_counter(), 3);
     assert_eq!(client.get_config(&symbol_short!("rate")), Some(10));
 }

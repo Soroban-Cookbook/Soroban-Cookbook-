@@ -29,6 +29,25 @@ if env.ledger().timestamp() < unlock_time {
 }
 ```
 
+---
+
+### [03-oracle-pattern](../examples/advanced/03-oracle-pattern/)
+**Single-source oracle** with authorized submission and freshness validation.
+
+**Key Concepts:**
+- Authorized data updater
+- Ledger-timestamp freshness checks
+- Strict (fail-on-stale) vs raw getters
+- Updater rotation by admin
+
+**Quick Code:**
+```rust
+// Submit data (authorized updater only)
+client.submit(&updater, &42_i128);
+// Query with freshness guard
+let value = client.get_value_strict(); // errors if stale
+```
+
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
 ## ⚠️ Warning

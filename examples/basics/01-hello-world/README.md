@@ -68,6 +68,8 @@ Tests live in `src/test.rs` and cover:
 | `test_hello_first_element_is_hello` | First element is always the literal `"Hello"` |
 | `test_hello_second_element_is_name` | Second element echoes the supplied name |
 | `test_hello_with_different_names` | Works correctly for multiple different inputs |
+| `test_hello_with_long_symbol_input` | Accepts symbols beyond `symbol_short!` length limits |
+| `test_hello_with_single_character_name` | Single-character names preserve output shape |
 
 ## Project Structure
 

@@ -1,59 +1,31 @@
 # Intermediate Examples
 
-Intermediate-level examples demonstrating common patterns and real-world use cases for developers who have mastered the Soroban basics.
-
-## 📂 Example Categories
-
-### Access Control
-Patterns for securing contracts and managing permissions.
-- **[Multi-Sig Patterns](./multi-sig-patterns/)** - Threshold signatures and multi-party authorization.
-- **Planned:** Role-Based Access Control (RBAC), Timelocks, Admin management.
-
-### Token Interactions
-Working with fungible and non-fungible tokens.
-- **Planned:** Custom token implementation, Token wrappers, Multi-token handling.
-
-### Cross-Contract Patterns
-How contracts interact with each other.
-- **Planned:** Contract Factory, Proxy patterns, Registry discovery.
-
-### Data Structures
-Efficient ways to store and manage data on-chain.
-- **Planned:** Iterable mappings, Queues, Priority queues, Linked lists.
-
-## 📋 Planned Examples
-
-- **Custom Token** - Create a custom token with minting and burning.
-- **Token Wrapper** - Wrap existing tokens with additional functionality.
-- **Contract Factory** - Deploy contracts from within a contract.
-- **Proxy Pattern** - Upgradeable contract pattern.
-- **Registry** - Central registry for contract discovery.
-- **Role-Based Access** - Implement RBAC (Role-Based Access Control).
-- **Iterables** - Implement iterable mappings.
+This category contains examples that demonstrate common, real-world design patterns and use cases for Soroban smart contracts. These examples combine multiple basic concepts to solve practical problems and prepare you for production-grade contract development.
 
 ## 🎯 Prerequisites
 
-Before diving into intermediate examples, ensure you understand:
-- [Basic Examples](../basics/) - Core Soroban concepts.
-- Rust ownership and borrowing.
-- Basic blockchain concepts (addresses, signatures, transactions).
+- **Access Control**: Implement patterns like multi-sig, Role-Based Access Control (RBAC), and timelocks.
+- **Cross-Contract Communication**: See how to build systems with factory, proxy, and registry patterns.
+- **Token Interactions**: Learn how to create contracts that interact with or wrap standard tokens.
+- **Advanced Data Structures**: Examples of iterable maps, queues, and other complex data structures.
+- **Emergency Controls**: Pause/unpause pattern for halting sensitive operations.
 
-## 🚀 Building and Testing
+## Implemented Examples
 
-```bash
-# Navigate to an example
-cd examples/intermediate/multi-sig-patterns
+- [`multi-sig-patterns`](./multi-sig-patterns/) — Threshold signatures and multi-party auth
+- [`ajo-factory`](./ajo-factory/) — Contract deployment from within a contract
+- [`03-pause-unpause`](./03-pause-unpause/) — Emergency pause/unpause mechanism
+Before diving into intermediate examples, make sure you've completed:
+- [Basic Examples](../basics/) — Core Soroban concepts (storage, auth, errors, events)
+- [Getting Started Guide](../../book/src/guides/getting-started.md) — Development environment setup
+- [Testing Guide](../../book/src/guides/testing.md) — Unit and integration testing patterns
 
-# Run tests
-cargo test
+## Included Examples
 
-# Build the contract
-cargo build --target wasm32-unknown-unknown --release
-```
-
-## 📚 Learning Path
-
-1. Start with **Access Control** to understand security patterns.
-2. Explore **Token Interactions** for asset handling.
-3. Master **Cross-Contract Patterns** for complex architectures.
-4. Study **Data Structures** for efficient storage patterns.
+- `02-role-based-access-control`: An RBAC implementation for managing permissions.
+- `04-token-wrapper`: A contract that wraps a standard token to add new functionality.
+- `05-upgradable-proxy`: A basic proxy pattern for contract upgradability.
+- `ajo-factory/` — Deploying new contract instances with template versioning and registry discovery.
+- `multi-sig-patterns/` — Multi-party authorization with proposal and approval workflows.
+- `storage-migration/` — Versioned storage upgrades with explicit staging and batch execution.
+- `event-history/` — On-chain audit history storage with pagination, filtering, and capacity management.

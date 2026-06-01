@@ -45,9 +45,34 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128)
         return Err(AuthError::InsufficientBalance);
     }
 
-    let bal: i128 = env.storage().persistent()
-        .get(&DataKey::Balance(from.clone())).unwrap_or(0);
-    if bal < amount {
+---
+
+## 3. Shared Validation Helpers
+
+**Source:** [`shared/`](../shared/src/lib.rs), [`06-validation-patterns`](../examples/basics/06-validation-patterns/src/lib.rs)
+
+Use shared validation utilities for common validation patterns. These provide
+consistent error handling and reduce code duplication across contracts.
+
+```rust
+use soroban_validation::*;
+
+// Parameter validation
+validate_amount(amount, 1, 1000000)?;
+validate_address(address)?;
+
+// State validation
+require_sufficient_balance(balance, required_amount)?;
+require_cooldown_expired(&env, last_action, 3600)?;
+
+// Authorization validation
+require_owner(stored_owner, caller)?;
+require_admin(stored_admin, caller)?;
+```
+
+**When to use:** For any input validation, state checking, or authorization logic.
+Import `soroban_validation::*` and use the appropriate validation functions.
+Always handle validation errors appropriately in your contract logic.
         return Err(AuthError::InsufficientBalance);
     }
 
@@ -556,6 +581,7 @@ event emission in one place.
 ## Related Resources
 
 - [Best Practices](./best-practices.md) — security and efficiency rules
+- [Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md) - cross-contract architecture guide
 - [Quick Reference](./quick-reference.md) — syntax cheat sheet
 - [03-authentication](../examples/basics/03-authentication/) — auth patterns in full
 - [02-storage-patterns](../examples/basics/02-storage-patterns/) — storage tiers in full
