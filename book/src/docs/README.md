@@ -48,6 +48,7 @@ New to Soroban? Start here:
 
 - **[Quick Reference](./quick-reference.md)** - Cheat sheet
 - **[Common Patterns](./common-patterns.md)** - Extracted patterns with when-to-use guide
+- **[Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md)** - Cross-contract architecture guide with diagrams and upgrade notes
 - **[Best Practices](./best-practices.md)** - Recommended patterns
 - **[Performance Benchmarks](./benchmarks.md)** - Resource usage comparison and optimization tips
 - **[Common Pitfalls](./common-pitfalls.md)** - Avoid these mistakes

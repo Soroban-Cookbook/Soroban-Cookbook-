@@ -43,6 +43,42 @@ let address = env.deployer()
 AjoClient::new(&env, &address).initialize(...);
 ```
 
+### Pause / Unpause [./03-pause-unpause/](../examples/intermediate/03-pause-unpause/)
+**Emergency shutdown mechanism.** Admin-controlled pause toggle that halts sensitive operations while keeping read-only functions available.
+
+**Key Concepts:**
+- `#[contracterror]` for pause-state errors
+- Internal `require_not_paused` guard
+- Guarded vs unguarded functions
+- Event emission on state transitions
+
+**Quick Code:**
+```rust
+// Guard sensitive operations
+fn require_not_paused(env: &Env) -> Result<(), PauseError> {
+    let paused: bool = env.storage().instance().get(&DataKey::Paused).unwrap_or(false);
+    if paused { return Err(PauseError::ContractPaused); }
+    Ok(())
+}
+```
+### Storage Migration [./storage-migration/](../examples/intermediate/storage-migration/)
+**Versioned storage upgrades.** Stage migrations, transform legacy storage, and execute in safe batches.
+
+**Key Concepts:**
+- Explicit version tracking
+- Prepared migration state
+- Chunked batch execution
+- Safe rollback/cancellation
+
+### Event History [./event-history/](../examples/intermediate/event-history/)
+**On-chain audit history.** Record event entries persistently and query them with pagination and time filters.
+
+**Key Concepts:**
+- Append-only audit entries
+- Queryable pagination
+- Time-based filtering
+- Storage cap trimming
+
 ---
 
 ## Prerequisites

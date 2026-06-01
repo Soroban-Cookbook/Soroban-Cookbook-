@@ -581,6 +581,7 @@ event emission in one place.
 ## Related Resources
 
 - [Best Practices](./best-practices.md) — security and efficiency rules
+- [Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md) - cross-contract architecture guide
 - [Quick Reference](./quick-reference.md) — syntax cheat sheet
 - [03-authentication](../examples/basics/03-authentication/) — auth patterns in full
 - [02-storage-patterns](../examples/basics/02-storage-patterns/) — storage tiers in full

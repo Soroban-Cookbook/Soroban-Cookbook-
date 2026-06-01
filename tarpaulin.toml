@@ -15,7 +15,7 @@ all-features = true
 #   xml  → Cobertura XML, consumed by Codecov
 #   html → human-readable report for local review
 #   lcov → standard format supported by many editors / tools
-out = ["xml", "html", "lcov"]
+out = ["Xml", "Html", "Lcov"]
 
 # Write all reports into a dedicated directory to keep the repo root clean
 output-dir = "coverage"

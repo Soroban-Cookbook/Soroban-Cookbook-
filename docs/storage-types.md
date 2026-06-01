@@ -58,6 +58,18 @@ Temporary storage is the cheapest option but only lasts for the current ledger. 
 env.storage().temporary().set(&key, &value);
 ```
 
+## 4. Compression Optimization
+
+Compressing byte payloads before storing them can reduce the storage footprint and the rent cost paid to the ledger. This is most effective for:
+
+- large payloads with repeated values
+- serialized records with repeated field values
+- predictable or structured text data
+
+Compression can be less helpful when data is already random, small, or minimally repetitive. In those cases, the storage entry may be larger after encoding and the additional on-chain compute can increase gas use.
+
+**Example:** [Compressed Storage Example](../examples/basics/13-compressed-storage/)
+
 ---
 
 ## When to Use Which?

@@ -43,6 +43,11 @@ Focused deep dive into temporary storage — the cheapest, ephemeral tier.
 - **Concepts:** Short-lived TTL, reentrancy guards, intra-transaction caching, gas cost trade-offs
 - **Best for:** Flags, intermediate computation results, short-lived caches
 
+#### [lazy-cache](./lazy-cache/) — 🟡 Intermediate
+Lazy loading and temporary caching for large persistent data sets.
+- **Concepts:** On-demand loading, bounded cache eviction, cache invalidation, hit/miss metrics
+- **Best for:** Reducing repeated persistent storage reads with a small working set
+
 ---
 
 ### Error Handling
