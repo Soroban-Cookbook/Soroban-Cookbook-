@@ -1,6 +1,8 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol, Vec,
+};
 
 #[contract]
 pub struct MultiPartyAuthContract;
@@ -144,7 +146,6 @@ impl MultiPartyAuthContract {
         for signer in signers.iter() {
             signer.require_auth();
         }
-    }
 
         // Audit trail for multi-sig action
         env.events().publish(
@@ -157,6 +158,32 @@ impl MultiPartyAuthContract {
 
         // Proceed with multi-authorized action (e.g., token transfer)
         // TokenClient::new(&env, &token_id).transfer(&signers.get_unchecked(0), &to, &amount);
+    }
+
+    /// N-of-N multi-sig transfer using a pre-encoded auth-vector blob.
+    ///
+    /// Decodes and validates the blob, then calls `require_auth()` on every
+    /// signer. Useful when the signer set is stored on-chain and reused across
+    /// multiple calls.
+    pub fn multi_sig_transfer_encoded(
+        env: Env,
+        encoded_signers: Bytes,
+        _to: Address,
+        _amount: i128,
+    ) {
+        let signers = Self::decode_and_validate(&env, &encoded_signers);
+        for signer in signers.iter() {
+            signer.require_auth();
+        }
+
+        // Audit trail for encoded multi-sig action
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT),
+            AuditTrailEventData {
+                details: symbol_short!("msig_enc"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
     }
 
     /// M-of-N threshold approval.
@@ -267,6 +294,210 @@ impl MultiPartyAuthContract {
                 timestamp: env.ledger().timestamp(),
             },
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // Multisig management (Issue #435)
+    //
+    // These functions allow an existing signer to rotate the signer set and
+    // adjust the approval threshold for a named multisig group.  Every
+    // mutation requires at least one current signer to authorize, and emits
+    // a structured event so off-chain indexers can track the full history.
+    // -----------------------------------------------------------------------
+
+    /// Add `new_signer` to the signer set for `proposal_id`.
+    ///
+    /// Requires authorization from `caller`, who must already be a member of
+    /// the current signer set.  Panics if `new_signer` is already present or
+    /// if adding them would exceed `MAX_SIGNERS`.
+    pub fn add_signer(env: Env, caller: Address, proposal_id: Symbol, new_signer: Address) {
+        caller.require_auth();
+
+        let key = DataKey::Signers(proposal_id.clone());
+        let mut signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if signers.contains(&new_signer) {
+            panic!("Signer already exists");
+        }
+        if signers.len() >= MAX_SIGNERS {
+            panic!("Signer set is full");
+        }
+
+        signers.push_back(new_signer.clone());
+        env.storage().instance().set(&key, &signers);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("add_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Remove `signer_to_remove` from the signer set for `proposal_id`.
+    ///
+    /// Requires authorization from `caller`, who must be a current signer.
+    /// Panics if the removal would leave fewer signers than the current
+    /// threshold (which would make the multisig permanently locked).
+    pub fn remove_signer(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        signer_to_remove: Address,
+    ) {
+        caller.require_auth();
+
+        let signers_key = DataKey::Signers(proposal_id.clone());
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&signers_key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if !signers.contains(&signer_to_remove) {
+            panic!("Signer not found");
+        }
+
+        let threshold: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Threshold(proposal_id.clone()))
+            .unwrap_or(1);
+
+        // After removal the remaining count must still satisfy the threshold.
+        if signers.len() - 1 < threshold {
+            panic!("Cannot remove: would drop below threshold");
+        }
+
+        let mut updated: Vec<Address> = Vec::new(&env);
+        for s in signers.iter() {
+            if s != signer_to_remove {
+                updated.push_back(s);
+            }
+        }
+        env.storage().instance().set(&signers_key, &updated);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("rm_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Update the approval threshold for `proposal_id`.
+    ///
+    /// Requires authorization from `caller`, who must be a current signer.
+    /// The new threshold must be ≥ 1 and ≤ the current number of signers.
+    pub fn set_threshold(env: Env, caller: Address, proposal_id: Symbol, new_threshold: u32) {
+        caller.require_auth();
+
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers(proposal_id.clone()))
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if new_threshold == 0 {
+            panic!("Threshold must be at least 1");
+        }
+        if new_threshold > signers.len() {
+            panic!("Threshold exceeds signer count");
+        }
+
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold(proposal_id.clone()), &new_threshold);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("set_thr"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Rotate a signer: atomically replace `old_signer` with `new_signer`.
+    ///
+    /// Requires authorization from `caller`, who must be a current signer.
+    /// This is equivalent to `remove_signer` + `add_signer` but is atomic
+    /// and never temporarily violates the threshold invariant.
+    pub fn rotate_signer(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        old_signer: Address,
+        new_signer: Address,
+    ) {
+        caller.require_auth();
+
+        let key = DataKey::Signers(proposal_id.clone());
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if !signers.contains(&old_signer) {
+            panic!("Old signer not found");
+        }
+        if signers.contains(&new_signer) {
+            panic!("New signer already exists");
+        }
+
+        // Replace in-place (preserves list length, so threshold is unaffected).
+        let mut updated: Vec<Address> = Vec::new(&env);
+        for s in signers.iter() {
+            if s == old_signer {
+                updated.push_back(new_signer.clone());
+            } else {
+                updated.push_back(s);
+            }
+        }
+        env.storage().instance().set(&key, &updated);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("rot_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Return the current signer list for `proposal_id`.
+    pub fn get_signers(env: Env, proposal_id: Symbol) -> Vec<Address> {
+        env.storage()
+            .instance()
+            .get(&DataKey::Signers(proposal_id))
+            .unwrap_or_else(|| Vec::new(&env))
+    }
+
+    /// Return the current threshold for `proposal_id`.
+    pub fn get_threshold(env: Env, proposal_id: Symbol) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::Threshold(proposal_id))
+            .unwrap_or(1)
     }
 
     // -----------------------------------------------------------------------

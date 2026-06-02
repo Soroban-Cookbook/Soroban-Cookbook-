@@ -812,9 +812,61 @@
   - Retrospective
   - Next phase planning
 
+## NFT & Marketplace Examples
+
+### Issue #531: Add Auction Variants
+
+- **Priority:** High
+- **Status:** Planned
+- **Description:** Different auction types
+- **Acceptance Criteria:**
+  - Dutch auction
+  - Reserve price
+  - Buy now option
+  - Auction extensions
+  - Tests and README
+
+### Issue #532: Create Fractional NFT
+
+- **Priority:** High
+- **Status:** Planned
+- **Description:** Fractionalize NFT ownership
+- **Acceptance Criteria:**
+  - Project in examples/nfts/05-fractional-nft/
+  - Fractionalization logic
+  - Share token creation
+  - Buyout mechanism
+  - Governance for fractions
+  - 10+ tests
+
+### Issue #533: Add Fractional NFT Trading
+
+- **Priority:** High
+- **Status:** Planned
+- **Description:** Trade fractional shares
+- **Acceptance Criteria:**
+  - Share transfer
+  - Price discovery
+  - Redemption mechanism
+  - Tests and docs
+  - Use cases
+
+### Issue #534: Create Dynamic NFT
+
+- **Priority:** High
+- **Status:** Planned
+- **Description:** NFT with changing attributes
+- **Acceptance Criteria:**
+  - Project in examples/nfts/06-dynamic-nft/
+  - Mutable metadata
+  - Update triggers
+  - Evolution patterns
+  - Oracle integration (optional)
+  - 8+ tests
+
 ## Summary
 
-**Total Issues Created:** 65 (Issues #379-#443)  
+**Total Issues Created:** 69 (Issues #379-#534)  
 **Completed:** 0  
 **In Progress:** 0  
 **Planned:** 65

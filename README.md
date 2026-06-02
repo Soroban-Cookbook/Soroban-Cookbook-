@@ -133,6 +133,7 @@ Core Soroban concepts, one at a time.
 
 | Example | Concepts |
 | --- | --- |
+| [hello-world](./examples/hello-world/) | Minimal contract struct, `#[contractimpl]`, returning vectors |
 | [01-hello-world](./examples/basics/01-hello-world/) | Contract struct, `#[contract]` / `#[contractimpl]`, unit tests |
 | [02-storage-patterns](./examples/basics/02-storage-patterns/) | `persistent`, `instance`, `temporary` storage, TTL |
 | [03-authentication](./examples/basics/03-authentication/) | `require_auth()`, admin roles, balances |
@@ -153,7 +154,7 @@ Common patterns and real-world use cases.
 - Token interactions and wrappers
 - Cross-contract patterns (factory, proxy, registry)
 - Access control: [multi-sig patterns](./examples/intermediate/multi-sig-patterns/), RBAC, timelocks
-- Data structures: iterables, queues, priority queues
+- Data structures: [iterable mappings](./examples/intermediate/iterable-mappings/), queues, priority queues
 
 #### [Advanced](./examples/advanced/)
 

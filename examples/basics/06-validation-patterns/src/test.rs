@@ -183,10 +183,9 @@ fn test_state_validation() {
         );
 
         // Set last action and test cooldown
-        env.storage().persistent().set(
-            &DataKey::LastAction(user),
-            &env.ledger().timestamp(),
-        );
+        env.storage()
+            .persistent()
+            .set(&DataKey::LastAction(user), &env.ledger().timestamp());
         assert_eq!(
             ValidationContract::validate_cooldown(&env, user, 60),
             Err(ValidationError::CooldownActive)
@@ -265,10 +264,7 @@ fn test_authorization_validation() {
 
         // Test ownership validation: set owner first so validate_ownership can find it
         env.storage().instance().set(&DataKey::Owner, &owner);
-        assert_eq!(
-            ValidationContract::validate_ownership(&env, owner),
-            Ok(())
-        );
+        assert_eq!(ValidationContract::validate_ownership(&env, owner), Ok(()));
     });
 }
 

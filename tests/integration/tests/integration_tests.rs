@@ -13,8 +13,9 @@ use soroban_sdk::{
     symbol_short,
     testutils::{Address as _, IssuerFlags},
     token::{StellarAssetClient, TokenClient},
-    Address, Env, IntoVal, Symbol, Vec,
+    Address, Bytes, Env, IntoVal, Symbol, Vec,
 };
+use timelock;
 use token_wrapper;
 
 // ---------------------------------------------------------------------------
@@ -257,6 +258,61 @@ fn test_authenticated_storage_workflow() {
         Vec::from_array(&env, [user2.into_val(&env)]),
     );
     assert_eq!(new_bal2, 400);
+}
+
+#[test]
+fn test_rbac_multisig_timelock_governance_workflow() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let auth_id = env.register_contract(None, authentication::AuthContract);
+    let msig_id = env.register_contract(None, multi_party_auth::MultiPartyAuth);
+    let timelock_id = env.register_contract(None, timelock::TimelockContract);
+
+    let admin = Address::generate(&env);
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let target = Address::generate(&env);
+
+    let auth_client = authentication::AuthContractClient::new(&env, &auth_id);
+    let msig_client = multi_party_auth::MultiPartyAuthClient::new(&env, &msig_id);
+    let timelock_client = timelock::TimelockContractClient::new(&env, &timelock_id);
+
+    auth_client.initialize(&admin);
+    assert_eq!(msig_client.initialize(&2, Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()])), Ok(()));
+    timelock_client.initialize(&admin);
+
+    let proposal_id = msig_client.create_proposal(&admin).unwrap();
+    assert_eq!(msig_client.approve(&proposal_id, &signer1), Ok(()));
+    assert_eq!(msig_client.approve(&proposal_id, &signer2), Ok(()));
+    assert_eq!(msig_client.execute(&proposal_id, &admin), Ok(true));
+
+    let op_id = Bytes::from_slice(&env, b"grant_moderator");
+    timelock_client.queue(&op_id, &(timelock::MIN_DELAY + 1));
+    env.ledger().with_mut(|l| l.timestamp += timelock::MIN_DELAY + 2);
+    assert_eq!(timelock_client.get_state(&op_id), timelock::OperationState::Ready);
+    timelock_client.execute(&op_id);
+
+    assert_eq!(auth_client.grant_role(&admin, &target, &authentication::Role::Moderator), Ok(()));
+    assert!(auth_client.has_role(&target, &authentication::Role::Moderator));
+}
+
+#[test]
+fn test_multisig_threshold_not_met_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let msig_id = env.register_contract(None, multi_party_auth::MultiPartyAuth);
+    let admin = Address::generate(&env);
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+
+    let msig_client = multi_party_auth::MultiPartyAuthClient::new(&env, &msig_id);
+    assert_eq!(msig_client.initialize(&2, Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()])), Ok(()));
+
+    let proposal_id = msig_client.create_proposal(&admin).unwrap();
+    assert_eq!(msig_client.approve(&proposal_id, &signer1), Ok(()));
+    assert_eq!(msig_client.execute(&proposal_id, &admin), Err(multi_party_auth::AuthError::ThresholdNotMet));
 }
 
 // ---------------------------------------------------------------------------

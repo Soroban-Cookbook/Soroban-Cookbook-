@@ -11,6 +11,9 @@ Learn how to set up your Soroban development environment, including Rust, the So
 ### [Testing Guide](./testing.md)
 A comprehensive guide to testing Soroban contracts, from unit tests to advanced integration testing.
 
+### [Local Simulation Guide](./local-simulation.md)
+Build, invoke, and debug contracts entirely on your machine before touching testnet.
+
 ### [Deployment Guide](./deployment.md)
 Learn how to deploy your smart contracts to Stellar's Testnet and Mainnet, including transaction fee management.
 
@@ -29,7 +32,8 @@ A translation guide for Ethereum developers, comparing Solidity patterns with th
 1. Start with **[Getting Started](./getting-started.md)** to set up your environment.
 2. Follow the **[Basics](../examples/basics/)** examples to learn core concepts.
 3. Use the **[Testing Guide](./testing.md)** as you develop your own contracts.
-4. Refer to the **[Deployment Guide](./deployment.md)** when you're ready to go live.
+4. Use the **[Local Simulation Guide](./local-simulation.md)** to validate locally before deploying.
+5. Refer to the **[Deployment Guide](./deployment.md)** when you're ready to go live.
 
 # Soroban Guides Index
 
@@ -50,6 +54,12 @@ Learn to test Soroban contracts effectively.
 - Unit testing, Integration testing
 - Mocking, Events verification
 - Test coverage and performance
+
+### [Local Simulation Guide](./local-simulation.md)
+Validate contracts locally before testnet deployment.
+- Reproducible build/invoke/inspect loop
+- Debugging panics, auth failures, and events
+- State inspection and ledger time manipulation
 
 ### [Deployment Guide](./deployment.md)
 Deploy your smart contracts to Stellar networks.
