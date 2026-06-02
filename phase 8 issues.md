@@ -6,17 +6,6 @@
 
 ## Monthly Community Calls
 
-### Issue #379: Setup Community Call Infrastructure
-
-- **Priority:** High
-- **Status:** Planned
-- **Description:** Set up infrastructure for monthly calls
-- **Acceptance Criteria:**
-  - Video conferencing platform selected
-  - Calendar created
-  - Registration system
-  - Recording setup
-  - Documentation
 
 ### Issue #380: Plan First Community Call
 
