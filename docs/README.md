@@ -33,6 +33,7 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 - [Governance & Authorization Patterns](./governance-rbac-multisig-timelock.md) — RBAC, multisig, and timelock guidance for secure deployments
 - [Glossary](./glossary.md) — Key terms and concepts
 - [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds
+- [Security Audit Preparation](./security-audit/README.md) — Audit scope, prep checklist, and known-issues log for the intermediate examples
 
 ### Architecture Decision Records
 
