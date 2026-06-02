@@ -18,6 +18,8 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 | Check best practices        | [Best Practices](./best-practices.md)                        |
 | Follow style guide          | [Style Guide](./style-guide.md)                              |
 | Get a cheat sheet           | [Quick Reference](./quick-reference.md)                      |
+| Understand token design     | [Token Patterns](./token-patterns.md)                        |
+| Compare gas costs           | [Gas Benchmarks](./gas-benchmarks.md)                        |
 | Compare example gas costs   | [Gas Benchmarks](./gas-benchmarks.md)                      |
 
 ## Reference Documentation
@@ -26,6 +28,8 @@ Welcome to the Soroban Cookbook documentation. Use this index to find what you n
 - [Style Guide](./style-guide.md) — Naming, documentation, and testing standards
 - [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
 - [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
+- [Token Patterns](./token-patterns.md) — Metadata, mint/burn, wrapping, and access control for tokens
+- [Gas Benchmarks](./gas-benchmarks.md) — CPU and memory cost comparison across examples
 - [Governance & Authorization Patterns](./governance-rbac-multisig-timelock.md) — RBAC, multisig, and timelock guidance for secure deployments
 - [Glossary](./glossary.md) — Key terms and concepts
 - [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds
