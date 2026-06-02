@@ -13,6 +13,7 @@ This category contains examples related to Decentralized Finance (DeFi) protocol
 ## Planned Examples
 
 - `01-simple-amm`: A basic constant-product AMM.
-- `02-lending-pool`: A contract for depositing assets and borrowing against them.
-- `03-farming-pool`: A yield farming system with admin management features.
+- `02-constant-product-amm`: Uniswap V2-style AMM with liquidity provider tokens.
+- `03-lending-pool`: A contract for depositing assets and borrowing against them.
+- `04-yield-vault`: A simple vault that implements a basic yield strategy.
 - `04-escrow`: A multi-party escrow contract.
