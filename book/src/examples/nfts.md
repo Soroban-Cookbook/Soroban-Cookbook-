@@ -4,7 +4,21 @@ Non-fungible tokens and marketplaces on Soroban.
 
 ## Examples
 
-### 01 — NFT Metadata Standards
+### 01 — Basic NFT
+
+**Path:** `examples/nfts/01-basic-nft`
+
+A mintable NFT contract with ownership queries, transfer mechanics, enumerability, and both single-token and operator approvals.
+
+**Key concepts:**
+- Mint function guarded by an admin role
+- `owner_of` + `balance_of` queries
+- Global and owner-specific token enumeration
+- `approve`, `set_approval_for_all`, and `transfer_from` patterns
+
+---
+
+### 02 — NFT Metadata Standards
 
 **Path:** `examples/nfts/01-nft-metadata`
 
@@ -17,6 +31,20 @@ A complete NFT contract implementing metadata standards with JSON schema complia
 - `validate_metadata()` called on every mint and update
 - Admin-controlled minting and metadata updates
 - Single-token and operator approvals
+
+---
+
+### 03 — NFT Marketplace
+
+**Path:** `examples/nfts/02-nft-marketplace`
+
+An advanced marketplace contract demonstrating fixed-price listings, auction bidding, bundle sales, automatic royalty accounting, and trading history.
+
+**Key concepts:**
+- Fixed-price and auction listing flows
+- Bundle sales for multiple NFTs in one order
+- Royalty calculation and payout accounting
+- Trade history storage for settlement auditing
 
 ---
 
