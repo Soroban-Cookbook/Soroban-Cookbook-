@@ -2,6 +2,15 @@
 
 Decentralized finance on Soroban: AMMs, lending, yield protocols.
 
+## Staking Pool
+A working staking example demonstrates how to build lockup duration options, calculate boost rewards, and enforce early withdrawal penalties.
+
+**Key Concepts:**
+- Lockup tiers and term-based incentives
+- Withdrawals before maturity incur a fixed penalty
+- Longer lockups earn higher boost rewards
+- State tracking per staker via durable storage
+
 ## 📋 Coming Soon
 
 Planned examples:
@@ -30,8 +39,8 @@ Planned examples:
 - Performance fees
 - Emergency withdrawal
 
-## Placeholder Content
-Currently empty `examples/defi/` directory.
+## Prerequisites
+- [Basics](../basics.md), [Tokens](../tokens.md)
 
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)

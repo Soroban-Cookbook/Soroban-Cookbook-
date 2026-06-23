@@ -20,13 +20,17 @@ Automated yield aggregation and reward systems.
 Complex financial instruments and stablecoin models.
 - **Planned:** Options protocols, Perpetual Swaps, Synthetic Assets, Collateralized Stablecoins.
 
-## 📋 Planned Examples
+## ≡ƒôï Available Examples
+
+- **Staking Pool** - Rewards for locking up balances with lockup duration options, early withdrawal penalties, and boost incentives for longer locks.
+  - [Staking Pool example](./staking-pool/)
+
+## ≡ƒôï Planned Examples
 
 - **Constant Product AMM** - Core liquidity pool mechanics (x * y = k).
 - **Simple Lending** - Basic lending and borrowing with interest.
 - **Yield Vault** - Automated yield harvesting and compounding.
 - **Flash Loans** - Uncollateralized borrowing within a single transaction.
-- **Staking Pool** - Rewards for locking up tokens.
 - **Stablecoin** - Collateral-backed stable asset.
 
 ## ⚠️ Security First
