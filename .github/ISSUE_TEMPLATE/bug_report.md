@@ -7,9 +7,20 @@ assignees: ''
 
 ---
 
+## Before Submitting
+
+Please check for duplicates before opening a new bug:
+
+1. Search open issues: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20in%3Atitle
+2. Search unassigned open issues: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20no%3Aassignee
+3. If a matching bug exists, add details there instead of opening a duplicate.
+
 ## Description
 
 <!-- Describe what is broken and where it happens. -->
+
+## Related Issues
+Link related or potentially duplicate issues, if any (for example: #123).
 
 ## Steps to Reproduce
 

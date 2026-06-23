@@ -68,6 +68,30 @@ To maintain a consistent and high-quality codebase, please follow these guidelin
 
 ---
 
+## 🧹 Issue Duplicate Triage Policy
+
+To keep issue tracking clean and searchable, use this duplicate-handling policy:
+
+1. Pick one canonical issue and keep it open.
+2. Prefer the oldest open issue as canonical for consistency.
+3. Close newer exact-title duplicates after adding a cross-link comment.
+
+Use this closure comment format on the duplicate issue:
+
+```text
+Closing as duplicate of #<canonical-issue-number>.
+Please continue updates and discussion on the canonical issue.
+```
+
+When useful, add a short note on the canonical issue linking the closed duplicate for traceability.
+
+Before opening a new issue, always search:
+
+- Open issues: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20in%3Atitle
+- Unassigned open issues: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20no%3Aassignee
+
+---
+
 ## 🔄 Pull Request Process
 
 1.  **Branching**: Create a feature branch from `main`.

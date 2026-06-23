@@ -39,6 +39,9 @@ client.approve(&proposal_id, &bob);
 
 // Execute once threshold met
 client.execute(&proposal_id, &alice);
+
+// Or cancel before execution
+client.cancel(&proposal_id, &alice);
 ```
 
 ### Single-Transaction Multi-Auth
@@ -63,6 +66,7 @@ client.require_all_signers();
 | `Already approved` | Signer approved twice | Each signer approves once |
 | `Threshold not met` | Not enough approvals | Collect more approvals |
 | `Already executed` | Proposal executed twice | Check execution status |
+| `Already canceled` | Proposal was canceled | Do not execute or approve canceled proposals |
 
 ## Security Checklist
 

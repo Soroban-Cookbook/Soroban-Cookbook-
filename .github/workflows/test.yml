@@ -11,6 +11,8 @@ env:
   # soroban-cli was renamed to stellar-cli at v22.
   # 22.1.0 is the last release under the soroban protocol 21 era.
   STELLAR_CLI_VERSION: 22.1.0
+  # SDK 26 still uses deprecated Events::publish in many examples; allow while migrating.
+  RUSTFLAGS: "-D warnings -A deprecated"
 
 jobs:
   fmt:
@@ -42,7 +44,7 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Run Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+        run: ./scripts/ci-workspace.sh clippy --tests --lib --target x86_64-unknown-linux-gnu -- -D warnings
 
   test:
     name: Test Suite
@@ -51,6 +53,8 @@ jobs:
     # edition 2024 (e.g. base64ct ≥ 1.8) — so we drop the old matrix entry.
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -68,8 +72,26 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
 
-      - name: Run tests
-        run: cargo test --workspace --all-features
+      - name: Run targeted tests for changed paths
+        if: github.event_name == 'pull_request'
+        run: |
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.sha }})
+          for file in $CHANGED_FILES; do
+            if [[ $file == examples/* ]]; then
+              EXAMPLE_DIR=$(echo $file | cut -d/ -f1-3)
+              if [ -f "$EXAMPLE_DIR/Cargo.toml" ]; then
+                echo "Running test for changed example $EXAMPLE_DIR"
+                cd $EXAMPLE_DIR && cargo test && cd -
+              fi
+            fi
+          done
+
+      - name: Run security tests
+        run: cargo test --package security-tests --target x86_64-unknown-linux-gnu
+
+      - name: Run tests (fallback)
+        if: github.event_name != 'pull_request'
+        run: ./scripts/ci-workspace.sh test --target x86_64-unknown-linux-gnu
 
   build:
     name: Build Contracts
@@ -81,7 +103,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
-          target: wasm32-unknown-unknown
+          target: wasm32v1-none
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -97,7 +119,33 @@ jobs:
         run: cargo install --locked stellar-cli --version ${{ env.STELLAR_CLI_VERSION }}
 
       - name: Build all contracts
-        run: cargo build --workspace --target wasm32-unknown-unknown --release
+        run: ./scripts/ci-workspace.sh build --target wasm32v1-none --release
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run security audit
+        run: |
+          for i in {1..3}; do
+            cargo audit --deny warnings --deny unsound && break
+            if [ $i -lt 3 ]; then
+              echo "Attempt $i failed, retrying in $((i*10)) seconds..."
+              sleep $((i*10))
+            else
+              exit 1
+            fi
+          done
 
   coverage:
     name: Code Coverage
@@ -135,7 +183,16 @@ jobs:
       # tarpaulin.toml controls output format (xml + html + lcov),
       # output directory (coverage/), timeout, and exclusions.
       - name: Generate coverage
-        run: cargo tarpaulin
+        run: |
+          EXCLUDE_ARGS=""
+          while IFS= read -r pkg || [[ -n "${pkg:-}" ]]; do
+            pkg="${pkg%%#*}"
+            pkg="$(echo "$pkg" | xargs)"
+            [[ -z "$pkg" ]] && continue
+            EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude $pkg"
+          done < scripts/ci-exclude-packages.txt
+          # shellcheck disable=SC2086
+          cargo tarpaulin $EXCLUDE_ARGS
 
       # Keep the full coverage report as a downloadable artifact for
       # historical review — retained for 90 days.

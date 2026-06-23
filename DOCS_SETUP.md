@@ -38,7 +38,7 @@ book/
 
 ## Deployment
 
-- GitHub Actions: `.github/workflows/deploy-docs.yml`
+- GitHub Actions `.github/workflows/deploy-docs.yml`
 - Push to `main` → automatic build/deploy to GitHub Pages
 - Live site: https://soroban-cookbook.github.io/Soroban-Cookbook/
 

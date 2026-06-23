@@ -56,13 +56,6 @@ cd Soroban-Cookbook-
 cargo test --workspace
 For more detailed setup, see the Getting Started Guide.
 
-📝 Code Style Guidelines
-To maintain a consistent and high-quality codebase, please follow these guidelines:
-
-Naming: Follow standard Rust naming conventions.
-
-Formatting: Always run cargo fmt before committing.
-
 To maintain a consistent and high-quality codebase, please follow our [Style Guide](./docs/style-guide.md).
 
 Key highlights:
@@ -72,10 +65,6 @@ Key highlights:
 - **Documentation**: Use `///` for public interface docs and `//!` for module-level explanations.
 - **Testing**: Every example must include comprehensive unit tests.
 - **No-std**: All contract code must be `#![no_std]`.
-
-Comments: Use /// for documentation comments and // for internal logic explanation.
-
-No-std: All contract code must be #![no_std].
 
 🏗️ Project Structure
 examples/: Categorized smart contract examples.
@@ -115,12 +104,6 @@ All contributions must include tests:
   # Reports are written to coverage/ (XML, HTML, LCOV)
   # Open coverage/tarpaulin-report.html in a browser for a line-by-line view
   ```
-
-Integration Tests: In tests/ for multi-contract or complex interactions.
-
-Mocking: Use env.mock_all_auths() for testing authorization flows.
-
-Coverage: Aim for high test coverage. You can check coverage locally using cargo tarpaulin.
 
 📋 Example Contribution Template
 When adding a new example in examples/category/name/:
@@ -165,3 +148,7 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 [ ] Documentation (README, guides, SUMMARY.md) is updated.
 
 [ ] PR is linked to relevant issues.
+### CI Testing Strategy
+
+- We run targeted tests for changed paths on pull requests to enable fast feedback.
+- For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.

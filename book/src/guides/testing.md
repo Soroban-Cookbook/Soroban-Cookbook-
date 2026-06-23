@@ -10,6 +10,8 @@ Testing is crucial for smart contract development. This guide covers:
 - Integration testing multi-contract interactions
 - Test organization and best practices
 - Advanced testing techniques
+- Snapshot testing and coverage tools
+- Common testing patterns and anti-patterns
 
 ## 🧪 Test Types
 
@@ -17,20 +19,41 @@ Testing is crucial for smart contract development. This guide covers:
 
 Test individual contract functions in isolation.
 
+#### Example from Hello World Contract
+
 ```rust
-#[cfg(test)]
-mod test {
-    use super::*;
-    use soroban_sdk::Env;
+use super::*;
+use soroban_sdk::{symbol_short, vec, Env, Symbol};
 
-    #[test]
-    fn test_single_function() {
-        let env = Env::default();
-        let contract_id = env.register_contract(None, MyContract);
-        let client = MyContractClient::new(&env, &contract_id);
+#[test]
+fn test_hello_returns_greeting_vec() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
 
-        let result = client.my_function(&42);
-        assert_eq!(result, 42);
+    let result = client.hello(&symbol_short!("World"));
+
+    assert_eq!(
+        result,
+        vec![&env, symbol_short!("Hello"), symbol_short!("World")]
+    );
+}
+
+#[test]
+fn test_hello_with_different_names() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    for name in [
+        symbol_short!("Alice"),
+        symbol_short!("Bob"),
+        symbol_short!("Dev"),
+    ] {
+        let result = client.hello(&name);
+        assert_eq!(result.len(), 2);
+        assert_eq!(result.get(0).unwrap(), symbol_short!("Hello"));
+        assert_eq!(result.get(1).unwrap(), name);
     }
 }
 ```
@@ -89,6 +112,7 @@ impl MyContract {
 }
 
 // Keep tests in separate file
+#[cfg(test)]
 mod test;
 ```
 
@@ -180,27 +204,250 @@ fn test_auth() {
 
 ## ✅ Best Practices
 
-### 1. Test Edge Cases
+### 1. Use Descriptive Test Names
+
+Test names should clearly describe what is being tested and the expected outcome.
+
+✅ **DO**:
 
 ```rust
 #[test]
-fn test_edge_cases() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, MyContract);
-    let client = MyContractClient::new(&env, &contract_id);
+fn test_transfer_succeeds_with_sufficient_balance() { }
 
-    // Test zero
-    assert_eq!(client.divide(&10, &0), Err(...));
+#[test]
+fn test_transfer_fails_with_insufficient_balance() { }
 
-    // Test maximum values
-    assert_eq!(client.add(&i128::MAX, &1), Err(...));
+#[test]
+fn test_transfer_fails_when_sender_not_authorized() { }
+```
 
-    // Test negative values
-    assert_eq!(client.absolute(&-42), 42);
+❌ **DON'T**:
+
+```rust
+#[test]
+fn test_transfer() { }
+
+#[test]
+fn test_1() { }
+
+#[test]
+fn test_error() { }
+```
+
+### 2. Test Both Happy Path and Error Cases
+
+Every function should have tests for success and failure scenarios.
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_withdraw_succeeds_with_sufficient_balance() {
+    // ... test successful withdrawal
+}
+
+#[test]
+#[should_panic(expected = "insufficient balance")]
+fn test_withdraw_fails_with_insufficient_balance() {
+    // ... test withdrawal failure
 }
 ```
 
-### 2. Test Error Conditions
+### 3. Use Assertions with Descriptive Messages
+
+Include context in assertion messages to aid debugging.
+
+✅ **DO**:
+
+```rust
+assert_eq!(
+    balance,
+    expected_balance,
+    "Balance should be {} after transfer, got {}",
+    expected_balance,
+    balance
+);
+```
+
+### 4. Keep Tests Focused and Independent
+
+Each test should verify one behavior. Tests should not depend on other tests.
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&env, &contract_id);
+
+    let key = symbol_short!("balance");
+    let value = 1000u64;
+
+    // Initially, key should not exist
+    assert!(!client.has_persistent(&key));
+
+    // Set value
+    client.set_persistent(&key, &value);
+
+    // Key should now exist
+    assert!(client.has_persistent(&key));
+
+    // Retrieved value should match
+    assert_eq!(client.get_persistent(&key), Some(value));
+}
+```
+
+### 5. Mock Authorization Appropriately
+
+Use `env.mock_all_auths()` for unit tests, but test authorization logic explicitly when needed.
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_transfer_logic_with_mocked_auth() {
+    let env = Env::default();
+    env.mock_all_auths();  // Focus on transfer logic
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // Test transfer logic
+}
+
+#[test]
+fn test_transfer_requires_sender_authorization() {
+    let env = Env::default();
+    // Don't mock auth - test authorization explicitly
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // Test that unauthorized transfers fail
+}
+```
+
+### 6. Test Edge Cases
+
+Include tests for boundary conditions and edge cases.
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_hello_with_single_character_name() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    let name = symbol_short!("A");
+    let result = client.hello(&name);
+
+    assert_eq!(result, vec![&env, symbol_short!("Hello"), name]);
+}
+
+#[test]
+fn test_zero_and_boundary_values() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&env, &contract_id);
+
+    let key = symbol_short!("boundary");
+
+    // Test zero value
+    client.set_persistent(&key, &0);
+    assert_eq!(client.get_persistent(&key), Some(0));
+
+    // Test max u64 value
+    client.set_persistent(&key, &u64::MAX);
+    assert_eq!(client.get_persistent(&key), Some(u64::MAX));
+}
+```
+
+### 7. Use Fixtures for Common Setup
+
+Create helper functions to reduce test boilerplate.
+
+✅ **DO**:
+
+```rust
+fn setup_test_env() -> (Env, Address, Address) {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    (env, user1, user2)
+}
+
+#[test]
+fn test_transfer() {
+    let (env, user1, user2) = setup_test_env();
+    // ... test logic
+}
+```
+
+### 8. Test Storage Behavior
+
+Example from Storage Patterns Contract:
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&env, &contract_id);
+
+    let key = symbol_short!("balance");
+    let value = 1000u64;
+
+    // Initially, key should not exist
+    assert!(!client.has_persistent(&key));
+
+    // Set value
+    client.set_persistent(&key, &value);
+
+    // Verify set event
+    let events = env.events().all();
+    let (_, topics, data) = events.last().unwrap();
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("set"));
+    let (d_key, d_value): (Symbol, u64) = <(Symbol, u64)>::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+    assert_eq!(d_value, value);
+
+    // Key should now exist
+    assert!(client.has_persistent(&key));
+
+    // Retrieved value should match
+    assert_eq!(client.get_persistent(&key), Some(value));
+
+    // Remove value
+    client.remove_persistent(&key);
+
+    // Verify remove event
+    let events = env.events().all();
+    let (_, topics, data) = events.last().unwrap();
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("remove"));
+    let d_key: Symbol = Symbol::try_from_val(&env, &data).unwrap();
+    assert_eq!(d_key, key);
+
+    // Key should no longer exist
+    assert!(!client.has_persistent(&key));
+}
+```
+
+### 9. Test Error Conditions
 
 ```rust
 #[test]
@@ -217,45 +464,146 @@ fn test_insufficient_balance() {
 }
 ```
 
-### 3. Use Descriptive Test Names
-
-```rust
-// Good ✅
-#[test]
-fn transfer_succeeds_with_sufficient_balance() { }
-
-#[test]
-fn transfer_fails_when_balance_insufficient() { }
-
-#[test]
-fn transfer_emits_event_on_success() { }
-
-// Bad ❌
-#[test]
-fn test1() { }
-
-#[test]
-fn transfer() { }
-```
-
-### 4. Test Storage Behavior
+### 10. Test Events
 
 ```rust
 #[test]
-fn test_storage_persistence() {
+fn test_events() {
     let env = Env::default();
     let contract_id = env.register_contract(None, MyContract);
     let client = MyContractClient::new(&env, &contract_id);
 
-    // Set value
-    client.set_value(&42);
+    client.transfer(&from, &to, &100);
 
-    // Verify persistence
-    assert_eq!(client.get_value(), 42);
+    // Get emitted events
+    let events = env.events().all();
 
-    // Update value
-    client.set_value(&100);
-    assert_eq!(client.get_value(), 100);
+    // Verify event was emitted
+    assert_eq!(events.len(), 1);
+    // ... verify event data
+}
+```
+
+## ⚠️ Common Testing Pitfalls
+
+### 1. Forgetting to Mock Authorization
+
+❌ **DON'T**:
+
+```rust
+#[test]
+fn test_transfer() {
+    let env = Env::default();
+    // Forgot env.mock_all_auths()!
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    // This will fail due to missing authorization
+    client.transfer(&from, &to, &100);
+}
+```
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_transfer() {
+    let env = Env::default();
+    env.mock_all_auths();  // Always mock auth for unit tests
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&env, &contract_id);
+
+    client.transfer(&from, &to, &100);
+}
+```
+
+### 2. Not Extending TTL for Persistent Storage
+
+❌ **DON'T**:
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&key, &1000);
+    // Forgot to extend TTL!
+
+    let value: u64 = env.storage().persistent().get(&key).unwrap();
+    assert_eq!(value, 1000);
+}
+```
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&key, &1000);
+    env.storage().persistent().extend_ttl(&key, 100, 100);  // Extend TTL
+
+    let value: u64 = env.storage().persistent().get(&key).unwrap();
+    assert_eq!(value, 1000);
+}
+```
+
+### 3. Testing Multiple Behaviors in One Test
+
+❌ **DON'T**:
+
+```rust
+#[test]
+fn test_everything() {
+    // Tests initialization, transfer, and withdrawal in one test
+    // Hard to debug when it fails
+}
+```
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_initialization() {}
+
+#[test]
+fn test_transfer() {}
+
+#[test]
+fn test_withdrawal() {}
+```
+
+### 4. Ignoring Error Cases
+
+❌ **DON'T**:
+
+```rust
+#[test]
+fn test_transfer() {
+    // Only test the happy path
+    client.transfer(&from, &to, &100);
+    assert_eq!(client.balance(&to), 100);
+}
+```
+
+✅ **DO**:
+
+```rust
+#[test]
+fn test_transfer_succeeds() {
+    client.transfer(&from, &to, &100);
+    assert_eq!(client.balance(&to), 100);
+}
+
+#[test]
+#[should_panic]
+fn test_transfer_fails_with_insufficient_balance() {
+    client.transfer(&from, &to, &1000000);
 }
 ```
 
@@ -314,7 +662,14 @@ fn emits_expected_event_shape() {
 }
 ```
 
-Tips:
+**When to use**:
+
+- Testing complex data structures
+- Verifying serialization/deserialization
+- Regression testing for output changes
+- Testing event emissions
+
+**Tips**:
 
 - Prefer deterministic inputs (fixed timestamps/amounts) before snapshot assertions.
 - Snapshot only stable values (avoid non-deterministic IDs unless normalized first).
@@ -331,144 +686,18 @@ insta = "1"
 
 The repository CI already uses `cargo-tarpaulin` and uploads Cobertura XML to Codecov.
 
-Run coverage locally:
+### Cargo Tarpaulin
+
+**Installation**:
 
 ```bash
 cargo install cargo-tarpaulin --locked
-cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300
 ```
 
-Alternative (LLVM-based):
+**Usage**:
 
 ```bash
-cargo install cargo-llvm-cov --locked
-cargo llvm-cov --workspace --all-features --lcov --output-path lcov.info
+cargo tarpaulin --out Xml --out Html
 ```
 
-Use coverage reports to identify untested error paths, auth branches, and storage edge cases.
-
-### 5. Test Events
-
-```rust
-#[test]
-fn test_events() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, MyContract);
-    let client = MyContractClient::new(&env, &contract_id);
-
-    client.transfer(&from, &to, &100);
-
-    // Get emitted events
-    let events = env.events().all();
-
-    // Verify event was emitted
-    assert_eq!(events.len(), 1);
-    // ... verify event data
-}
-```
-
-## 🚀 Running Tests
-
-### Basic Test Run
-
-```bash
-cargo test
-```
-
-### Run Specific Test
-
-```bash
-cargo test test_transfer
-```
-
-### Run with Output
-
-```bash
-cargo test -- --nocapture
-```
-
-### Run with Multiple Threads
-
-```bash
-cargo test -- --test-threads=4
-```
-
-### Run Integration Tests Only
-
-```bash
-cargo test --test integration
-```
-
-## 📊 Test Coverage
-
-### Install Tarpaulin (Linux only)
-
-```bash
-cargo install cargo-tarpaulin
-```
-
-### Generate Coverage Report
-
-```bash
-cargo tarpaulin --out Html
-```
-
-### View Coverage
-
-```bash
-open tarpaulin-report.html
-```
-
-## 🐛 Debugging Tests
-
-### Print Debugging
-
-```rust
-#[test]
-fn debug_test() {
-    let env = Env::default();
-
-    // Use env.logs() for debugging
-    env.logs().enable();
-
-    // Your test code
-    let result = some_function();
-
-    // Check logs
-    println!("{:?}", env.logs().all());
-}
-```
-
-### Test Isolation
-
-Each test runs in isolation - tests don't share state:
-
-```rust
-#[test]
-fn test_a() {
-    // Has its own Env
-}
-
-#[test]
-fn test_b() {
-    // Completely separate Env
-}
-```
-
-## 📚 Examples
-
-Check out our test examples:
-
-- [Basic Tests](../examples/basics/01-hello-world/src/test.rs)
-- [Storage Tests](../examples/basics/02-storage-patterns/src/test.rs)
-- [Auth Tests](../examples/basics/03-authentication/src/test.rs)
-
-## 🔗 Resources
-
-- [Soroban Testing Documentation](https://developers.stellar.org/docs/smart-contracts/testing)
-- [Rust Testing Best Practices](https://doc.rust-lang.org/book/ch11-00-testing.html)
-- [SDK Test Utilities](https://docs.rs/soroban-sdk/latest/soroban_sdk/testutils/)
-
----
-
-**Next:** Learn about [Local Simulation](./local-simulation.md)
+Reports are written to `coverage/`. Open `coverage/tarpaulin-report.html` in a browser for a line-by-line view of what your tests are (and aren't) hitting.

@@ -11,6 +11,7 @@ use soroban_sdk::{
     testutils::{Address as _, Events as _},
     Address, Env, Symbol, TryFromVal,
 };
+use soroban_validation::test_events::EventList;
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -33,30 +34,56 @@ fn test_naming_convention_namespace_and_action_slots_are_stable() {
     // Emit one event per structured API so we can validate a shared convention:
     // topic[0] = contract namespace, topic[1] = action name.
     client.transfer(&a1, &a2, &10, &1);
+    let events = EventList::new(&env, env.events().all());
+    assert_eq!(events.len(), 1);
+    let (_id, topics, _data) = events.get(0).unwrap();
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap(),
+        CONTRACT_NS
+    );
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap(),
+        ACTION_TRANSFER
+    );
+
     client.update_config(&symbol_short!("fee"), &1, &2);
+    let events = EventList::new(&env, env.events().all());
+    assert_eq!(events.len(), 1);
+    let (_id, topics, _data) = events.get(0).unwrap();
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap(),
+        CONTRACT_NS
+    );
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap(),
+        ACTION_CONFIG_UPDATE
+    );
+
     client.admin_action(&a1, &symbol_short!("pause"));
+    let events = EventList::new(&env, env.events().all());
+    assert_eq!(events.len(), 1);
+    let (_id, topics, _data) = events.get(0).unwrap();
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap(),
+        CONTRACT_NS
+    );
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap(),
+        ACTION_ADMIN
+    );
+
     client.audit_trail(&a2, &symbol_short!("resume"), &symbol_short!("ok"));
-
-    let events = env.events().all();
-    assert_eq!(events.len(), 4);
-
-    for (index, expected_action) in [
-        ACTION_TRANSFER,
-        ACTION_CONFIG_UPDATE,
-        ACTION_ADMIN,
-        ACTION_AUDIT,
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        let (_id, topics, _data) = events.get(index as u32).unwrap();
-
-        let namespace: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
-        let action: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
-
-        assert_eq!(namespace, CONTRACT_NS);
-        assert_eq!(action, expected_action);
-    }
+    let events = EventList::new(&env, env.events().all());
+    assert_eq!(events.len(), 1);
+    let (_id, topics, _data) = events.get(0).unwrap();
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap(),
+        CONTRACT_NS
+    );
+    assert_eq!(
+        Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap(),
+        ACTION_AUDIT
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -72,7 +99,7 @@ fn test_transfer_emits_one_event() {
 
     client.transfer(&sender, &recipient, &1000, &0);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1, "transfer must emit exactly one event");
 }
 
@@ -84,7 +111,7 @@ fn test_transfer_event_has_four_topics() {
     let recipient = Address::generate(&env);
     client.transfer(&sender, &recipient, &500, &42);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     let (_id, topics, _data) = events.get(0).unwrap();
 
     assert_eq!(topics.len(), 4, "transfer event must have 4 topics");
@@ -98,7 +125,7 @@ fn test_transfer_topic_namespace_and_action() {
     let recipient = Address::generate(&env);
     client.transfer(&sender, &recipient, &1, &0);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     // Topic 0: contract namespace
     let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
@@ -117,7 +144,7 @@ fn test_transfer_indexed_addresses_in_topics() {
     let recipient = Address::generate(&env);
     client.transfer(&sender, &recipient, &999, &0);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     // Topic 2: sender (indexed for off-chain search)
     let t_sender = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
@@ -139,7 +166,7 @@ fn test_transfer_structured_data_payload() {
 
     client.transfer(&sender, &recipient, &amount, &memo);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = TransferEventData::try_from_val(&env, &data).unwrap();
 
     assert_eq!(payload.amount, amount);
@@ -157,7 +184,7 @@ fn test_transfer_payload_regression_allows_negative_amount() {
 
     client.transfer(&sender, &recipient, &amount, &memo);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = TransferEventData::try_from_val(&env, &data).unwrap();
     assert_eq!(payload.amount, amount);
     assert_eq!(payload.memo, memo);
@@ -174,7 +201,7 @@ fn test_transfer_payload_regression_supports_max_memo() {
 
     client.transfer(&sender, &recipient, &amount, &memo);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = TransferEventData::try_from_val(&env, &data).unwrap();
     assert_eq!(payload.amount, amount);
     assert_eq!(payload.memo, memo);
@@ -188,7 +215,7 @@ fn test_transfer_topic_order_regression_is_stable() {
     let recipient = Address::generate(&env);
     client.transfer(&sender, &recipient, &77, &123);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let topic_0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let topic_1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
     let topic_2: Address = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
@@ -210,7 +237,7 @@ fn test_config_update_emits_one_event() {
 
     client.update_config(&symbol_short!("max_sup"), &100, &200);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1, "update_config must emit exactly one event");
 }
 
@@ -220,7 +247,7 @@ fn test_config_update_event_has_three_topics() {
 
     client.update_config(&symbol_short!("fee"), &5, &10);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     assert_eq!(topics.len(), 3, "cfg_update event must have 3 topics");
 }
 
@@ -230,7 +257,7 @@ fn test_config_update_topic_namespace_and_action() {
 
     client.update_config(&symbol_short!("fee"), &5, &10);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     assert_eq!(ns, symbol_short!("events"));
@@ -246,7 +273,7 @@ fn test_config_update_indexed_key_in_topic() {
     let key = symbol_short!("max_sup");
     client.update_config(&key, &50, &100);
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     // Topic 2: the config key — indexed so consumers can filter by key name
     let t_key: Symbol = Symbol::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
@@ -259,7 +286,7 @@ fn test_config_update_structured_data_payload() {
 
     client.update_config(&symbol_short!("rate"), &10, &20);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = ConfigUpdateEventData::try_from_val(&env, &data).unwrap();
 
     assert_eq!(payload.old_value, 10);
@@ -274,28 +301,28 @@ fn test_config_update_structured_data_payload() {
 fn test_event_emission_exists() {
     let (env, _, client) = make_env_and_client();
     client.emit_simple(&100);
-    assert!(!env.events().all().is_empty());
+    assert!(!EventList::new(&env, env.events().all()).is_empty());
 }
 
 #[test]
 fn test_event_count_single() {
     let (env, _, client) = make_env_and_client();
     client.emit_simple(&42);
-    assert_eq!(env.events().all().len(), 1);
+    assert_eq!(EventList::new(&env, env.events().all()).len(), 1);
 }
 
 #[test]
 fn test_event_count_multiple() {
     let (env, _, client) = make_env_and_client();
     client.emit_multiple(&3);
-    assert_eq!(env.events().all().len(), 3);
+    assert_eq!(EventList::new(&env, env.events().all()).len(), 3);
 }
 
 #[test]
 fn test_topic_structure_simple() {
     let (env, _, client) = make_env_and_client();
     client.emit_simple(&99);
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     assert_eq!(topics.len(), 1);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     assert_eq!(t0, symbol_short!("simple"));
@@ -306,7 +333,7 @@ fn test_topic_structure_tagged() {
     let (env, _, client) = make_env_and_client();
     let tag = symbol_short!("mytag");
     client.emit_tagged(&tag, &50);
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -319,7 +346,7 @@ fn test_payload_values() {
     let (env, _, client) = make_env_and_client();
     let value = 12345u64;
     client.emit_simple(&value);
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload: u64 = u64::try_from_val(&env, &data).unwrap();
     assert_eq!(payload, value);
 }
@@ -328,7 +355,7 @@ fn test_payload_values() {
 fn test_zero_events_on_empty_emit() {
     let (env, _, client) = make_env_and_client();
     client.emit_multiple(&0);
-    assert_eq!(env.events().all().len(), 0);
+    assert_eq!(EventList::new(&env, env.events().all()).len(), 0);
 }
 
 // ==================== QUERY-FRIENDLY PATTERN TESTS ====================
@@ -344,7 +371,7 @@ fn test_emit_transfer_topic_layout() {
 
     client.emit_transfer(&from, &to, &500);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1);
 
     let (_id, topics, data) = events.get(0).unwrap();
@@ -378,23 +405,22 @@ fn test_emit_transfer_independent_senders_queryable() {
     let carol = Address::generate(&env);
 
     client.emit_transfer(&alice, &carol, &100);
+    let first = EventList::new(&env, env.events().all());
+    assert_eq!(first.len(), 1);
+    let (_id, topics, _data) = first.get(0).unwrap();
+    let action: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    assert_eq!(action, symbol_short!("transfer"));
+    let sender0: Address = Address::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(sender0, alice);
+
     client.emit_transfer(&bob, &carol, &200);
-
-    let events = env.events().all();
-    assert_eq!(events.len(), 2);
-
-    // Both events share the same action topic, so a "get all transfers" query works.
-    for i in 0..2u32 {
-        let (_id, topics, _data) = events.get(i).unwrap();
-        let action: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
-        assert_eq!(action, symbol_short!("transfer"));
-    }
-
-    // Sender is distinguishable via topic[1].
-    let (_id0, topics0, _) = events.get(0).unwrap();
-    let (_id1, topics1, _) = events.get(1).unwrap();
-    let sender0: Address = Address::try_from_val(&env, &topics0.get(1).unwrap()).unwrap();
-    let sender1: Address = Address::try_from_val(&env, &topics1.get(1).unwrap()).unwrap();
+    let second = EventList::new(&env, env.events().all());
+    assert_eq!(second.len(), 1);
+    let (_id, topics, _data) = second.get(0).unwrap();
+    let action: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    assert_eq!(action, symbol_short!("transfer"));
+    let sender1: Address = Address::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
+    assert_eq!(sender1, bob);
     assert_ne!(
         sender0, sender1,
         "Senders must be distinguishable via topic[1]"
@@ -413,7 +439,7 @@ fn test_emit_namespaced_three_topic_hierarchy() {
 
     client.emit_namespaced(&category, &action, &pool, &1000);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1);
 
     let (_id, topics, data) = events.get(0).unwrap();
@@ -442,7 +468,7 @@ fn test_emit_status_change_four_topics() {
 
     client.emit_status_change(&entity, &old_s, &new_s);
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1);
 
     let (_id, topics, data) = events.get(0).unwrap();
@@ -476,7 +502,7 @@ fn test_admin_action_emits_one_event() {
     let admin = Address::generate(&env);
     client.admin_action(&admin, &symbol_short!("pause"));
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1, "admin_action must emit exactly one event");
 }
 
@@ -487,7 +513,7 @@ fn test_admin_action_event_has_three_topics() {
     let admin = Address::generate(&env);
     client.admin_action(&admin, &symbol_short!("pause"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     assert_eq!(topics.len(), 3, "admin_action event must have 3 topics");
 }
 
@@ -498,7 +524,7 @@ fn test_admin_action_topic_namespace_and_category() {
     let admin = Address::generate(&env);
     client.admin_action(&admin, &symbol_short!("upgrade"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     assert_eq!(ns, symbol_short!("events"));
@@ -514,7 +540,7 @@ fn test_admin_action_indexed_admin_address() {
     let admin = Address::generate(&env);
     client.admin_action(&admin, &symbol_short!("pause"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     let t_admin = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
     assert_eq!(t_admin, admin);
@@ -528,7 +554,7 @@ fn test_admin_action_structured_data_payload() {
     let action = symbol_short!("pause");
     client.admin_action(&admin, &action);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = AdminActionEventData::try_from_val(&env, &data).unwrap();
 
     assert_eq!(payload.action, action);
@@ -545,7 +571,7 @@ fn test_audit_trail_emits_one_event() {
     let actor = Address::generate(&env);
     client.audit_trail(&actor, &symbol_short!("delete"), &symbol_short!("rec_42"));
 
-    let events = env.events().all();
+    let events = EventList::new(&env, env.events().all());
     assert_eq!(events.len(), 1, "audit_trail must emit exactly one event");
 }
 
@@ -556,7 +582,7 @@ fn test_audit_trail_event_has_four_topics() {
     let actor = Address::generate(&env);
     client.audit_trail(&actor, &symbol_short!("create"), &symbol_short!("item_1"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     assert_eq!(topics.len(), 4, "audit_trail event must have 4 topics");
 }
 
@@ -567,7 +593,7 @@ fn test_audit_trail_topic_namespace_and_category() {
     let actor = Address::generate(&env);
     client.audit_trail(&actor, &symbol_short!("update"), &symbol_short!("cfg_x"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     let ns: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     assert_eq!(ns, symbol_short!("events"));
@@ -584,7 +610,7 @@ fn test_audit_trail_indexed_actor_and_action() {
     let action = symbol_short!("delete");
     client.audit_trail(&actor, &action, &symbol_short!("rec_7"));
 
-    let (_id, topics, _data) = env.events().all().get(0).unwrap();
+    let (_id, topics, _data) = EventList::new(&env, env.events().all()).get(0).unwrap();
 
     let t_actor = Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap();
     assert_eq!(t_actor, actor);
@@ -602,7 +628,7 @@ fn test_audit_trail_structured_data_payload() {
     let details = symbol_short!("new_usr");
     client.audit_trail(&actor, &action, &details);
 
-    let (_id, _topics, data) = env.events().all().get(0).unwrap();
+    let (_id, _topics, data) = EventList::new(&env, env.events().all()).get(0).unwrap();
     let payload = AuditTrailEventData::try_from_val(&env, &data).unwrap();
 
     assert_eq!(payload.details, details);

@@ -1,0 +1,14 @@
+[package]
+name = "storage-pagination"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+base64ct = { workspace = true, features = ["std"] }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

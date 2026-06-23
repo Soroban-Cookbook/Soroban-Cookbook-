@@ -101,7 +101,7 @@ generate_coverage() {
     # Generate coverage
     if [ "$target_path" = "." ]; then
         # Workspace coverage
-        if cargo tarpaulin --workspace --all-features --out xml --output-dir ./coverage --timeout 300; then
+        if cargo tarpaulin --workspace --out xml --output-dir ./coverage --timeout 300; then
             print_info "✓ Coverage report generated: coverage/cobertura.xml"
             
             # Show coverage summary if available
@@ -121,7 +121,7 @@ generate_coverage() {
     else
         # Single package coverage
         cd "$target_path"
-        if cargo tarpaulin --all-features --out xml --output-dir ../../coverage --timeout 300; then
+        if cargo tarpaulin --out xml --output-dir ../../coverage --timeout 300; then
             print_info "✓ Coverage report generated for $target_path"
             cd - > /dev/null
             return 0
@@ -154,9 +154,9 @@ test_workspace() {
     print_test "Testing entire workspace..."
     
     if [ "$verbose" = true ]; then
-        cargo test --workspace --all-features -- --nocapture
+        cargo test --workspace --target x86_64-unknown-linux-gnu -- --nocapture
     else
-        cargo test --workspace --all-features --quiet
+        cargo test --workspace --target x86_64-unknown-linux-gnu --quiet
     fi
     
     local result=$?

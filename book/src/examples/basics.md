@@ -2,164 +2,64 @@
 
 Core Soroban fundamentals, one concept per example. Perfect for beginners.
 
-## 📋 Examples (11 total)
+## Examples
 
 ### [01-hello-world](../examples/basics/01-hello-world/)
-**Basic contract structure.** Simplest possible contract - a `hello` function returning greeting.
-
-**Key Concepts:**
-- `#[contract]` / `#[contractimpl]` macros
-- Contract client generation for testing
-- Symbol types & Vec return
-
-**Quick Code:**
-```rust
-pub fn hello(env: Env, to: Symbol) -> Vec<Symbol> {
-    vec![&env, symbol_short!(\"Hello\"), to]
-}
-```
-**Test:** `cargo test -p hello-world`
-
----
+Basic contract structure — `#[contract]`, `#[contractimpl]`, `Env`, `Symbol`, `Vec`.
 
 ### [02-storage-patterns](../examples/basics/02-storage-patterns/)
-**All 3 storage types** (persistent/instance/temporary) + TTL management. **Essential for all contracts.**
+All three storage tiers (persistent, instance, temporary) with TTL management.
 
 **[Full Guide →](../storage-patterns.md)**
 
-**Key Concepts:**
-- Persistent: user balances (per-key TTL)
-- Instance: config (shared TTL) 
-- Temporary: caches (cheapest, short-lived)
-- `has()` before `get()`, `extend_ttl(threshold, extend_to)`
-- `#[contracttype] enum DataKey`
-
-**Decision Tree:**
-```
-> few ledgers? → Temporary
-> config? → Instance
-> user data → Persistent
-```
-
-**Gas:** Temp < Instance < Persistent
-
-**Pro Tip:** Forget TTL extension → data archives!
-
-**Test:** `cargo test -p storage-patterns`
-
----
-
 ### [03-custom-errors](../examples/basics/03-custom-errors/)
-**Custom errors** w/ 8 variants, codes, events. **Essential.**
+Custom error enums with structured codes.
 
 **[Full Guide →](../error-handling.md)**
 
-**Key Concepts:**
-- `#[contracterror] #[repr(u32)] enum Error`
-- `Result<(), Error>`, `Err(MyError::Variant)`
-- Event logging on failures
-- Frontend error code mapping
-
-**Examples:** InvalidInput(1), Unauthorized(2), NotFound(3)...
-
-**Test:** `cargo test -p custom-errors`
-
----
-
 ### [03-authentication](../examples/basics/03-authentication/)
-**Authorization & roles:** `require_auth()`, admin checks, allowances.
-
-**Key Concepts:**
-- `address.require_auth()`
-- Stored admin verification
-- Balance transfer with validation
-- Role-based access control (RBAC)
-
----
+Authorization with `require_auth()`, admin checks, and RBAC.
 
 ### [04-events](../examples/basics/04-events/)
-**Structured events** (4-topic, custom payloads). **Essential for indexing.**
+Structured events with multi-topic indexing.
 
-**[Full Guide →](../events.md)** | [Quick Ref →](../04-events/EVENT_QUICK_REFERENCE.md)
-
-**Key Concepts:**
-- Topics: `(events, transfer, from, to)`
-- Payloads: `#[contracttype] struct TransferData`
-- Filters: sender/receiver specific
-- Patterns: transfer/config/admin/audit
-
-**Gas:** Topics cheap; limit loops
-
-**Test:** `cargo test -p events`
-
----
+**[Full Guide →](../events.md)**
 
 ### [05-error-handling](../examples/basics/05-error-handling/)
-**Result vs panic!** patterns (good/bad).
-
-**Key Concepts:**
-- `Result<T,E>` for user errors, `panic!` for invariants
-- Gas efficient, UX friendly
-
----
+Result-based error handling and propagation.
 
 ### [05-auth-context](../examples/basics/05-auth-context/)
-**Invocation context:** Who called the contract?
-
-**Key Concepts:**
-- `env.invoker().clone()` vs `env.current_contract_address()`
-- Cross-contract auth propagation
-
----
-
-### [06-soroban-types](../examples/basics/06-soroban-types/)
-**Core types:** Address, Symbol, Map, Vec, bytes.
-
-**Key Concepts:**
-- Type conversions (`to_val()`, `try_from_val()`)
-- Collection operations (push/pop)
-
----
+Invocation context across cross-contract call chains.
 
 ### [06-validation-patterns](../examples/basics/06-validation-patterns/)
-**Input validation** with checked math.
+Input validation with checked arithmetic.
 
-**Key Concepts:**
-- `checked_add/sub/mul/div`
-- Range bounds, zero checks
+### [07-type-conversions](../examples/basics/07-type-conversions/)
+Safe type conversions with `TryFromVal` and `IntoVal`.
 
----
+### [08-soroban-types](../examples/basics/08-soroban-types/)
+Core SDK types: Address, Symbol, Map, Vec, bytes.
 
-### [07-enum-types](../examples/basics/07-enum-types/)
-**`#[contracttype]` enums** for state machines.
+### [09-enum-types](../examples/basics/09-enum-types/)
+Contract enums for state machines and dispatch.
 
-**Key Concepts:**
-- Enum storage & matching
-- Operation dispatch
+### [10-custom-structs](../examples/basics/10-custom-structs/)
+Nested `#[contracttype]` structs and composite storage keys.
 
----
+### [11-primitive-types](../examples/basics/11-primitive-types/)
+Integer handling and overflow safety.
 
-### [08-custom-structs](../examples/basics/08-custom-structs/)
-**Complex data** with nested `#[contracttype]` structs.
+### [12-data-types](../examples/basics/12-data-types/)
+Comprehensive type system reference.
 
-**Key Concepts:**
-- User profiles, portfolios
-- Tuple keys `(Status, Address)`
+### [13-collection-types](../examples/basics/13-collection-types/)
+Vec and Map collection patterns.
 
----
+### [14-event-filtering](../examples/basics/14-event-filtering/)
+Indexer-friendly event topic design.
 
-### [09-primitive-types](../examples/basics/09-primitive-types/)
-**Integer handling** & overflow safety.
+## Quick Start
 
-**Key Concepts:**
-- u32/u64/i128 behaviors
-- Safe casting
-
----
-
-**Supporting:** events/, instance-storage/, persistent-storage/, temporary_storage/
-
-## 🚀 Quick Start
 ```bash
 cd examples/basics/01-hello-world
 cargo test && cargo build --target wasm32-unknown-unknown --release

@@ -1,0 +1,5 @@
+[advisories]
+ignore = [
+    # Transitive unmaintained crate from soroban-sdk dependency tree.
+    "RUSTSEC-2024-0436",
+]

@@ -3,8 +3,197 @@ extern crate std;
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation},
-    Address, Env, IntoVal, Symbol, Vec,
+    Address, Bytes, Env, IntoVal, Symbol, Vec,
 };
+
+// ---------------------------------------------------------------------------
+// Auth vector: encode / decode / validate tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_encode_decode_roundtrip() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let c = Address::generate(&env);
+    let signers = Vec::from_array(&env, [a.clone(), b.clone(), c.clone()]);
+
+    let encoded = client.encode_auth_vec(&signers);
+    let decoded = client.decode_auth_vec(&encoded);
+
+    // Decoded length must equal number of unique signers.
+    assert_eq!(decoded.len(), 3);
+    // Every original signer must appear in the decoded vector.
+    assert!(decoded.contains(&a));
+    assert!(decoded.contains(&b));
+    assert!(decoded.contains(&c));
+}
+
+#[test]
+fn test_encode_deduplicates() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    // Pass the same address twice.
+    let signers = Vec::from_array(&env, [a.clone(), a.clone()]);
+
+    let encoded = client.encode_auth_vec(&signers);
+    // After dedup only one entry should remain.
+    assert_eq!(client.auth_vec_len(&encoded), 1);
+}
+
+#[test]
+fn test_encode_sorts_canonically() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+
+    // Encode in both orders — the resulting blobs must be identical.
+    let fwd = client.encode_auth_vec(&Vec::from_array(&env, [a.clone(), b.clone()]));
+    let rev = client.encode_auth_vec(&Vec::from_array(&env, [b.clone(), a.clone()]));
+
+    assert_eq!(fwd, rev);
+}
+
+#[test]
+fn test_validate_accepts_well_formed_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a, b]));
+
+    assert!(client.validate_auth_vec(&encoded));
+}
+
+#[test]
+fn test_validate_rejects_empty_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    assert!(!client.validate_auth_vec(&Bytes::new(&env)));
+}
+
+#[test]
+fn test_validate_rejects_truncated_blob() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a]));
+
+    // Truncate by one byte — length no longer matches count.
+    let truncated_len = encoded.len() - 1;
+    let mut bad = Bytes::new(&env);
+    for i in 0..truncated_len {
+        bad.push_back(encoded.get(i).unwrap());
+    }
+    assert!(!client.validate_auth_vec(&bad));
+}
+
+#[test]
+fn test_validate_rejects_zero_count_header() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    // Manually craft a blob with count = 0.
+    let mut bad = Bytes::new(&env);
+    bad.push_back(0);
+    bad.push_back(0);
+    bad.push_back(0);
+    bad.push_back(0);
+    assert!(!client.validate_auth_vec(&bad));
+}
+
+#[test]
+fn test_auth_vec_len() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let signers = Vec::from_array(
+        &env,
+        [
+            Address::generate(&env),
+            Address::generate(&env),
+            Address::generate(&env),
+        ],
+    );
+    let encoded = client.encode_auth_vec(&signers);
+    assert_eq!(client.auth_vec_len(&encoded), 3);
+}
+
+#[test]
+fn test_auth_vec_contains() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let a = Address::generate(&env);
+    let b = Address::generate(&env);
+    let outsider = Address::generate(&env);
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [a.clone(), b.clone()]));
+
+    assert!(client.auth_vec_contains(&encoded, &a));
+    assert!(client.auth_vec_contains(&encoded, &b));
+    assert!(!client.auth_vec_contains(&encoded, &outsider));
+}
+
+#[test]
+#[should_panic(expected = "auth vector must not be empty")]
+fn test_encode_empty_panics() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+    client.encode_auth_vec(&Vec::new(&env));
+}
+
+#[test]
+#[should_panic(expected = "auth vector exceeds MAX_SIGNERS")]
+fn test_encode_exceeds_max_signers_panics() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let mut too_many: Vec<Address> = Vec::new(&env);
+    for _ in 0..=MAX_SIGNERS {
+        too_many.push_back(Address::generate(&env));
+    }
+    client.encode_auth_vec(&too_many);
+}
+
+#[test]
+fn test_encoded_transfer_requires_all_auths() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let to = Address::generate(&env);
+
+    let encoded = client.encode_auth_vec(&Vec::from_array(&env, [s1.clone(), s2.clone()]));
+    // Should not panic — both signers are mocked.
+    client.multi_sig_transfer_encoded(&encoded, &to, &500i128);
+}
+
+// ---------------------------------------------------------------------------
+// Existing multi-party tests (unchanged)
+// ---------------------------------------------------------------------------
 
 #[test]
 fn test_multi_sig_transfer() {
@@ -256,4 +445,283 @@ fn test_sequential_auth_escrow_unauthorized_step2() {
     env.set_auths(&[]);
 
     client.sequential_auth_escrow(&buyer, &seller, &1000i128);
+}
+
+// ---------------------------------------------------------------------------
+// Multisig management tests (Issue #435)
+// ---------------------------------------------------------------------------
+
+fn setup_multisig(
+    env: &Env,
+    client: &MultiPartyAuthContractClient,
+    proposal_id: &Symbol,
+    threshold: u32,
+    signers: &[Address],
+) {
+    let mut v: Vec<Address> = Vec::new(env);
+    for s in signers {
+        v.push_back(s.clone());
+    }
+    client.setup_proposal(proposal_id, &threshold, &v);
+}
+
+#[test]
+fn test_add_signer_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let new_signer = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt1");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone(), s2.clone()]);
+
+    client.add_signer(&s1, &proposal_id, &new_signer);
+
+    let signers = client.get_signers(&proposal_id);
+    assert_eq!(signers.len(), 3);
+    assert!(signers.contains(&new_signer));
+}
+
+#[test]
+#[should_panic(expected = "Signer already exists")]
+fn test_add_signer_duplicate_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt2");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.add_signer(&s1, &proposal_id, &s1); // duplicate
+}
+
+#[test]
+#[should_panic(expected = "Caller is not a current signer")]
+fn test_add_signer_non_member_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let outsider = Address::generate(&env);
+    let new_signer = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt3");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.add_signer(&outsider, &proposal_id, &new_signer);
+}
+
+#[test]
+fn test_remove_signer_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt4");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone(), s2.clone()]);
+
+    client.remove_signer(&s1, &proposal_id, &s2);
+
+    let signers = client.get_signers(&proposal_id);
+    assert_eq!(signers.len(), 1);
+    assert!(!signers.contains(&s2));
+}
+
+#[test]
+#[should_panic(expected = "Cannot remove: would drop below threshold")]
+fn test_remove_signer_below_threshold_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt5");
+
+    // 2-of-2: removing one would leave 1 < threshold 2
+    setup_multisig(&env, &client, &proposal_id, 2, &[s1.clone(), s2.clone()]);
+    client.remove_signer(&s1, &proposal_id, &s2);
+}
+
+#[test]
+#[should_panic(expected = "Signer not found")]
+fn test_remove_signer_not_found_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let ghost = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt6");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.remove_signer(&s1, &proposal_id, &ghost);
+}
+
+#[test]
+fn test_set_threshold_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let s3 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt7");
+
+    setup_multisig(
+        &env,
+        &client,
+        &proposal_id,
+        1,
+        &[s1.clone(), s2.clone(), s3.clone()],
+    );
+
+    client.set_threshold(&s1, &proposal_id, &3u32);
+    assert_eq!(client.get_threshold(&proposal_id), 3);
+}
+
+#[test]
+#[should_panic(expected = "Threshold exceeds signer count")]
+fn test_set_threshold_exceeds_signers_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt8");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.set_threshold(&s1, &proposal_id, &5u32); // only 1 signer
+}
+
+#[test]
+#[should_panic(expected = "Threshold must be at least 1")]
+fn test_set_threshold_zero_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt9");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.set_threshold(&s1, &proposal_id, &0u32);
+}
+
+#[test]
+fn test_rotate_signer_success() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let replacement = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt10");
+
+    setup_multisig(&env, &client, &proposal_id, 2, &[s1.clone(), s2.clone()]);
+
+    // s1 rotates s2 out and brings in replacement
+    client.rotate_signer(&s1, &proposal_id, &s2, &replacement);
+
+    let signers = client.get_signers(&proposal_id);
+    assert_eq!(signers.len(), 2);
+    assert!(!signers.contains(&s2));
+    assert!(signers.contains(&replacement));
+    // Threshold is unchanged
+    assert_eq!(client.get_threshold(&proposal_id), 2);
+}
+
+#[test]
+#[should_panic(expected = "Old signer not found")]
+fn test_rotate_signer_old_not_found_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let ghost = Address::generate(&env);
+    let replacement = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt11");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+    client.rotate_signer(&s1, &proposal_id, &ghost, &replacement);
+}
+
+#[test]
+#[should_panic(expected = "New signer already exists")]
+fn test_rotate_signer_new_already_exists_panics() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let s2 = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "mgmt12");
+
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone(), s2.clone()]);
+    // s2 is already in the set
+    client.rotate_signer(&s1, &proposal_id, &s1, &s2);
+}
+
+#[test]
+fn test_get_signers_empty() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let proposal_id = Symbol::new(&env, "empty");
+    let signers = client.get_signers(&proposal_id);
+    assert_eq!(signers.len(), 0);
+}
+
+#[test]
+fn test_get_threshold_default() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let proposal_id = Symbol::new(&env, "nosetup");
+    // Default threshold is 1 when not configured
+    assert_eq!(client.get_threshold(&proposal_id), 1);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_add_signer_unauthorized() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MultiPartyAuthContract);
+    let client = MultiPartyAuthContractClient::new(&env, &contract_id);
+
+    let s1 = Address::generate(&env);
+    let new_signer = Address::generate(&env);
+    let proposal_id = Symbol::new(&env, "unauth");
+
+    env.mock_all_auths();
+    setup_multisig(&env, &client, &proposal_id, 1, &[s1.clone()]);
+
+    env.set_auths(&[]); // strip auths
+    client.add_signer(&s1, &proposal_id, &new_signer);
 }

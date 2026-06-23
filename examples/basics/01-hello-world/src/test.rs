@@ -43,6 +43,18 @@ fn test_hello_second_element_is_name() {
     assert_eq!(result.get(1).unwrap(), name);
 }
 
+/// Benchmark the hello function.
+#[test]
+fn test_hello_benchmark() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&env, &contract_id);
+
+    env.budget().reset_default();
+    let _result = client.hello(&symbol_short!("World"));
+    env.budget().print();
+}
+
 /// The greeting with different valid symbol names.
 #[test]
 fn test_hello_with_different_names() {

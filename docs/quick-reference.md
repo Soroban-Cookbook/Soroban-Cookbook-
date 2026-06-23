@@ -15,13 +15,23 @@ cd my-contract
 `Cargo.toml`:
 ```toml
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = "21.7.0"
 
 [dev-dependencies]
 soroban-sdk = { version = "21.7.0", features = ["testutils"] }
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
 ```
 
 ## Basic Contract Structure
@@ -57,7 +67,7 @@ let d: bool = true;
 ### Soroban-Specific Types
 
 ```rust
-use soroban_sdk::{Address, Bytes, BytesN, Map, String, Symbol, Vec};
+use soroban_sdk::{symbol_short, Address, Bytes, BytesN, Map, String, Symbol, Vec};
 
 // Address — a Stellar account or contract address
 let addr: Address = Address::from_string(&String::from_str(&env, "GABC...XYZ"));
@@ -97,6 +107,7 @@ let amount: i128 = 1_000_000_000; // 100 XLM in stroops
 // Address to/from String
 let addr_str = String::from_str(&env, "GABC...XYZ");
 let addr = Address::from_string(&addr_str);
+let back_to_string = addr.to_string();
 
 // Bytes to BytesN
 let fixed: BytesN<4> = BytesN::from_array(&env, &[1, 2, 3, 4]);
@@ -200,7 +211,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 ### Require Auth with Specific Arguments
 
 ```rust
-use soroban_sdk::auth::ContractContext;
+use soroban_sdk::IntoVal;
 
 pub fn approve(env: Env, owner: Address, spender: Address, amount: i128) {
     owner.require_auth_for_args((spender.clone(), amount).into_val(&env));
@@ -297,6 +308,8 @@ env.events().publish(
 ### Reading Events in Tests
 
 ```rust
+use soroban_sdk::{symbol_short, Symbol, TryFromVal};
+
 #[test]
 fn test_events() {
     let env = Env::default();
@@ -310,16 +323,19 @@ fn test_events() {
     let events = env.events().all();
     assert_eq!(events.len(), 1);
 
-    // Inspect the event
-    let (topics, data): (soroban_sdk::Vec<soroban_sdk::Val>, soroban_sdk::Val) =
-        events.first().unwrap();
+    let (_contract_id, topics, data) = events.get(0).unwrap();
+    let action: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
+    let amount: i128 = i128::try_from_val(&env, &data).unwrap();
+
+    assert_eq!(action, symbol_short!("transfer"));
+    assert_eq!(amount, 1000i128);
 }
 ```
 
 ### Querying Events On-Chain (CLI)
 
 ```bash
-soroban events \
+stellar events \
   --start-ledger <LEDGER> \
   --id <CONTRACT_ID> \
   --network testnet
@@ -405,22 +421,22 @@ env.ledger().with_mut(|li| {
 
 ```bash
 # Build
-soroban contract build
+stellar contract build
 
 # Deploy to testnet
-CONTRACT_ID=$(soroban contract deploy \
+CONTRACT_ID=$(stellar contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
   --source alice \
   --network testnet)
 
 # Invoke
-soroban contract invoke \
+stellar contract invoke \
   --id $CONTRACT_ID \
   --source alice \
   --network testnet \
   -- \
   transfer \
-  --from $(soroban keys address alice) \
+  --from $(stellar keys address alice) \
   --to GDEST... \
   --amount 1000
 ```

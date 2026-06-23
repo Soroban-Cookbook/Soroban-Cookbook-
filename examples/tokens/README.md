@@ -1,40 +1,19 @@
 # Token Examples
 
-Fungible and semi-fungible token implementations, standards, and utility patterns on Soroban.
+This category contains examples related to fungible tokens, including implementations of Stellar-native standards and common token-related patterns.
 
-## 📂 Example Categories
+## What's Inside?
 
-### Standard Tokens
-Compliance with Stellar's token standards and core fungible token logic.
-- **Planned:** SEP-41 Token interface, Basic Fungible Token, Mintable/Burnable tokens.
+- **Token Standards**: Implementations of official Stellar token standards like SEP-41.
+- **[Mint/Burn Token](./mint-burn/)**: Admin-controlled minting and user burn flows with supply cap handling.
+- **[Allowance Pattern](./allowance-pattern/)**: Delegated spending with `approve`/`transfer_from`, allowance queries, expiration ledgers, and revocation.
+- **[Token Wrapper](./token-wrapper/)**: A 1:1 wrapper around an existing token with deposit, withdraw, backing checks, and invariant tests.
+- **[Token Optimization](./optimized-token-ops/)**: Batched transfer and storage-layout optimization patterns with before/after benchmarks.
+- **Distribution Patterns**: Examples of vesting schedules and airdrop contracts.
 
-### Advanced Features
-Adding utility and control to token systems.
-- **Planned:** Pausable transfers, Capped supply, Snapshot tokens (for voting/dividends), Taxed tokens (fee-on-transfer).
+## Examples
 
-### Token Utilities
-Tools for interacting with and managing tokens.
-- **Planned:** Token Wrapper (Native asset bridging), Multi-token handling, Token Vesting, Airdrop tools.
-
-### Specialized Tokens
-Tokens designed for specific use cases.
-- **Planned:** Reward tokens (Staking), Governance tokens, Rebasing tokens, Loyalty points.
-
-## 📋 Planned Examples
-
-- **SEP-41 Token** - Soroban's standard token interface compliance.
-- **Token Wrapper** - Wrapping native XLM or other assets for smart contract use.
-- **Mintable Token** - A token with controlled minting capabilities.
-- **Burnable Token** - A token with controlled burning capabilities.
-- **Token Vesting** - Locking tokens with a release schedule.
-
-## 🏗️ SEP-41: The Soroban Token Standard
-
-SEP-41 is the standard interface for tokens on Soroban, ensuring interoperability across protocols. All token examples in this category aim to be SEP-41 compliant.
-
-## 🎯 Prerequisites
-
-Before exploring token examples, ensure you understand:
-- [Basic Examples](../basics/) - Core concepts.
-- [Authorization](../basics/03-authentication/) - Securely managing transfers and approvals.
-- [Storage Patterns](../basics/02-storage-patterns/) - Efficiently storing balances and metadata.
+- `01-sep41-token`: A minimal SEP-41-compliant fungible token contract.
+- `02-vesting-contract`: A contract that releases tokens to a beneficiary over time.
+- `04-airdrop-contract`: A contract to efficiently distribute tokens to a list of addresses.
+- `05-wrapped-asset`: A contract that creates a Soroban-native representation of a classic Stellar asset.

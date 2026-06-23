@@ -1,3 +1,4 @@
+
 # Hello World
 
 The simplest possible Soroban smart contract. Use this as a starting template or to understand the fundamental building blocks of every Soroban contract.
@@ -5,6 +6,14 @@ The simplest possible Soroban smart contract. Use this as a starting template or
 ## Overview
 
 This contract exposes a single `hello(to: Symbol) -> Vec<Symbol>` function that returns `["Hello", <to>]`. Its purpose is to demonstrate contract structure, not business logic.
+
+## 🎬 Video Walkthrough
+
+> **Getting Started — Examples 01–03** *(coming soon)*
+> This example is covered in the first section of the video (0:00 – 4:30).
+> Once published, the link will appear here.
+
+## Project Structure
 
 ## Key Concepts
 
@@ -68,6 +77,8 @@ Tests live in `src/test.rs` and cover:
 | `test_hello_first_element_is_hello` | First element is always the literal `"Hello"` |
 | `test_hello_second_element_is_name` | Second element echoes the supplied name |
 | `test_hello_with_different_names` | Works correctly for multiple different inputs |
+| `test_hello_with_long_symbol_input` | Accepts symbols beyond `symbol_short!` length limits |
+| `test_hello_with_single_character_name` | Single-character names preserve output shape |
 
 ## Project Structure
 

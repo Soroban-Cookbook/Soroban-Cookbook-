@@ -10,4 +10,6 @@ crate-type = ["cdylib", "rlib"]
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]
+soroban-validation = { path = "../../../shared", features = ["testutils"] }
+
 soroban-sdk = { workspace = true, features = ["testutils"] }

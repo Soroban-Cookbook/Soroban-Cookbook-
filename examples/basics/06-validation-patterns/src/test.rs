@@ -35,13 +35,13 @@ fn test_parameter_validation() {
     // Test string validation
     let valid_string = String::from_str(&env, "Hello, World!");
     assert_eq!(
-        ValidationContract::validate_string_parameters(valid_string.clone(), 1, 100),
+        ValidationContract::validate_string_parameters(valid_string, 1, 100),
         Ok(())
     );
 
     let short_string = String::from_str(&env, "");
     assert_eq!(
-        ValidationContract::validate_string_parameters(short_string.clone(), 1, 100),
+        ValidationContract::validate_string_parameters(short_string, 1, 100),
         Err(ValidationError::StringTooShort)
     );
 
@@ -50,24 +50,24 @@ fn test_parameter_validation() {
         "This string is way too long and exceeds the maximum length limit",
     );
     assert_eq!(
-        ValidationContract::validate_string_parameters(long_string.clone(), 1, 50),
+        ValidationContract::validate_string_parameters(long_string, 1, 50),
         Err(ValidationError::StringTooLong)
     );
 
     // Test address validation (should always pass for valid addresses)
     let user1 = <soroban_sdk::Address as AddressTest>::generate(&env);
-    assert_eq!(ValidationContract::validate_address(user1.clone()), Ok(()));
+    assert_eq!(ValidationContract::validate_address(user1), Ok(()));
 
     // Test array validation
     let valid_array = Vec::from_array(&env, [1i32, 2i32, 3i32, 4i32, 5i32]);
     assert_eq!(
-        ValidationContract::validate_array_parameters(valid_array.clone(), 1, 10),
+        ValidationContract::validate_array_parameters(valid_array, 1, 10),
         Ok(())
     );
 
     let small_array = Vec::from_array(&env, [1i32]);
     assert_eq!(
-        ValidationContract::validate_array_parameters(small_array.clone(), 2, 10),
+        ValidationContract::validate_array_parameters(small_array, 2, 10),
         Err(ValidationError::ArrayTooSmall)
     );
 
@@ -78,7 +78,7 @@ fn test_parameter_validation() {
         ],
     );
     assert_eq!(
-        ValidationContract::validate_array_parameters(large_array.clone(), 1, 10),
+        ValidationContract::validate_array_parameters(large_array, 1, 10),
         Err(ValidationError::ArrayTooLarge)
     );
 
@@ -458,7 +458,7 @@ fn test_error_codes() {
     let mut codes = Vec::new(&env);
     for error in errors.iter() {
         let code = *error as u32;
-        assert!(!codes.contains(code), "Duplicate error code: {}", code);
+        assert!(!codes.contains(code), "Duplicate error code: {code}");
         codes.push_back(code);
     }
 

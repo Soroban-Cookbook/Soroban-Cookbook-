@@ -1,43 +1,17 @@
 # NFT Examples
 
-Non-Fungible Token (NFT) implementations, standards, and marketplace patterns on Soroban.
+This category contains examples related to Non-Fungible Tokens (NFTs). These contracts demonstrate minting, metadata standards, and marketplace logic on Soroban.
 
-## 📂 Example Categories
+## What's Inside?
 
-### Core NFT Standards
-Base implementations for unique digital assets.
-- **Planned:** Simple NFT (Mint/Transfer), NFT with Metadata (JSON), Enumerable NFT (Iteration).
+- **NFT Minting**: Contracts for creating and distributing NFTs.
+- **Metadata Standards**: How to implement on-chain and off-chain metadata.
+- **Marketplace Logic**: Examples of contracts for listing, buying, and selling NFTs.
 
-### NFT Marketplaces
-Patterns for trading and auctioning NFTs.
-- **Planned:** Fixed-price Marketplace, English and Dutch Auctions, P2P Offer systems.
+## Examples
 
-### Advanced NFT Patterns
-Complex logic and utility for NFTs.
-- **Planned:** Composable NFTs (NFTs within NFTs), Fractionalized NFTs (Shared ownership), Dynamic NFTs (Evolving metadata), Soulbound Tokens (Non-transferable).
-
-### Gaming & Utility
-Using NFTs for interactive and practical applications.
-- **Planned:** Achievement systems, Breeding mechanics, NFT Staking for rewards.
-
-## 📋 Planned Examples
-
-- **Simple NFT** - Core NFT contract with minting and transfers.
-- **NFT Marketplace** - Buy and sell NFTs with simple listings.
-- **English Auction** - Bid-based NFT auction system.
-- **Composable NFT** - An NFT that can hold other NFTs or tokens.
-- **Dynamic NFT** - Metadata that changes based on on-chain events.
-
-## 🎨 Metadata Best Practices
-
-### On-Chain vs Off-Chain
-- **On-Chain Metadata:** Immutable and verifiable, but higher storage costs.
-- **Off-Chain Metadata:** Lower costs and supports rich media, but requires external storage (e.g., IPFS).
-
-## 🎯 Prerequisites
-
-Before exploring NFT examples, ensure you understand:
-- [Basic Examples](../basics/) - Core concepts.
-- [Token Standards](../tokens/) - Fungible token interfaces.
-- [Storage Patterns](../basics/02-storage-patterns/) - Efficiently storing large metadata.
-- [Authorization](../basics/03-authentication/) - Securely managing NFT ownership.
+- `01-basic-nft`: A simple implementation of a mintable NFT with authorization, enumeration, and approvals.
+- `02-nft-metadata`: NFT metadata storage patterns with optional on-chain metadata and IPFS integration.
+- `02-nft-marketplace`: A contract for listing and trading NFTs with auctions, bundles, royalties, and trade history.
+- `03-nft-with-onchain-metadata`: An example of storing NFT metadata directly on the ledger.
+- `04-generative-nft`: A contract that creates generative art or attributes on-chain.

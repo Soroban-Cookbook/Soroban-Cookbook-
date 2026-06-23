@@ -5,10 +5,12 @@ edition = "2021"
 
 [lib]
 name = "events_structured"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]
+soroban-validation = { path = "../../../shared", features = ["testutils"] }
+
 soroban-sdk = { workspace = true, features = ["testutils"] }

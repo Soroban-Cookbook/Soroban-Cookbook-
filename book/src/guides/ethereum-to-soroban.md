@@ -392,7 +392,7 @@ npx hardhat run scripts/deploy.js --network mainnet
 
 ```bash
 stellar contract deploy \
-  --wasm target/wasm32v1-none/release/my_contract.wasm \
+    --wasm target/wasm32v1-none/release/my_contract.wasm \
   --source-account alice \
   --network testnet
 ```

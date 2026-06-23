@@ -109,7 +109,7 @@ run_clippy() {
     print_lint "Running clippy: $target"
 
     if [ "$target" = "." ]; then
-        if cargo clippy --all-targets --all-features -- -D warnings; then
+        if cargo clippy --workspace --all-targets --target x86_64-unknown-linux-gnu -- -D warnings; then
             print_info "✓ Clippy passed"
             return 0
         else
@@ -118,7 +118,7 @@ run_clippy() {
         fi
     else
         cd "$target"
-        if cargo clippy --all-targets --all-features -- -D warnings; then
+        if cargo clippy --all-targets --target x86_64-unknown-linux-gnu -- -D warnings; then
             print_info "✓ Clippy passed for $target"
             cd - > /dev/null
             return 0

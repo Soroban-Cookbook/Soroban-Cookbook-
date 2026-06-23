@@ -1,0 +1,16 @@
+[package]
+name = "soroban-flash-loan-use-cases"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-validation = { path = "../../../shared", features = ["testutils"] }
+
+soroban-sdk = { workspace = true, features = ["testutils"] }

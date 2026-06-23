@@ -7,6 +7,16 @@ assignees: ''
 
 ---
 
+## Before Submitting
+
+Please complete all duplicate checks before writing your request:
+
+1. Search open issues with this query:
+     https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20in%3Atitle
+2. Search unassigned open issues (high duplicate risk):
+     https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues?q=is%3Aissue%20is%3Aopen%20no%3Aassignee
+3. If a related issue exists, link it in Additional Context instead of opening a duplicate.
+
 ## Use Case
 
 <!-- Describe the use case or problem this feature addresses.
@@ -34,6 +44,7 @@ assignees: ''
 
 ## Checklist
 
-- [ ] I have searched existing issues to avoid duplicates
+- [ ] I searched open issues using the links above before submitting
+- [ ] I linked any related or overlapping issues in Additional Context
 - [ ] This request aligns with the Soroban Cookbook's scope (examples, guides, docs)
 - [ ] I am willing to contribute this feature (optional)

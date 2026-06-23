@@ -121,7 +121,6 @@ cd examples/basics/01-hello-world
 
 # Run tests
 cargo test
-```
 
 # Build WASM
 cargo build --target wasm32-unknown-unknown --release
