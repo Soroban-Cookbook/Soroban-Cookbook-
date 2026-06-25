@@ -30,6 +30,15 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
+  typos:
+    name: Spelling Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check spelling
+        uses: crate-ci/typos@v1.28.0
+
   clippy:
     name: Clippy Lint
     runs-on: ubuntu-latest
