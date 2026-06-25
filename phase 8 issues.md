@@ -1,7 +1,7 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 0% (0/49)
+**Completion:** 2% (1/50)
 **Last Audit Date:** June 23, 2026
 
 Community and ecosystem initiatives — no in-repo deliverables yet.
@@ -198,6 +198,25 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
   - Requirements discussed
   - Agreement drafted
   - Partnership established
+
+
+### Issue #396: Collaborative content with Stellar
+
+
+- **Priority:** High
+- **Status:** Completed
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Collaborative content with Stellar
+- **Acceptance Criteria:**
+  - Joint blog posts
+  - Co-hosted events
+  - Shared examples
+  - Cross-linking
+  - Regular sync meetings
 
 
 ### Issue #402: Integrate with Other Wallets
@@ -937,9 +956,9 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 ## Summary
 
 **Total Issues Created:** 69 (Issues #379-#534)  
-**Completed:** 0  
+**Completed:** 1  
 **In Progress:** 0  
-**Planned:** 65
+**Planned:** 64
 
 **Phase 8 Status:** 📋 **0% COMPLETE (Ongoing)**
 
