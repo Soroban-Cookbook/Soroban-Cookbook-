@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Overview &amp; listing - Soroban Cookbook</title>
+        <title>Token Development Walkthrough - Soroban Cookbook</title>
 
 
         <!-- Custom HTML head -->
@@ -146,7 +146,7 @@
                         <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
                             <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
                         </a>
-                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/examples/basics.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/token-development-video.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
                             <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
                         </a>
 
@@ -180,59 +180,69 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="basic-examples"><a class="header" href="#basic-examples">Basic Examples</a></h1>
-<p>Core Soroban fundamentals, one concept per example. Perfect for beginners.</p>
-<h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<h3 id="01-hello-world"><a class="header" href="#01-hello-world"><a href="../examples/basics/01-hello-world/">01-hello-world</a></a></h3>
-<p>Basic contract structure — <code>#[contract]</code>, <code>#[contractimpl]</code>, <code>Env</code>, <code>Symbol</code>, <code>Vec</code>.</p>
-<h3 id="02-storage-patterns"><a class="header" href="#02-storage-patterns"><a href="../examples/basics/02-storage-patterns/">02-storage-patterns</a></a></h3>
-<p>All three storage tiers (persistent, instance, temporary) with TTL management.</p>
-<p><strong><a href="../storage-patterns.html">Full Guide →</a></strong></p>
-<h3 id="03-custom-errors"><a class="header" href="#03-custom-errors"><a href="../examples/basics/03-custom-errors/">03-custom-errors</a></a></h3>
-<p>Custom error enums with structured codes.</p>
-<p><strong><a href="../error-handling.html">Full Guide →</a></strong></p>
-<h3 id="03-authentication"><a class="header" href="#03-authentication"><a href="../examples/basics/03-authentication/">03-authentication</a></a></h3>
-<p>Authorization with <code>require_auth()</code>, admin checks, and RBAC.</p>
-<h3 id="04-events"><a class="header" href="#04-events"><a href="../examples/basics/04-events/">04-events</a></a></h3>
-<p>Structured events with multi-topic indexing.</p>
-<p><strong><a href="../events.html">Full Guide →</a></strong></p>
-<h3 id="05-error-handling"><a class="header" href="#05-error-handling"><a href="../examples/basics/05-error-handling/">05-error-handling</a></a></h3>
-<p>Result-based error handling and propagation.</p>
-<h3 id="05-auth-context"><a class="header" href="#05-auth-context"><a href="../examples/basics/05-auth-context/">05-auth-context</a></a></h3>
-<p>Invocation context across cross-contract call chains.</p>
-<h3 id="06-validation-patterns"><a class="header" href="#06-validation-patterns"><a href="../examples/basics/06-validation-patterns/">06-validation-patterns</a></a></h3>
-<p>Input validation with checked arithmetic.</p>
-<h3 id="07-type-conversions"><a class="header" href="#07-type-conversions"><a href="../examples/basics/07-type-conversions/">07-type-conversions</a></a></h3>
-<p>Safe type conversions with <code>TryFromVal</code> and <code>IntoVal</code>.</p>
-<h3 id="08-soroban-types"><a class="header" href="#08-soroban-types"><a href="../examples/basics/08-soroban-types/">08-soroban-types</a></a></h3>
-<p>Core SDK types: Address, Symbol, Map, Vec, bytes.</p>
-<h3 id="09-enum-types"><a class="header" href="#09-enum-types"><a href="../examples/basics/09-enum-types/">09-enum-types</a></a></h3>
-<p>Contract enums for state machines and dispatch.</p>
-<h3 id="10-custom-structs"><a class="header" href="#10-custom-structs"><a href="../examples/basics/10-custom-structs/">10-custom-structs</a></a></h3>
-<p>Nested <code>#[contracttype]</code> structs and composite storage keys.</p>
-<h3 id="11-primitive-types"><a class="header" href="#11-primitive-types"><a href="../examples/basics/11-primitive-types/">11-primitive-types</a></a></h3>
-<p>Integer handling and overflow safety.</p>
-<h3 id="12-data-types"><a class="header" href="#12-data-types"><a href="../examples/basics/12-data-types/">12-data-types</a></a></h3>
-<p>Comprehensive type system reference.</p>
-<h3 id="13-collection-types"><a class="header" href="#13-collection-types"><a href="../examples/basics/13-collection-types/">13-collection-types</a></a></h3>
-<p>Vec and Map collection patterns.</p>
-<h3 id="14-event-filtering"><a class="header" href="#14-event-filtering"><a href="../examples/basics/14-event-filtering/">14-event-filtering</a></a></h3>
-<p>Indexer-friendly event topic design.</p>
-<h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
-<pre><code class="language-bash">cd examples/basics/01-hello-world
-cargo test &amp;&amp; cargo build --target wasm32-unknown-unknown --release
+                        <h1 id="token-development-video-walkthrough"><a class="header" href="#token-development-video-walkthrough">Token Development Video Walkthrough</a></h1>
+<p>This page provides the outline, references, and accompanying materials for the <strong>Token Development Video Tutorial</strong>.</p>
+<p>🎬 <strong><a href="https://www.youtube.com/watch?v=mock-token-video">Watch the Token Development Tutorial on YouTube</a></strong> (15-20 minutes)</p>
+<hr>
+<h2 id="tutorial-outline"><a class="header" href="#tutorial-outline">Tutorial Outline</a></h2>
+<p>The video covers the lifecycle of token design, testing, and deployment on the Stellar network using Soroban.</p>
+<h3 id="1-introduction--sep-41-standard-000--300"><a class="header" href="#1-introduction--sep-41-standard-000--300">1. Introduction &amp; SEP-41 Standard (0:00 – 3:00)</a></h3>
+<ul>
+<li>Overview of the <strong>SEP-41 Token Standard</strong> interface.</li>
+<li>Core functions required for wallet and protocol compatibility: <code>allowance</code>, <code>approve</code>, <code>balance</code>, <code>transfer</code>, <code>transfer_from</code>.</li>
+<li>Project structure of token examples in the Cookbook.</li>
+</ul>
+<h3 id="2-walkthrough-of-token-creation-300--800"><a class="header" href="#2-walkthrough-of-token-creation-300--800">2. Walkthrough of Token Creation (3:00 – 8:00)</a></h3>
+<ul>
+<li>Coding an admin-controlled token with mint/burn flows under <code>examples/tokens/mint-burn/</code>.</li>
+<li>Leveraging <strong>Instance Storage</strong> for metadata (name, symbol, decimals, admin address) and extending its TTL.</li>
+<li>Enforcing checked arithmetic (<code>checked_add</code>, <code>checked_sub</code>) to protect balance transitions.</li>
+<li>Emitting standard <code>Transfer</code> and <code>Mint</code>/<code>Burn</code> events.</li>
+</ul>
+<h3 id="3-testing--mocking-auth-800--1200"><a class="header" href="#3-testing--mocking-auth-800--1200">3. Testing &amp; Mocking Auth (8:00 – 12:00)</a></h3>
+<ul>
+<li>Setting up the test suite in <code>src/test.rs</code>.</li>
+<li>Simulating caller authorization with <code>env.mock_all_auths()</code>.</li>
+<li>Writing defensive tests to assert that non-admin callers cannot trigger <code>mint</code> actions.</li>
+<li>Checking events and balance correctness post-transaction.</li>
+</ul>
+<h3 id="4-deploying-to-stellar-testnet-1200--1600"><a class="header" href="#4-deploying-to-stellar-testnet-1200--1600">4. Deploying to Stellar Testnet (12:00 – 16:00)</a></h3>
+<ul>
+<li>Configuring keys and setting up a funded Testnet developer identity with <code>Stellar CLI</code>:
+<pre><code class="language-bash">stellar keys generate --global admin --network testnet
 </code></pre>
-<h2 id="next-intermediate"><a class="header" href="#next-intermediate">Next: <a href="../intermediate.html">Intermediate</a></a></h2>
+</li>
+<li>Deploying the compiled <code>.wasm</code> binary:
+<pre><code class="language-bash">stellar contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/mint_burn.wasm \
+  --source admin \
+  --network testnet
+</code></pre>
+</li>
+<li>Instantiating and invoking the deployed contract from the command line.</li>
+</ul>
+<h3 id="5-best-practices--summary-1600--2000"><a class="header" href="#5-best-practices--summary-1600--2000">5. Best Practices &amp; Summary (16:00 – 20:00)</a></h3>
+<ul>
+<li><strong>Checked Math:</strong> Avoid direct operators; enforce overflows checks.</li>
+<li><strong>TTL Extension:</strong> Prevent storage expiration using instance storage extensions.</li>
+<li><strong>Event Integrity:</strong> Ensure off-chain indexers and wallets can trace balances using standard event layouts.</li>
+</ul>
+<hr>
+<h2 id="related-code--docs"><a class="header" href="#related-code--docs">Related Code &amp; Docs</a></h2>
+<ul>
+<li><strong>Example Code:</strong> <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/examples/tokens/01-sep41-token">01-sep41-token</a> | <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/examples/tokens/mint-burn">mint-burn</a></li>
+<li><strong>Reference Docs:</strong> <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/docs/token-patterns.md">Token Patterns Reference</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../guides/ethereum-to-soroban.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/troubleshooting.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../examples/storage-patterns.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../CONTRIBUTING.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -242,11 +252,11 @@ cargo test &amp;&amp; cargo build --target wasm32-unknown-unknown --release
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../guides/ethereum-to-soroban.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/troubleshooting.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../examples/storage-patterns.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../CONTRIBUTING.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>

@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-599f08de.js";
+            window.path_to_searchindex_js = "searchindex-3ccc4abe.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-3a7278a2.js"></script>
+        <script src="toc-6d4fb062.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -4446,6 +4446,245 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 <hr>
 <p>For more detailed examples, see our <a href="examples">examples directory</a> and specific guides.</p>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="common-pitfalls-in-soroban-smart-contracts"><a class="header" href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls in Soroban Smart Contracts</a></h1>
+<p>This guide outlines the most common mistakes developers make when writing smart contracts for Soroban on Stellar. It covers both beginner-level issues (basic API usage, Rust quirks, and entry point rules) and intermediate-level design flaws (storage architecture, state archival, and security vulnerabilities).</p>
+<hr>
+<h2 id="-beginner-pitfalls"><a class="header" href="#-beginner-pitfalls">🟢 Beginner Pitfalls</a></h2>
+<h3 id="1-missing-authorization-checks"><a class="header" href="#1-missing-authorization-checks">1. Missing Authorization Checks</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Passing an <code>Address</code> to a function and performing state changes or asset transfers on its behalf without verifying its authorization.</li>
+<li><strong>Consequence:</strong> Anyone can call the contract function and input another user’s address, allowing them to unauthorizedly spend funds or manipulate state.</li>
+<li><strong>How to avoid/fix:</strong> Always invoke <code>.require_auth()</code> on the <code>Address</code> parameter representing the signer.</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Anyone can call this function and pass another user's address
+pub fn withdraw(env: Env, user: Address, amount: i128) {
+    let mut balance = get_balance(&amp;env, &amp;user);
+    balance -= amount;
+    set_balance(&amp;env, &amp;user, balance);
+}
+
+// ✅ GOOD: Verifies that the transaction was signed by the user
+pub fn withdraw(env: Env, user: Address, amount: i128) {
+    user.require_auth();
+    let mut balance = get_balance(&amp;env, &amp;user);
+    balance -= amount;
+    set_balance(&amp;env, &amp;user, balance);
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="2-unchecked-arithmetic-integer-overflowunderflow"><a class="header" href="#2-unchecked-arithmetic-integer-overflowunderflow">2. Unchecked Arithmetic (Integer Overflow/Underflow)</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Using standard mathematical operators (<code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>) for calculating token balances or values.</li>
+<li><strong>Consequence:</strong> In release builds, overflow checks might wrap around silently (if they are disabled in the profile), leading to exploit vectors such as minting massive numbers of tokens. Even if checks are enabled, standard operators panic without providing a clear error code, making error handling impossible.</li>
+<li><strong>How to avoid/fix:</strong> Use checked arithmetic methods (<code>checked_add</code>, <code>checked_sub</code>, <code>checked_mul</code>, <code>checked_div</code>) and return custom, descriptive contract errors.</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Standard operator can cause panics or wrap-around exploits
+pub fn add_interest(balance: u64, rate: u64) -&gt; u64 {
+    balance + (balance * rate) / 100
+}
+
+// ✅ GOOD: Checked math returning custom error types
+pub fn add_interest(balance: u64, rate: u64) -&gt; Result&lt;u64, Error&gt; {
+    let interest = balance
+        .checked_mul(rate)
+        .ok_or(Error::ArithmeticOverflow)?
+        .checked_div(100)
+        .ok_or(Error::ArithmeticOverflow)?;
+    
+    balance.checked_add(interest).ok_or(Error::ArithmeticOverflow)
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="3-exceeding-the-32-character-limit-on-custom-symbols"><a class="header" href="#3-exceeding-the-32-character-limit-on-custom-symbols">3. Exceeding the 32-Character Limit on Custom Symbols</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Creating a <code>Symbol</code> (often used as storage keys) with a string length greater than 32 characters.</li>
+<li><strong>Consequence:</strong> The Soroban VM enforces a strict 32-character limit on symbols. Calling <code>Symbol::new(&amp;env, "...")</code> with a string longer than 32 characters will result in a runtime panic.</li>
+<li><strong>How to avoid/fix:</strong> Keep symbols short and descriptive. For symbols of 9 characters or less, use <code>symbol_short!</code> which is stored more efficiently.</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Panics at runtime (44 characters)
+let key = Symbol::new(&amp;env, "user_registration_timestamp_for_active_pool");
+
+// ✅ GOOD: Short symbol or type-safe enum key (see intermediate section)
+let key = Symbol::new(&amp;env, "user_reg_time");
+// Or:
+let key = symbol_short!("reg_time");
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="4-ignoring-resultreturn-values-on-safe-token-operations"><a class="header" href="#4-ignoring-resultreturn-values-on-safe-token-operations">4. Ignoring Result/Return Values on Safe Token Operations</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Calling transfer functions or contract client actions that return <code>Result</code> values and ignoring them via <code>let _ = ...</code> or not asserting success.</li>
+<li><strong>Consequence:</strong> The contract execution proceeds assuming the operation succeeded, even if it failed silently or returned an error payload, causing state inconsistency.</li>
+<li><strong>How to avoid/fix:</strong> Always handle results using Rust’s <code>?</code> operator or explicitly match on them. Note that SEP-41 token operations panic on failure, but custom token logic or cross-contract invocations might return <code>Result</code>.</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Ignored return value could cause transaction to proceed unexpectedly
+let result = token_client.try_transfer(&amp;from, &amp;to, &amp;amount);
+// execution continues anyway...
+
+// ✅ GOOD: Explicitly check result and bubble up custom error
+token_client.try_transfer(&amp;from, &amp;to, &amp;amount)
+    .map_err(|_| Error::TokenTransferFailed)?;
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<hr>
+<h2 id="-intermediate-pitfalls"><a class="header" href="#-intermediate-pitfalls">🟡 Intermediate Pitfalls</a></h2>
+<h3 id="1-unbounded-storage-growth-gas-exhaustion"><a class="header" href="#1-unbounded-storage-growth-gas-exhaustion">1. Unbounded Storage Growth (Gas Exhaustion)</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Appending items to a single shared <code>Vec</code> or <code>Map</code> under one storage key to keep track of all users or transactions.</li>
+<li><strong>Consequence:</strong> Every time the collection is read or written, the entire collection must be deserialized and serialized. As the number of users grows, the transaction CPU and memory gas usage increases linearly. Eventually, transactions will exceed the ledger limits, permanently bricking the contract and locking user funds.</li>
+<li><strong>How to avoid/fix:</strong> Store user-specific data under separate, unique keys. Use a type-safe <code>#[contracttype]</code> enum to represent storage key variants.</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Storing a growing list of users in a single vector under one key
+pub fn register_user(env: Env, user: Address) {
+    let mut users: Vec&lt;Address&gt; = env.storage().instance()
+        .get(&amp;symbol_short!("users"))
+        .unwrap_or_else(|| Vec::new(&amp;env));
+    users.push_back(user);
+    env.storage().instance().set(&amp;symbol_short!("users"), &amp;users);
+}
+
+// ✅ GOOD: Storing individual user flags under separate, scoped keys
+#[contracttype]
+pub enum DataKey {
+    UserRegistered(Address),
+}
+
+pub fn register_user(env: Env, user: Address) {
+    let key = DataKey::UserRegistered(user);
+    env.storage().persistent().set(&amp;key, &amp;true);
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="2-state-archival-lockout-storage-type--ttl-selection"><a class="header" href="#2-state-archival-lockout-storage-type--ttl-selection">2. State Archival Lockout (Storage Type &amp; TTL Selection)</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Storing user balances in <code>instance</code> storage or failing to extend the Time-To-Live (TTL) of <code>persistent</code> storage keys.</li>
+<li><strong>Consequence:</strong>
+<ol>
+<li><code>instance</code> storage has limited size constraints. Storing user data here can cause the storage to fill up. Additionally, if the <code>instance</code> key expires, the contract is locked for <em>all</em> users and requires a costly restoration process.</li>
+<li>If <code>persistent</code> storage keys are not periodically extended, they will expire and be archived. Users will lose access to their data/funds until a manual, costly on-chain restoration transaction is submitted.</li>
+</ol>
+</li>
+<li><strong>How to avoid/fix:</strong>
+<ol>
+<li>Use <code>instance</code> storage only for configuration and admin addresses.</li>
+<li>Use <code>persistent</code> storage for user balances and user-specific structs.</li>
+<li>Regularly extend the TTL of keys when they are accessed using <code>extend_ttl</code>.</li>
+</ol>
+</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+pub enum DataKey {
+    Balance(Address),
+}
+
+// ✅ GOOD: Access balance from persistent storage and extend its TTL
+pub fn get_balance_and_bump(env: Env, user: Address) -&gt; i128 {
+    let key = DataKey::Balance(user);
+    let balance: i128 = env.storage().persistent().get(&amp;key).unwrap_or(0);
+    
+    // Bump TTL: if the key has less than 10,000 ledgers remaining,
+    // extend its lifespan to 50,000 ledgers from the current ledger.
+    env.storage().persistent().extend_ttl(&amp;key, 10000, 50000);
+    
+    balance
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="3-reentrancy-and-the-checks-effects-interactions-pattern"><a class="header" href="#3-reentrancy-and-the-checks-effects-interactions-pattern">3. Reentrancy and the Checks-Effects-Interactions Pattern</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Changing local contract state <em>after</em> invoking an external contract (such as a token transfer to a user).</li>
+<li><strong>Consequence:</strong> The external contract could intercept control and call back into this contract (reenter) before the local state is updated, leading to double-withdrawals.</li>
+<li><strong>How to avoid/fix:</strong> Follow the <strong>Checks-Effects-Interactions</strong> pattern: perform validation checks first, write and persist local state changes next (effects), and invoke external contract calls last (interactions).</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Draining external tokens before updating internal state
+pub fn claim_rewards(env: Env, user: Address) {
+    user.require_auth();
+    let rewards = get_pending_rewards(&amp;env, &amp;user);
+    
+    let token_client = token::Client::new(&amp;env, &amp;get_token_id(&amp;env));
+    token_client.transfer(&amp;env.current_contract_address(), &amp;user, &amp;rewards); // Interaction
+    
+    // DANGER: Reentrant call could hijack control before this line executes!
+    set_pending_rewards(&amp;env, &amp;user, 0); // Effect
+}
+
+// ✅ GOOD: State update occurs before the external transfer is initiated
+pub fn claim_rewards(env: Env, user: Address) {
+    user.require_auth();
+    
+    let rewards = get_pending_rewards(&amp;env, &amp;user);
+    if rewards &lt;= 0 {
+        panic!("No rewards to claim"); // Check
+    }
+    
+    set_pending_rewards(&amp;env, &amp;user, 0); // Effect
+    
+    let token_client = token::Client::new(&amp;env, &amp;get_token_id(&amp;env));
+    token_client.transfer(&amp;env.current_contract_address(), &amp;user, &amp;rewards); // Interaction
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<h3 id="4-custom-signature-replay-attacks"><a class="header" href="#4-custom-signature-replay-attacks">4. Custom Signature Replay Attacks</a></h3>
+<ul>
+<li><strong>Mistake:</strong> Verifying custom cryptographic signatures (e.g. Ed25519 or secp256k1) directly without binding the payload to the specific contract instance, network, and sequential transaction nonces.</li>
+<li><strong>Consequence:</strong> The signature can be intercepted by an attacker and replayed on other contracts, different networks (e.g., testnet vs. mainnet), or multiple times on the same contract to execute unauthorized actions.</li>
+<li><strong>How to avoid/fix:</strong> Use native Soroban authorization (<code>require_auth</code>) whenever possible, as it manages nonces and replay protection automatically. If custom verification is absolutely necessary, construct a signed payload containing:
+<ol>
+<li>The contract’s unique address (<code>env.current_contract_address()</code>).</li>
+<li>The network’s passphrase ID (<code>env.ledger().network_id()</code>).</li>
+<li>A unique, incrementing user nonce.</li>
+</ol>
+</li>
+<li><strong>Code Example:</strong>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ❌ BAD: Signature payload contains only action data, vulnerable to replays
+pub fn execute_custom_auth(env: Env, public_key: BytesN&lt;32&gt;, signature: BytesN&lt;64&gt;, action_data: Bytes) {
+    env.crypto().ed25519_verify(&amp;public_key, &amp;action_data, &amp;signature);
+}
+
+// ✅ GOOD: Signed payload binds contract address, network, and nonce
+pub fn execute_custom_auth(
+    env: Env, 
+    user: Address, 
+    public_key: BytesN&lt;32&gt;, 
+    signature: BytesN&lt;64&gt;, 
+    action_data: Bytes
+) {
+    let nonce = get_and_increment_nonce(&amp;env, &amp;user);
+    
+    let mut signed_payload = Bytes::new(&amp;env);
+    signed_payload.append(&amp;env.current_contract_address().to_xdr_bytes());
+    signed_payload.append(&amp;env.ledger().network_id().to_xdr_bytes());
+    signed_payload.append(&amp;nonce.to_xdr_bytes());
+    signed_payload.append(&amp;action_data);
+    
+    env.crypto().ed25519_verify(&amp;public_key, &amp;signed_payload, &amp;signature);
+}
+<span class="boring">}</span></code></pre>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="soroban-cookbook-style-guide"><a class="header" href="#soroban-cookbook-style-guide">Soroban Cookbook Style Guide</a></h1>
 <p>This guide outlines the coding standards and best practices for the Soroban Cookbook. Adhering to these guidelines ensures consistency, readability, and high quality across all examples.</p>
 <h2 id="1-naming-conventions"><a class="header" href="#1-naming-conventions">1. Naming Conventions</a></h2>
@@ -5355,6 +5594,60 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
 <li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues">GitHub Issues</a> — report bugs or ask questions</li>
 <li><a href="#soroban-quick-reference">Quick Reference</a> — common patterns cheat sheet</li>
 <li><a href="#soroban-smart-contract-best-practices">Best Practices</a> — security and code quality guidelines</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="token-development-video-walkthrough"><a class="header" href="#token-development-video-walkthrough">Token Development Video Walkthrough</a></h1>
+<p>This page provides the outline, references, and accompanying materials for the <strong>Token Development Video Tutorial</strong>.</p>
+<p>🎬 <strong><a href="https://www.youtube.com/watch?v=mock-token-video">Watch the Token Development Tutorial on YouTube</a></strong> (15-20 minutes)</p>
+<hr>
+<h2 id="tutorial-outline"><a class="header" href="#tutorial-outline">Tutorial Outline</a></h2>
+<p>The video covers the lifecycle of token design, testing, and deployment on the Stellar network using Soroban.</p>
+<h3 id="1-introduction--sep-41-standard-000--300"><a class="header" href="#1-introduction--sep-41-standard-000--300">1. Introduction &amp; SEP-41 Standard (0:00 – 3:00)</a></h3>
+<ul>
+<li>Overview of the <strong>SEP-41 Token Standard</strong> interface.</li>
+<li>Core functions required for wallet and protocol compatibility: <code>allowance</code>, <code>approve</code>, <code>balance</code>, <code>transfer</code>, <code>transfer_from</code>.</li>
+<li>Project structure of token examples in the Cookbook.</li>
+</ul>
+<h3 id="2-walkthrough-of-token-creation-300--800"><a class="header" href="#2-walkthrough-of-token-creation-300--800">2. Walkthrough of Token Creation (3:00 – 8:00)</a></h3>
+<ul>
+<li>Coding an admin-controlled token with mint/burn flows under <code>examples/tokens/mint-burn/</code>.</li>
+<li>Leveraging <strong>Instance Storage</strong> for metadata (name, symbol, decimals, admin address) and extending its TTL.</li>
+<li>Enforcing checked arithmetic (<code>checked_add</code>, <code>checked_sub</code>) to protect balance transitions.</li>
+<li>Emitting standard <code>Transfer</code> and <code>Mint</code>/<code>Burn</code> events.</li>
+</ul>
+<h3 id="3-testing--mocking-auth-800--1200"><a class="header" href="#3-testing--mocking-auth-800--1200">3. Testing &amp; Mocking Auth (8:00 – 12:00)</a></h3>
+<ul>
+<li>Setting up the test suite in <code>src/test.rs</code>.</li>
+<li>Simulating caller authorization with <code>env.mock_all_auths()</code>.</li>
+<li>Writing defensive tests to assert that non-admin callers cannot trigger <code>mint</code> actions.</li>
+<li>Checking events and balance correctness post-transaction.</li>
+</ul>
+<h3 id="4-deploying-to-stellar-testnet-1200--1600"><a class="header" href="#4-deploying-to-stellar-testnet-1200--1600">4. Deploying to Stellar Testnet (12:00 – 16:00)</a></h3>
+<ul>
+<li>Configuring keys and setting up a funded Testnet developer identity with <code>Stellar CLI</code>:
+<pre><code class="language-bash">stellar keys generate --global admin --network testnet
+</code></pre>
+</li>
+<li>Deploying the compiled <code>.wasm</code> binary:
+<pre><code class="language-bash">stellar contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/mint_burn.wasm \
+  --source admin \
+  --network testnet
+</code></pre>
+</li>
+<li>Instantiating and invoking the deployed contract from the command line.</li>
+</ul>
+<h3 id="5-best-practices--summary-1600--2000"><a class="header" href="#5-best-practices--summary-1600--2000">5. Best Practices &amp; Summary (16:00 – 20:00)</a></h3>
+<ul>
+<li><strong>Checked Math:</strong> Avoid direct operators; enforce overflows checks.</li>
+<li><strong>TTL Extension:</strong> Prevent storage expiration using instance storage extensions.</li>
+<li><strong>Event Integrity:</strong> Ensure off-chain indexers and wallets can trace balances using standard event layouts.</li>
+</ul>
+<hr>
+<h2 id="related-code--docs"><a class="header" href="#related-code--docs">Related Code &amp; Docs</a></h2>
+<ul>
+<li><strong>Example Code:</strong> <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/examples/tokens/01-sep41-token">01-sep41-token</a> | <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/examples/tokens/mint-burn">mint-burn</a></li>
+<li><strong>Reference Docs:</strong> <a href="file:///home/douglas/WAVE%203/Soroban-Cookbook-/docs/token-patterns.md">Token Patterns Reference</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="contributing-to-soroban-cookbook"><a class="header" href="#contributing-to-soroban-cookbook">Contributing to Soroban Cookbook</a></h1>
