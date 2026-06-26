@@ -19,3 +19,12 @@ multi-sig-patterns = { path = "../../examples/intermediate/multi-sig-patterns" }
 multi-party-auth = { path = "../../examples/advanced/01-multi-party-auth" }
 timelock = { path = "../../examples/advanced/02-timelock" }
 token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+error-handling = { path = "../../examples/basics/05-error-handling", package = "soroban-error-handling-example" }
+auth-context = { path = "../../examples/basics/05-auth-context" }
+type-conversions = { path = "../../examples/basics/07-type-conversions" }
+soroban-types-example = { path = "../../examples/basics/08-soroban-types", package = "soroban_types_example" }
+enum-types = { path = "../../examples/basics/09-enum-types" }
+custom-structs = { path = "../../examples/basics/10-custom-structs" }
+primitive-types = { path = "../../examples/basics/11-primitive-types" }
+data-types = { path = "../../examples/basics/12-data-types" }
+collection-types = { path = "../../examples/basics/13-collection-types" }

@@ -16,6 +16,7 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 - [Testing Requirements](#-testing-requirements)
 - [Example Contribution Template](#-example-contribution-template)
 - [Validation Steps](#-validation-steps)
+- [Bug Bounty Program](#-bug-bounty-program)
 
 ---
 
@@ -152,3 +153,59 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 
 - We run targeted tests for changed paths on pull requests to enable fast feedback.
 - For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.
+
+---
+
+## 🛡️ Bug Bounty Program
+
+The Soroban Cookbook Bug Bounty Program rewards community members who responsibly disclose security vulnerabilities in the contract examples and shared library code.
+
+### Scope
+
+**In scope:**
+- Smart contract examples in `examples/` that contain logic vulnerabilities, incorrect auth patterns, or integer overflow/underflow bugs
+- The `shared/` library (validation helpers, test utilities)
+- Integration tests in `tests/` that mask rather than catch security issues
+- Documentation that provides insecure guidance or incorrect security advice
+
+**Out of scope:**
+- Third-party dependencies (report upstream)
+- Issues in the `webapp/` Next.js frontend
+- Theoretical vulnerabilities without a working proof-of-concept
+- Style or formatting issues
+
+### Reward Tiers
+
+| Severity | Description | Reward |
+|----------|-------------|--------|
+| **Critical** | Auth bypass, fund theft, or arbitrary state manipulation in any example contract | $500–$1,000 USD equivalent |
+| **High** | Logic flaw enabling incorrect behavior affecting core contract functions | $200–$500 USD equivalent |
+| **Medium** | Incorrect documentation that teaches insecure patterns; test gaps hiding real bugs | $50–$200 USD equivalent |
+| **Low** | Minor issues, missing input validation, documentation inaccuracies | $10–$50 USD equivalent or public acknowledgment |
+
+Rewards are paid in XLM at the time of payout. The triage team makes final severity determinations.
+
+### Rules and Guidelines
+
+1. **Responsible Disclosure**: Report vulnerabilities privately before public disclosure. Do not open a public GitHub issue for security bugs.
+2. **Report Channel**: Email `security@soroban-cookbook.dev` or open a [GitHub Security Advisory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new) with full details.
+3. **Proof of Concept**: Include a minimal failing test or reproduction steps. Reports without a PoC may not qualify for rewards.
+4. **No Destructive Testing**: Do not test on mainnet. All testing must be done locally or on testnet using the provided tooling.
+5. **One Report Per Issue**: Duplicate reports are not rewarded. The first valid submission receives the reward.
+6. **Good Faith**: Researchers must not access, modify, or delete data beyond what is needed to demonstrate the vulnerability.
+7. **No Social Engineering**: Do not attempt to compromise maintainer accounts or CI infrastructure.
+8. **Response SLA**: The team will acknowledge reports within 5 business days and provide a resolution timeline within 14 business days.
+
+### Disclosure Timeline
+
+- **Day 0**: Vulnerability reported privately
+- **Day 1–5**: Team acknowledges receipt
+- **Day 1–14**: Severity triage and fix timeline communicated
+- **Day 14–60**: Fix developed, reviewed, and merged
+- **Day 60+**: Coordinated public disclosure with researcher credit (if desired)
+
+### Budget
+
+The program is funded from the project's community treasury. Total annual budget: **$5,000 USD**. Awards are distributed on a first-come, first-served basis until the annual budget is exhausted.
+
+For full details, see [`docs/security-audit/bug-bounty.md`](./docs/security-audit/bug-bounty.md).
