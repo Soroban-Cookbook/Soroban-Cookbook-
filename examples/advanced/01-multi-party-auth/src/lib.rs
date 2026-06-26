@@ -276,6 +276,196 @@ impl MultiPartyAuthContract {
         );
     }
 
+    /// Add `new_signer` to the signer set for `proposal_id`.
+    pub fn add_signer(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        new_signer: Address,
+    ) {
+        caller.require_auth();
+
+        let key = DataKey::Signers(proposal_id.clone());
+        let mut signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if signers.contains(&new_signer) {
+            panic!("Signer already exists");
+        }
+        if signers.len() >= MAX_SIGNERS {
+            panic!("Signer set is full");
+        }
+
+        signers.push_back(new_signer.clone());
+        env.storage().instance().set(&key, &signers);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("add_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Remove `signer_to_remove` from the signer set for `proposal_id`.
+    pub fn remove_signer(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        signer_to_remove: Address,
+    ) {
+        caller.require_auth();
+
+        let signers_key = DataKey::Signers(proposal_id.clone());
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&signers_key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if !signers.contains(&signer_to_remove) {
+            panic!("Signer not found");
+        }
+
+        let threshold: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Threshold(proposal_id.clone()))
+            .unwrap_or(1);
+
+        // After removal the remaining count must still satisfy the threshold.
+        if signers.len() - 1 < threshold {
+            panic!("Cannot remove: would drop below threshold");
+        }
+
+        let mut updated: Vec<Address> = Vec::new(&env);
+        for s in signers.iter() {
+            if s != signer_to_remove {
+                updated.push_back(s);
+            }
+        }
+        env.storage().instance().set(&signers_key, &updated);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("rm_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Update the approval threshold for `proposal_id`.
+    pub fn set_threshold(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        new_threshold: u32,
+    ) {
+        caller.require_auth();
+
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers(proposal_id.clone()))
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if new_threshold == 0 {
+            panic!("Threshold must be at least 1");
+        }
+        if new_threshold > signers.len() {
+            panic!("Threshold exceeds signer count");
+        }
+
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold(proposal_id.clone()), &new_threshold);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("set_thr"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Rotate a signer: atomically replace `old_signer` with `new_signer`.
+    pub fn rotate_signer(
+        env: Env,
+        caller: Address,
+        proposal_id: Symbol,
+        old_signer: Address,
+        new_signer: Address,
+    ) {
+        caller.require_auth();
+
+        let key = DataKey::Signers(proposal_id.clone());
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        if !signers.contains(&caller) {
+            panic!("Caller is not a current signer");
+        }
+        if !signers.contains(&old_signer) {
+            panic!("Old signer not found");
+        }
+        if signers.contains(&new_signer) {
+            panic!("New signer already exists");
+        }
+
+        // Replace in-place (preserves list length, so threshold is unaffected).
+        let mut updated: Vec<Address> = Vec::new(&env);
+        for s in signers.iter() {
+            if s == old_signer {
+                updated.push_back(new_signer.clone());
+            } else {
+                updated.push_back(s);
+            }
+        }
+        env.storage().instance().set(&key, &updated);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_ADMIN, proposal_id),
+            AdminActionEventData {
+                action: symbol_short!("rot_sgn"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
+    /// Return the current signer list for `proposal_id`.
+    pub fn get_signers(env: Env, proposal_id: Symbol) -> Vec<Address> {
+        env.storage()
+            .instance()
+            .get(&DataKey::Signers(proposal_id))
+            .unwrap_or_else(|| Vec::new(&env))
+    }
+
+    /// Return the current threshold for `proposal_id`.
+    pub fn get_threshold(env: Env, proposal_id: Symbol) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::Threshold(proposal_id))
+            .unwrap_or(1)
+    }
+
     // -----------------------------------------------------------------------
     // Private helpers
     // -----------------------------------------------------------------------

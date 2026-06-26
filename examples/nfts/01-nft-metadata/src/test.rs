@@ -12,7 +12,7 @@ fn setup() -> (Env, Address, Address) {
     let env = Env::default();
     env.mock_all_auths();
 
-    let contract_id = env.register_contract(None, NftMetadataContract);
+    let contract_id = env.register(NftMetadataContract, ());
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
@@ -23,8 +23,7 @@ fn setup() -> (Env, Address, Address) {
             &String::from_str(&env, "My Collection"),
             &String::from_str(&env, "MNFT"),
             &String::from_str(&env, ""),
-        )
-        .unwrap();
+        );
 
     (env, contract_id, admin)
 }
@@ -81,10 +80,10 @@ fn test_initialize_success() {
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     assert_eq!(
-        client.name().unwrap(),
+        client.name(),
         String::from_str(&env, "My Collection")
     );
-    assert_eq!(client.symbol().unwrap(), String::from_str(&env, "MNFT"));
+    assert_eq!(client.symbol(), String::from_str(&env, "MNFT"));
     assert_eq!(client.total_supply(), 0);
 }
 
@@ -93,13 +92,13 @@ fn test_initialize_twice_fails() {
     let (env, contract_id, admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
-    let result = client.initialize(
+    let err = client.try_initialize(
         &admin,
         &String::from_str(&env, "Second"),
         &String::from_str(&env, "SEC"),
         &String::from_str(&env, ""),
-    );
-    assert_eq!(result, Err(NftError::AlreadyInitialized));
+    ).unwrap_err();
+    assert_eq!(err, Ok(NftError::AlreadyInitialized));
 }
 
 // ---------------------------------------------------------------------------
@@ -114,9 +113,9 @@ fn test_mint_success() {
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 
-    assert_eq!(client.owner_of(&1u32).unwrap(), owner);
+    assert_eq!(client.owner_of(&1u32), owner);
     assert_eq!(client.balance_of(&owner), 1);
     assert_eq!(client.total_supply(), 1);
 }
@@ -131,7 +130,7 @@ fn test_mint_multiple_tokens() {
     for id in 1u32..=5 {
         let mut meta = valid_metadata(&env);
         meta.name = String::from_str(&env, "Token");
-        client.mint(&admin, &owner, &id, &meta).unwrap();
+        client.mint(&admin, &owner, &id, &meta);
     }
 
     assert_eq!(client.balance_of(&owner), 5);
@@ -146,10 +145,10 @@ fn test_mint_double_fails() {
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &owner, &1u32, &meta.clone()).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta.clone());
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::TokenAlreadyExists));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::TokenAlreadyExists));
 }
 
 #[test]
@@ -161,8 +160,8 @@ fn test_mint_non_admin_fails() {
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    let result = client.mint(&attacker, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::NotAdmin));
+    let err = client.try_mint(&attacker, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::NotAdmin));
 }
 
 // ---------------------------------------------------------------------------
@@ -177,9 +176,9 @@ fn test_get_metadata_roundtrip() {
     let owner = Address::generate(&env);
     let meta = metadata_with_attrs(&env);
 
-    client.mint(&admin, &owner, &42u32, &meta.clone()).unwrap();
+    client.mint(&admin, &owner, &42u32, &meta.clone());
 
-    let stored = client.get_metadata(&42u32).unwrap();
+    let stored = client.get_metadata(&42u32);
     assert_eq!(stored.name, meta.name);
     assert_eq!(stored.description, meta.description);
     assert_eq!(stored.image, meta.image);
@@ -197,9 +196,9 @@ fn test_get_attributes() {
     let owner = Address::generate(&env);
     let meta = metadata_with_attrs(&env);
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 
-    let attrs = client.get_attributes(&1u32).unwrap();
+    let attrs = client.get_attributes(&1u32);
     assert_eq!(attrs.len(), 3);
 
     let first = attrs.get(0).unwrap();
@@ -212,8 +211,8 @@ fn test_get_metadata_nonexistent_fails() {
     let (env, contract_id, _admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
-    let result = client.get_metadata(&999u32);
-    assert_eq!(result, Err(NftError::TokenNotFound));
+    let err = client.try_get_metadata(&999u32).unwrap_err();
+    assert_eq!(err, Ok(NftError::TokenNotFound));
 }
 
 // ---------------------------------------------------------------------------
@@ -228,9 +227,9 @@ fn test_token_uri_no_base_returns_image() {
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 
-    let uri = client.token_uri(&1u32).unwrap();
+    let uri = client.token_uri(&1u32);
     assert_eq!(uri, String::from_str(&env, "ipfs://QmHash/image.png"));
 }
 
@@ -239,7 +238,7 @@ fn test_token_uri_with_base_uri() {
     let env = Env::default();
     env.mock_all_auths();
 
-    let contract_id = env.register_contract(None, NftMetadataContract);
+    let contract_id = env.register(NftMetadataContract, ());
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
@@ -249,14 +248,13 @@ fn test_token_uri_with_base_uri() {
             &String::from_str(&env, "My Collection"),
             &String::from_str(&env, "MNFT"),
             &String::from_str(&env, "https://api.example.com/metadata/"),
-        )
-        .unwrap();
+        );
 
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
-    client.mint(&admin, &owner, &7u32, &meta).unwrap();
+    client.mint(&admin, &owner, &7u32, &meta);
 
-    let uri = client.token_uri(&7u32).unwrap();
+    let uri = client.token_uri(&7u32);
     assert_eq!(
         uri,
         String::from_str(&env, "https://api.example.com/metadata/7")
@@ -268,8 +266,8 @@ fn test_token_uri_nonexistent_fails() {
     let (env, contract_id, _admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
-    let result = client.token_uri(&999u32);
-    assert_eq!(result, Err(NftError::TokenNotFound));
+    let err = client.try_token_uri(&999u32).unwrap_err();
+    assert_eq!(err, Ok(NftError::TokenNotFound));
 }
 
 // ---------------------------------------------------------------------------
@@ -285,10 +283,10 @@ fn test_transfer_success() {
     let bob = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta).unwrap();
-    client.transfer(&alice, &bob, &1u32).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta);
+    client.transfer(&alice, &bob, &1u32);
 
-    assert_eq!(client.owner_of(&1u32).unwrap(), bob);
+    assert_eq!(client.owner_of(&1u32), bob);
     assert_eq!(client.balance_of(&alice), 0);
     assert_eq!(client.balance_of(&bob), 1);
 }
@@ -303,10 +301,10 @@ fn test_transfer_not_owner_fails() {
     let charlie = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta);
 
-    let result = client.transfer(&charlie, &bob, &1u32);
-    assert_eq!(result, Err(NftError::NotApproved));
+    let err = client.try_transfer(&charlie, &bob, &1u32).unwrap_err();
+    assert_eq!(err, Ok(NftError::NotApproved));
 }
 
 #[test]
@@ -319,11 +317,11 @@ fn test_transfer_clears_approval() {
     let charlie = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta).unwrap();
-    client.approve(&alice, &bob, &1u32).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta);
+    client.approve(&alice, &bob, &1u32);
 
     // Bob transfers to Charlie
-    client.transfer(&bob, &charlie, &1u32).unwrap();
+    client.transfer(&bob, &charlie, &1u32);
 
     // Approval should be cleared
     assert!(client.get_approved(&1u32).is_none());
@@ -343,14 +341,14 @@ fn test_approve_and_transfer() {
     let charlie = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta).unwrap();
-    client.approve(&alice, &bob, &1u32).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta);
+    client.approve(&alice, &bob, &1u32);
 
     assert_eq!(client.get_approved(&1u32).unwrap(), bob);
 
     // Bob (approved) transfers to Charlie
-    client.transfer(&bob, &charlie, &1u32).unwrap();
-    assert_eq!(client.owner_of(&1u32).unwrap(), charlie);
+    client.transfer(&bob, &charlie, &1u32);
+    assert_eq!(client.owner_of(&1u32), charlie);
 }
 
 #[test]
@@ -363,17 +361,16 @@ fn test_set_approval_for_all() {
     let bob = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta.clone()).unwrap();
-    client.mint(&admin, &alice, &2u32, &meta).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta.clone());
+    client.mint(&admin, &alice, &2u32, &meta);
 
     client
-        .set_approval_for_all(&alice, &operator, &true)
-        .unwrap();
+        .set_approval_for_all(&alice, &operator, &true);
     assert!(client.is_approved_for_all(&alice, &operator));
 
     // Operator can transfer any of Alice's tokens
-    client.transfer(&operator, &bob, &1u32).unwrap();
-    client.transfer(&operator, &bob, &2u32).unwrap();
+    client.transfer(&operator, &bob, &1u32);
+    client.transfer(&operator, &bob, &2u32);
 
     assert_eq!(client.balance_of(&alice), 0);
     assert_eq!(client.balance_of(&bob), 2);
@@ -388,18 +385,16 @@ fn test_revoke_approval_for_all() {
     let operator = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    client.mint(&admin, &alice, &1u32, &meta).unwrap();
+    client.mint(&admin, &alice, &1u32, &meta);
     client
-        .set_approval_for_all(&alice, &operator, &true)
-        .unwrap();
+        .set_approval_for_all(&alice, &operator, &true);
     client
-        .set_approval_for_all(&alice, &operator, &false)
-        .unwrap();
+        .set_approval_for_all(&alice, &operator, &false);
 
     assert!(!client.is_approved_for_all(&alice, &operator));
 
-    let result = client.transfer(&operator, &alice, &1u32);
-    assert_eq!(result, Err(NftError::NotApproved));
+    let err = client.try_transfer(&operator, &alice, &1u32).unwrap_err();
+    assert_eq!(err, Ok(NftError::NotApproved));
 }
 
 // ---------------------------------------------------------------------------
@@ -415,8 +410,8 @@ fn test_validate_empty_name_fails() {
     let mut meta = valid_metadata(&env);
     meta.name = String::from_str(&env, "");
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::MetadataFieldEmpty));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::MetadataFieldEmpty));
 }
 
 #[test]
@@ -428,8 +423,8 @@ fn test_validate_empty_description_fails() {
     let mut meta = valid_metadata(&env);
     meta.description = String::from_str(&env, "");
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::MetadataFieldEmpty));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::MetadataFieldEmpty));
 }
 
 #[test]
@@ -441,8 +436,8 @@ fn test_validate_empty_image_fails() {
     let mut meta = valid_metadata(&env);
     meta.image = String::from_str(&env, "");
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::MetadataFieldEmpty));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::MetadataFieldEmpty));
 }
 
 #[test]
@@ -454,8 +449,8 @@ fn test_validate_invalid_image_uri_fails() {
     let mut meta = valid_metadata(&env);
     meta.image = String::from_str(&env, "ftp://bad-scheme.com/img.png");
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::InvalidImageUri));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::InvalidImageUri));
 }
 
 #[test]
@@ -467,7 +462,7 @@ fn test_validate_https_image_uri_ok() {
     let mut meta = valid_metadata(&env);
     meta.image = String::from_str(&env, "https://cdn.example.com/img.png");
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 }
 
 #[test]
@@ -479,7 +474,7 @@ fn test_validate_data_uri_ok() {
     let mut meta = valid_metadata(&env);
     meta.image = String::from_str(&env, "data:image/svg+xml;base64,PHN2Zy8+");
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 }
 
 #[test]
@@ -492,8 +487,8 @@ fn test_validate_invalid_background_color_fails() {
     // 7 chars — too long
     meta.background_color = String::from_str(&env, "FFAABB0");
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::InvalidBackgroundColor));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::InvalidBackgroundColor));
 }
 
 #[test]
@@ -505,7 +500,7 @@ fn test_validate_valid_background_color_ok() {
     let mut meta = valid_metadata(&env);
     meta.background_color = String::from_str(&env, "FF0000");
 
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 }
 
 #[test]
@@ -523,8 +518,8 @@ fn test_validate_empty_attribute_trait_type_fails() {
         },
     ];
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::InvalidAttribute));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::InvalidAttribute));
 }
 
 #[test]
@@ -542,8 +537,8 @@ fn test_validate_empty_attribute_value_fails() {
         },
     ];
 
-    let result = client.mint(&admin, &owner, &1u32, &meta);
-    assert_eq!(result, Err(NftError::InvalidAttribute));
+    let err = client.try_mint(&admin, &owner, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::InvalidAttribute));
 }
 
 // ---------------------------------------------------------------------------
@@ -557,12 +552,12 @@ fn test_update_metadata_success() {
 
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
-    client.mint(&admin, &owner, &1u32, &meta).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta);
 
     let updated = metadata_with_attrs(&env);
-    client.update_metadata(&admin, &1u32, &updated).unwrap();
+    client.update_metadata(&admin, &1u32, &updated);
 
-    let stored = client.get_metadata(&1u32).unwrap();
+    let stored = client.get_metadata(&1u32);
     assert_eq!(stored.name, String::from_str(&env, "Legendary Sword #42"));
     assert_eq!(stored.attributes.len(), 3);
 }
@@ -574,11 +569,11 @@ fn test_update_metadata_non_admin_fails() {
 
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
-    client.mint(&admin, &owner, &1u32, &meta.clone()).unwrap();
+    client.mint(&admin, &owner, &1u32, &meta.clone());
 
     let attacker = Address::generate(&env);
-    let result = client.update_metadata(&attacker, &1u32, &meta);
-    assert_eq!(result, Err(NftError::NotAdmin));
+    let err = client.try_update_metadata(&attacker, &1u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::NotAdmin));
 }
 
 #[test]
@@ -587,8 +582,8 @@ fn test_update_metadata_nonexistent_token_fails() {
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     let meta = valid_metadata(&env);
-    let result = client.update_metadata(&admin, &999u32, &meta);
-    assert_eq!(result, Err(NftError::TokenNotFound));
+    let err = client.try_update_metadata(&admin, &999u32, &meta).unwrap_err();
+    assert_eq!(err, Ok(NftError::TokenNotFound));
 }
 
 // ---------------------------------------------------------------------------

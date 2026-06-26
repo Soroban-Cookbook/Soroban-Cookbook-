@@ -30,7 +30,9 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Symbol};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, token, Address, Env, Symbol,
+};
 
 // ─── Storage keys ────────────────────────────────────────────────────────────
 
@@ -168,8 +170,10 @@ impl LiquidityMining {
         pool.reward_rate = new_rate;
         Self::save_pool(&env, pool_id, &pool);
 
-        env.events()
-            .publish((Symbol::new(&env, "rate_changed"),), (pool_id, new_rate));
+        env.events().publish(
+            (Symbol::new(&env, "rate_changed"),),
+            (pool_id, new_rate),
+        );
     }
 
     /// Pause or resume a pool.
@@ -182,8 +186,10 @@ impl LiquidityMining {
         pool.active = active;
         Self::save_pool(&env, pool_id, &pool);
 
-        env.events()
-            .publish((Symbol::new(&env, "pool_status"),), (pool_id, active));
+        env.events().publish(
+            (Symbol::new(&env, "pool_status"),),
+            (pool_id, active),
+        );
     }
 
     // ── User actions ─────────────────────────────────────────────────────────
@@ -210,11 +216,14 @@ impl LiquidityMining {
         // Settle user's pending rewards before changing their stake
         let mut info = Self::load_user(&env, pool_id, &user);
         let pending = Self::calc_pending(&pool, &info);
-        info.pending_rewards = info.pending_rewards.checked_add(pending).expect("Overflow");
+        info.pending_rewards = info
+            .pending_rewards
+            .checked_add(pending)
+            .expect("Overflow");
 
         // Pull LP tokens from user
         let lp_client = token::Client::new(&env, &pool.lp_token);
-        lp_client.transfer(&user, env.current_contract_address(), &amount);
+        lp_client.transfer(&user, &env.current_contract_address(), &amount);
 
         // Update state
         info.staked = info.staked.checked_add(amount).expect("Overflow");
@@ -256,7 +265,10 @@ impl LiquidityMining {
 
         // Accumulate pending rewards
         let pending = Self::calc_pending(&pool, &info);
-        info.pending_rewards = info.pending_rewards.checked_add(pending).expect("Overflow");
+        info.pending_rewards = info
+            .pending_rewards
+            .checked_add(pending)
+            .expect("Overflow");
 
         // Update stake
         info.staked = info.staked.checked_sub(amount).expect("Underflow");
@@ -291,7 +303,10 @@ impl LiquidityMining {
 
         let mut info = Self::load_user(&env, pool_id, &user);
         let pending = Self::calc_pending(&pool, &info);
-        let total_claimable = info.pending_rewards.checked_add(pending).expect("Overflow");
+        let total_claimable = info
+            .pending_rewards
+            .checked_add(pending)
+            .expect("Overflow");
 
         if total_claimable == 0 {
             panic!("Nothing to harvest");
@@ -307,7 +322,11 @@ impl LiquidityMining {
 
         // Transfer reward tokens to user
         let reward_client = token::Client::new(&env, &pool.reward_token);
-        reward_client.transfer(&env.current_contract_address(), &user, &total_claimable);
+        reward_client.transfer(
+            &env.current_contract_address(),
+            &user,
+            &total_claimable,
+        );
 
         Self::save_pool(&env, pool_id, &pool);
         Self::save_user(&env, pool_id, &user, &info);
@@ -339,7 +358,9 @@ impl LiquidityMining {
         // Simulate what update_pool would do
         let simulated_acc = if pool.total_staked > 0 {
             let elapsed = (env.ledger().sequence() - pool.last_update_ledger) as i128;
-            let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
+            let reward = elapsed
+                .checked_mul(pool.reward_rate)
+                .expect("Overflow");
             pool.acc_reward_per_share
                 .checked_add(reward.checked_mul(PRECISION).expect("Overflow") / pool.total_staked)
                 .expect("Overflow")
@@ -347,7 +368,10 @@ impl LiquidityMining {
             pool.acc_reward_per_share
         };
 
-        let simulated_pending = info.staked.checked_mul(simulated_acc).expect("Overflow")
+        let simulated_pending = info
+            .staked
+            .checked_mul(simulated_acc)
+            .expect("Overflow")
             / PRECISION
             - info.reward_debt;
 
@@ -372,12 +396,19 @@ impl LiquidityMining {
         if current_ledger <= pool.last_update_ledger {
             return;
         }
-        if pool.total_staked > 0 {
+        if pool.active && pool.total_staked > 0 {
             let elapsed = (current_ledger - pool.last_update_ledger) as i128;
-            let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
+            let reward = elapsed
+                .checked_mul(pool.reward_rate)
+                .expect("Overflow");
             pool.acc_reward_per_share = pool
                 .acc_reward_per_share
-                .checked_add(reward.checked_mul(PRECISION).expect("Overflow") / pool.total_staked)
+                .checked_add(
+                    reward
+                        .checked_mul(PRECISION)
+                        .expect("Overflow")
+                        / pool.total_staked,
+                )
                 .expect("Overflow");
         }
         pool.last_update_ledger = current_ledger;

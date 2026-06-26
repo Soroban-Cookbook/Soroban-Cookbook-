@@ -13,7 +13,7 @@ fn setup() -> (Env, Address, VaultContractClient<'static>) {
     let env = Env::default();
     env.mock_all_auths();
 
-    let contract_id = env.register_contract(None, VaultContract);
+    let contract_id = env.register(VaultContract, ());
     let client = VaultContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
@@ -54,7 +54,7 @@ fn test_conservative_strategy_params() {
     let params = strategy_params(&env, &StrategyType::Conservative);
 
     assert_eq!(params.max_allocation_bps, 10_000); // 100 %
-    assert_eq!(params.expected_apy_bps, 300); // 3 %
+    assert_eq!(params.expected_apy_bps, 300);       // 3 %
     assert_eq!(params.risk_level, RiskLevel::Low);
 }
 
@@ -64,7 +64,7 @@ fn test_balanced_strategy_params() {
     let params = strategy_params(&env, &StrategyType::Balanced);
 
     assert_eq!(params.max_allocation_bps, 8_000); // 80 %
-    assert_eq!(params.expected_apy_bps, 800); // 8 %
+    assert_eq!(params.expected_apy_bps, 800);      // 8 %
     assert_eq!(params.risk_level, RiskLevel::Medium);
 }
 
@@ -74,7 +74,7 @@ fn test_aggressive_strategy_params() {
     let params = strategy_params(&env, &StrategyType::Aggressive);
 
     assert_eq!(params.max_allocation_bps, 5_000); // 50 %
-    assert_eq!(params.expected_apy_bps, 2_000); // 20 %
+    assert_eq!(params.expected_apy_bps, 2_000);   // 20 %
     assert_eq!(params.risk_level, RiskLevel::High);
 }
 
@@ -288,13 +288,14 @@ fn test_deposit_within_balanced_allocation_cap() {
     let user1 = Address::generate(&env);
     let user2 = Address::generate(&env);
 
+    // Deposit 20 tokens first (user2 — acts as "other" TVL) under Conservative (100% cap)
+    client.deposit(&user2, &20);
+
     // Switch to Balanced (80 % cap)
     client.switch_strategy(&admin, &StrategyType::Balanced);
 
-    // Deposit 20 tokens first (user2 — acts as "other" TVL)
     // Then deposit 80 tokens (user1).
     // new_total = 100; user1 amount = 80; 80 * 10_000 = 800_000 == 100 * 8_000 = 800_000 → OK
-    client.deposit(&user2, &20);
     client.deposit(&user1, &80);
 
     assert_eq!(client.balance(&user1), 80);

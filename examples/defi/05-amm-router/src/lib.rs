@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec, Map};
 
 #[contracttype]
 pub struct Pool {
@@ -16,42 +16,25 @@ pub struct AMMRouter;
 #[contractimpl]
 impl AMMRouter {
     pub fn initialize(env: Env) {
-        if env
-            .storage()
-            .instance()
-            .has(&soroban_sdk::Symbol::new(&env, "pools"))
-        {
+        if env.storage().instance().has(&soroban_sdk::Symbol::new(&env, "pools")) {
             panic!("already initialized");
         }
-        env.storage().instance().set(
-            &soroban_sdk::Symbol::new(&env, "pools"),
-            &Map::<(Address, Address), Pool>::new(&env),
-        );
+        env.storage().instance().set(&soroban_sdk::Symbol::new(&env, "pools"), &Map::<(Address, Address), Pool>::new(&env));
     }
 
     pub fn add_pool(env: Env, pool: Pool) {
-        let mut pools: Map<(Address, Address), Pool> = env
-            .storage()
-            .instance()
-            .get(&soroban_sdk::Symbol::new(&env, "pools"))
-            .unwrap();
+        let mut pools: Map<(Address, Address), Pool> = env.storage().instance().get(&soroban_sdk::Symbol::new(&env, "pools")).unwrap();
         let key = if pool.token_a < pool.token_b {
             (pool.token_a.clone(), pool.token_b.clone())
         } else {
             (pool.token_b.clone(), pool.token_a.clone())
         };
         pools.set(key, pool);
-        env.storage()
-            .instance()
-            .set(&soroban_sdk::Symbol::new(&env, "pools"), &pools);
+        env.storage().instance().set(&soroban_sdk::Symbol::new(&env, "pools"), &pools);
     }
 
     pub fn get_pool(env: Env, token_a: Address, token_b: Address) -> Option<Pool> {
-        let pools: Map<(Address, Address), Pool> = env
-            .storage()
-            .instance()
-            .get(&soroban_sdk::Symbol::new(&env, "pools"))
-            .unwrap();
+        let pools: Map<(Address, Address), Pool> = env.storage().instance().get(&soroban_sdk::Symbol::new(&env, "pools")).unwrap();
         let key = if token_a < token_b {
             (token_a, token_b)
         } else {

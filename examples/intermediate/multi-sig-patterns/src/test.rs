@@ -56,7 +56,7 @@ fn test_create_and_approve_proposal() {
     client.approve(&proposal_id, &signer1);
     client.approve(&proposal_id, &signer2);
 
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert_eq!(proposal.approvals.len(), 2);
     assert!(!proposal.executed);
 }
@@ -104,7 +104,7 @@ fn test_double_approval() {
 }
 
 #[test]
-fn test_cancel_proposal() {
+fn test_cancel_proposal_by_proposer() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -121,7 +121,7 @@ fn test_cancel_proposal() {
     client.approve(&proposal_id, &signer1);
     client.cancel(&proposal_id, &signer1);
 
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert!(proposal.cancelled);
 
     let result = client.try_execute(&proposal_id, &signer1);
@@ -157,12 +157,41 @@ fn test_execute_with_threshold() {
     let result = client.execute(&proposal_id, &signer1);
     assert!(result);
 
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert!(proposal.executed);
 
     // Test execution after execution
     let result = client.try_execute(&proposal_id, &signer1);
     assert_eq!(result, Err(Ok(AuthError::AlreadyExecuted)));
+}
+
+#[test]
+fn test_cancel_proposal_by_other_signer() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuth);
+    let client = MultiPartyAuthClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
+
+    client.initialize(&2, &signers);
+    let proposal_id = client.create_proposal(&signer1);
+
+    client.approve(&proposal_id, &signer1);
+    client.cancel(&proposal_id, &signer2);
+
+    let proposal = client.get_proposal(&proposal_id);
+    assert!(proposal.cancelled);
+
+    let result = client.try_approve(&proposal_id, &signer3);
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
+
+    let result = client.try_execute(&proposal_id, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
 }
 
 #[test]
@@ -221,6 +250,6 @@ fn test_proposal_not_found() {
     let signers = vec![&env, signer1.clone()];
     client.initialize(&1, &signers);
 
-    let result = client.try_get_proposal(&99);
-    assert!(result.is_err());
+    let result = client.try_approve(&999, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ProposalNotFound)));
 }

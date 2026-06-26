@@ -1,10 +1,11 @@
 use super::*;
-use soroban_sdk::{Address, Env, Vec};
+use soroban_sdk::{Env, Address, Vec};
+use soroban_sdk::testutils::{Address as _, Ledger as _};
 
 #[test]
 fn test_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
     client.initialize();
 }
@@ -13,7 +14,7 @@ fn test_initialize() {
 #[should_panic(expected = "already initialized")]
 fn test_initialize_twice() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
     client.initialize();
     client.initialize();
@@ -22,10 +23,10 @@ fn test_initialize_twice() {
 #[test]
 fn test_add_pool() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    let token_a = Address::random(&env);
-    let token_b = Address::random(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
 
     client.initialize();
     client.add_pool(&Pool {
@@ -42,12 +43,13 @@ fn test_add_pool() {
 #[test]
 fn test_single_hop_swap() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    env.mock_all_auths();
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    let user = Address::random(&env);
-    let to = Address::random(&env);
-    let token_a = Address::random(&env);
-    let token_b = Address::random(&env);
+    let user = Address::generate(&env);
+    let to = Address::generate(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
 
     client.initialize();
     client.add_pool(&Pool {
@@ -76,13 +78,14 @@ fn test_single_hop_swap() {
 #[test]
 fn test_multi_hop_swap() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    env.mock_all_auths();
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    let user = Address::random(&env);
-    let to = Address::random(&env);
-    let token_a = Address::random(&env);
-    let token_b = Address::random(&env);
-    let token_c = Address::random(&env);
+    let user = Address::generate(&env);
+    let to = Address::generate(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
+    let token_c = Address::generate(&env);
 
     client.initialize();
     client.add_pool(&Pool {
@@ -119,12 +122,14 @@ fn test_multi_hop_swap() {
 #[should_panic(expected = "deadline exceeded")]
 fn test_deadline_exceeded() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    env.mock_all_auths();
+    env.ledger().with_mut(|l| l.timestamp = 100);
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    let user = Address::random(&env);
-    let to = Address::random(&env);
-    let token_a = Address::random(&env);
-    let token_b = Address::random(&env);
+    let user = Address::generate(&env);
+    let to = Address::generate(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
 
     client.initialize();
     client.add_pool(&Pool {
@@ -152,12 +157,13 @@ fn test_deadline_exceeded() {
 #[should_panic(expected = "insufficient output amount")]
 fn test_slippage_control() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, AMMRouter);
+    env.mock_all_auths();
+    let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    let user = Address::random(&env);
-    let to = Address::random(&env);
-    let token_a = Address::random(&env);
-    let token_b = Address::random(&env);
+    let user = Address::generate(&env);
+    let to = Address::generate(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
 
     client.initialize();
     client.add_pool(&Pool {

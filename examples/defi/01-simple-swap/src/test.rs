@@ -52,7 +52,7 @@ fn test_swap_exact_rate() {
     token_a.mint(&alice, &1000i128);
     token_b.mint(&env.current_contract_address(), &5000i128);
 
-    swap_client.swap(&token_a_id, &100i128, &200i128, &bob);
+    swap_client.swap(&alice, &token_a_id, &100i128, &200i128, &bob);
 
     assert_eq!(token_a.balance(&alice), 900i128);
     assert_eq!(token_b.balance(&bob), 200i128);
@@ -71,7 +71,7 @@ fn test_swap_rejects_slippage() {
     token_b.mint(&env.current_contract_address(), &5000i128);
 
     let result = std::panic::catch_unwind(|| {
-        swap_client.swap(&token_a_id, &100i128, &201i128, &bob);
+        swap_client.swap(&alice, &token_a_id, &100i128, &201i128, &bob);
     });
     assert!(result.is_err());
 }
@@ -116,7 +116,7 @@ fn test_swap_rejects_low_minimum() {
     token_a.mint(&alice, &1000i128);
     token_b.mint(&env.current_contract_address(), &1000i128);
 
-    swap_client.swap(&token_a_id, &100i128, &201i128, &bob);
+    swap_client.swap(&alice, &token_a_id, &100i128, &201i128, &bob);
 }
 
 #[test]
@@ -131,7 +131,7 @@ fn test_swap_reverse_direction() {
     token_b.mint(&alice, &1000i128);
     token_a.mint(&env.current_contract_address(), &1000i128);
 
-    swap_client.swap(&token_b_id, &200i128, &99i128, &bob);
+    swap_client.swap(&alice, &token_b_id, &200i128, &99i128, &bob);
 
     assert_eq!(token_b.balance(&alice), 800i128);
     assert_eq!(token_a.balance(&bob), 100i128);
@@ -149,7 +149,7 @@ fn test_swap_emits_event() {
     token_a.mint(&alice, &1000i128);
     token_b.mint(&env.current_contract_address(), &5000i128);
 
-    swap_client.swap(&token_a_id, &100i128, &200i128, &alice);
+    swap_client.swap(&alice, &token_a_id, &100i128, &200i128, &alice);
     let events = EventList::new(&env, env.events().all());
     assert!(!events.is_empty());
 }
@@ -160,7 +160,7 @@ fn test_swap_rejects_unknown_sell_token() {
     let (env, _owner, alice, bob, swap_client) = setup();
     let unknown = Address::generate(&env);
     env.mock_all_auths();
-    swap_client.swap(&unknown, &100i128, &1i128, &bob);
+    swap_client.swap(&alice, &unknown, &100i128, &1i128, &bob);
 }
 
 #[test]

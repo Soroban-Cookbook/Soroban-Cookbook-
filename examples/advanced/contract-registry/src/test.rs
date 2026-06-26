@@ -10,15 +10,13 @@ fn test_register_and_query() {
     let name = symbol_short!("reg1");
     let category = symbol_short!("finance");
     let version = symbol_short!("v1");
-    let addr = Address::from_contract_id(&env, &contract_id);
+    let addr = contract_id.clone();
 
     // Register
-    client
-        .register(&name, &category, &version, &addr)
-        .expect("register failed");
+    client.register(&name, &category, &version, &addr);
 
     // Query by name
-    let md = client.get_by_name(&name).unwrap();
+    let md = client.get_by_name(&name);
     assert_eq!(md.name, name);
     assert_eq!(md.category, category);
     assert_eq!(md.version, version);
@@ -31,7 +29,7 @@ fn test_register_and_query() {
 
     // Categories list contains our category
     let cats: Vec<Symbol> = client.list_categories();
-    assert!(cats.iter().any(|c| *c == category));
+    assert!(cats.iter().any(|c| c == category));
 }
 
 #[test]
@@ -43,12 +41,10 @@ fn test_duplicate_register_fails() {
     let name = symbol_short!("dup");
     let category = symbol_short!("util");
     let version = symbol_short!("v1");
-    let addr = Address::from_contract_id(&env, &contract_id);
+    let addr = contract_id.clone();
 
-    client
-        .register(&name, &category, &version, &addr)
-        .expect("first register failed");
+    client.register(&name, &category, &version, &addr);
 
-    let res = client.register(&name, &category, &version, &addr);
+    let res = client.try_register(&name, &category, &version, &addr);
     assert!(res.is_err());
 }

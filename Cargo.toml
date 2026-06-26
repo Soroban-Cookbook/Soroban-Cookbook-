@@ -7,6 +7,8 @@ members = [
     "examples/basics/*",
     "examples/intermediate/*",
     "examples/advanced/*",
+    "examples/advanced/05-diamond-security/facet-adder",
+    "examples/advanced/05-diamond-security/facet-multiplier",
     "examples/defi/*",
     "examples/nfts/*",
     "examples/governance/*",

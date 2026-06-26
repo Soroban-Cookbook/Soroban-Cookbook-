@@ -15,6 +15,7 @@
 
 ## Basics (14 examples)
 - [Overview & listing](./examples/basics.md)
+- [Video Tutorials](./examples/video-tutorials.md)
 - [Storage Patterns](./examples/storage-patterns.md)
 - [Error Handling](./examples/error-handling.md)
 - [Events](./examples/events.md)
@@ -27,6 +28,7 @@
 ## Advanced (3 examples)
 - [Multi-party auth](./examples/advanced.md)
 - [Oracle Pattern](./examples/oracle-pattern.md)
+- [Diamond Security](./examples/advanced/05-diamond-security/README.md)
 
 # Use Cases
 
@@ -39,6 +41,7 @@
 
 ## Governance
 - [Overview & planned](./examples/governance.md)
+- [Vote Delegation](./examples/governance/01-vote-delegation/README.md)
 
 ## Tokens
 - [Overview & planned](./examples/tokens.md)

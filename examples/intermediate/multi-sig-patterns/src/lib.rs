@@ -17,7 +17,9 @@ pub enum AuthError {
     AlreadyApproved = 4,
     AlreadyExecuted = 5,
     ThresholdNotMet = 6,
-    AlreadyInitialized = 7,
+    AlreadyCancelled = 7,
+    ProposalCancelled = 8,
+    AlreadyInitialized = 9,
 }
 
 #[contracttype]
@@ -34,6 +36,7 @@ pub enum DataKey {
 pub struct Proposal {
     pub approvals: Vec<Address>,
     pub executed: bool,
+    pub cancelled: bool,
 }
 
 #[contract]
@@ -84,6 +87,7 @@ impl MultiPartyAuth {
         let proposal = Proposal {
             approvals: Vec::new(&env),
             executed: false,
+            cancelled: false,
         };
 
         env.storage()
@@ -120,6 +124,10 @@ impl MultiPartyAuth {
             return Err(AuthError::AlreadyExecuted);
         }
 
+        if proposal.cancelled {
+            return Err(AuthError::ProposalCancelled);
+        }
+
         if proposal.approvals.contains(&signer) {
             return Err(AuthError::AlreadyApproved);
         }
@@ -152,6 +160,10 @@ impl MultiPartyAuth {
             return Err(AuthError::AlreadyExecuted);
         }
 
+        if proposal.cancelled {
+            return Err(AuthError::ProposalCancelled);
+        }
+
         if proposal.approvals.len() < threshold {
             return Err(AuthError::ThresholdNotMet);
         }
@@ -162,6 +174,42 @@ impl MultiPartyAuth {
             .set(&DataKey::Proposal(proposal_id), &proposal);
 
         Ok(true)
+    }
+
+    /// Cancel a proposal before it is executed
+    pub fn cancel(env: Env, proposal_id: u32, canceller: Address) -> Result<(), AuthError> {
+        canceller.require_auth();
+
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers)
+            .ok_or(AuthError::NotAuthorized)?;
+
+        if !signers.contains(&canceller) {
+            return Err(AuthError::NotAuthorized);
+        }
+
+        let mut proposal: Proposal = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Proposal(proposal_id))
+            .ok_or(AuthError::ProposalNotFound)?;
+
+        if proposal.executed {
+            return Err(AuthError::AlreadyExecuted);
+        }
+
+        if proposal.cancelled {
+            return Err(AuthError::AlreadyCancelled);
+        }
+
+        proposal.cancelled = true;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(proposal_id), &proposal);
+
+        Ok(())
     }
 
     /// Get proposal status

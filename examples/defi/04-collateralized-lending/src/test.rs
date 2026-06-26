@@ -1,10 +1,11 @@
 use super::*;
-use soroban_sdk::{Address, Env};
+use soroban_sdk::{Env, Address, testutils::Address as _};
 
 #[test]
 fn test_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
 
     client.initialize(&80, &85, &10, &50);
@@ -14,7 +15,8 @@ fn test_initialize() {
 #[should_panic(expected = "already initialized")]
 fn test_initialize_twice() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
 
     client.initialize(&80, &85, &10, &50);
@@ -24,9 +26,10 @@ fn test_initialize_twice() {
 #[test]
 fn test_deposit_collateral() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -40,9 +43,10 @@ fn test_deposit_collateral() {
 #[should_panic(expected = "amount must be positive")]
 fn test_deposit_zero() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &0);
@@ -52,9 +56,10 @@ fn test_deposit_zero() {
 #[should_panic(expected = "amount must be positive")]
 fn test_deposit_negative() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &-100);
@@ -63,9 +68,10 @@ fn test_deposit_negative() {
 #[test]
 fn test_withdraw_collateral() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -79,9 +85,10 @@ fn test_withdraw_collateral() {
 #[should_panic(expected = "insufficient collateral")]
 fn test_withdraw_too_much() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -91,9 +98,10 @@ fn test_withdraw_too_much() {
 #[test]
 fn test_borrow() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -107,9 +115,10 @@ fn test_borrow() {
 #[should_panic(expected = "exceeds maximum borrow amount")]
 fn test_borrow_too_much() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -119,9 +128,10 @@ fn test_borrow_too_much() {
 #[test]
 fn test_repay() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -135,9 +145,10 @@ fn test_repay() {
 #[test]
 fn test_repay_full() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -151,12 +162,13 @@ fn test_repay_full() {
 #[test]
 fn test_partial_liquidation() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let borrower = Address::random(&env);
-    let liquidator = Address::random(&env);
+    let borrower = Address::generate(&env);
+    let liquidator = Address::generate(&env);
 
-    client.initialize(&80, &85, &10, &50);
+    client.initialize(&80, &75, &10, &50);
     client.deposit_collateral(&borrower, &1000);
     client.borrow(&borrower, &800);
 
@@ -173,12 +185,13 @@ fn test_partial_liquidation() {
 #[test]
 fn test_liquidation_incentive() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let borrower = Address::random(&env);
-    let liquidator = Address::random(&env);
+    let borrower = Address::generate(&env);
+    let liquidator = Address::generate(&env);
 
-    client.initialize(&80, &85, &10, &50);
+    client.initialize(&80, &75, &10, &50);
     client.deposit_collateral(&borrower, &1000);
     client.borrow(&borrower, &800);
 
@@ -192,10 +205,11 @@ fn test_liquidation_incentive() {
 #[should_panic(expected = "position is healthy")]
 fn test_liquidate_healthy() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let borrower = Address::random(&env);
-    let liquidator = Address::random(&env);
+    let borrower = Address::generate(&env);
+    let liquidator = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&borrower, &2000);
@@ -207,9 +221,10 @@ fn test_liquidate_healthy() {
 #[test]
 fn test_health_factor_max() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     let health_factor = client.get_health_factor(&user);
@@ -219,9 +234,10 @@ fn test_health_factor_max() {
 #[test]
 fn test_health_factor_calculation() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -234,10 +250,11 @@ fn test_health_factor_calculation() {
 #[test]
 fn test_multiple_users() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user1 = Address::random(&env);
-    let user2 = Address::random(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user1, &1000);
@@ -253,9 +270,10 @@ fn test_multiple_users() {
 #[test]
 fn test_withdraw_after_repay() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&user, &1000);
@@ -271,27 +289,26 @@ fn test_withdraw_after_repay() {
 #[test]
 fn test_emergency_pause() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let admin = Address::random(&env);
-    let user = Address::random(&env);
+    let admin = Address::generate(&env);
+    let user = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.set_emergency_pause(&admin, &true);
 
-    let result = std::panic::catch_unwind(|| {
-        client.deposit_collateral(&user, &1000);
-    });
-    assert!(result.is_err());
+    client.try_deposit_collateral(&user, &1000).unwrap_err();
 }
 
 #[test]
 fn test_emergency_liquidate() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let admin = Address::random(&env);
-    let borrower = Address::random(&env);
+    let admin = Address::generate(&env);
+    let borrower = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&borrower, &1000);
@@ -308,10 +325,11 @@ fn test_emergency_liquidate() {
 #[should_panic(expected = "not in emergency mode")]
 fn test_emergency_liquidate_not_paused() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingContract);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
     let client = LendingContractClient::new(&env, &contract_id);
-    let admin = Address::random(&env);
-    let borrower = Address::random(&env);
+    let admin = Address::generate(&env);
+    let borrower = Address::generate(&env);
 
     client.initialize(&80, &85, &10, &50);
     client.deposit_collateral(&borrower, &1000);

@@ -44,8 +44,21 @@
 
 use super::*;
 use soroban_sdk::testutils::{Events as _, Ledger as _};
-use soroban_sdk::{symbol_short, Env, Symbol, TryFromVal};
-use soroban_validation::test_events::EventList;
+use soroban_sdk::{symbol_short, Env, Symbol, TryFromVal, Val, Vec};
+
+fn get_last_event_topics_and_data(
+    env: &Env,
+    events: &soroban_sdk::testutils::ContractEvents,
+) -> (Vec<Val>, Val) {
+    let last_event = events.events().last().unwrap();
+    let soroban_sdk::xdr::ContractEventBody::V0(body) = &last_event.body;
+    let mut topics = Vec::new(env);
+    for topic in body.topics.iter() {
+        topics.push_back(Val::try_from_val(env, topic).unwrap());
+    }
+    let data = Val::try_from_val(env, &body.data).unwrap();
+    (topics, data)
+}
 
 #[test]
 fn test_persistent_storage() {
@@ -63,8 +76,8 @@ fn test_persistent_storage() {
     client.set_persistent(&key, &value);
 
     // Verify set event
-    let events = EventList::new(&env, env.events().all());
-    let (_, topics, data) = events.last().unwrap();
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -84,8 +97,8 @@ fn test_persistent_storage() {
     client.remove_persistent(&key);
 
     // Verify remove event
-    let events = EventList::new(&env, env.events().all());
-    let (_, topics, data) = events.last().unwrap();
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -114,8 +127,8 @@ fn test_temporary_storage() {
     client.set_temporary(&key, &value);
 
     // Verify event
-    let events = EventList::new(&env, env.events().all());
-    let (_, topics, data) = events.last().unwrap();
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -148,8 +161,8 @@ fn test_instance_storage() {
     client.set_instance(&key, &value);
 
     // Verify event
-    let events = EventList::new(&env, env.events().all());
-    let (_, topics, data) = events.last().unwrap();
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -169,8 +182,8 @@ fn test_instance_storage() {
     client.remove_instance(&key);
 
     // Verify remove event
-    let events = EventList::new(&env, env.events().all());
-    let (_, topics, data) = events.last().unwrap();
+    let events = env.events().all();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -303,7 +316,7 @@ fn test_missing_key_returns_none_for_get_persistent() {
     let client = StorageContractClient::new(&env, &contract_id);
 
     let missing = symbol_short!("nope");
-    // Should return None for missing key across all storage types
+    // Should return None for missing key
     assert_eq!(client.get_persistent(&missing), None);
     assert_eq!(client.get_temporary(&missing), None);
     assert_eq!(client.get_instance(&missing), None);

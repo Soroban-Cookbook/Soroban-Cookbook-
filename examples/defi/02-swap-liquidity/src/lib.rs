@@ -29,8 +29,6 @@ pub struct LiquidityEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap_liq");
-const EVENT_ADD: Symbol = symbol_short!("liquidity_added");
-const EVENT_REMOVE: Symbol = symbol_short!("liquidity_removed");
 
 impl SwapLiquidityContract {
     fn require_owner(&self, env: &Env) {
@@ -144,7 +142,7 @@ impl SwapLiquidityContract {
         };
 
         assert!(minted_shares > 0, "insufficient liquidity added");
-        token::Client::new(&env, &lp_token).mint(&provider, &minted_shares);
+        token::StellarAssetClient::new(&env, &lp_token).mint(&provider, &minted_shares);
 
         env.storage()
             .instance()
@@ -157,7 +155,7 @@ impl SwapLiquidityContract {
             .set(&DataKey::TotalShares, &(total_shares + minted_shares));
 
         env.events().publish(
-            (EVENT_NS, EVENT_ADD),
+            (EVENT_NS, Symbol::new(&env, "liquidity_added")),
             LiquidityEventData {
                 provider,
                 amount_a,
@@ -205,7 +203,7 @@ impl SwapLiquidityContract {
             .set(&DataKey::TotalShares, &(total_shares - shares));
 
         env.events().publish(
-            (EVENT_NS, EVENT_REMOVE),
+            (EVENT_NS, Symbol::new(&env, "liquidity_removed")),
             LiquidityEventData {
                 provider,
                 amount_a,
