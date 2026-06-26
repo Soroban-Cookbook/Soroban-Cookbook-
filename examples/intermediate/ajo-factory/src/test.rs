@@ -12,8 +12,8 @@ struct Fixture {
 fn setup() -> Fixture {
     let env = Env::default();
     env.mock_all_auths();
-A
-    let template_wasm = [0u8; 0];
+
+    let template_wasm = [0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00];
     let ajo_hash = env
         .deployer()
         .upload_contract_wasm(template_wasm.as_slice());
@@ -216,7 +216,7 @@ fn test_ajo_cannot_be_reinitialized() {
 
 #[test]
 fn test_create_ajo_benchmark() {
-    let mut f = setup();
+    let f = setup();
     let creator = Address::generate(&f.env);
 
     f.env.budget().reset_default();

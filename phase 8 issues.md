@@ -107,7 +107,7 @@
 ### Issue #387: Establish Triage Process
 
 - **Priority:** High
-- **Status:** Planned
+- **Status:** Completed
 - **Description:** Process for triaging bug reports
 - **Acceptance Criteria:**
   - Triage team identified

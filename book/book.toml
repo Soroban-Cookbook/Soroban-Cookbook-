@@ -14,7 +14,7 @@ preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/Soroban-Cookbook/Soroban-Cookbook"
 edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/{path}"
 
-theme = "css/navy.css"
+# theme = "css/navy.css"
 copy-button = { enable = true }
 
 [output.html.table-of-contents]

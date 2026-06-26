@@ -67,7 +67,7 @@ impl LazyCacheContract {
         prune_expired_cache(&env, &mut metadata);
         remove_cached_entry(&env, &mut metadata, id);
         save_metadata(&env, &metadata);
-        env.events().publish((symbol_short!("cache"), symbol_short!("invalidate")), id);
+        env.events().publish((symbol_short!("cache"), Symbol::new(&env, "invalidate")), id);
     }
 
     /// Clear the entire temporary cache.
@@ -76,7 +76,7 @@ impl LazyCacheContract {
         for cached_id in metadata.ids.iter() {
             env.storage()
                 .temporary()
-                .remove(&StorageKey::Cache(*cached_id));
+                .remove(&StorageKey::Cache(cached_id));
         }
         metadata.ids = Vec::new(&env);
         save_metadata(&env, &metadata);
@@ -112,22 +112,22 @@ fn save_metadata(env: &Env, metadata: &CacheMetadata) {
 fn prune_expired_cache(env: &Env, metadata: &mut CacheMetadata) {
     let mut active_ids = Vec::new(env);
     for id in metadata.ids.iter() {
-        if env.storage().temporary().has(&StorageKey::Cache(*id)) {
-            active_ids.push_back(*id);
+        if env.storage().temporary().has(&StorageKey::Cache(id)) {
+            active_ids.push_back(id);
         }
     }
     metadata.ids = active_ids;
 }
 
 fn add_to_cache(env: &Env, metadata: &mut CacheMetadata, id: u32, value: u64) {
-    if !metadata.ids.iter().any(|cached_id| *cached_id == id) {
+    if !metadata.ids.iter().any(|cached_id| cached_id == id) {
         if metadata.ids.len() >= MAX_CACHE_SIZE {
             if let Some(evicted_id) = metadata.ids.get(0) {
                 env.storage()
                     .temporary()
-                    .remove(&StorageKey::Cache(*evicted_id));
+                    .remove(&StorageKey::Cache(evicted_id));
                 metadata.ids.remove(0);
-                env.events().publish((symbol_short!("cache"), symbol_short!("evict")), *evicted_id);
+                env.events().publish((symbol_short!("cache"), symbol_short!("evict")), evicted_id);
             }
         }
         metadata.ids.push_back(id);
@@ -143,8 +143,8 @@ fn remove_cached_entry(env: &Env, metadata: &mut CacheMetadata, id: u32) {
     env.storage().temporary().remove(&StorageKey::Cache(id));
     let mut remaining = Vec::new(env);
     for cached_id in metadata.ids.iter() {
-        if *cached_id != id {
-            remaining.push_back(*cached_id);
+        if cached_id != id {
+            remaining.push_back(cached_id);
         }
     }
     metadata.ids = remaining;

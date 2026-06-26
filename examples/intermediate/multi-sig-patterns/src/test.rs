@@ -104,7 +104,7 @@ fn test_double_approval() {
 }
 
 #[test]
-fn test_cancel_proposal() {
+fn test_cancel_proposal_by_proposer() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -122,13 +122,13 @@ fn test_cancel_proposal() {
     client.cancel(&proposal_id, &signer1);
 
     let proposal = client.get_proposal(&proposal_id);
-    assert!(proposal.canceled);
+    assert!(proposal.cancelled);
 
     let result = client.try_execute(&proposal_id, &signer1);
-    assert_eq!(result, Err(Ok(AuthError::AlreadyCanceled)));
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
 
     let result = client.try_approve(&proposal_id, &signer2);
-    assert_eq!(result, Err(Ok(AuthError::AlreadyCanceled)));
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
 }
 
 #[test]
@@ -166,7 +166,7 @@ fn test_execute_with_threshold() {
 }
 
 #[test]
-fn test_cancel_proposal() {
+fn test_cancel_proposal_by_other_signer() {
     let env = Env::default();
     env.mock_all_auths();
 

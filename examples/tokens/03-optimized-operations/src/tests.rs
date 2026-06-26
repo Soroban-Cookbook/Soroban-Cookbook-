@@ -13,10 +13,10 @@ fn test_standard_initialize() {
     env.mock_all_auths();
 
     let underlying = Address::generate(&env);
-    let standard = StandardTokenOpsClient::new(&env, &env.register_contract(None, StandardTokenOps));
+    let standard =
+        StandardTokenOpsClient::new(&env, &env.register_contract(None, StandardTokenOps));
 
-    let result = standard.initialize(&underlying);
-    assert!(result.is_ok());
+    standard.initialize(&underlying);
 }
 
 #[test]
@@ -50,8 +50,7 @@ fn test_optimized_initialize() {
     let optimized_id = env.register_contract(None, OptimizedTokenOps);
     let optimized = OptimizedTokenOpsClient::new(&env, &optimized_id);
 
-    let result = optimized.initialize(&underlying);
-    assert!(result.is_ok());
+    optimized.initialize(&underlying);
 }
 
 #[test]
@@ -102,7 +101,7 @@ fn test_optimized_batch_transfer() {
     ];
 
     // Attempt batch transfer (would fail due to insufficient balance)
-    let result = optimized.batch_transfer(&alice, &batch);
+    let result = optimized.try_batch_transfer(&alice, &batch);
     assert!(result.is_err());
 }
 
@@ -121,7 +120,7 @@ fn test_optimized_empty_batch_transfer() {
 
     let empty_batch: Vec<BatchTransfer> = vec![&env];
 
-    let result = optimized.batch_transfer(&alice, &empty_batch);
+    let result = optimized.try_batch_transfer(&alice, &empty_batch);
     assert!(result.is_err());
 }
 
@@ -139,9 +138,9 @@ fn test_optimized_transfer_invalid_amount() {
 
     optimized.initialize(&underlying);
 
-    let result = optimized.transfer(&alice, &bob, &0);
+    let result = optimized.try_transfer(&alice, &bob, &0);
     assert!(result.is_err());
 
-    let result = optimized.transfer(&alice, &bob, &-100);
+    let result = optimized.try_transfer(&alice, &bob, &-100);
     assert!(result.is_err());
 }

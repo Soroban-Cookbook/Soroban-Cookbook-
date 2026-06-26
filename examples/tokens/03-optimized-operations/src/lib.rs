@@ -22,6 +22,7 @@ use soroban_sdk::{
 // Standard Implementation (Baseline for benchmarking)
 // ============================================================================
 
+#[cfg(any(not(target_arch = "wasm32"), test, feature = "testutils"))]
 #[contracttype]
 #[derive(Clone)]
 pub enum StandardDataKey {
@@ -30,6 +31,7 @@ pub enum StandardDataKey {
     Balance(Address),
 }
 
+#[cfg(any(not(target_arch = "wasm32"), test, feature = "testutils"))]
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
@@ -40,9 +42,11 @@ pub enum StandardError {
     ArithmeticOverflow = 4,
 }
 
+#[cfg(any(not(target_arch = "wasm32"), test, feature = "testutils"))]
 #[contract]
 pub struct StandardTokenOps;
 
+#[cfg(any(not(target_arch = "wasm32"), test, feature = "testutils"))]
 #[contractimpl]
 impl StandardTokenOps {
     pub fn initialize(env: Env, underlying: Address) -> Result<(), StandardError> {
@@ -66,7 +70,7 @@ impl StandardTokenOps {
             .get(&StandardDataKey::Underlying)
             .ok_or(StandardError::NotInitialized)?;
 
-        let old_balance = env
+        let old_balance: i128 = env
             .storage()
             .persistent()
             .get(&StandardDataKey::Balance(user.clone()))
@@ -76,7 +80,7 @@ impl StandardTokenOps {
             .checked_add(amount)
             .ok_or(StandardError::ArithmeticOverflow)?;
 
-        let old_supply = env
+        let old_supply: i128 = env
             .storage()
             .instance()
             .get(&StandardDataKey::TotalSupply)
@@ -292,9 +296,7 @@ impl OptimizedTokenOps {
 
         let mut total: i128 = 0;
         for entry in balances.iter() {
-            total = total
-                .checked_add(entry.1)
-                .unwrap_or(i128::MAX);
+            total = total.checked_add(entry.1).unwrap_or(i128::MAX);
         }
         total
     }

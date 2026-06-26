@@ -8,6 +8,11 @@ This category contains examples related to on-chain governance, including Decent
 - **Voting Systems**: Different models for on-chain voting, such as token-weighted voting and quadratic voting.
 - **Treasury Management**: Contracts for managing a community-controlled treasury.
 
+## Examples
+
+*   **[01-vote-delegation](./01-vote-delegation/) — 🟡 Intermediate**
+    Liquid voting delegation with chain delegation, loop prevention (cycle detection), and recursion depth limits.
+
 ## Planned Examples
 
 - `01-simple-dao`: A basic DAO with token-based voting on proposals.

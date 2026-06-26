@@ -1,4 +1,4 @@
 [toolchain]
-channel = "stable-i686-pc-windows-gnu"
+channel = "stable"
 targets = ["wasm32-unknown-unknown"]
 components = ["rust-src", "rustfmt", "clippy"]

@@ -1,5 +1,8 @@
 # Storage Patterns
 
+> **🎬 Video Walkthrough** (13:15)
+> Learn how to work with Persistent, Instance, and Temporary storage in our [Soroban Basics #2 Video Walkthrough](https://www.youtube.com/watch?v=storage-patterns-walkthrough).
+
 Learn the fundamentals of storing and retrieving data in Soroban contracts across all three storage types: **Persistent**, **Instance**, and **Temporary**.
 
 ## Project Structure

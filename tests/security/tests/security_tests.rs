@@ -1,12 +1,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{
-    contract, contractimpl, symbol_short,
-    testutils::Address as _,
-    Address, Env,
-};
-use token_wrapper;
+use soroban_sdk::{contract, contractimpl, symbol_short, testutils::Address as _, Address, Env};
 
 // ---------------------------------------------------------------------------
 // Malicious Token Contract for Reentrancy Testing
@@ -23,15 +18,16 @@ impl MaliciousToken {
         env.storage().instance().set(&key, &false);
     }
 
-    pub fn setup_reentrancy(
-        env: Env,
-        wrapper: Address,
-        user: Address,
-        amount: i128,
-    ) {
-        env.storage().instance().set(&symbol_short!("wrap_ad"), &wrapper);
-        env.storage().instance().set(&symbol_short!("user_ad"), &user);
-        env.storage().instance().set(&symbol_short!("ramt"), &amount);
+    pub fn setup_reentrancy(env: Env, wrapper: Address, user: Address, amount: i128) {
+        env.storage()
+            .instance()
+            .set(&symbol_short!("wrap_ad"), &wrapper);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("user_ad"), &user);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("ramt"), &amount);
     }
 
     pub fn transfer(env: Env, _from: Address, _to: Address, _amount: i128) {
@@ -40,15 +36,28 @@ impl MaliciousToken {
 
         if !reentered {
             // Retrieve reentrancy configuration
-            if let Some(wrapper_addr) = env.storage().instance().get::<_, Address>(&symbol_short!("wrap_ad")) {
-                let user_addr: Address = env.storage().instance().get(&symbol_short!("user_ad")).unwrap();
-                let ramt: i128 = env.storage().instance().get(&symbol_short!("ramt")).unwrap();
+            if let Some(wrapper_addr) = env
+                .storage()
+                .instance()
+                .get::<_, Address>(&symbol_short!("wrap_ad"))
+            {
+                let user_addr: Address = env
+                    .storage()
+                    .instance()
+                    .get(&symbol_short!("user_ad"))
+                    .unwrap();
+                let ramt: i128 = env
+                    .storage()
+                    .instance()
+                    .get(&symbol_short!("ramt"))
+                    .unwrap();
 
                 if ramt > 0 {
                     // Set flag to true to avoid infinite recursion
                     env.storage().instance().set(&reent_key, &true);
 
-                    let wrapper_client = token_wrapper::TokenWrapperClient::new(&env, &wrapper_addr);
+                    let wrapper_client =
+                        token_wrapper::TokenWrapperClient::new(&env, &wrapper_addr);
                     // Reenter wrap/unwrap by calling unwrap
                     let _ = wrapper_client.try_unwrap(&user_addr, &ramt);
                 }
@@ -62,13 +71,28 @@ impl MaliciousToken {
     }
 
     // Include dummy/noop implementations of standard SEP-41 methods if needed
-    pub fn allowance(_env: Env, _from: Address, _spender: Address) -> i128 { 0 }
-    pub fn approve(_env: Env, _from: Address, _spender: Address, _amount: i128, _live_until_ledgers: u32) {}
+    pub fn allowance(_env: Env, _from: Address, _spender: Address) -> i128 {
+        0
+    }
+    pub fn approve(
+        _env: Env,
+        _from: Address,
+        _spender: Address,
+        _amount: i128,
+        _live_until_ledgers: u32,
+    ) {
+    }
     pub fn burn(_env: Env, _from: Address, _amount: i128) {}
     pub fn burn_from(_env: Env, _spender: Address, _from: Address, _amount: i128) {}
-    pub fn decimals(_env: Env) -> u32 { 7 }
-    pub fn name(env: Env) -> soroban_sdk::String { soroban_sdk::String::from_str(&env, "Malicious") }
-    pub fn symbol(env: Env) -> soroban_sdk::String { soroban_sdk::String::from_str(&env, "MAL") }
+    pub fn decimals(_env: Env) -> u32 {
+        7
+    }
+    pub fn name(env: Env) -> soroban_sdk::String {
+        soroban_sdk::String::from_str(&env, "Malicious")
+    }
+    pub fn symbol(env: Env) -> soroban_sdk::String {
+        soroban_sdk::String::from_str(&env, "MAL")
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -81,7 +105,9 @@ fn test_unauthorized_initialize() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
@@ -101,16 +127,18 @@ fn test_unauthorized_initialize() {
 fn test_unauthorized_wrap() {
     let env = Env::default();
     // Intentionally DO NOT call env.mock_all_auths() to test lack of signature
-    
+
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
     wrapper.initialize(&underlying_id);
 
     let alice = Address::generate(&env);
-    
+
     // Attempting to wrap without Alice's mock authorization should fail with a host error
     let res = wrapper.try_wrap(&alice, &100);
     assert!(res.is_err());
@@ -120,9 +148,11 @@ fn test_unauthorized_wrap() {
 fn test_unauthorized_transfer() {
     let env = Env::default();
     // Intentionally DO NOT call env.mock_all_auths() to test lack of signature
-    
+
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
@@ -142,7 +172,9 @@ fn test_invalid_wrap_amount() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
@@ -152,10 +184,7 @@ fn test_invalid_wrap_amount() {
 
     // Wrap negative amount
     let res_neg = wrapper.try_wrap(&alice, &-100);
-    assert_eq!(
-        res_neg,
-        Err(Ok(token_wrapper::WrapperError::InvalidAmount))
-    );
+    assert_eq!(res_neg, Err(Ok(token_wrapper::WrapperError::InvalidAmount)));
 
     // Wrap zero amount
     let res_zero = wrapper.try_wrap(&alice, &0);
@@ -171,7 +200,9 @@ fn test_invalid_transfer_amount() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
@@ -182,10 +213,7 @@ fn test_invalid_transfer_amount() {
 
     // Transfer negative amount
     let res_neg = wrapper.try_transfer(&alice, &bob, &-50);
-    assert_eq!(
-        res_neg,
-        Err(Ok(token_wrapper::WrapperError::InvalidAmount))
-    );
+    assert_eq!(res_neg, Err(Ok(token_wrapper::WrapperError::InvalidAmount)));
 
     // Transfer zero amount
     let res_zero = wrapper.try_transfer(&alice, &bob, &0);
@@ -201,7 +229,9 @@ fn test_wrap_overflow() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
     let underlying_admin = soroban_sdk::token::StellarAssetClient::new(&env, &underlying_id);
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
@@ -228,7 +258,9 @@ fn test_unwrap_insufficient_balance() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
     let underlying_admin = soroban_sdk::token::StellarAssetClient::new(&env, &underlying_id);
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
@@ -253,7 +285,9 @@ fn test_transfer_insufficient_balance() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let underlying_id = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    let underlying_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
     let underlying_admin = soroban_sdk::token::StellarAssetClient::new(&env, &underlying_id);
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);

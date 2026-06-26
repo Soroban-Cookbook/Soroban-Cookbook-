@@ -186,10 +186,10 @@ fn test_update_delay_bounds_invalid() {
 fn test_emergency_pause() {
     let (_env, _admin, client) = setup();
     assert!(!client.is_paused());
-    
+
     client.set_pause(&true);
     assert!(client.is_paused());
-    
+
     client.set_pause(&false);
     assert!(!client.is_paused());
 }
@@ -211,7 +211,7 @@ fn test_execute_when_paused() {
     let (min_delay, _) = client.get_delay_bounds();
     client.queue(&id, &min_delay);
     env.ledger().with_mut(|l| l.timestamp += min_delay + 1);
-    
+
     client.set_pause(&true);
     client.execute(&id);
 }

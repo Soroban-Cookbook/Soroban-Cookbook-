@@ -97,6 +97,7 @@ fn test_transfer_updates_balances() {
 /// Benchmark the transfer function with authentication.
 #[test]
 fn test_transfer_benchmark() {
+    extern crate std;
     let env = Env::default();
     let (client, admin) = setup_initialized(&env);
     let user1 = Address::generate(&env);
@@ -104,7 +105,7 @@ fn test_transfer_benchmark() {
 
     client.set_balance(&admin, &user1, &1000);
 
-    println!("--- Transfer with Auth Benchmark ---");
+    std::println!("--- Transfer with Auth Benchmark ---");
     env.budget().reset_default();
     client.transfer(&user1, &user2, &100);
     env.budget().print();

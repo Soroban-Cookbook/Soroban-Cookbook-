@@ -235,7 +235,7 @@ fn test_event_logging_with_errors() {
     // Verify that at least one event was emitted by the contract
     let events = env.events().all();
     assert!(
-        !events.is_empty(),
+        !events.events().is_empty(),
         "Expected at least one event to be emitted"
     );
 }

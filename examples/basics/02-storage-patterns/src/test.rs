@@ -44,7 +44,21 @@
 
 use super::*;
 use soroban_sdk::testutils::{Events as _, Ledger as _};
-use soroban_sdk::{symbol_short, Env, Symbol, TryFromVal};
+use soroban_sdk::{symbol_short, Env, Symbol, TryFromVal, Val, Vec};
+
+fn get_last_event_topics_and_data(
+    env: &Env,
+    events: &soroban_sdk::testutils::ContractEvents,
+) -> (Vec<Val>, Val) {
+    let last_event = events.events().last().unwrap();
+    let soroban_sdk::xdr::ContractEventBody::V0(body) = &last_event.body;
+    let mut topics = Vec::new(env);
+    for topic in body.topics.iter() {
+        topics.push_back(Val::try_from_val(env, topic).unwrap());
+    }
+    let data = Val::try_from_val(env, &body.data).unwrap();
+    (topics, data)
+}
 
 #[test]
 fn test_persistent_storage() {
@@ -63,7 +77,7 @@ fn test_persistent_storage() {
 
     // Verify set event
     let events = env.events().all();
-    let (_, topics, data) = events.last().unwrap();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -84,7 +98,7 @@ fn test_persistent_storage() {
 
     // Verify remove event
     let events = env.events().all();
-    let (_, topics, data) = events.last().unwrap();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -114,7 +128,7 @@ fn test_temporary_storage() {
 
     // Verify event
     let events = env.events().all();
-    let (_, topics, data) = events.last().unwrap();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -148,7 +162,7 @@ fn test_instance_storage() {
 
     // Verify event
     let events = env.events().all();
-    let (_, topics, data) = events.last().unwrap();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -169,7 +183,7 @@ fn test_instance_storage() {
 
     // Verify remove event
     let events = env.events().all();
-    let (_, topics, data) = events.last().unwrap();
+    let (topics, data) = get_last_event_topics_and_data(&env, &events);
     assert_eq!(topics.len(), 2);
     let t0: Symbol = Symbol::try_from_val(&env, &topics.get(0).unwrap()).unwrap();
     let t1: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
@@ -193,19 +207,16 @@ fn test_storage_costs_benchmark() {
     let value = 100u64;
 
     // Benchmark Persistent Storage
-    println!("--- Persistent Storage Benchmark ---");
     env.budget().reset_default();
     client.set_persistent(&key, &value);
     env.budget().print();
 
     // Benchmark Instance Storage
-    println!("--- Instance Storage Benchmark ---");
     env.budget().reset_default();
     client.set_instance(&key, &value);
     env.budget().print();
 
     // Benchmark Temporary Storage
-    println!("--- Temporary Storage Benchmark ---");
     env.budget().reset_default();
     client.set_temporary(&key, &value);
     env.budget().print();

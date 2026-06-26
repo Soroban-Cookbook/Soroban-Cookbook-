@@ -81,8 +81,12 @@ impl TimelockContract {
             panic!("Already initialized");
         }
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::MinDelay, &DEFAULT_MIN_DELAY);
-        env.storage().instance().set(&DataKey::MaxDelay, &DEFAULT_MAX_DELAY);
+        env.storage()
+            .instance()
+            .set(&DataKey::MinDelay, &DEFAULT_MIN_DELAY);
+        env.storage()
+            .instance()
+            .set(&DataKey::MaxDelay, &DEFAULT_MAX_DELAY);
         env.storage().instance().set(&DataKey::Paused, &false);
 
         // Audit trail for initialization
@@ -109,13 +113,25 @@ impl TimelockContract {
             .expect("Not initialized");
         admin.require_auth();
 
-        let paused: bool = env.storage().instance().get(&DataKey::Paused).unwrap_or(false);
+        let paused: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
         if paused {
             panic!("Contract is paused");
         }
 
-        let min_delay: u64 = env.storage().instance().get(&DataKey::MinDelay).unwrap_or(DEFAULT_MIN_DELAY);
-        let max_delay: u64 = env.storage().instance().get(&DataKey::MaxDelay).unwrap_or(DEFAULT_MAX_DELAY);
+        let min_delay: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::MinDelay)
+            .unwrap_or(DEFAULT_MIN_DELAY);
+        let max_delay: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::MaxDelay)
+            .unwrap_or(DEFAULT_MAX_DELAY);
 
         if !(min_delay..=max_delay).contains(&delay) {
             panic!("Delay out of range");
@@ -154,7 +170,11 @@ impl TimelockContract {
             .expect("Not initialized");
         admin.require_auth();
 
-        let paused: bool = env.storage().instance().get(&DataKey::Paused).unwrap_or(false);
+        let paused: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false);
         if paused {
             panic!("Contract is paused");
         }
@@ -242,7 +262,8 @@ impl TimelockContract {
             .expect("Not initialized");
         admin.require_auth();
 
-        if min_delay < ABSOLUTE_MIN_DELAY || max_delay > ABSOLUTE_MAX_DELAY || min_delay > max_delay {
+        if min_delay < ABSOLUTE_MIN_DELAY || max_delay > ABSOLUTE_MAX_DELAY || min_delay > max_delay
+        {
             panic!("Invalid delay bounds");
         }
 
@@ -272,7 +293,11 @@ impl TimelockContract {
         env.events().publish(
             (CONTRACT_NS, ACTION_AUDIT, admin),
             AuditTrailEventData {
-                details: if paused { symbol_short!("pause") } else { symbol_short!("unpause") },
+                details: if paused {
+                    symbol_short!("pause")
+                } else {
+                    symbol_short!("unpause")
+                },
                 timestamp: env.ledger().timestamp(),
             },
         );
@@ -280,14 +305,25 @@ impl TimelockContract {
 
     /// Get current delay bounds.
     pub fn get_delay_bounds(env: Env) -> (u64, u64) {
-        let min_delay: u64 = env.storage().instance().get(&DataKey::MinDelay).unwrap_or(DEFAULT_MIN_DELAY);
-        let max_delay: u64 = env.storage().instance().get(&DataKey::MaxDelay).unwrap_or(DEFAULT_MAX_DELAY);
+        let min_delay: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::MinDelay)
+            .unwrap_or(DEFAULT_MIN_DELAY);
+        let max_delay: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::MaxDelay)
+            .unwrap_or(DEFAULT_MAX_DELAY);
         (min_delay, max_delay)
     }
 
     /// Get pause state.
     pub fn is_paused(env: Env) -> bool {
-        env.storage().instance().get(&DataKey::Paused).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or(false)
     }
 }
 

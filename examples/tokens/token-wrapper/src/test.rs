@@ -177,23 +177,40 @@ fn unwrap_fails_if_underlying_backing_is_clawed_back() {
     );
 }
 
+fn get_event_topics_and_data(
+    env: &Env,
+    events: &soroban_sdk::testutils::ContractEvents,
+    idx: usize,
+) -> (soroban_sdk::Vec<soroban_sdk::Val>, soroban_sdk::Val) {
+    let event = events.events().get(idx).unwrap();
+    let soroban_sdk::xdr::ContractEventBody::V0(body) = &event.body;
+    let mut topics = soroban_sdk::Vec::new(env);
+    for topic in body.topics.iter() {
+        topics.push_back(soroban_sdk::Val::try_from_val(env, topic).unwrap());
+    }
+    let data = soroban_sdk::Val::try_from_val(env, &body.data).unwrap();
+    (topics, data)
+}
+
 #[test]
 fn emits_wrap_and_unwrap_events() {
     let f = setup();
 
     f.wrapper.wrap(&f.alice, &100);
-    f.wrapper.unwrap(&f.alice, &40);
+    let events_wrap = f.env.events().all();
+    assert_eq!(events_wrap.events().len(), 2);
 
-    let events = f.env.events().all();
-    assert_eq!(events.len(), 7);
-
-    let (_id, wrap_topics, wrap_amount) = events.get(4).unwrap();
+    let (wrap_topics, wrap_amount) = get_event_topics_and_data(&f.env, &events_wrap, 1);
     let wrap_event: Symbol = Symbol::try_from_val(&f.env, &wrap_topics.get(0).unwrap()).unwrap();
     let wrapped: i128 = i128::try_from_val(&f.env, &wrap_amount).unwrap();
     assert_eq!(wrap_event, EVENT_WRAP);
     assert_eq!(wrapped, 100);
 
-    let (_id, unwrap_topics, unwrap_amount) = events.get(6).unwrap();
+    f.wrapper.unwrap(&f.alice, &40);
+    let events_unwrap = f.env.events().all();
+    assert_eq!(events_unwrap.events().len(), 2);
+
+    let (unwrap_topics, unwrap_amount) = get_event_topics_and_data(&f.env, &events_unwrap, 1);
     let unwrap_event: Symbol =
         Symbol::try_from_val(&f.env, &unwrap_topics.get(0).unwrap()).unwrap();
     let unwrapped: i128 = i128::try_from_val(&f.env, &unwrap_amount).unwrap();
@@ -212,7 +229,7 @@ mod bench {
 
     use super::*;
     use soroban_sdk::{
-        testutils::{IssuerFlags},
+        testutils::IssuerFlags,
         token::{StellarAssetClient, TokenClient},
         Address, Env,
     };

@@ -149,45 +149,46 @@ fn test_state_validation() {
 
         // Insufficient balance
         assert_eq!(
-            ValidationContract::validate_balance(&env, user, 100),
+            ValidationContract::validate_balance(&env, user.clone(), 100),
             Err(ValidationError::InsufficientBalance)
         );
 
         // Set balance and test again
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(user), &200i128);
+            .set(&DataKey::Balance(user.clone()), &200i128);
         assert_eq!(
-            ValidationContract::validate_balance(&env, user, 100),
+            ValidationContract::validate_balance(&env, user.clone(), 100),
             Ok(())
         );
 
         // Test allowance validation
         assert_eq!(
-            ValidationContract::validate_allowance(&env, user, spender, 100),
+            ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
             Err(ValidationError::InsufficientAllowance)
         );
 
         env.storage()
             .persistent()
-            .set(&DataKey::Allowance(user, spender), &200i128);
+            .set(&DataKey::Allowance(user.clone(), spender.clone()), &200i128);
         assert_eq!(
-            ValidationContract::validate_allowance(&env, user, spender, 100),
+            ValidationContract::validate_allowance(&env, user.clone(), spender.clone(), 100),
             Ok(())
         );
 
         // Test cooldown validation — no previous action should pass
         assert_eq!(
-            ValidationContract::validate_cooldown(&env, user, 60),
+            ValidationContract::validate_cooldown(&env, user.clone(), 60),
             Ok(())
         );
 
         // Set last action and test cooldown
-        env.storage()
-            .persistent()
-            .set(&DataKey::LastAction(user), &env.ledger().timestamp());
+        env.storage().persistent().set(
+            &DataKey::LastAction(user.clone()),
+            &env.ledger().timestamp(),
+        );
         assert_eq!(
-            ValidationContract::validate_cooldown(&env, user, 60),
+            ValidationContract::validate_cooldown(&env, user.clone(), 60),
             Err(ValidationError::CooldownActive)
         );
 
@@ -224,47 +225,54 @@ fn test_authorization_validation() {
 
         // Test role validation with no role assigned
         assert_eq!(
-            ValidationContract::validate_role(&env, user, UserRole::User),
+            ValidationContract::validate_role(&env, user.clone(), UserRole::User),
             Err(ValidationError::InsufficientRole)
         );
 
         // Set user role directly (already in contract context)
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(user), &UserRole::User);
+            .set(&DataKey::UserRole(user.clone()), &UserRole::User);
         assert_eq!(
-            ValidationContract::validate_role(&env, user, UserRole::User),
+            ValidationContract::validate_role(&env, user.clone(), UserRole::User),
             Ok(())
         );
 
         // Test insufficient role
         assert_eq!(
-            ValidationContract::validate_role(&env, user, UserRole::Moderator),
+            ValidationContract::validate_role(&env, user.clone(), UserRole::Moderator),
             Err(ValidationError::InsufficientRole)
         );
 
         // Set moderator role directly
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(moderator), &UserRole::Moderator);
+            .set(&DataKey::UserRole(moderator.clone()), &UserRole::Moderator);
         assert_eq!(
-            ValidationContract::validate_role(&env, moderator, UserRole::User),
+            ValidationContract::validate_role(&env, moderator.clone(), UserRole::User),
             Ok(())
         );
 
         // Set admin role directly
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(admin), &UserRole::Admin);
-        env.storage().instance().set(&DataKey::Admin, &admin);
+            .set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::Admin, &admin.clone());
         assert_eq!(
-            ValidationContract::validate_role(&env, admin, UserRole::Moderator),
+            ValidationContract::validate_role(&env, admin.clone(), UserRole::Moderator),
             Ok(())
         );
 
         // Test ownership validation: set owner first so validate_ownership can find it
-        env.storage().instance().set(&DataKey::Owner, &owner);
-        assert_eq!(ValidationContract::validate_ownership(&env, owner), Ok(()));
+        env.storage()
+            .instance()
+            .set(&DataKey::Owner, &owner.clone());
+        assert_eq!(
+            ValidationContract::validate_ownership(&env, owner.clone()),
+            Ok(())
+        );
     });
 }
 
@@ -288,13 +296,13 @@ fn test_validated_transfer() {
             .set(&DataKey::State, &ContractState::Active);
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(user), &UserRole::User);
+            .set(&DataKey::UserRole(user.clone()), &UserRole::User);
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(recipient), &UserRole::User);
+            .set(&DataKey::UserRole(recipient.clone()), &UserRole::User);
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(user), &1000i128);
+            .set(&DataKey::Balance(user.clone()), &1000i128);
     });
 
     // Test successful transfer via client (handles require_auth through invocation path)
@@ -310,12 +318,12 @@ fn test_validated_transfer() {
         let balance1: i128 = env
             .storage()
             .persistent()
-            .get(&DataKey::Balance(user))
+            .get(&DataKey::Balance(user.clone()))
             .unwrap_or(0);
         let balance2: i128 = env
             .storage()
             .persistent()
-            .get(&DataKey::Balance(recipient))
+            .get(&DataKey::Balance(recipient.clone()))
             .unwrap_or(0);
         assert_eq!(balance1, 900);
         assert_eq!(balance2, 100);
@@ -359,13 +367,15 @@ fn test_admin_functions() {
     env.as_contract(&contract_id, || {
         let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
         env.storage().instance().set(&DataKey::Owner, &owner);
-        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::Admin, &admin.clone());
         env.storage()
             .instance()
             .set(&DataKey::State, &ContractState::Active);
         env.storage()
             .instance()
-            .set(&DataKey::UserRole(admin), &UserRole::Admin);
+            .set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
     });
 
     // Test admin setting user role via client
@@ -376,7 +386,7 @@ fn test_admin_functions() {
         let role: UserRole = env
             .storage()
             .instance()
-            .get(&DataKey::UserRole(user))
+            .get(&DataKey::UserRole(user.clone()))
             .unwrap_or(UserRole::None);
         assert_eq!(role, UserRole::Moderator);
     });

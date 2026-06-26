@@ -23,7 +23,7 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 
 1.  **Add New Examples**: Create well-documented smart contract examples demonstrating specific patterns.
 2.  **Improve Documentation**: Fix typos, clarify guides, or add new documentation.
-3.  **Bug Reports & Feature Requests**: Use [GitHub Issues] to report bugs or suggest new features.
+3.  **Bug Reports & Feature Requests**: Use [GitHub Issues] to report bugs or suggest new features. Our issue resolution and security bug handling follow our [Triage Process](./TRIAGE.md).
 4.  **Code Review**: Review open pull requests and provide constructive feedback.
 
 ---

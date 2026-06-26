@@ -39,7 +39,7 @@ jobs:
         with:
           toolchain: ${{ env.RUST_VERSION }}
           components: clippy
-          target: wasm32-unknown-unknown
+          target: wasm32v1-none
 
       - name: Run Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
@@ -58,7 +58,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
-          target: wasm32-unknown-unknown
+          target: wasm32v1-none
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -101,7 +101,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: ${{ env.RUST_VERSION }}
-          target: wasm32-unknown-unknown
+          target: wasm32v1-none
 
       - name: Cache cargo registry
         uses: actions/cache@v4
@@ -117,7 +117,7 @@ jobs:
         run: cargo install --locked stellar-cli --version ${{ env.STELLAR_CLI_VERSION }}
 
       - name: Build all contracts
-        run: cargo build --workspace --target wasm32-unknown-unknown --release
+        run: cargo build --workspace --target wasm32v1-none --release
 
   security-audit:
     name: Security Audit
@@ -155,7 +155,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
           toolchain: stable
-          target: wasm32-unknown-unknown
+          target: wasm32v1-none
 
       # Cache the Cargo registry AND the compiled tarpaulin binary together
       # so repeated runs don't rebuild tarpaulin from source every time.

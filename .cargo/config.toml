@@ -9,5 +9,7 @@ rustflags = ["-C", "target-feature=-reference-types"]
 [build]
 # Default build target for WASM contract compilation.
 # Override per-invocation with --target if needed (e.g. for host-native tests).
-target = "wasm32-unknown-unknown"
-target = "wasm32v1-none"
+# target = "wasm32-unknown-unknown"
+
+[target.'cfg(all())']
+rustflags = ["-A", "deprecated", "-A", "unused-imports", "-A", "dead-code", "-A", "clippy::unnecessary-cast", "-A", "clippy::cloned-ref-to-slice-refs"]

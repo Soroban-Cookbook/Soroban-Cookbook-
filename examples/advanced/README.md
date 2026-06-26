@@ -15,6 +15,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with freshness checks
+- [`05-diamond-security`](./05-diamond-security/) — Secure multi-facet proxy with interface checks and isolated namespaced storage
 
 ## Planned Examples
 
