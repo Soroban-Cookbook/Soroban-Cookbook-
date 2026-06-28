@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Best Practices - Soroban Cookbook</title>
+        <title>Security Best Practices - Soroban Cookbook</title>
 
 
         <!-- Custom HTML head -->
@@ -146,7 +146,7 @@
                         <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
                             <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
                         </a>
-                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/best-practices.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/security-best-practices.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
                             <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
                         </a>
 
@@ -180,589 +180,520 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="soroban-smart-contract-best-practices"><a class="header" href="#soroban-smart-contract-best-practices">Soroban Smart Contract Best Practices</a></h1>
-<p>A comprehensive guide to writing secure, efficient, and maintainable Soroban smart contracts.</p>
-<h2 id="-security-best-practices"><a class="header" href="#-security-best-practices">🔒 Security Best Practices</a></h2>
-<h3 id="1-always-use-authorization-checks"><a class="header" href="#1-always-use-authorization-checks">1. Always Use Authorization Checks</a></h3>
-<p>✅ <strong>DO:</strong> Always verify authorization before state changes</p>
+                        <h1 id="security-best-practices-for-soroban-smart-contracts"><a class="header" href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices for Soroban Smart Contracts</a></h1>
+<p>A practical guide to writing secure Soroban contracts, covering common vulnerabilities, defensive patterns, and a pre-deployment audit checklist with real contract examples.</p>
+<hr>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-common-vulnerabilities">Common Vulnerabilities</a></li>
+<li><a href="#2-secure-patterns">Secure Patterns</a></li>
+<li><a href="#3-pre-deployment-audit-checklist">Pre-Deployment Audit Checklist</a></li>
+<li><a href="#4-real-world-examples">Real-World Examples</a></li>
+</ol>
+<hr>
+<h2 id="1-common-vulnerabilities"><a class="header" href="#1-common-vulnerabilities">1. Common Vulnerabilities</a></h2>
+<h3 id="11-missing-authorization-checks"><a class="header" href="#11-missing-authorization-checks">1.1 Missing Authorization Checks</a></h3>
+<p>The most critical vulnerability: calling a state-changing function without verifying the caller is allowed to perform it.</p>
+<p><strong>Vulnerable:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn transfer(env: Env, from: Address, to: Address, amount: u64) {
-    // Verify the sender has authorized this action
-    from.require_auth();
-
-    // Proceed with transfer logic
-    let balance = read_balance(&amp;env, &amp;from);
-    write_balance(&amp;env, &amp;from, balance - amount);
-    write_balance(&amp;env, &amp;to, read_balance(&amp;env, &amp;to) + amount);
+</span>pub fn withdraw(env: Env, user: Address, amount: i128) {
+    // No require_auth() — anyone can drain any account!
+    let bal = read_balance(&amp;env, &amp;user);
+    write_balance(&amp;env, &amp;user, bal - amount);
 }
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Skip authorization checks</p>
+<p><strong>Secure:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn transfer(env: Env, from: Address, to: Address, amount: u64) {
-    // DANGER: No authorization check!
-    let balance = read_balance(&amp;env, &amp;from);
-    write_balance(&amp;env, &amp;from, balance - amount);
-    write_balance(&amp;env, &amp;to, read_balance(&amp;env, &amp;to) + amount);
-}
-<span class="boring">}</span></code></pre>
-<h3 id="2-validate-all-inputs"><a class="header" href="#2-validate-all-inputs">2. Validate All Inputs</a></h3>
-<p>✅ <strong>DO:</strong> Validate inputs before processing</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn set_limit(env: Env, admin: Address, limit: u64) {
-    admin.require_auth();
-
-    // Validate input
-    if limit == 0 {
-        panic!("Limit must be greater than zero");
+</span>pub fn withdraw(env: Env, user: Address, amount: i128) {
+    user.require_auth(); // Caller must be `user`
+    let bal = read_balance(&amp;env, &amp;user);
+    if bal &lt; amount {
+        panic!("insufficient balance");
     }
-
-    if limit &gt; MAX_LIMIT {
-        panic!("Limit exceeds maximum allowed");
-    }
-
-    env.storage().persistent().set(&amp;symbol_short!("limit"), &amp;limit);
+    write_balance(&amp;env, &amp;user, bal - amount);
 }
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Trust inputs blindly</p>
+<blockquote>
+<p><code>require_auth()</code> must be called before any state mutation. Soroban’s host enforces this at the protocol level — if the required signature is absent the transaction is rejected.</p>
+</blockquote>
+<hr>
+<h3 id="12-integer-overflow--underflow"><a class="header" href="#12-integer-overflow--underflow">1.2 Integer Overflow / Underflow</a></h3>
+<p>Rust’s release profile enables <code>overflow-checks = true</code> in this workspace (see root <code>Cargo.toml</code>). However, intermediate calculations can still produce logically-wrong results if you rely on wrapping semantics. Always use <strong>checked arithmetic</strong> for financial values.</p>
+<p><strong>Vulnerable:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn set_limit(env: Env, admin: Address, limit: u64) {
-    admin.require_auth();
-    // DANGER: No validation, could set to 0 or excessive value
-    env.storage().persistent().set(&amp;symbol_short!("limit"), &amp;limit);
-}
-<span class="boring">}</span></code></pre>
-<h3 id="3-use-safe-arithmetic"><a class="header" href="#3-use-safe-arithmetic">3. Use Safe Arithmetic</a></h3>
-<p>✅ <strong>DO:</strong> Use checked arithmetic to prevent overflows</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn add_balance(env: Env, user: Address, amount: u64) {
+</span>pub fn add_reward(env: Env, user: Address, amount: i128) {
     let current = read_balance(&amp;env, &amp;user);
-
-    // Safe addition with overflow check
-    let new_balance = current.checked_add(amount)
-        .expect("Balance overflow");
-
-    write_balance(&amp;env, &amp;user, new_balance);
-}
-<span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Use unchecked arithmetic</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn add_balance(env: Env, user: Address, amount: u64) {
-    let current = read_balance(&amp;env, &amp;user);
-    // DANGER: Could overflow
+    // Wraps on overflow if overflow-checks = false (e.g. a custom profile)
     write_balance(&amp;env, &amp;user, current + amount);
 }
 <span class="boring">}</span></code></pre>
-<h3 id="4-protect-admin-functions"><a class="header" href="#4-protect-admin-functions">4. Protect Admin Functions</a></h3>
-<p>✅ <strong>DO:</strong> Restrict sensitive functions to authorized admins</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>const ADMIN_KEY: Symbol = symbol_short!("admin");
-
-pub fn initialize(env: Env, admin: Address) {
-    if env.storage().persistent().has(&amp;ADMIN_KEY) {
-        panic!("Already initialized");
-    }
-    env.storage().persistent().set(&amp;ADMIN_KEY, &amp;admin);
-}
-
-pub fn set_config(env: Env, config: Config) {
-    // Only admin can change config
-    let admin: Address = env.storage().persistent()
-        .get(&amp;ADMIN_KEY)
-        .expect("Not initialized");
-    admin.require_auth();
-
-    env.storage().persistent().set(&amp;symbol_short!("config"), &amp;config);
-}
-<span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Leave admin functions unprotected</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn set_config(env: Env, config: Config) {
-    // DANGER: Anyone can change config!
-    env.storage().persistent().set(&amp;symbol_short!("config"), &amp;config);
-}
-<span class="boring">}</span></code></pre>
-<h3 id="5-handle-errors-properly"><a class="header" href="#5-handle-errors-properly">5. Handle Errors Properly</a></h3>
-<p>✅ <strong>DO:</strong> Use custom error types for clarity</p>
+<p><strong>Secure:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
-pub enum Error {
-    InsufficientBalance = 1,
-    Unauthorized = 2,
-    InvalidAmount = 3,
+pub enum TokenError {
+    ArithmeticOverflow = 1,
 }
 
-pub fn withdraw(env: Env, user: Address, amount: u64) -&gt; Result&lt;(), Error&gt; {
+pub fn add_reward(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), TokenError&gt; {
     user.require_auth();
-
-    let balance = read_balance(&amp;env, &amp;user);
-
-    if amount == 0 {
-        return Err(Error::InvalidAmount);
-    }
-
-    if balance &lt; amount {
-        return Err(Error::InsufficientBalance);
-    }
-
-    write_balance(&amp;env, &amp;user, balance - amount);
+    let current = read_balance(&amp;env, &amp;user);
+    let new_bal = current
+        .checked_add(amount)
+        .ok_or(TokenError::ArithmeticOverflow)?;
+    write_balance(&amp;env, &amp;user, new_bal);
     Ok(())
 }
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Use generic panics without context</p>
+<hr>
+<h3 id="13-re-initialization-attacks"><a class="header" href="#13-re-initialization-attacks">1.3 Re-Initialization Attacks</a></h3>
+<p>A contract that can be initialized more than once lets an attacker overwrite the admin or reset state.</p>
+<p><strong>Vulnerable:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn withdraw(env: Env, user: Address, amount: u64) {
-    user.require_auth();
-    let balance = read_balance(&amp;env, &amp;user);
-    // POOR: No clear error message
-    assert!(balance &gt;= amount);
-    write_balance(&amp;env, &amp;user, balance - amount);
+</span>pub fn initialize(env: Env, admin: Address) {
+    // No guard — callable multiple times!
+    env.storage().instance().set(&amp;DataKey::Admin, &amp;admin);
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-resource-optimization-best-practices"><a class="header" href="#-resource-optimization-best-practices">⚡ Resource Optimization Best Practices</a></h2>
-<h3 id="1-choose-the-right-storage-type"><a class="header" href="#1-choose-the-right-storage-type">1. Choose the Right Storage Type</a></h3>
-<p>✅ <strong>DO:</strong> Use appropriate storage for data lifetime</p>
+<p><strong>Secure:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>// Persistent: Critical data that must survive
-pub fn set_admin(env: Env, admin: Address) {
-    env.storage().persistent().set(&amp;symbol_short!("admin"), &amp;admin);
-}
-
-// Instance: Contract configuration
-pub fn initialize(env: Env, config: Config) {
-    env.storage().instance().set(&amp;symbol_short!("config"), &amp;config);
-}
-
-// Temporary: Short-lived data (e.g., nonces, locks)
-pub fn create_lock(env: Env, user: Address) {
-    let ledger = env.ledger().sequence();
-    env.storage().temporary().set(&amp;user, &amp;ledger);
-}
-<span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Use persistent storage for everything</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// INEFFICIENT: Using expensive persistent storage for temporary data
-pub fn create_lock(env: Env, user: Address) {
-    let ledger = env.ledger().sequence();
-    env.storage().persistent().set(&amp;user, &amp;ledger); // Too expensive!
-}
-<span class="boring">}</span></code></pre>
-<h3 id="2-minimize-storage-operations"><a class="header" href="#2-minimize-storage-operations">2. Minimize Storage Operations</a></h3>
-<p>✅ <strong>DO:</strong> Batch reads and writes</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn batch_transfer(env: Env, from: Address, transfers: Vec&lt;(Address, u64)&gt;) {
-    from.require_auth();
-
-    // Read once
-    let mut from_balance = read_balance(&amp;env, &amp;from);
-
-    // Calculate total
-    let total: u64 = transfers.iter().map(|(_, amt)| amt).sum();
-    from_balance = from_balance.checked_sub(total).expect("Insufficient balance");
-
-    // Write once
-    write_balance(&amp;env, &amp;from, from_balance);
-
-    // Update recipients
-    for (to, amount) in transfers.iter() {
-        let balance = read_balance(&amp;env, &amp;to);
-        write_balance(&amp;env, &amp;to, balance + amount);
+</span>pub fn initialize(env: Env, admin: Address) {
+    if env.storage().instance().has(&amp;DataKey::Admin) {
+        panic!("already initialized");
     }
+    env.storage().instance().set(&amp;DataKey::Admin, &amp;admin);
 }
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Make redundant storage calls</p>
+<hr>
+<h3 id="14-unchecked-cross-contract-return-values"><a class="header" href="#14-unchecked-cross-contract-return-values">1.4 Unchecked Cross-Contract Return Values</a></h3>
+<p>When calling another contract, a non-<code>Result</code> return type causes a panic on error. This is usually fine, but if you’re passing unchecked external input into a sub-call, the caller can craft arguments that trigger panics in unexpected places.</p>
+<p><strong>Pattern to avoid:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn batch_transfer(env: Env, from: Address, transfers: Vec&lt;(Address, u64)&gt;) {
-    from.require_auth();
+</span>// If `token_address` is attacker-controlled, they can pass a contract
+// that panics or misbehaves.
+TokenClient::new(&amp;env, &amp;token_address).transfer(&amp;from, &amp;to, &amp;amount);
+<span class="boring">}</span></code></pre>
+<p><strong>Mitigation:</strong> Validate that <code>token_address</code> is a known, trusted contract before calling it. Store the trusted address at initialization and reject callers who supply a different one.</p>
+<hr>
+<h3 id="15-storage-key-collisions"><a class="header" href="#15-storage-key-collisions">1.5 Storage Key Collisions</a></h3>
+<p>Using short, generic keys increases the risk of collisions between different data items, especially after contract upgrades.</p>
+<p><strong>Vulnerable:</strong></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Both "bal" keys might clash if multiple features share the same namespace.
+env.storage().persistent().set(&amp;symbol_short!("bal"), &amp;amount);
+<span class="boring">}</span></code></pre>
+<p><strong>Secure:</strong></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+pub enum DataKey {
+    Balance(Address),   // includes the address — unique per user
+    Allowance(Address, Address),
+    TotalSupply,
+}
 
-    for (to, amount) in transfers.iter() {
-        // INEFFICIENT: Reading/writing from_balance repeatedly
-        let from_balance = read_balance(&amp;env, &amp;from);
-        write_balance(&amp;env, &amp;from, from_balance - amount);
-
-        let to_balance = read_balance(&amp;env, &amp;to);
-        write_balance(&amp;env, &amp;to, to_balance + amount);
+env.storage().persistent().set(&amp;DataKey::Balance(user.clone()), &amp;amount);
+<span class="boring">}</span></code></pre>
+<p>Using a <code>#[contracttype]</code> enum guarantees each variant has a unique XDR serialization, eliminating collisions.</p>
+<hr>
+<h3 id="16-improper-access-control-on-admin-functions"><a class="header" href="#16-improper-access-control-on-admin-functions">1.6 Improper Access Control on Admin Functions</a></h3>
+<p>Admin operations that don’t verify the caller is the stored admin allow privilege escalation.</p>
+<p><strong>Vulnerable:</strong></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn set_rate(env: Env, caller: Address, new_rate: u32) {
+    caller.require_auth();
+    // Any authorized address can change the rate!
+    env.storage().instance().set(&amp;DataKey::Rate, &amp;new_rate);
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Secure:</strong></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn set_rate(env: Env, caller: Address, new_rate: u32) -&gt; Result&lt;(), Error&gt; {
+    caller.require_auth();
+    let admin: Address = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::Admin)
+        .ok_or(Error::NotInitialized)?;
+    if caller != admin {
+        return Err(Error::Unauthorized);
     }
+    env.storage().instance().set(&amp;DataKey::Rate, &amp;new_rate);
+    Ok(())
 }
 <span class="boring">}</span></code></pre>
-<h3 id="3-use-efficient-data-structures"><a class="header" href="#3-use-efficient-data-structures">3. Use Efficient Data Structures</a></h3>
-<p>✅ <strong>DO:</strong> Use appropriate collection types</p>
+<hr>
+<h3 id="17-timestamp-dependence"><a class="header" href="#17-timestamp-dependence">1.7 Timestamp Dependence</a></h3>
+<p><code>env.ledger().timestamp()</code> returns the ledger close time, which validators can influence by a small amount. Do <strong>not</strong> use timestamps for high-precision timing or as a source of randomness.</p>
+<p><strong>Avoid:</strong></p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>// Use Map for key-value lookups
-let mut balances: Map&lt;Address, u64&gt; = Map::new(&amp;env);
-balances.set(user, amount);
-
-// Use Vec for ordered lists
-let mut users: Vec&lt;Address&gt; = Vec::new(&amp;env);
-users.push_back(user);
+</span>// Validators can slightly shift this to force a particular outcome
+let won = env.ledger().timestamp() % 2 == 0;
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Use inefficient structures</p>
+<p><strong>Use instead:</strong> commit-reveal schemes, VRF oracles, or sequence-number-based logic for randomness; use ledger sequence numbers for ordering.</p>
+<hr>
+<h2 id="2-secure-patterns"><a class="header" href="#2-secure-patterns">2. Secure Patterns</a></h2>
+<h3 id="21-checks-effects-interactions"><a class="header" href="#21-checks-effects-interactions">2.1 Checks-Effects-Interactions</a></h3>
+<p>Perform all authorization and state checks first, update storage next, and make external calls last. This is the Soroban equivalent of the Ethereum CEI pattern.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>// INEFFICIENT: Storing list as separate keys
-for i in 0..count {
-    let key = (symbol_short!("user"), i);
-    env.storage().persistent().set(&amp;key, &amp;users[i]);
-}
-<span class="boring">}</span></code></pre>
-<h3 id="4-optimize-wasm-size"><a class="header" href="#4-optimize-wasm-size">4. Optimize WASM Size</a></h3>
-<p>✅ <strong>DO:</strong> Configure release profile for size</p>
-<pre><code class="language-toml">[profile.release]
-opt-level = "z"          # Optimize for size
-overflow-checks = true
-debug = 0
-strip = "symbols"
-debug-assertions = false
-panic = "abort"
-codegen-units = 1
-lto = true
-</code></pre>
-<p>✅ <strong>DO:</strong> Avoid unnecessary dependencies</p>
-<pre><code class="language-toml">[dependencies]
-soroban-sdk = "21.7.0"  # Only what you need
-
-# Avoid heavy crates if possible
-</code></pre>
-<p>✅ <strong>DO:</strong> Run <code>wasm-opt</code> after release builds and compare size output</p>
-<pre><code class="language-bash"># Build optimized release wasm
-cargo build --workspace --target wasm32-unknown-unknown --release
-
-# Install wasm-opt (Binaryen)
-sudo apt-get update &amp;&amp; sudo apt-get install -y binaryen
-
-# Example optimization for one contract
-wasm-opt -Oz target/wasm32-unknown-unknown/release/hello_world.wasm \
-    -o target/wasm32-unknown-unknown/release/hello_world.opt.wasm
-
-# Before/after comparison
-stat -c "%n %s bytes" target/wasm32-unknown-unknown/release/hello_world.wasm
-stat -c "%n %s bytes" target/wasm32-unknown-unknown/release/hello_world.opt.wasm
-</code></pre>
-<p>Use <code>-Oz</code> for smallest output size. Keep both before/after numbers in PR notes when optimizing contracts.</p>
-<h2 id="-testing-best-practices"><a class="header" href="#-testing-best-practices">🧪 Testing Best Practices</a></h2>
-<h3 id="1-comprehensive-test-coverage"><a class="header" href="#1-comprehensive-test-coverage">1. Comprehensive Test Coverage</a></h3>
-<p>✅ <strong>DO:</strong> Test happy paths and edge cases</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[test]
-fn test_transfer_success() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, TokenContract);
-    let client = TokenContractClient::new(&amp;env, &amp;contract_id);
-
-    let user1 = Address::generate(&amp;env);
-    let user2 = Address::generate(&amp;env);
-
-    client.mint(&amp;user1, &amp;1000);
-    client.transfer(&amp;user1, &amp;user2, &amp;500);
-
-    assert_eq!(client.balance(&amp;user1), 500);
-    assert_eq!(client.balance(&amp;user2), 500);
-}
-
-#[test]
-#[should_panic(expected = "Insufficient balance")]
-fn test_transfer_insufficient_balance() {
-    let env = Env::default();
-    let contract_id = env.register_contract(None, TokenContract);
-    let client = TokenContractClient::new(&amp;env, &amp;contract_id);
-
-    let user1 = Address::generate(&amp;env);
-    let user2 = Address::generate(&amp;env);
-
-    client.mint(&amp;user1, &amp;100);
-    client.transfer(&amp;user1, &amp;user2, &amp;500); // Should panic
-}
-
-#[test]
-fn test_transfer_zero_amount() {
-    // Test edge case: zero amount
-}
-
-#[test]
-fn test_transfer_to_self() {
-    // Test edge case: transfer to same address
-}
-<span class="boring">}</span></code></pre>
-<h3 id="2-use-test-utilities"><a class="header" href="#2-use-test-utilities">2. Use Test Utilities</a></h3>
-<p>✅ <strong>DO:</strong> Leverage Soroban test utilities</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[test]
-fn test_with_auth() {
-    let env = Env::default();
-    env.mock_all_auths(); // Mock authorizations for testing
-
-    let contract_id = env.register_contract(None, MyContract);
-    let client = MyContractClient::new(&amp;env, &amp;contract_id);
-
-    let user = Address::generate(&amp;env);
-    client.protected_function(&amp;user);
-
-    // Verify authorization was required
-    assert_eq!(
-        env.auths(),
-        std::vec![(
-            user.clone(),
-            AuthorizedInvocation {
-                function: AuthorizedFunction::Contract((
-                    contract_id.clone(),
-                    symbol_short!("protected"),
-                    vec![&amp;env, user.to_val()]
-                )),
-                sub_invocations: std::vec![]
-            }
-        )]
-    );
-}
-<span class="boring">}</span></code></pre>
-<h3 id="3-test-integration-scenarios"><a class="header" href="#3-test-integration-scenarios">3. Test Integration Scenarios</a></h3>
-<p>✅ <strong>DO:</strong> Test cross-contract interactions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>#[test]
-fn test_token_with_vault() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    // Deploy token
-    let token_id = env.register_contract(None, TokenContract);
-    let token = TokenContractClient::new(&amp;env, &amp;token_id);
-
-    // Deploy vault
-    let vault_id = env.register_contract(None, VaultContract);
-    let vault = VaultContractClient::new(&amp;env, &amp;vault_id);
-
-    // Initialize vault with token
-    vault.initialize(&amp;token_id);
-
-    // Test deposit flow
-    let user = Address::generate(&amp;env);
-    token.mint(&amp;user, &amp;1000);
-    vault.deposit(&amp;user, &amp;500);
-
-    assert_eq!(token.balance(&amp;user), 500);
-    assert_eq!(vault.balance(&amp;user), 500);
-}
-<span class="boring">}</span></code></pre>
-<h2 id="-code-organization-best-practices"><a class="header" href="#-code-organization-best-practices">📝 Code Organization Best Practices</a></h2>
-<h3 id="1-structure-your-code"><a class="header" href="#1-structure-your-code">1. Structure Your Code</a></h3>
-<p>✅ <strong>DO:</strong> Organize code into logical modules</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>// lib.rs
-mod storage;
-mod validation;
-mod events;
-
-use storage::{read_balance, write_balance};
-use validation::validate_amount;
-use events::emit_transfer;
-
-#[contract]
-pub struct TokenContract;
-
-#[contractimpl]
-impl TokenContract {
-    pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
-        from.require_auth();
-        validate_amount(amount);
-
-        // Implementation
-        emit_transfer(&amp;env, from, to, amount);
+</span>pub fn flash_withdraw(
+    env: Env,
+    caller: Address,
+    amount: i128,
+    callback: Address,
+) -&gt; Result&lt;(), Error&gt; {
+    // 1. CHECKS
+    caller.require_auth();
+    let bal = read_balance(&amp;env, &amp;caller);
+    if bal &lt; amount {
+        return Err(Error::InsufficientBalance);
     }
+
+    // 2. EFFECTS — mutate state before any external call
+    write_balance(&amp;env, &amp;caller, bal - amount);
+
+    // 3. INTERACTIONS — external call after state is updated
+    CallbackClient::new(&amp;env, &amp;callback).on_flash(&amp;caller, &amp;amount);
+
+    Ok(())
 }
 <span class="boring">}</span></code></pre>
-<h3 id="2-use-meaningful-names"><a class="header" href="#2-use-meaningful-names">2. Use Meaningful Names</a></h3>
-<p>✅ <strong>DO:</strong> Use clear, descriptive names</p>
+<hr>
+<h3 id="22-principle-of-least-privilege"><a class="header" href="#22-principle-of-least-privilege">2.2 Principle of Least Privilege</a></h3>
+<p>Grant only the minimum access required. Prefer function-level authorization over blanket admin powers.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn calculate_interest_rate(
-    total_borrowed: u64,
-    total_supplied: u64,
-    base_rate: u64,
-) -&gt; u64 {
-    // Implementation
+</span>#[contracttype]
+pub enum Role {
+    Admin,
+    Minter,
+    Pauser,
+}
+
+fn require_role(env: &amp;Env, caller: &amp;Address, role: Role) -&gt; Result&lt;(), Error&gt; {
+    caller.require_auth();
+    let stored: Address = env
+        .storage()
+        .instance()
+        .get(&amp;role)
+        .ok_or(Error::RoleNotSet)?;
+    if *caller != stored {
+        return Err(Error::Unauthorized);
+    }
+    Ok(())
+}
+
+pub fn mint(env: Env, minter: Address, to: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
+    require_role(&amp;env, &amp;minter, Role::Minter)?;
+    // ...
+    Ok(())
+}
+
+pub fn pause(env: Env, pauser: Address) -&gt; Result&lt;(), Error&gt; {
+    require_role(&amp;env, &amp;pauser, Role::Pauser)?;
+    // ...
+    Ok(())
 }
 <span class="boring">}</span></code></pre>
-<p>❌ <strong>DON’T:</strong> Use cryptic abbreviations</p>
+<hr>
+<h3 id="23-emergency-pause"><a class="header" href="#23-emergency-pause">2.3 Emergency Pause</a></h3>
+<p>Critical contracts should support a pause mechanism so an admin can halt operations while a vulnerability is investigated.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
-</span>pub fn calc_ir(tb: u64, ts: u64, br: u64) -&gt; u64 {
-    // Hard to understand
+</span>#[contracttype]
+pub enum DataKey {
+    Paused,
+    Admin,
 }
-<span class="boring">}</span></code></pre>
-<h3 id="3-document-public-functions"><a class="header" href="#3-document-public-functions">3. Document Public Functions</a></h3>
-<p>✅ <strong>DO:</strong> Add doc comments to public functions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>/// Transfers tokens from one account to another.
-///
-/// # Arguments
-///
-/// * `from` - The address to transfer from (must authorize)
-/// * `to` - The address to transfer to
-/// * `amount` - The amount of tokens to transfer
-///
-/// # Panics
-///
-/// Panics if:
-/// - `from` hasn't authorized the transfer
-/// - `from` has insufficient balance
-/// - `amount` is negative
-///
-/// # Examples
-///
-/// ```
-/// client.transfer(&amp;from, &amp;to, &amp;1000);
-/// ```
-pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
-    // Implementation
+
+fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), Error&gt; {
+    let paused: bool = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::Paused)
+        .unwrap_or(false);
+    if paused {
+        return Err(Error::ContractPaused);
+    }
+    Ok(())
 }
-<span class="boring">}</span></code></pre>
-<h3 id="4-keep-functions-focused"><a class="header" href="#4-keep-functions-focused">4. Keep Functions Focused</a></h3>
-<p>✅ <strong>DO:</strong> Write small, single-purpose functions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>fn validate_transfer(from: &amp;Address, amount: i128) {
+
+pub fn pause(env: Env, admin: Address) -&gt; Result&lt;(), Error&gt; {
+    admin.require_auth();
+    require_admin(&amp;env, &amp;admin)?;
+    env.storage().instance().set(&amp;DataKey::Paused, &amp;true);
+    Ok(())
+}
+
+pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
+    require_not_paused(&amp;env)?;
     from.require_auth();
-    validate_amount(amount);
-}
-
-fn execute_transfer(env: &amp;Env, from: &amp;Address, to: &amp;Address, amount: i128) {
-    let from_balance = read_balance(env, from);
-    let to_balance = read_balance(env, to);
-
-    write_balance(env, from, from_balance - amount);
-    write_balance(env, to, to_balance + amount);
-}
-
-pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
-    validate_transfer(&amp;from, amount);
-    execute_transfer(&amp;env, &amp;from, &amp;to, amount);
-    emit_transfer(&amp;env, from, to, amount);
+    // ...
+    Ok(())
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-documentation-best-practices"><a class="header" href="#-documentation-best-practices">📚 Documentation Best Practices</a></h2>
-<h3 id="1-write-clear-readmes"><a class="header" href="#1-write-clear-readmes">1. Write Clear READMEs</a></h3>
-<p>Each example should have a README with:</p>
+<p>See <code>examples/intermediate/03-pause-unpause</code> for a full implementation.</p>
+<hr>
+<h3 id="24-input-validation-at-boundaries"><a class="header" href="#24-input-validation-at-boundaries">2.4 Input Validation at Boundaries</a></h3>
+<p>Validate inputs as early as possible, ideally in a dedicated validation helper.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn validate_amount(amount: i128) -&gt; Result&lt;(), Error&gt; {
+    if amount &lt;= 0 {
+        return Err(Error::InvalidAmount);
+    }
+    if amount &gt; MAX_TRANSFER {
+        return Err(Error::AmountExceedsLimit);
+    }
+    Ok(())
+}
+
+fn validate_recipient(recipient: &amp;Address, _env: &amp;Env) -&gt; Result&lt;(), Error&gt; {
+    // In a real contract, you might check a whitelist here.
+    // For now this is a placeholder showing the pattern.
+    let _ = recipient;
+    Ok(())
+}
+
+pub fn transfer(
+    env: Env,
+    from: Address,
+    to: Address,
+    amount: i128,
+) -&gt; Result&lt;(), Error&gt; {
+    from.require_auth();
+    validate_amount(amount)?;
+    validate_recipient(&amp;to, &amp;env)?;
+    // ... proceed
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h3 id="25-event-driven-auditability"><a class="header" href="#25-event-driven-auditability">2.5 Event-Driven Auditability</a></h3>
+<p>Every significant state change should emit an event. Events are the primary mechanism for off-chain monitoring and incident detection.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const NS: Symbol = symbol_short!("token");
+const EV_XFER: Symbol = symbol_short!("transfer");
+const EV_PAUSE: Symbol = symbol_short!("paused");
+const EV_ADMIN: Symbol = symbol_short!("admin_chg");
+
+#[contracttype]
+pub struct TransferEvent {
+    pub from: Address,
+    pub to: Address,
+    pub amount: i128,
+}
+
+fn emit_transfer(env: &amp;Env, from: Address, to: Address, amount: i128) {
+    env.events()
+        .publish((NS, EV_XFER), TransferEvent { from, to, amount });
+}
+
+fn emit_paused(env: &amp;Env, by: Address) {
+    env.events().publish((NS, EV_PAUSE, by), true);
+}
+
+fn emit_admin_changed(env: &amp;Env, old: Address, new: Address) {
+    env.events().publish((NS, EV_ADMIN, old), new);
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h3 id="26-safe-admin-transfer-two-step"><a class="header" href="#26-safe-admin-transfer-two-step">2.6 Safe Admin Transfer (Two-Step)</a></h3>
+<p>A one-step admin transfer can lock the contract forever if the wrong address is supplied. Use a two-step pattern.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+pub enum DataKey {
+    Admin,
+    PendingAdmin,
+}
+
+/// Step 1: current admin nominates a successor.
+pub fn transfer_admin(env: Env, current_admin: Address, new_admin: Address) -&gt; Result&lt;(), Error&gt; {
+    current_admin.require_auth();
+    require_admin(&amp;env, &amp;current_admin)?;
+    env.storage()
+        .instance()
+        .set(&amp;DataKey::PendingAdmin, &amp;new_admin);
+    Ok(())
+}
+
+/// Step 2: the successor accepts, proving they control the key.
+pub fn accept_admin(env: Env, new_admin: Address) -&gt; Result&lt;(), Error&gt; {
+    new_admin.require_auth();
+    let pending: Address = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::PendingAdmin)
+        .ok_or(Error::NoPendingAdmin)?;
+    if new_admin != pending {
+        return Err(Error::Unauthorized);
+    }
+    env.storage().instance().set(&amp;DataKey::Admin, &amp;new_admin);
+    env.storage().instance().remove(&amp;DataKey::PendingAdmin);
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h2 id="3-pre-deployment-audit-checklist"><a class="header" href="#3-pre-deployment-audit-checklist">3. Pre-Deployment Audit Checklist</a></h2>
+<p>Use this checklist before every production deployment.</p>
+<h3 id="authorization"><a class="header" href="#authorization">Authorization</a></h3>
 <ul>
-<li>Purpose and use case</li>
-<li>Key concepts demonstrated</li>
-<li>How to build and test</li>
-<li>How to deploy</li>
-<li>Example invocations</li>
-<li>Security considerations</li>
+<li><input disabled="" type="checkbox"> Every function that mutates state calls <code>require_auth()</code> on the appropriate signer <strong>before</strong> any storage write</li>
+<li><input disabled="" type="checkbox"> Admin-gated functions verify the caller equals the stored admin address, not just that they have some authorization</li>
+<li><input disabled="" type="checkbox"> There is no way to call <code>initialize()</code> (or equivalent setup function) more than once</li>
 </ul>
-<h3 id="2-comment-complex-logic"><a class="header" href="#2-comment-complex-logic">2. Comment Complex Logic</a></h3>
-<p>✅ <strong>DO:</strong> Explain non-obvious code</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn calculate_reward(env: &amp;Env, user: &amp;Address) -&gt; u64 {
-    let stake_amount = read_stake(env, user);
-    let stake_time = read_stake_time(env, user);
-    let current_time = env.ledger().timestamp();
-
-    // Calculate time-weighted reward
-    // Formula: stake_amount * time_multiplier * base_rate
-    // Where time_multiplier = sqrt(days_staked) / 10
-    let days_staked = (current_time - stake_time) / 86400;
-    let time_multiplier = (days_staked as f64).sqrt() / 10.0;
-    let base_rate = 100; // 1% represented as basis points
-
-    (stake_amount as f64 * time_multiplier * base_rate as f64) as u64
-}
-<span class="boring">}</span></code></pre>
-<h3 id="3-include-usage-examples"><a class="header" href="#3-include-usage-examples">3. Include Usage Examples</a></h3>
-<p>Add examples in tests or documentation:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>/// # Example
-///
-/// ```rust
-/// let env = Env::default();
-/// let contract_id = env.register_contract(None, MyContract);
-/// let client = MyContractClient::new(&amp;env, &amp;contract_id);
-///
-/// // Initialize the contract
-/// client.initialize(&amp;admin);
-///
-/// // Make a deposit
-/// client.deposit(&amp;user, &amp;1000);
-/// ```
-<span class="boring">}</span></code></pre>
-<h2 id="-upgrade--migration-best-practices"><a class="header" href="#-upgrade--migration-best-practices">🔄 Upgrade &amp; Migration Best Practices</a></h2>
-<h3 id="1-version-your-storage-keys"><a class="header" href="#1-version-your-storage-keys">1. Version Your Storage Keys</a></h3>
-<p>✅ <strong>DO:</strong> Include version in storage keys for upgradability</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>const VERSION: u32 = 1;
-
-fn get_balance_key(user: &amp;Address) -&gt; (Symbol, u32, Address) {
-    (symbol_short!("balance"), VERSION, user.clone())
-}
-<span class="boring">}</span></code></pre>
-<h3 id="2-plan-for-initialization"><a class="header" href="#2-plan-for-initialization">2. Plan for Initialization</a></h3>
-<p>✅ <strong>DO:</strong> Use initialization pattern</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span><span class="boring">fn main() {
-</span>pub fn initialize(env: Env, admin: Address, config: Config) {
-    if has_admin(&amp;env) {
-        panic!("Already initialized");
-    }
-
-    set_admin(&amp;env, &amp;admin);
-    set_config(&amp;env, &amp;config);
-}
-
-fn has_admin(env: &amp;Env) -&gt; bool {
-    env.storage().persistent().has(&amp;symbol_short!("admin"))
-}
-<span class="boring">}</span></code></pre>
-<h2 id="summary-checklist"><a class="header" href="#summary-checklist">Summary Checklist</a></h2>
-<p>Before deploying a contract, verify:</p>
+<h3 id="arithmetic"><a class="header" href="#arithmetic">Arithmetic</a></h3>
 <ul>
-<li><input disabled="" type="checkbox"> All state-changing functions require authorization</li>
-<li><input disabled="" type="checkbox"> All inputs are validated</li>
-<li><input disabled="" type="checkbox"> Arithmetic operations use checked math</li>
-<li><input disabled="" type="checkbox"> Admin functions are protected</li>
-<li><input disabled="" type="checkbox"> Errors are handled with custom types</li>
-<li><input disabled="" type="checkbox"> Storage types are appropriate for data lifetime</li>
-<li><input disabled="" type="checkbox"> Storage operations are minimized</li>
-<li><input disabled="" type="checkbox"> Test coverage is &gt;80%</li>
-<li><input disabled="" type="checkbox"> Edge cases are tested</li>
-<li><input disabled="" type="checkbox"> Code is well-documented</li>
-<li><input disabled="" type="checkbox"> WASM size is optimized</li>
-<li><input disabled="" type="checkbox"> Security considerations are documented</li>
+<li><input disabled="" type="checkbox"> All balance additions use <code>checked_add</code> / <code>saturating_add</code> with explicit error handling</li>
+<li><input disabled="" type="checkbox"> All balance subtractions use <code>checked_sub</code> / <code>saturating_sub</code> with explicit error handling</li>
+<li><input disabled="" type="checkbox"> Multiplication and division on financial values use checked variants</li>
+<li><input disabled="" type="checkbox"> Division-by-zero cases are guarded explicitly</li>
+</ul>
+<h3 id="storage"><a class="header" href="#storage">Storage</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> All storage keys use a <code>#[contracttype]</code> enum — no raw <code>symbol_short!</code> for keys that include variable data</li>
+<li><input disabled="" type="checkbox"> Storage types match data lifetime: <code>persistent()</code> for balances, <code>instance()</code> for contract config, <code>temporary()</code> for nonces/locks</li>
+<li><input disabled="" type="checkbox"> No two enum variants can produce the same serialized key</li>
+<li><input disabled="" type="checkbox"> There are no orphaned storage entries left behind after contract logic changes</li>
+</ul>
+<h3 id="errors"><a class="header" href="#errors">Errors</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> A <code>#[contracterror]</code> enum is defined and used for all error conditions</li>
+<li><input disabled="" type="checkbox"> No <code>unwrap()</code> on <code>Option</code> or <code>Result</code> in contract code — every failure path is an intentional error variant</li>
+<li><input disabled="" type="checkbox"> Error values start at <code>1</code> (never <code>0</code>) to distinguish them from success</li>
+</ul>
+<h3 id="events"><a class="header" href="#events">Events</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Every balance transfer emits a transfer event</li>
+<li><input disabled="" type="checkbox"> Admin changes, pauses, and role assignments emit events</li>
+<li><input disabled="" type="checkbox"> Event topics follow the <code>(namespace, action, ...)</code> pattern for easy filtering</li>
+</ul>
+<h3 id="testing"><a class="header" href="#testing">Testing</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Unit tests cover every public function’s happy path</li>
+<li><input disabled="" type="checkbox"> Unit tests cover every error variant (insufficient balance, unauthorized, invalid amount, etc.)</li>
+<li><input disabled="" type="checkbox"> Authorization tests verify the call panics without a valid auth (<code>env.set_auths(&amp;[])</code>)</li>
+<li><input disabled="" type="checkbox"> Overflow edge cases are tested (max <code>i128</code> values)</li>
+<li><input disabled="" type="checkbox"> <code>cargo clippy --workspace --all-targets -- -D warnings</code> passes cleanly</li>
+<li><input disabled="" type="checkbox"> <code>cargo test --workspace</code> passes</li>
+<li><input disabled="" type="checkbox"> WASM release build succeeds: <code>cargo build --target wasm32-unknown-unknown --release</code></li>
+</ul>
+<h3 id="configuration"><a class="header" href="#configuration">Configuration</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> The crate compiles with <code>#![no_std]</code></li>
+<li><input disabled="" type="checkbox"> <code>[profile.release]</code> has <code>overflow-checks = true</code> and <code>panic = "abort"</code></li>
+<li><input disabled="" type="checkbox"> No <code>std</code> features are enabled in contract dependencies</li>
 </ul>
 <hr>
-<p>For more detailed examples, see our <a href="../examples/">examples directory</a> and specific guides.</p>
+<h2 id="4-real-world-examples"><a class="header" href="#4-real-world-examples">4. Real-World Examples</a></h2>
+<h3 id="example-a-secure-token-transfer"><a class="header" href="#example-a-secure-token-transfer">Example A: Secure Token Transfer</a></h3>
+<p>The following combines authorization, checked arithmetic, input validation, and event emission in a single function — the pattern used in <code>examples/tokens/01-sep41-token</code>.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum TokenError {
+    NotInitialized      = 1,
+    Unauthorized        = 2,
+    InsufficientBalance = 3,
+    InvalidAmount       = 4,
+    ArithmeticOverflow  = 5,
+}
+
+pub fn transfer(
+    env: Env,
+    from: Address,
+    to: Address,
+    amount: i128,
+) -&gt; Result&lt;(), TokenError&gt; {
+    // AUTHORIZATION
+    from.require_auth();
+
+    // INPUT VALIDATION
+    ensure_initialized(&amp;env)?;
+    if amount &lt;= 0 {
+        return Err(TokenError::InvalidAmount);
+    }
+
+    // CHECKS
+    let from_bal = read_balance(&amp;env, &amp;from);
+    if from_bal &lt; amount {
+        return Err(TokenError::InsufficientBalance);
+    }
+
+    // EFFECTS (checked arithmetic)
+    let to_bal = read_balance(&amp;env, &amp;to);
+    let new_to_bal = to_bal
+        .checked_add(amount)
+        .ok_or(TokenError::ArithmeticOverflow)?;
+
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Balance(from.clone()), &amp;(from_bal - amount));
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Balance(to.clone()), &amp;new_to_bal);
+
+    // EVENTS
+    env.events().publish(
+        (symbol_short!("token"), symbol_short!("transfer"), from, to),
+        amount,
+    );
+
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="example-b-multi-party-authorization"><a class="header" href="#example-b-multi-party-authorization">Example B: Multi-Party Authorization</a></h3>
+<p>See <code>examples/advanced/01-multi-party-auth</code> for a complete N-of-N and M-of-N threshold authorization implementation with:</p>
+<ul>
+<li>Canonical auth-vector encoding</li>
+<li>Signer set management (add / remove / rotate)</li>
+<li>Threshold enforcement</li>
+<li>Full audit-trail events</li>
+</ul>
+<h3 id="example-c-time-locked-execution"><a class="header" href="#example-c-time-locked-execution">Example C: Time-Locked Execution</a></h3>
+<p>See <code>examples/advanced/02-timelock</code> for a contract demonstrating:</p>
+<ul>
+<li>Delayed execution of sensitive operations</li>
+<li>Queue / cancel / execute state machine</li>
+<li>Time-based validation using <code>env.ledger().timestamp()</code></li>
+<li>Appropriate use of persistent vs. instance storage</li>
+</ul>
+<hr>
+<h2 id="further-reading"><a class="header" href="#further-reading">Further Reading</a></h2>
+<ul>
+<li><a href="./best-practices.html">Best Practices</a> — general coding and performance guidelines</li>
+<li><a href="./common-pitfalls.html">Common Pitfalls</a> — mistakes to avoid when writing Soroban contracts</li>
+<li><a href="./security-audit/audit-prep-checklist.html">Security Audit Prep Checklist</a> — full pre-audit readiness guide</li>
+<li><a href="https://docs.rs/soroban-sdk">Soroban SDK Documentation</a></li>
+<li><a href="https://www.stellar.org/security">Stellar Security Disclosure Policy</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../docs/quick-reference.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/token-development-video.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/common-pitfalls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../CONTRIBUTING.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -772,11 +703,11 @@ fn has_admin(env: &amp;Env) -&gt; bool {
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../docs/quick-reference.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/token-development-video.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/common-pitfalls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../CONTRIBUTING.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
