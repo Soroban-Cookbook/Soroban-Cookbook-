@@ -13,7 +13,7 @@ This category contains examples related to fungible tokens, including implementa
 
 ## Examples
 
-- `01-sep41-token`: A minimal SEP-41-compliant fungible token contract.
+- `01-sep41-token`: A complete SEP-41 fungible token with metadata, approvals, events, and comprehensive tests.
 - `02-vesting-contract`: A contract that releases tokens to a beneficiary over time.
 - `04-airdrop-contract`: A contract to efficiently distribute tokens to a list of addresses.
 - `05-wrapped-asset`: A contract that creates a Soroban-native representation of a classic Stellar asset.

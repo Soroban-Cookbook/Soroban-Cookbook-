@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Soroban Cookbook | Terminal Settings",
-  description: "Manage your Soroban development environment settings.",
+  title: "Soroban Cookbook | Showcase",
+  description: "Discover Soroban Cookbook projects, templates, and contribution paths.",
 };
 
 export default function RootLayout({
