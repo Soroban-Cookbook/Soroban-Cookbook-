@@ -19,3 +19,10 @@ multi-sig-patterns = { path = "../../examples/intermediate/multi-sig-patterns" }
 multi-party-auth = { path = "../../examples/advanced/01-multi-party-auth" }
 timelock = { path = "../../examples/advanced/02-timelock" }
 token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+oracle-pattern = { path = "../../examples/advanced/03-oracle-pattern" }
+proxy-admin = { path = "../../examples/advanced/03-proxy-admin" }
+rbac-modifiers = { path = "../../examples/advanced/03-rbac-modifiers" }
+registry-access-controls = { path = "../../examples/advanced/03-registry-access-controls" }
+cross-contract-integration-testing = { path = "../../examples/advanced/04-cross-contract-integration-testing" }
+upgradeable-proxy = { path = "../../examples/advanced/04-upgradeable-proxy" }
+contract-registry = { path = "../../examples/advanced/contract-registry" }
