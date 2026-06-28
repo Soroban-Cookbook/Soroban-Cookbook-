@@ -15,6 +15,7 @@
 
 ## Basics (14 examples)
 - [Overview & listing](./examples/basics.md)
+- [Interactive Playground](./examples/playground.md)
 - [Storage Patterns](./examples/storage-patterns.md)
 - [Error Handling](./examples/error-handling.md)
 - [Events](./examples/events.md)
