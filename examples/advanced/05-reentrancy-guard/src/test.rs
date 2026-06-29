@@ -1,7 +1,9 @@
 #![cfg(test)]
 
 use super::*;
-use soroban_sdk::{contract, contractimpl, testutils::Address as _, Address, Env, Symbol, IntoVal, vec};
+use soroban_sdk::{
+    contract, contractimpl, testutils::Address as _, vec, Address, Env, IntoVal, Symbol,
+};
 
 #[contracttype]
 pub enum MaliciousDataKey {
@@ -15,20 +17,37 @@ pub struct MaliciousContract;
 #[contractimpl]
 impl MaliciousContract {
     pub fn init(env: Env, main_contract: Address, attack_type: u32) {
-        env.storage().instance().set(&MaliciousDataKey::MainContract, &main_contract);
-        env.storage().instance().set(&MaliciousDataKey::AttackType, &attack_type);
+        env.storage()
+            .instance()
+            .set(&MaliciousDataKey::MainContract, &main_contract);
+        env.storage()
+            .instance()
+            .set(&MaliciousDataKey::AttackType, &attack_type);
     }
 
     pub fn receive_funds(env: Env, to: Address, amount: i128) {
-        let main_contract: Address = env.storage().instance().get(&MaliciousDataKey::MainContract).unwrap();
-        let attack_type: u32 = env.storage().instance().get(&MaliciousDataKey::AttackType).unwrap();
+        let main_contract: Address = env
+            .storage()
+            .instance()
+            .get(&MaliciousDataKey::MainContract)
+            .unwrap();
+        let attack_type: u32 = env
+            .storage()
+            .instance()
+            .get(&MaliciousDataKey::AttackType)
+            .unwrap();
 
         if attack_type == 1 {
             // Attempt to re-enter withdraw
             let _: () = env.invoke_contract(
                 &main_contract,
                 &Symbol::new(&env, "withdraw"),
-                vec![&env, to.into_val(&env), amount.into_val(&env), env.current_contract_address().into_val(&env)],
+                vec![
+                    &env,
+                    to.into_val(&env),
+                    amount.into_val(&env),
+                    env.current_contract_address().into_val(&env),
+                ],
             );
         } else if attack_type == 2 {
             // Attempt to read-only re-enter
@@ -48,7 +67,7 @@ fn test_reentrancy_guard_deposit_withdraw() {
 
     let contract_id = env.register(ReentrancyGuardContract, ());
     let client = ReentrancyGuardContractClient::new(&env, &contract_id);
-    
+
     client.init();
 
     let user = Address::generate(&env);

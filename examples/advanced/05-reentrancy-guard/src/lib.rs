@@ -1,6 +1,8 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, contracterror, vec, Address, Env, IntoVal, Symbol};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, vec, Address, Env, IntoVal, Symbol,
+};
 
 #[contracttype]
 #[derive(Clone)]
@@ -27,21 +29,32 @@ impl ReentrancyGuardContract {
 
     pub fn deposit(env: Env, from: Address, amount: i128) -> Result<(), ContractError> {
         from.require_auth();
-        
+
         if Self::is_entered(&env) {
             return Err(ContractError::ReentrancyError);
         }
         env.storage().instance().set(&DataKey::Entered, &true);
 
-        let mut balance: i128 = env.storage().persistent().get(&DataKey::Balance(from.clone())).unwrap_or(0);
+        let mut balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(from.clone()))
+            .unwrap_or(0);
         balance += amount;
-        env.storage().persistent().set(&DataKey::Balance(from), &balance);
-        
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from), &balance);
+
         env.storage().instance().set(&DataKey::Entered, &false);
         Ok(())
     }
 
-    pub fn withdraw(env: Env, to: Address, amount: i128, target_contract: Address) -> Result<(), ContractError> {
+    pub fn withdraw(
+        env: Env,
+        to: Address,
+        amount: i128,
+        target_contract: Address,
+    ) -> Result<(), ContractError> {
         to.require_auth();
 
         if Self::is_entered(&env) {
@@ -49,10 +62,16 @@ impl ReentrancyGuardContract {
         }
         env.storage().instance().set(&DataKey::Entered, &true);
 
-        let mut balance: i128 = env.storage().persistent().get(&DataKey::Balance(to.clone())).unwrap_or(0);
+        let mut balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(to.clone()))
+            .unwrap_or(0);
         if balance >= amount {
             balance -= amount;
-            env.storage().persistent().set(&DataKey::Balance(to.clone()), &balance);
+            env.storage()
+                .persistent()
+                .set(&DataKey::Balance(to.clone()), &balance);
 
             // Cross-contract call which opens up a reentrancy vector
             env.invoke_contract::<()>(
@@ -71,12 +90,19 @@ impl ReentrancyGuardContract {
         if Self::is_entered(&env) {
             return Err(ContractError::ReentrancyError);
         }
-        
-        Ok(env.storage().persistent().get(&DataKey::Balance(user)).unwrap_or(0))
+
+        Ok(env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(user))
+            .unwrap_or(0))
     }
 
     fn is_entered(env: &Env) -> bool {
-        env.storage().instance().get(&DataKey::Entered).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::Entered)
+            .unwrap_or(false)
     }
 }
 
