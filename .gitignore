@@ -25,6 +25,10 @@ soroban-ledger*.json
 .env
 .env.local
 
+# Node
+node_modules/
+.next/
+
 # Testing
 coverage/
 *.profraw
