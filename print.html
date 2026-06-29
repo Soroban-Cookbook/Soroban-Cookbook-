@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-091ee6c3.js";
+            window.path_to_searchindex_js = "searchindex-c78a290d.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-45e6d180.js"></script>
+        <script src="toc-581aac75.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -5579,6 +5579,101 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 <hr>
 <p>For more detailed examples, see our <a href="examples">examples directory</a> and specific guides.</p>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="documentation-platform-evaluation"><a class="header" href="#documentation-platform-evaluation">Documentation Platform Evaluation</a></h1>
+<p>This note compares the repository’s current <code>mdBook</code> setup with a possible move to Docusaurus.</p>
+<h2 id="scope"><a class="header" href="#scope">Scope</a></h2>
+<p>The evaluation is based on the current Soroban Cookbook repository shape:</p>
+<ul>
+<li>Rust-heavy examples with many local markdown files</li>
+<li>a docs pipeline that already builds from <code>book/</code></li>
+<li>a need for low-friction contributor edits</li>
+<li>reference-heavy content that benefits from fast local preview and stable linking</li>
+</ul>
+<h2 id="summary-decision"><a class="header" href="#summary-decision">Summary Decision</a></h2>
+<p>Keep <code>mdBook</code> as the primary documentation platform for the current repository phase.</p>
+<p>Docusaurus remains a reasonable future option if the project later needs a richer marketing layer, versioned product docs, or plugin-driven content experiences that exceed the current cookbook scope.</p>
+<h2 id="evaluation-matrix"><a class="header" href="#evaluation-matrix">Evaluation Matrix</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Capability</th><th>mdBook</th><th>Docusaurus</th><th>Repo Fit</th></tr>
+</thead>
+<tbody>
+<tr><td>Rust documentation workflow</td><td>Excellent</td><td>Good</td><td><code>mdBook</code> wins</td></tr>
+<tr><td>Contributor simplicity</td><td>Excellent</td><td>Moderate</td><td><code>mdBook</code> wins</td></tr>
+<tr><td>Local build speed</td><td>Excellent</td><td>Moderate</td><td><code>mdBook</code> wins</td></tr>
+<tr><td>Sidebar authoring</td><td>Good</td><td>Excellent</td><td>Docusaurus wins</td></tr>
+<tr><td>Search customization</td><td>Moderate</td><td>Good</td><td>Docusaurus wins</td></tr>
+<tr><td>Interactive marketing pages</td><td>Weak</td><td>Excellent</td><td>Docusaurus wins</td></tr>
+<tr><td>Existing repo alignment</td><td>Excellent</td><td>Weak</td><td><code>mdBook</code> wins</td></tr>
+<tr><td>Migration cost today</td><td>None</td><td>High</td><td><code>mdBook</code> wins</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="what-was-compared"><a class="header" href="#what-was-compared">What Was Compared</a></h2>
+<h3 id="mdbook-strengths"><a class="header" href="#mdbook-strengths">mdBook strengths</a></h3>
+<ul>
+<li>Already adopted in this repository.</li>
+<li>Minimal configuration and low contributor overhead.</li>
+<li>Predictable markdown-first authoring for guides, examples, and reference material.</li>
+<li>Good fit for a cookbook where page structure mirrors repository structure.</li>
+<li>Easy to review in pull requests because content changes stay close to source.</li>
+</ul>
+<h3 id="mdbook-limitations"><a class="header" href="#mdbook-limitations">mdBook limitations</a></h3>
+<ul>
+<li>Limited out-of-the-box search tuning and UI customization.</li>
+<li>Weaker support for landing-page style community storytelling.</li>
+<li>Fewer plugin and ecosystem options than modern JS doc stacks.</li>
+</ul>
+<h3 id="docusaurus-strengths"><a class="header" href="#docusaurus-strengths">Docusaurus strengths</a></h3>
+<ul>
+<li>Better front-end customization, theming, and navigation polish.</li>
+<li>Stronger support for search providers, docs versioning, and hybrid docs plus marketing pages.</li>
+<li>Easier to build community-facing sections with filters, cards, and richer navigation.</li>
+</ul>
+<h3 id="docusaurus-limitations"><a class="header" href="#docusaurus-limitations">Docusaurus limitations</a></h3>
+<ul>
+<li>Introduces a larger JavaScript toolchain for a Rust-first repository.</li>
+<li>Raises the maintenance bar for contributors making small documentation fixes.</li>
+<li>Requires migration of current mdBook navigation and link structure.</li>
+<li>Creates overlap with the existing <code>webapp/</code> surface for UI-heavy content.</li>
+</ul>
+<h2 id="architecture-plan"><a class="header" href="#architecture-plan">Architecture Plan</a></h2>
+<h3 id="near-term"><a class="header" href="#near-term">Near term</a></h3>
+<p>Keep the documentation stack split by responsibility:</p>
+<ul>
+<li><code>book/</code>: authoritative technical docs, guides, and example write-ups</li>
+<li><code>docs/</code>: supporting reference material and operational notes</li>
+<li><code>webapp/</code>: interactive or community-facing pages that benefit from filtering and richer UI</li>
+</ul>
+<p>This preserves the current authoring model while letting UI-rich content evolve independently.</p>
+<h3 id="medium-term"><a class="header" href="#medium-term">Medium term</a></h3>
+<p>If discoverability becomes the main bottleneck, add incremental improvements before migrating platforms:</p>
+<ol>
+<li>tighten <code>SUMMARY.md</code> coverage</li>
+<li>standardize page metadata and naming</li>
+<li>move community showcase and discovery features into the webapp</li>
+<li>keep mdBook focused on technical documentation</li>
+</ol>
+<h2 id="migration-trigger-criteria"><a class="header" href="#migration-trigger-criteria">Migration Trigger Criteria</a></h2>
+<p>Revisit Docusaurus only if at least two of these become true:</p>
+<ul>
+<li>versioned docs are required</li>
+<li>the docs homepage must double as the primary public marketing site</li>
+<li>custom search facets become a hard requirement inside the docs site</li>
+<li>contributor demand shifts toward UI-rich discovery over code-adjacent reference pages</li>
+</ul>
+<h2 id="migration-plan-if-triggered-later"><a class="header" href="#migration-plan-if-triggered-later">Migration Plan If Triggered Later</a></h2>
+<ol>
+<li>Freeze the current <code>mdBook</code> information architecture and export a page inventory.</li>
+<li>Move only community and landing content first, not the full reference set.</li>
+<li>Keep example source and technical reference pages in markdown with stable slugs.</li>
+<li>Add redirects for existing mdBook paths before switching the primary docs URL.</li>
+<li>Migrate the remaining technical sections only after parity checks pass.</li>
+</ol>
+<h2 id="recommendation"><a class="header" href="#recommendation">Recommendation</a></h2>
+<p>Use <code>mdBook</code> for technical docs now, and use the <code>webapp/</code> for richer discovery experiences such as project showcase pages. That split matches the repository’s current structure with the least operational cost.</p>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="defi-best-practices"><a class="header" href="#defi-best-practices">DeFi Best Practices</a></h1>
 <p>This page collects DeFi-specific best practices for security, robustness, and maintainability on Soroban.</p>
 <h2 id="economic-security"><a class="header" href="#economic-security">Economic Security</a></h2>
@@ -7658,7 +7753,7 @@ or harmful.</p>
 comments, commits, code, wiki edits, issues, and other contributions that are
 not aligned to this Code of Conduct, and will communicate reasons for moderation
 decisions when appropriate.</p>
-<h2 id="scope"><a class="header" href="#scope">Scope</a></h2>
+<h2 id="scope-1"><a class="header" href="#scope-1">Scope</a></h2>
 <p>This Code of Conduct applies within all community spaces, and also applies when
 an individual is officially representing the community in public spaces.
 Examples of representing our community include using an official e-mail address,
