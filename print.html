@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-2b08302c.js";
+            window.path_to_searchindex_js = "searchindex-05dfc2c6.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-bf0d7173.js"></script>
+        <script src="toc-4f10cddc.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -2387,6 +2387,427 @@ fn require_admin(env: &amp;Env) -&gt; Address {
 </ul>
 <hr>
 <p><strong>Welcome to Soroban!</strong> The transition from Solidity takes time, but Rust’s safety and Soroban’s design will help you build more secure smart contracts.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="video-creation-tools--processes"><a class="header" href="#video-creation-tools--processes">Video Creation Tools &amp; Processes</a></h1>
+<p>This guide documents the tools, processes, and standards for creating video content for the Soroban Cookbook.</p>
+<hr>
+<h2 id="recording-software"><a class="header" href="#recording-software">Recording Software</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Tool</th><th>Platform</th><th>Use Case</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>OBS Studio</strong> (recommended)</td><td>Windows / macOS / Linux</td><td>Screen recording, webcam overlay</td></tr>
+<tr><td><strong>ScreenFlow</strong></td><td>macOS</td><td>Polished screencasts with built-in editing</td></tr>
+<tr><td><strong>Loom</strong></td><td>Browser</td><td>Quick informal walkthroughs</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="obs-studio-configuration"><a class="header" href="#obs-studio-configuration">OBS Studio Configuration</a></h3>
+<pre><code>Resolution: 1920x1080 (1080p)
+FPS: 30 (screencasts) or 60 (UI demos)
+Encoder: x264 / NVENC
+Audio: 48 kHz, mono or stereo
+Format: MKV (remux to MP4 after recording)
+</code></pre>
+<p><strong>Recommended scenes:</strong></p>
+<ul>
+<li><strong>Code Only</strong> — full-screen IDE/terminal capture</li>
+<li><strong>Code + Webcam</strong> — small webcam overlay in bottom-right corner</li>
+<li><strong>Slides + Webcam</strong> — presentation mode with speaker visible</li>
+</ul>
+<hr>
+<h2 id="editing-software"><a class="header" href="#editing-software">Editing Software</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Tool</th><th>Platform</th><th>Best For</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>DaVinci Resolve</strong> (recommended)</td><td>Cross-platform</td><td>Professional editing, free tier available</td></tr>
+<tr><td><strong>Kdenlive</strong></td><td>Linux</td><td>Open-source, lightweight</td></tr>
+<tr><td><strong>iMovie</strong></td><td>macOS</td><td>Quick simple edits</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="davinci-resolve-project-settings"><a class="header" href="#davinci-resolve-project-settings">DaVinci Resolve Project Settings</a></h3>
+<pre><code>Timeline Resolution: 1920x1080
+Timeline Frame Rate: 30 fps
+Color Science: DaVinci YRGB
+Export Codec: H.264 (YouTube optimized)
+Export Bitrate: 10-15 Mbps
+Audio: AAC 320 kbps
+</code></pre>
+<hr>
+<h2 id="template--style-guide"><a class="header" href="#template--style-guide">Template &amp; Style Guide</a></h2>
+<h3 id="video-structure-template"><a class="header" href="#video-structure-template">Video Structure Template</a></h3>
+<p>Every Soroban Cookbook video follows this structure:</p>
+<pre><code>1. INTRO (15-30s)
+   - Cookbook branding bumper (3s)
+   - Topic title card
+   - Brief "what you'll learn" overview
+
+2. PREREQUISITES (15-30s)
+   - Required knowledge
+   - Tools needed
+   - Link to relevant setup guide
+
+3. MAIN CONTENT (4-6 min)
+   - Concept explanation (diagrams/slides)
+   - Live coding demonstration
+   - Testing &amp; verification
+
+4. RECAP (30-60s)
+   - Key takeaways (bullet points)
+   - Link to source code in the Cookbook
+   - Next video teaser
+
+5. OUTRO (10s)
+   - Subscribe/like CTA
+   - Community links
+</code></pre>
+<h3 id="visual-style-guide"><a class="header" href="#visual-style-guide">Visual Style Guide</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Element</th><th>Specification</th></tr>
+</thead>
+<tbody>
+<tr><td>Font (code)</td><td>JetBrains Mono, 18px</td></tr>
+<tr><td>Font (titles)</td><td>Inter Bold, 48px</td></tr>
+<tr><td>Font (body)</td><td>Inter Regular, 24px</td></tr>
+<tr><td>Background</td><td>Dark theme (#1a1a2e)</td></tr>
+<tr><td>Accent color</td><td>Stellar blue (#3b82f6)</td></tr>
+<tr><td>Code theme</td><td>One Dark Pro or Catppuccin Mocha</td></tr>
+<tr><td>Aspect ratio</td><td>16:9</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="branding-assets"><a class="header" href="#branding-assets">Branding Assets</a></h3>
+<p>Store in <code>assets/video/</code>:</p>
+<pre><code>assets/video/
+  intro-bumper.mp4       # 3-second animated intro
+  outro-card.png         # End screen template
+  lower-third.png        # Speaker name overlay
+  thumbnail-template.psd # YouTube thumbnail
+  logo-watermark.png     # Corner watermark
+</code></pre>
+<h3 id="thumbnail-guidelines"><a class="header" href="#thumbnail-guidelines">Thumbnail Guidelines</a></h3>
+<ul>
+<li><strong>Resolution:</strong> 1280x720 (minimum)</li>
+<li><strong>Text:</strong> Max 5 words, readable at small sizes</li>
+<li><strong>Include:</strong> Code snippet preview or diagram</li>
+<li><strong>Color:</strong> High contrast, use Stellar blue accent</li>
+</ul>
+<hr>
+<h2 id="youtube-channel-setup"><a class="header" href="#youtube-channel-setup">YouTube Channel Setup</a></h2>
+<h3 id="channel-configuration"><a class="header" href="#channel-configuration">Channel Configuration</a></h3>
+<pre><code class="language-yaml">Channel Name: Soroban Cookbook
+Handle: @SorobanCookbook
+Category: Science &amp; Technology
+Description: |
+  Learn Soroban smart contract development through practical examples.
+  From basics to advanced patterns — building on Stellar, one recipe at a time.
+
+  GitHub: https://github.com/Soroban-Cookbook/Soroban-Cookbook
+  Docs: https://soroban-cookbook.github.io/Soroban-Cookbook/
+
+Playlists:
+  - "Getting Started with Soroban"
+  - "Soroban Basics"
+  - "DeFi Patterns"
+  - "Governance &amp; Voting"
+  - "Testing &amp; Best Practices"
+  - "Advanced Patterns"
+</code></pre>
+<h3 id="video-settings-defaults"><a class="header" href="#video-settings-defaults">Video Settings (Defaults)</a></h3>
+<pre><code class="language-yaml">Visibility: Public
+License: Creative Commons - Attribution
+Category: Education
+Language: English
+Comments: Enabled (hold for review)
+Tags:
+  - soroban
+  - stellar
+  - smart contracts
+  - rust
+  - blockchain development
+  - web3
+</code></pre>
+<hr>
+<h2 id="upload-process"><a class="header" href="#upload-process">Upload Process</a></h2>
+<h3 id="pre-upload-checklist"><a class="header" href="#pre-upload-checklist">Pre-Upload Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Video exported in H.264 at 1080p / 30fps</li>
+<li><input disabled="" type="checkbox"> Audio levels normalized (-14 LUFS target)</li>
+<li><input disabled="" type="checkbox"> Captions generated (auto or manual review)</li>
+<li><input disabled="" type="checkbox"> Thumbnail created from template</li>
+<li><input disabled="" type="checkbox"> Description written with timestamps</li>
+<li><input disabled="" type="checkbox"> Code links verified (point to correct branch/commit)</li>
+<li><input disabled="" type="checkbox"> Related cookbook page linked</li>
+</ul>
+<h3 id="upload-workflow"><a class="header" href="#upload-workflow">Upload Workflow</a></h3>
+<pre><code>1. Export final video from DaVinci Resolve
+   → Format: MP4, H.264, 10-15 Mbps
+   → Audio: AAC 320 kbps
+
+2. Upload to YouTube Studio
+   → Set title: "[Category] Topic Name | Soroban Cookbook"
+   → Add to relevant playlist
+   → Set thumbnail
+   → Add end screen (last 20s)
+   → Add cards linking to related videos
+
+3. Write description (template below)
+
+4. Set publish time
+   → Consistent schedule (e.g., Tuesdays 14:00 UTC)
+   → Or publish immediately for launch content
+
+5. Update cookbook documentation
+   → Add video embed/link to relevant mdBook page
+   → Update SUMMARY.md if new page created
+   → Commit: "docs: add video link for &lt;topic&gt;"
+</code></pre>
+<h3 id="description-template"><a class="header" href="#description-template">Description Template</a></h3>
+<pre><code class="language-markdown">[Brief 1-2 sentence summary of what the video covers]
+
+In this video, we [action verb] [topic] using [approach].
+
+📖 Source Code: [GitHub link to example]
+📚 Written Guide: [mdBook page link]
+
+⏱️ Timestamps:
+00:00 - Introduction
+00:30 - Prerequisites
+01:00 - [First section]
+03:00 - [Second section]
+05:00 - Testing
+06:00 - Recap &amp; Next Steps
+
+🔗 Resources:
+- Soroban Cookbook: https://soroban-cookbook.github.io/Soroban-Cookbook/
+- Soroban Docs: https://soroban.stellar.org/docs
+- Stellar Discord: https://discord.gg/stellar
+
+#soroban #stellar #smartcontracts #rust #blockchain
+</code></pre>
+<h3 id="post-upload-steps"><a class="header" href="#post-upload-steps">Post-Upload Steps</a></h3>
+<ol>
+<li><strong>Verify playback</strong> — watch first 30s, check audio sync</li>
+<li><strong>Check captions</strong> — review auto-generated subtitles for accuracy</li>
+<li><strong>Share</strong> — post link in Stellar Discord and relevant channels</li>
+<li><strong>Cross-reference</strong> — update the mdBook page with embedded video link</li>
+<li><strong>Monitor</strong> — check comments in first 24h for questions</li>
+</ol>
+<hr>
+<h2 id="quick-reference-1"><a class="header" href="#quick-reference-1">Quick Reference</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Task</th><th>Tool</th><th>Command/Action</th></tr>
+</thead>
+<tbody>
+<tr><td>Record screen</td><td>OBS Studio</td><td>Start Recording (Ctrl+Shift+R)</td></tr>
+<tr><td>Edit video</td><td>DaVinci Resolve</td><td>Import → Edit → Export</td></tr>
+<tr><td>Generate captions</td><td>YouTube Studio</td><td>Auto-captions → Review</td></tr>
+<tr><td>Create thumbnail</td><td>Template (PSD)</td><td>Edit text + screenshot</td></tr>
+<tr><td>Upload</td><td>YouTube Studio</td><td>Create → Upload video</td></tr>
+<tr><td>Link in docs</td><td>mdBook</td><td>Add link to <code>book/src/</code> page</td></tr>
+</tbody>
+</table>
+</div>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="introduction-to-soroban-cookbook-video"><a class="header" href="#introduction-to-soroban-cookbook-video">Introduction to Soroban Cookbook (Video)</a></h1>
+<p>A 5-7 minute introductory video providing a complete overview of the Soroban Cookbook project, how to navigate the examples, and getting started.</p>
+<hr>
+<h2 id="video"><a class="header" href="#video">Video</a></h2>
+<blockquote>
+<p><strong>Status:</strong> Planned — script and outline finalized below.</p>
+<p>Once recorded, the video will be embedded here and uploaded to the
+<a href="https://www.youtube.com/@SorobanCookbook">Soroban Cookbook YouTube channel</a>.</p>
+<p>Duration target: 5-7 minutes</p>
+</blockquote>
+<!-- Embed placeholder — replace with YouTube iframe after upload:
+<iframe width="560" height="315" src="https://www.youtube.com/embed/VIDEO_ID"
+  title="Introduction to Soroban Cookbook" frameborder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen></iframe>
+-->
+<hr>
+<h2 id="video-script--outline"><a class="header" href="#video-script--outline">Video Script &amp; Outline</a></h2>
+<h3 id="1-introduction-000---045"><a class="header" href="#1-introduction-000---045">1. Introduction (0:00 - 0:45)</a></h3>
+<p><strong>Visual:</strong> Cookbook landing page + animated logo</p>
+<blockquote>
+<p>“Welcome to the Soroban Cookbook — a developer-first guide to building smart
+contracts on Stellar using Soroban. Whether you’re just starting with Rust and
+blockchain development, or you’re an experienced engineer looking for production
+patterns, this cookbook has something for you.”</p>
+</blockquote>
+<p><strong>Key points:</strong></p>
+<ul>
+<li>What is the Soroban Cookbook?</li>
+<li>Who is it for? (beginners through advanced Soroban devs)</li>
+<li>What makes it different? (practical, runnable examples with tests)</li>
+</ul>
+<hr>
+<h3 id="2-project-overview-045---230"><a class="header" href="#2-project-overview-045---230">2. Project Overview (0:45 - 2:30)</a></h3>
+<p><strong>Visual:</strong> Repository structure walkthrough in terminal/IDE</p>
+<blockquote>
+<p>“Let’s look at how the project is organized…”</p>
+</blockquote>
+<p><strong>Walkthrough structure:</strong></p>
+<pre><code>Soroban-Cookbook/
+├── examples/           ← Runnable smart contract examples
+│   ├── basics/         ← 14 foundational examples
+│   ├── intermediate/   ← Multi-contract patterns
+│   ├── advanced/       ← Complex DeFi &amp; governance
+│   ├── defi/           ← DeFi use cases
+│   ├── governance/     ← Voting &amp; DAO patterns
+│   ├── nfts/           ← NFT examples
+│   └── tokens/         ← Token implementations
+├── book/               ← This documentation (mdBook)
+├── tests/integration/  ← Cross-contract integration tests
+└── docs/               ← Additional references
+</code></pre>
+<p><strong>Key points:</strong></p>
+<ul>
+<li>Each example is a self-contained Cargo crate</li>
+<li>Every example has comprehensive tests</li>
+<li>Examples follow a naming convention: <code>XX-name/</code></li>
+<li>Difficulty progression within each category</li>
+</ul>
+<hr>
+<h3 id="3-navigating-the-examples-230---400"><a class="header" href="#3-navigating-the-examples-230---400">3. Navigating the Examples (2:30 - 4:00)</a></h3>
+<p><strong>Visual:</strong> Opening an example, showing code + tests</p>
+<blockquote>
+<p>“Let me show you how to use an example. Let’s open the simple voting
+contract…”</p>
+</blockquote>
+<p><strong>Live demo steps:</strong></p>
+<ol>
+<li>Navigate to <code>examples/governance/01-simple-voting/</code></li>
+<li>Show <code>Cargo.toml</code> — dependencies and SDK version</li>
+<li>Show <code>src/lib.rs</code> — contract structure (storage, types, impl)</li>
+<li>Show <code>src/test.rs</code> — how tests validate behavior</li>
+<li>Run <code>cargo test -p simple-voting</code> — all tests pass</li>
+</ol>
+<p><strong>Key points:</strong></p>
+<ul>
+<li>Every example follows the same pattern: <code>Cargo.toml</code> + <code>src/lib.rs</code> + tests</li>
+<li>Tests serve as both validation and documentation</li>
+<li>You can copy any example as a starting point for your own project</li>
+<li>Integration tests show how contracts interact with each other</li>
+</ul>
+<hr>
+<h3 id="4-getting-started-guide-400---530"><a class="header" href="#4-getting-started-guide-400---530">4. Getting Started Guide (4:00 - 5:30)</a></h3>
+<p><strong>Visual:</strong> Terminal — environment setup in real time</p>
+<blockquote>
+<p>“Here’s how to get up and running in under 5 minutes…”</p>
+</blockquote>
+<p><strong>Steps demonstrated:</strong></p>
+<pre><code class="language-bash"># 1. Clone the repository
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook.git
+cd Soroban-Cookbook
+
+# 2. Install Rust (if needed)
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+rustup target add wasm32-unknown-unknown
+
+# 3. Install Soroban CLI
+cargo install stellar-cli
+
+# 4. Run your first example
+cargo test -p hello-world
+
+# 5. Build for deployment
+cargo build -p hello-world --target wasm32-unknown-unknown --release
+
+# 6. Run all tests to verify setup
+cargo test --workspace
+</code></pre>
+<p><strong>Key points:</strong></p>
+<ul>
+<li>Prerequisites: Rust, <code>wasm32-unknown-unknown</code> target, Soroban CLI</li>
+<li>Start with the basics examples (01 through 14)</li>
+<li>Each example builds on concepts from previous ones</li>
+<li>The mdBook docs explain concepts in depth</li>
+<li>Integration tests show advanced cross-contract patterns</li>
+</ul>
+<hr>
+<h3 id="5-where-to-go-next-530---615"><a class="header" href="#5-where-to-go-next-530---615">5. Where to Go Next (5:30 - 6:15)</a></h3>
+<p><strong>Visual:</strong> mdBook documentation site</p>
+<blockquote>
+<p>“Now that you’re set up, here’s how I recommend progressing…”</p>
+</blockquote>
+<p><strong>Suggested learning path:</strong></p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Stage</th><th>Focus</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Week 1</td><td>Basics</td><td>01-hello through 06-data-types</td></tr>
+<tr><td>Week 2</td><td>Patterns</td><td>07-storage through 11-time</td></tr>
+<tr><td>Week 3</td><td>Intermediate</td><td>Multi-sig, Ajo Factory</td></tr>
+<tr><td>Week 4</td><td>Use Cases</td><td>DeFi vaults, Governance voting</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Additional resources:</strong></p>
+<ul>
+<li>Written guides in the mdBook (testing, deployment, local simulation)</li>
+<li>Integration test framework for learning cross-contract patterns</li>
+<li>Reference docs (best practices, common pitfalls, glossary)</li>
+</ul>
+<hr>
+<h3 id="6-recap--outro-615---700"><a class="header" href="#6-recap--outro-615---700">6. Recap &amp; Outro (6:15 - 7:00)</a></h3>
+<p><strong>Visual:</strong> Summary slide with links</p>
+<blockquote>
+<p>“To recap what we covered today…”</p>
+</blockquote>
+<p><strong>Summary bullets:</strong></p>
+<ul>
+<li>The Cookbook is a practical, example-driven learning resource</li>
+<li>Examples are organized by difficulty and use case</li>
+<li>Every example has tests you can run immediately</li>
+<li>Start with basics, progress through intermediate to advanced</li>
+<li>The docs site provides written explanations alongside the code</li>
+</ul>
+<p><strong>Call to action:</strong></p>
+<ul>
+<li>Star the repository on GitHub</li>
+<li>Join the Stellar Discord for questions</li>
+<li>Subscribe to the YouTube channel for more videos</li>
+<li>Contribute your own examples (see CONTRIBUTING.md)</li>
+</ul>
+<p><strong>End screen:</strong> Links to GitHub, YouTube, Discord</p>
+<hr>
+<h2 id="production-notes"><a class="header" href="#production-notes">Production Notes</a></h2>
+<h3 id="recording-setup"><a class="header" href="#recording-setup">Recording Setup</a></h3>
+<p>Follow the <a href="#video-creation-tools--processes">Video Creation Tools</a> guide for:</p>
+<ul>
+<li>OBS Studio configuration (1080p, 30fps)</li>
+<li>Audio setup (clear narration, -14 LUFS)</li>
+<li>Code theme (One Dark Pro, JetBrains Mono 18px)</li>
+</ul>
+<h3 id="post-production"><a class="header" href="#post-production">Post-Production</a></h3>
+<ol>
+<li>Record narration following the script above</li>
+<li>Capture screen recordings for each section</li>
+<li>Edit in DaVinci Resolve (see video-creation guide)</li>
+<li>Add intro bumper and outro card</li>
+<li>Generate captions</li>
+<li>Export and upload per the documented process</li>
+</ol>
+<h3 id="linking"><a class="header" href="#linking">Linking</a></h3>
+<p>After upload, update this page with the YouTube embed and add the video link to:</p>
+<ul>
+<li><code>book/src/README.md</code> (main introduction)</li>
+<li>Repository root <code>README.md</code></li>
+<li>YouTube playlist: “Getting Started with Soroban”</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="basic-examples"><a class="header" href="#basic-examples">Basic Examples</a></h1>
 <p>Core Soroban fundamentals, one concept per example. Perfect for beginners.</p>
