@@ -18,6 +18,7 @@
 - [Documentation](#documentation)
 - [Web Application](#web-application)
 - [Contributing](#contributing)
+- [Onboarding](#onboarding)
 - [Community & Integration](#community--integration)
 - [Additional Resources](#additional-resources)
 - [License](#license)
@@ -214,6 +215,16 @@ cd webapp
 npm install
 npm run dev
 ```
+
+## Onboarding
+
+New to the Soroban Cookbook community? The **[Community Onboarding Guide](./docs/onboarding.md)** is your starting point. It includes:
+
+- Learning paths by background (new to Stellar, Rust dev, EVM dev, ready to contribute)
+- A first-steps checklist to get set up and open your first PR
+- Community channels, help resources, and external documentation links
+
+Start there, then return here and to [CONTRIBUTING.md](./CONTRIBUTING.md) when you are ready to contribute.
 
 ## Contributing
 

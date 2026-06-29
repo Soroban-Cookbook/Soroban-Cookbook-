@@ -1,5 +1,5 @@
 [package]
-name = "nft-metadata"
+name = "nft-metadata-standards"
 version = "0.1.0"
 edition = "2021"
 publish = false

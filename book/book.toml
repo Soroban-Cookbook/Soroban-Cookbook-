@@ -11,8 +11,9 @@ build-dir = "book-output"
 [output.html]
 default-theme = "rust"
 preferred-dark-theme = "navy"
-git-repository-url = "https://github.com/Soroban-Cookbook/Soroban-Cookbook"
-edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/{path}"
+site-url = "/Soroban-Cookbook-/"
+git-repository-url = "https://github.com/Soroban-Cookbook/Soroban-Cookbook-"
+edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook-/edit/main/book/{path}"
 
 [output.html.code]
 
