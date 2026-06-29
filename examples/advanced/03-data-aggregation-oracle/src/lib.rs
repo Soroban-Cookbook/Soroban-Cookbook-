@@ -215,7 +215,7 @@ impl DataAggregationOracleContract {
             }
         }
 
-        let mean = if filtered.len() > 0 {
+        let mean = if !filtered.is_empty() {
             Self::calc_mean(&filtered)
         } else {
             median
@@ -258,10 +258,10 @@ impl DataAggregationOracleContract {
 
     /// Check if paused
     pub fn is_paused(env: Env) -> bool {
-        match env.storage().instance().get(&DataKey::Paused) {
-            Some(val) => val,
-            None => false,
-        }
+        env.storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or_default()
     }
 
     // Internal helpers
@@ -277,10 +277,11 @@ impl DataAggregationOracleContract {
     }
 
     fn require_not_paused(env: &Env) {
-        let paused: bool = match env.storage().instance().get(&DataKey::Paused) {
-            Some(val) => val,
-            None => false,
-        };
+        let paused: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Paused)
+            .unwrap_or_default();
         if paused {
             panic!("Paused");
         }
@@ -330,13 +331,13 @@ impl DataAggregationOracleContract {
     }
 
     fn calc_mean(values: &Vec<i128>) -> i128 {
-        if values.len() == 0 {
+        if values.is_empty() {
             return 0;
         }
 
         let mut sum: i128 = 0;
         for val in values.iter() {
-            sum = sum + val;
+            sum += val;
         }
 
         sum / (values.len() as i128)
