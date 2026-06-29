@@ -112,6 +112,29 @@ fn approve_and_transfer_from_updates_allowance() {
 }
 
 #[test]
+fn approve_emits_approval_event() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &123_456).unwrap();
+
+    let events = EventList::new(&f.env, f.env.events().all());
+    assert_eq!(events.len(), 1);
+
+    let (_id, topics, data) = events.get(0).unwrap();
+    let namespace: Symbol = Symbol::try_from_val(&f.env, &topics.get(0).unwrap()).unwrap();
+    let action: Symbol = Symbol::try_from_val(&f.env, &topics.get(1).unwrap()).unwrap();
+    let owner: Address = Address::try_from_val(&f.env, &topics.get(2).unwrap()).unwrap();
+    let spender: Address = Address::try_from_val(&f.env, &topics.get(3).unwrap()).unwrap();
+    let payload: ApprovalEventData = ApprovalEventData::try_from_val(&f.env, &data).unwrap();
+
+    assert_eq!(namespace, EVENT_NAMESPACE);
+    assert_eq!(action, EVENT_APPROVE);
+    assert_eq!(owner, f.admin);
+    assert_eq!(spender, f.alice);
+    assert_eq!(payload.amount, 123_456);
+}
+
+#[test]
 fn transfer_from_rejects_over_allowance() {
     let f = setup();
 
@@ -119,6 +142,30 @@ fn transfer_from_rejects_over_allowance() {
     assert_eq!(
         f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &101),
         Err(Ok(TokenError::AllowanceExceeded))
+    );
+}
+
+#[test]
+fn transfer_from_rejects_zero_amount() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &0),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+}
+
+#[test]
+fn transfer_from_rejects_when_owner_balance_is_too_low() {
+    let f = setup();
+
+    f.token.transfer(&f.admin, &f.bob, &999_950).unwrap();
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &100),
+        Err(Ok(TokenError::InsufficientBalance))
     );
 }
 
@@ -143,6 +190,42 @@ fn mint_rejects_non_admin() {
         f.token.try_mint(&f.alice, &f.bob, &1),
         Err(Ok(TokenError::Unauthorized))
     );
+}
+
+#[test]
+fn burn_rejects_insufficient_balance() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_burn(&f.alice, &1),
+        Err(Ok(TokenError::InsufficientBalance))
+    );
+}
+
+#[test]
+fn burn_rejects_zero_amount() {
+    let f = setup();
+
+    assert_eq!(f.token.try_burn(&f.admin, &0), Err(Ok(TokenError::InvalidAmount)));
+}
+
+#[test]
+fn approve_rejects_negative_amount() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_approve(&f.admin, &f.alice, &-1),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+}
+
+#[test]
+fn balance_and_allowance_default_to_zero() {
+    let f = setup();
+    let carol = Address::generate(&f.env);
+
+    assert_eq!(f.token.balance(&carol), 0);
+    assert_eq!(f.token.allowance(&f.admin, &carol), 0);
 }
 
 #[test]

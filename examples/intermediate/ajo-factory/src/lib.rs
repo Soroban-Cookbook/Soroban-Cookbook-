@@ -54,6 +54,7 @@ impl AjoFactory {
     }
 
     /// Create a new Ajo instance.
+    #[allow(deprecated)]
     pub fn create_ajo(
         env: Env,
         amount: i128,

@@ -6,16 +6,29 @@ publish = false
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
-soroban-validation = { path = "../../shared" }
-hello-world = { path = "../../examples/basics/01-hello-world" }
-storage-patterns = { path = "../../examples/basics/02-storage-patterns" }
-authentication = { path = "../../examples/basics/03-authentication" }
-custom-errors = { path = "../../examples/basics/03-custom-errors" }
+soroban-validation = { path = "../../shared", package = "soroban-validation" }
+hello_world = { path = "../../examples/basics/01-hello-world", package = "hello-world" }
+storage_patterns = { path = "../../examples/basics/02-storage-patterns", package = "storage-patterns" }
+authentication = { path = "../../examples/basics/03-authentication", package = "authentication" }
+custom_errors = { path = "../../examples/basics/03-custom-errors", package = "custom-errors" }
 events_structured = { path = "../../examples/basics/04-events", package = "events" }
-validation-patterns = { path = "../../examples/basics/06-validation-patterns" }
-ajo = { path = "../../examples/intermediate/ajo" }
-ajo-factory = { path = "../../examples/intermediate/ajo-factory" }
-multi-sig-patterns = { path = "../../examples/intermediate/multi-sig-patterns" }
-multi-party-auth = { path = "../../examples/advanced/01-multi-party-auth" }
-timelock = { path = "../../examples/advanced/02-timelock" }
-token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+validation_patterns = { path = "../../examples/basics/06-validation-patterns", package = "validation-patterns" }
+ajo = { path = "../../examples/intermediate/ajo", package = "ajo" }
+ajo_factory = { path = "../../examples/intermediate/ajo-factory", package = "ajo-factory" }
+multi_sig_patterns = { path = "../../examples/intermediate/multi-sig-patterns", package = "multi-sig-patterns" }
+multi_party_auth = { path = "../../examples/advanced/01-multi-party-auth", package = "multi-party-auth" }
+timelock = { path = "../../examples/advanced/02-timelock", package = "timelock" }
+token_wrapper = { path = "../../examples/tokens/token-wrapper", package = "token-wrapper" }
+error_handling = { path = "../../examples/basics/05-error-handling", package = "soroban-error-handling-example" }
+auth_context = { path = "../../examples/basics/05-auth-context", package = "auth-context" }
+type_conversions = { path = "../../examples/basics/07-type-conversions", package = "type-conversions" }
+soroban_types_example = { path = "../../examples/basics/08-soroban-types", package = "soroban_types_example" }
+enum_types = { path = "../../examples/basics/09-enum-types", package = "enum-types" }
+custom_structs = { path = "../../examples/basics/10-custom-structs", package = "custom-structs" }
+primitive_types = { path = "../../examples/basics/11-primitive-types", package = "primitive-types" }
+data_types = { path = "../../examples/basics/12-data-types", package = "data-types" }
+collection_types = { path = "../../examples/basics/13-collection-types", package = "collection-types" }
+basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
+nft_marketplace = { path = "../../examples/nfts/02-nft-marketplace", package = "nft-marketplace" }
+proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
+simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }

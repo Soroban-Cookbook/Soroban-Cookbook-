@@ -16,4 +16,8 @@ done < "$EXCLUDE_FILE"
 cd "$ROOT"
 SUBCMD=$1
 shift
-cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+if [ "$SUBCMD" = "clippy" ]; then
+  RUSTFLAGS="${RUSTFLAGS:-} -A deprecated" cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+else
+  cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+fi

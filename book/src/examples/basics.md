@@ -65,4 +65,19 @@ cd examples/basics/01-hello-world
 cargo test && cargo build --target wasm32-unknown-unknown --release
 ```
 
+## Interactive Playground
+
+Want to explore every example with runnable code snippets, edit hints, and
+deployment instructions all in one place?
+
+**[→ Open the Interactive Playground](./playground.md)**
+
+The playground page covers all 14 examples with:
+- Editable code blocks showing the key contract patterns
+- `cargo test` commands for each example
+- What to change to trigger intentional failures (great for learning)
+- Full suite test and build commands
+- Testnet deployment walk-through
+- Troubleshooting for the most common errors
+
 ## Next: [Intermediate](../intermediate.md)

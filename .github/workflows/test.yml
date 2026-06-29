@@ -89,6 +89,9 @@ jobs:
       - name: Run security tests
         run: cargo test --package security-tests --target x86_64-unknown-linux-gnu
 
+      - name: Run integration tests
+        run: cargo test -p integration-tests --target x86_64-unknown-linux-gnu
+
       - name: Run tests (fallback)
         if: github.event_name != 'pull_request'
         run: ./scripts/ci-workspace.sh test --target x86_64-unknown-linux-gnu
