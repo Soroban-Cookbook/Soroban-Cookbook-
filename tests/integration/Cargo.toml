@@ -32,3 +32,9 @@ basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
 nft_marketplace = { path = "../../examples/nfts/02-nft-marketplace", package = "nft-marketplace" }
 proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
 simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }
+
+# DeFi Examples
+simple_swap = { path = "../../examples/defi/01-simple-swap", package = "simple-token-swap" }
+lending_pool = { path = "../../examples/defi/03-lending-pool", package = "lending-pool" }
+soroban_flash_loan = { path = "../../examples/defi/05-flash-loans", package = "soroban-flash-loan" }
+liquidity_mining = { path = "../../examples/defi/08-liquidity-mining", package = "liquidity-mining" }
