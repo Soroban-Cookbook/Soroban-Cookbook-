@@ -32,3 +32,4 @@ basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
 nft_marketplace = { path = "../../examples/nfts/02-nft-marketplace", package = "nft-marketplace" }
 proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
 simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }
+voting_time_constraints = { path = "../../examples/governance/01-voting-time-constraints", package = "voting-time-constraints" }
