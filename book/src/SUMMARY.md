@@ -17,6 +17,7 @@
 
 ## Basics (14 examples)
 - [Overview & listing](./examples/basics.md)
+- [Interactive Playground](./examples/playground.md)
 - [Storage Patterns](./examples/storage-patterns.md)
 - [Error Handling](./examples/error-handling.md)
 - [Events](./examples/events.md)
@@ -49,6 +50,7 @@
 
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
+- [DeFi Best Practices](./docs/defi-best-practices.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
@@ -57,6 +59,7 @@
 - [Factory, Proxy, and Registry Patterns](./docs/cross-contract-patterns.md)
 - [Troubleshooting](./docs/troubleshooting.md)
 - [Token Development Walkthrough](./docs/token-development-video.md)
+- [Security Best Practices](./docs/security-best-practices.md)
 
 
 # Contributing

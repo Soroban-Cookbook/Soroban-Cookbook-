@@ -18,6 +18,8 @@ pub enum AuthError {
     AlreadyExecuted = 5,
     ThresholdNotMet = 6,
     AlreadyInitialized = 7,
+    ProposalCancelled = 8,
+    AlreadyCancelled = 9,
 }
 
 #[contracttype]
@@ -34,6 +36,7 @@ pub enum DataKey {
 pub struct Proposal {
     pub approvals: Vec<Address>,
     pub executed: bool,
+    pub cancelled: bool,
 }
 
 #[contract]
@@ -84,6 +87,7 @@ impl MultiPartyAuth {
         let proposal = Proposal {
             approvals: Vec::new(&env),
             executed: false,
+            cancelled: false,
         };
 
         env.storage()
@@ -120,11 +124,51 @@ impl MultiPartyAuth {
             return Err(AuthError::AlreadyExecuted);
         }
 
+        if proposal.cancelled {
+            return Err(AuthError::ProposalCancelled);
+        }
+
         if proposal.approvals.contains(&signer) {
             return Err(AuthError::AlreadyApproved);
         }
 
         proposal.approvals.push_back(signer);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(proposal_id), &proposal);
+
+        Ok(())
+    }
+
+    /// Cancel a proposal before it is executed
+    pub fn cancel(env: Env, proposal_id: u32, signer: Address) -> Result<(), AuthError> {
+        signer.require_auth();
+
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers)
+            .ok_or(AuthError::NotAuthorized)?;
+
+        if !signers.contains(&signer) {
+            return Err(AuthError::NotAuthorized);
+        }
+
+        let mut proposal: Proposal = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Proposal(proposal_id))
+            .ok_or(AuthError::ProposalNotFound)?;
+
+        if proposal.executed {
+            return Err(AuthError::AlreadyExecuted);
+        }
+
+        if proposal.cancelled {
+            return Err(AuthError::AlreadyCancelled);
+        }
+
+        proposal.cancelled = true;
         env.storage()
             .persistent()
             .set(&DataKey::Proposal(proposal_id), &proposal);
@@ -152,6 +196,10 @@ impl MultiPartyAuth {
             return Err(AuthError::AlreadyExecuted);
         }
 
+        if proposal.cancelled {
+            return Err(AuthError::ProposalCancelled);
+        }
+
         if proposal.approvals.len() < threshold {
             return Err(AuthError::ThresholdNotMet);
         }
@@ -165,11 +213,16 @@ impl MultiPartyAuth {
     }
 
     /// Get proposal status
-    pub fn get_proposal(env: Env, proposal_id: u32) -> Result<Proposal, AuthError> {
-        env.storage()
+    pub fn get_proposal(env: Env, proposal_id: u32) -> Result<Option<Proposal>, AuthError> {
+        let proposal = env
+            .storage()
             .persistent()
-            .get(&DataKey::Proposal(proposal_id))
-            .ok_or(AuthError::ProposalNotFound)
+            .get(&DataKey::Proposal(proposal_id));
+
+        match proposal {
+            Some(value) => Ok(Some(value)),
+            None => Err(AuthError::ProposalNotFound),
+        }
     }
 
     /// Require multiple addresses to authorize in a single call
