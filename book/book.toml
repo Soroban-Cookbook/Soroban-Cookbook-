@@ -1,23 +1,35 @@
 [book]
-title = "Soroban Cookbook"
 authors = ["Soroban Cookbook Contributors"]
-description = "A comprehensive guide to building smart contracts on Stellar with Soroban"
 language = "en"
+multilingual = false
 src = "src"
-
-[build]
-build-dir = "book-output"
+title = "Soroban Cookbook"
 
 [output.html]
-default-theme = "rust"
-preferred-dark-theme = "navy"
+additional-css = ["theme/custom.css"]
+additional-js = ["theme/custom.js"]
 git-repository-url = "https://github.com/Soroban-Cookbook/Soroban-Cookbook"
-edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/{path}"
+edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/src/{path}"
+site-url = "/Soroban-Cookbook/"
+cname = "docs.soroban-cookbook.com"
 
-[output.html.code]
+[output.html.playground]
+editable = false
+copyable = true
 
 [output.html.search]
-enable = true
-limit-results = 25
+limit-results = 30
+teaser-word-count = 15
 use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 3
+copy-js = true
 
+[preprocessor]
+[preprocessor.index]
+
+[rust]
+edition = "2021"
