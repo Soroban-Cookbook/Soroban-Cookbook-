@@ -152,3 +152,11 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 
 - We run targeted tests for changed paths on pull requests to enable fast feedback.
 - For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.
+
+---
+
+## 🏆 Recognition System
+
+All contributors are recognized for their work. We have a tiered recognition system with rewards ranging from public acknowledgment to Stellar swag and community spotlights.
+
+See [docs/recognition-system.md](./docs/recognition-system.md) for the full criteria, tiers, rewards, and automation plan.
