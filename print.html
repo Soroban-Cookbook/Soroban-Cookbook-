@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1da269f5.js";
+            window.path_to_searchindex_js = "searchindex-f54a62b0.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-6c272775.js"></script>
+        <script src="toc-abd00cd6.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -4445,6 +4445,46 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 </ul>
 <hr>
 <p>For more detailed examples, see our <a href="examples">examples directory</a> and specific guides.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="defi-best-practices"><a class="header" href="#defi-best-practices">DeFi Best Practices</a></h1>
+<p>This page collects DeFi-specific best practices for security, robustness, and maintainability on Soroban.</p>
+<h2 id="economic-security"><a class="header" href="#economic-security">Economic Security</a></h2>
+<ul>
+<li>Align incentives: ensure users, oracles, and liquidators are incentivized to behave correctly.</li>
+<li>Avoid under-collateralized positions by setting conservative collateral ratios and stress-testing price movements.</li>
+<li>Use time-weighted oracles, multi-source pricing, and buffers to protect against flash crashes and price manipulation.</li>
+<li>Clearly separate accounting from execution logic to reduce the impact of contract upgrades or bug fixes.</li>
+<li>Include liquidation penalties, reserve cushions, and mechanism parameters that remain safe under extreme conditions.</li>
+</ul>
+<h2 id="oracle-usage"><a class="header" href="#oracle-usage">Oracle Usage</a></h2>
+<ul>
+<li>Use trusted, decentralized oracle sources rather than a single price feed.</li>
+<li>Validate oracle data on-chain and reject stale or inconsistent updates.</li>
+<li>Protect against oracle failure modes by setting safe default values, maximum update intervals, and fallback behavior.</li>
+<li>If using automated oracles, restrict who can update feeds and require multi-party confirmation where appropriate.</li>
+<li>Prefer aggregated pricing over single-node or single-source values for economic-critical operations.</li>
+</ul>
+<h2 id="liquidation-design"><a class="header" href="#liquidation-design">Liquidation Design</a></h2>
+<ul>
+<li>Design liquidation logic to preserve solvency and avoid cascading failures.</li>
+<li>Keep auctions or liquidator incentives predictable, with clear rules for when, how, and at what costs positions can be closed.</li>
+<li>Use gradual penalties and slippage limits to reduce market impact during deleveraging events.</li>
+<li>Allow sufficient time for borrowers to react to margin or collateral calls before forced closure.</li>
+<li>Test liquidation workflows across edge cases such as rapid price moves, low liquidity, and partial fills.</li>
+</ul>
+<h2 id="testing-strategies"><a class="header" href="#testing-strategies">Testing Strategies</a></h2>
+<ul>
+<li>Write unit tests for contract invariants, pricing logic, collateral accounting, and role-based access controls.</li>
+<li>Build integration tests that simulate real-world DeFi flows, including deposits, borrows, rate changes, oracle updates, and liquidations.</li>
+<li>Use fuzz testing and property-based tests for arithmetic safety, bounds checking, and overflow/underflow protection.</li>
+<li>Test failure cases explicitly: stale oracle data, invalid user input, unauthorized access, and emergency pause behavior.</li>
+<li>Consider gas costs and performance in the test suite, verifying that common operations remain within expected limits.</li>
+</ul>
+<h2 id="related-reading"><a class="header" href="#related-reading">Related Reading</a></h2>
+<ul>
+<li><a href="#soroban-smart-contract-best-practices">Best Practices</a></li>
+<li><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="common-pitfalls-in-soroban-smart-contracts"><a class="header" href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls in Soroban Smart Contracts</a></h1>
 <p>This guide outlines the most common mistakes developers make when writing smart contracts for Soroban on Stellar. It covers both beginner-level issues (basic API usage, Rust quirks, and entry point rules) and intermediate-level design flaws (storage architecture, state archival, and security vulnerabilities).</p>

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Factory, Proxy, and Registry Patterns - Soroban Cookbook</title>
+        <title>DeFi Best Practices - Soroban Cookbook</title>
 
 
         <!-- Custom HTML head -->
@@ -146,7 +146,7 @@
                         <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
                             <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
                         </a>
-                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/cross-contract-patterns.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/defi-best-practices.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
                             <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
                         </a>
 
@@ -180,208 +180,55 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="factory-proxy-and-registry-patterns"><a class="header" href="#factory-proxy-and-registry-patterns">Factory, Proxy, and Registry Patterns</a></h1>
-<p>Cross-contract systems let small contracts compose into larger products, but
-they also create new failure modes. This guide explains three common
-architecture patterns for Soroban applications: factories, proxies, and
-registries.</p>
-<p>Use these patterns when one contract needs to deploy, locate, route to, or
-coordinate with other contracts.</p>
-<h2 id="pattern-overview"><a class="header" href="#pattern-overview">Pattern Overview</a></h2>
-<div class="table-wrapper">
-<table>
-<thead>
-<tr><th>Pattern</th><th>Use It For</th><th>Main Risk</th></tr>
-</thead>
-<tbody>
-<tr><td>Factory</td><td>Creating many similar contract instances</td><td>Uninitialized child contracts</td></tr>
-<tr><td>Proxy</td><td>Routing calls through a stable address</td><td>Unsafe upgrades or storage mismatch</td></tr>
-<tr><td>Registry</td><td>Discovering approved contract addresses</td><td>Stale or malicious registrations</td></tr>
-</tbody>
-</table>
-</div>
-<h2 id="factory-pattern"><a class="header" href="#factory-pattern">Factory Pattern</a></h2>
-<p>A factory contract deploys and initializes child contracts from a known Wasm
-hash. It is useful for vaults, pools, group savings contracts, and other
-systems where users create many instances of the same template.</p>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant User
-    participant Factory
-    participant Deployer
-    participant Child
-
-    User-&gt;&gt;Factory: create(config, salt)
-    Factory-&gt;&gt;Factory: validate config and derive unique salt
-    Factory-&gt;&gt;Deployer: deploy_v2(wasm_hash, salt)
-    Deployer--&gt;&gt;Factory: child address
-    Factory-&gt;&gt;Child: initialize(admin, config)
-    Child--&gt;&gt;Factory: ok
-    Factory--&gt;&gt;User: child address
-</code></pre>
-<h3 id="factory-checklist"><a class="header" href="#factory-checklist">Factory Checklist</a></h3>
+                        <h1 id="defi-best-practices"><a class="header" href="#defi-best-practices">DeFi Best Practices</a></h1>
+<p>This page collects DeFi-specific best practices for security, robustness, and maintainability on Soroban.</p>
+<h2 id="economic-security"><a class="header" href="#economic-security">Economic Security</a></h2>
 <ul>
-<li>Store the child Wasm hash in instance storage and protect updates with admin
-or governance authorization.</li>
-<li>Derive salts from stable inputs such as creator address, nonce, and template
-version.</li>
-<li>Initialize the child in the same transaction that deploys it.</li>
-<li>Emit an event with the child address, creator, template version, and config
-hash.</li>
-<li>Keep a registry or index if users need to find their created contracts later.</li>
+<li>Align incentives: ensure users, oracles, and liquidators are incentivized to behave correctly.</li>
+<li>Avoid under-collateralized positions by setting conservative collateral ratios and stress-testing price movements.</li>
+<li>Use time-weighted oracles, multi-source pricing, and buffers to protect against flash crashes and price manipulation.</li>
+<li>Clearly separate accounting from execution logic to reduce the impact of contract upgrades or bug fixes.</li>
+<li>Include liquidation penalties, reserve cushions, and mechanism parameters that remain safe under extreme conditions.</li>
 </ul>
-<h3 id="factory-pitfalls"><a class="header" href="#factory-pitfalls">Factory Pitfalls</a></h3>
+<h2 id="oracle-usage"><a class="header" href="#oracle-usage">Oracle Usage</a></h2>
 <ul>
-<li>Do not deploy a child and leave initialization to a separate user call.</li>
-<li>Do not let callers choose arbitrary Wasm hashes unless the factory is
-explicitly permissionless and the UI labels that risk.</li>
-<li>Do not reuse salts unless deterministic address reuse is intentional and
-fully documented.</li>
+<li>Use trusted, decentralized oracle sources rather than a single price feed.</li>
+<li>Validate oracle data on-chain and reject stale or inconsistent updates.</li>
+<li>Protect against oracle failure modes by setting safe default values, maximum update intervals, and fallback behavior.</li>
+<li>If using automated oracles, restrict who can update feeds and require multi-party confirmation where appropriate.</li>
+<li>Prefer aggregated pricing over single-node or single-source values for economic-critical operations.</li>
 </ul>
-<h2 id="proxy-pattern"><a class="header" href="#proxy-pattern">Proxy Pattern</a></h2>
-<p>A proxy provides a stable address while delegating behavior to another
-contract or dispatching calls to versioned implementations. Soroban contracts
-are immutable after deployment, so proxy-style designs usually mean explicit
-routing, migration, or adapter contracts rather than EVM-style delegatecall.</p>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant User
-    participant Proxy
-    participant Registry
-    participant Implementation
-
-    User-&gt;&gt;Proxy: perform_action(args)
-    Proxy-&gt;&gt;Registry: implementation_for("module", version)
-    Registry--&gt;&gt;Proxy: implementation address
-    Proxy-&gt;&gt;Proxy: validate version and authorization
-    Proxy-&gt;&gt;Implementation: perform_action(args)
-    Implementation--&gt;&gt;Proxy: result
-    Proxy--&gt;&gt;User: result
-</code></pre>
-<h3 id="proxy-variants"><a class="header" href="#proxy-variants">Proxy Variants</a></h3>
+<h2 id="liquidation-design"><a class="header" href="#liquidation-design">Liquidation Design</a></h2>
 <ul>
-<li><strong>Router proxy:</strong> forwards specific calls to registered modules.</li>
-<li><strong>Adapter proxy:</strong> normalizes interfaces between old and new contracts.</li>
-<li><strong>Migration proxy:</strong> keeps a stable entry point while users migrate state to
-a new contract.</li>
+<li>Design liquidation logic to preserve solvency and avoid cascading failures.</li>
+<li>Keep auctions or liquidator incentives predictable, with clear rules for when, how, and at what costs positions can be closed.</li>
+<li>Use gradual penalties and slippage limits to reduce market impact during deleveraging events.</li>
+<li>Allow sufficient time for borrowers to react to margin or collateral calls before forced closure.</li>
+<li>Test liquidation workflows across edge cases such as rapid price moves, low liquidity, and partial fills.</li>
 </ul>
-<h3 id="upgrade-safety-notes"><a class="header" href="#upgrade-safety-notes">Upgrade Safety Notes</a></h3>
+<h2 id="testing-strategies"><a class="header" href="#testing-strategies">Testing Strategies</a></h2>
 <ul>
-<li>Treat every upgrade as a protocol change, not a code patch.</li>
-<li>Keep storage ownership clear. A proxy should not assume it can read or write
-another contract’s internal storage.</li>
-<li>Version implementation addresses and keep old implementations available until
-users and integrations have migrated.</li>
-<li>Require admin, multisig, or governance authorization for implementation
-changes.</li>
-<li>Consider a timelock for upgrades that affect funds, permissions, or pricing.</li>
-<li>Emit upgrade events with old address, new address, version, and activation
-ledger.</li>
-<li>Provide a rollback plan before activating the new implementation.</li>
+<li>Write unit tests for contract invariants, pricing logic, collateral accounting, and role-based access controls.</li>
+<li>Build integration tests that simulate real-world DeFi flows, including deposits, borrows, rate changes, oracle updates, and liquidations.</li>
+<li>Use fuzz testing and property-based tests for arithmetic safety, bounds checking, and overflow/underflow protection.</li>
+<li>Test failure cases explicitly: stale oracle data, invalid user input, unauthorized access, and emergency pause behavior.</li>
+<li>Consider gas costs and performance in the test suite, verifying that common operations remain within expected limits.</li>
 </ul>
-<pre><code class="language-mermaid">flowchart TD
-    A[Propose upgrade] --&gt; B[Publish new implementation address]
-    B --&gt; C[Run compatibility tests]
-    C --&gt; D[Start timelock]
-    D --&gt; E{Issue found?}
-    E -- Yes --&gt; F[Cancel upgrade]
-    E -- No --&gt; G[Activate implementation]
-    G --&gt; H[Emit upgrade event]
-    H --&gt; I[Monitor integrations]
-</code></pre>
-<h2 id="registry-pattern"><a class="header" href="#registry-pattern">Registry Pattern</a></h2>
-<p>A registry maps names, roles, modules, or asset identifiers to contract
-addresses and metadata. Registries are the glue for wallets, factories,
-routers, vaults, and cross-contract apps.</p>
-<pre><code class="language-mermaid">sequenceDiagram
-    participant Admin
-    participant Registry
-    participant App
-    participant Target
-
-    Admin-&gt;&gt;Registry: register(key, address, metadata)
-    Registry-&gt;&gt;Registry: validate admin and key
-    Registry--&gt;&gt;Admin: registered
-    App-&gt;&gt;Registry: get(key)
-    Registry--&gt;&gt;App: address and metadata
-    App-&gt;&gt;Target: call using returned address
-</code></pre>
-<h3 id="registry-design-tips"><a class="header" href="#registry-design-tips">Registry Design Tips</a></h3>
+<h2 id="related-reading"><a class="header" href="#related-reading">Related Reading</a></h2>
 <ul>
-<li>Use typed keys instead of raw strings where possible.</li>
-<li>Store metadata that helps callers validate intent, such as version,
-interface name, network, and activation status.</li>
-<li>Distinguish active, deprecated, and blocked entries.</li>
-<li>Emit events for register, update, deactivate, and remove operations.</li>
-<li>Decide whether the registry is admin-controlled, governance-controlled, or
-permissionless before writing the storage model.</li>
-</ul>
-<h3 id="registry-pitfalls"><a class="header" href="#registry-pitfalls">Registry Pitfalls</a></h3>
-<ul>
-<li>A registry is an allowlist only if callers enforce it.</li>
-<li>Stale entries can be worse than missing entries; include deactivation flows.</li>
-<li>Do not store display metadata as a substitute for validating contract
-behavior.</li>
-</ul>
-<h2 id="integration-tips"><a class="header" href="#integration-tips">Integration Tips</a></h2>
-<ul>
-<li>Prefer small, explicit cross-contract interfaces over broad manager
-contracts.</li>
-<li>Validate every external address before calling it.</li>
-<li>Make authorization boundaries obvious: the caller authorizes the source
-contract, and the source contract chooses which downstream contracts to call.</li>
-<li>Use events as integration contracts for off-chain indexers.</li>
-<li>Avoid circular dependencies between contracts. If two contracts need each
-other, introduce a registry or shared configuration contract.</li>
-<li>Keep read batching separate from write batching when possible. Reads can be
-tolerant; writes should fail fast and leave no ambiguous partial state.</li>
-<li>Document every external contract address in deployment notes.</li>
-</ul>
-<h2 id="upgrade-safety-checklist"><a class="header" href="#upgrade-safety-checklist">Upgrade Safety Checklist</a></h2>
-<ul>
-<li><input disabled="" type="checkbox"> New implementation address is registered with an explicit version.</li>
-<li><input disabled="" type="checkbox"> Storage ownership and migration rules are documented.</li>
-<li><input disabled="" type="checkbox"> Authorization for upgrade is enforced from stored config, not from a user
-supplied argument alone.</li>
-<li><input disabled="" type="checkbox"> A timelock or review period exists for high-value contracts.</li>
-<li><input disabled="" type="checkbox"> Integration tests cover old and new implementations.</li>
-<li><input disabled="" type="checkbox"> Events announce proposed and activated upgrades.</li>
-<li><input disabled="" type="checkbox"> Rollback or migration recovery path is documented.</li>
-<li><input disabled="" type="checkbox"> Off-chain services know which event topics and registry keys to watch.</li>
-</ul>
-<h2 id="choosing-a-pattern"><a class="header" href="#choosing-a-pattern">Choosing a Pattern</a></h2>
-<div class="table-wrapper">
-<table>
-<thead>
-<tr><th>Need</th><th>Recommended Pattern</th></tr>
-</thead>
-<tbody>
-<tr><td>Create many instances from one template</td><td>Factory</td></tr>
-<tr><td>Keep a stable entry point across versions</td><td>Proxy or adapter</td></tr>
-<tr><td>Discover module or asset addresses</td><td>Registry</td></tr>
-<tr><td>Create and discover child contracts</td><td>Factory plus registry</td></tr>
-<tr><td>Upgrade an integration safely</td><td>Registry plus timelocked proxy</td></tr>
-</tbody>
-</table>
-</div>
-<h2 id="related-examples"><a class="header" href="#related-examples">Related Examples</a></h2>
-<ul>
-<li><a href="../examples/ajo-factory.html"><code>Ajo Factory</code></a>
-shows a factory deploying initialized child contracts.</li>
-<li><a href="./common-patterns.html"><code>docs/common-patterns</code></a> covers lower-level building
-blocks such as initialization guards, stored-admin checks, typed storage keys,
-and events.</li>
-<li><a href="./best-practices.html"><code>docs/best-practices</code></a> covers security and storage
-recommendations that apply to multi-contract systems.</li>
+<li><a href="./best-practices.html">Best Practices</a></li>
+<li><a href="./common-pitfalls.html">Common Pitfalls</a></li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../docs/common-patterns.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/best-practices.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/troubleshooting.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/common-pitfalls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -391,11 +238,11 @@ recommendations that apply to multi-contract systems.</li>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../docs/common-patterns.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/best-practices.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/troubleshooting.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/common-pitfalls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
