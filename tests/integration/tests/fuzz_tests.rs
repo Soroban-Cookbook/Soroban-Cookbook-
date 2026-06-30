@@ -6,9 +6,7 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
 
-use soroban_sdk::{
-    symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec,
-};
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Symbol, Vec};
 
 // ---------------------------------------------------------------------------
 // Storage — boundary values
@@ -361,7 +359,6 @@ fn fuzz_events_high_increment_count() {
         env.invoke_contract::<()>(&id, &symbol_short!("increment"), Vec::new(&env));
     }
 
-    let count: u32 =
-        env.invoke_contract(&id, &Symbol::new(&env, "get_number"), Vec::new(&env));
+    let count: u32 = env.invoke_contract(&id, &Symbol::new(&env, "get_number"), Vec::new(&env));
     assert_eq!(count, 20);
 }
