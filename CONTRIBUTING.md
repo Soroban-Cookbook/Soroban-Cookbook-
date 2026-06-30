@@ -28,6 +28,33 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 3.  **Bug Reports & Feature Requests**: Use [GitHub Issues] to report bugs or suggest new features.
 4.  **Code Review**: Review open pull requests and provide constructive feedback.
 
+## Showcase Submissions
+
+Project showcase entries should make it easy for maintainers to review whether a project is active, relevant, and useful to other Soroban builders.
+
+Include these fields in a showcase submission:
+
+- project name
+- one-sentence summary
+- category such as DeFi, tooling, infrastructure, governance, NFT, or education
+- repository URL and live demo URL if available
+- cookbook examples or guides used
+- current status: prototype, testnet, or production
+- one screenshot or short demo clip
+
+Use one of these templates depending on the project shape:
+
+- starter template: first project built from one cookbook example
+- integration template: production app that combines multiple patterns
+- infrastructure template: tooling, SDK, indexer, or dev workflow project
+
+Review standard:
+
+- the submission must be Soroban-related
+- links must be live and publicly accessible
+- the description must explain concrete cookbook usage
+- maintainers may request tighter summaries or stronger evidence before listing
+
 ---
 
 ## 🛠️ Development Environment Setup
