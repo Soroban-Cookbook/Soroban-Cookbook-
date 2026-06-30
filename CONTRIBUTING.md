@@ -1,5 +1,7 @@
 # Contributing to Soroban-Cookbook
 
+Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ## Feedback System
 
 We have implemented a comprehensive feedback system to collect and manage input from our community. The system is located in the `docs/feedback-system/` directory.
