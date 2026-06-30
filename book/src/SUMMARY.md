@@ -64,6 +64,7 @@
 - [Token Development Walkthrough](./docs/token-development-video.md)
 - [DeFi Development Walkthrough](./docs/defi-development-video.md)
 - [Wallet Ecosystem Survey](./docs/wallet-ecosystem.md)
+- [Wallet Integration Guide](./docs/wallet-integration.md)
 - [Security Best Practices](./docs/security-best-practices.md)
 
 
