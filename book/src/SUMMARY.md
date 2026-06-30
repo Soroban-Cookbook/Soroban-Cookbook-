@@ -6,6 +6,9 @@
 
 - [Setup Environment](./guides/getting-started.md)
 - [macOS Setup Guide](./guides/macos-setup.md)
+
+# Guides
+
 - [Testing Guide](./guides/testing.md)
 - [Local Simulation](./guides/local-simulation.md)
 - [Deployment Guide](./guides/deployment.md)
@@ -48,7 +51,7 @@
 ## Tokens
 - [Overview & planned](./examples/tokens.md)
 
-# Reference
+# API Reference
 
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
@@ -66,9 +69,9 @@
 - [Wallet Ecosystem Survey](./docs/wallet-ecosystem.md)
 - [Security Best Practices](./docs/security-best-practices.md)
 
+# Community
 
-# Contributing
-
+- [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 
