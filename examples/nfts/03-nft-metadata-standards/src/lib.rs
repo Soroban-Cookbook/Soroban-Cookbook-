@@ -271,7 +271,7 @@ impl NftMetadataContract {
         // If a base URI is configured, concatenate it with the token ID string.
         // Soroban String does not support formatting, so we build the numeric
         // suffix manually and append it byte-by-byte.
-        if base_uri.len() > 0 {
+        if !base_uri.is_empty() {
             // Convert token_id to decimal string bytes
             let id_bytes = u32_to_decimal_bytes(token_id);
             let id_len = id_bytes[8] as usize; // last byte stores length
@@ -281,9 +281,7 @@ impl NftMetadataContract {
             // Build combined byte slice on the stack (max 256 bytes)
             let mut buf = [0u8; 256];
             base_uri.copy_into_slice(&mut buf[..base_len]);
-            for i in 0..id_len {
-                buf[base_len + i] = id_bytes[i];
-            }
+            buf[base_len..(id_len + base_len)].copy_from_slice(&id_bytes[..id_len]);
 
             return Ok(String::from_bytes(&env, &buf[..total_len]));
         }
@@ -686,15 +684,15 @@ impl NftMetadataContract {
     /// Every `Attribute` must have a non-empty `trait_type` and `value`.
     pub fn validate_metadata(env: &Env, meta: &TokenMetadata) -> Result<(), NftError> {
         // Required: name
-        if meta.name.len() == 0 {
+        if meta.name.is_empty() {
             return Err(NftError::MetadataFieldEmpty);
         }
         // Required: description
-        if meta.description.len() == 0 {
+        if meta.description.is_empty() {
             return Err(NftError::MetadataFieldEmpty);
         }
         // Required: image
-        if meta.image.len() == 0 {
+        if meta.image.is_empty() {
             return Err(NftError::MetadataFieldEmpty);
         }
 
@@ -704,13 +702,13 @@ impl NftMetadataContract {
         }
 
         // Background color: must be empty OR exactly 6 hex chars
-        if meta.background_color.len() > 0 && !is_valid_hex_color(&meta.background_color) {
+        if !meta.background_color.is_empty() && !is_valid_hex_color(&meta.background_color) {
             return Err(NftError::InvalidBackgroundColor);
         }
 
         // Attributes: each must have non-empty trait_type and value
         for attr in meta.attributes.iter() {
-            if attr.trait_type.len() == 0 || attr.value.len() == 0 {
+            if attr.trait_type.is_empty() || attr.value.is_empty() {
                 return Err(NftError::InvalidAttribute);
             }
         }
@@ -764,12 +762,7 @@ fn is_valid_hex_color(color: &String) -> bool {
     }
     let mut buf = [0u8; 6];
     color.copy_into_slice(&mut buf);
-    for b in buf.iter() {
-        if !matches!(b, b'0'..=b'9' | b'a'..=b'f' | b'A'..=b'F') {
-            return false;
-        }
-    }
-    true
+    buf.iter().all(|b| b.is_ascii_hexdigit())
 }
 
 /// Convert a `u32` to its decimal ASCII bytes.
