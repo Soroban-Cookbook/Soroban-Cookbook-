@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-c78a290d.js";
+            window.path_to_searchindex_js = "searchindex-91a76d89.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-581aac75.js"></script>
+        <script src="toc-6e36cc74.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -2809,43 +2809,791 @@ cargo test --workspace
 <li>YouTube playlist: “Getting Started with Soroban”</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="all-examples-index"><a class="header" href="#all-examples-index">All Examples Index</a></h1>
+<p>Search-optimized index of all examples with formatted code snippets and live demos.</p>
+<h2 id="basics"><a class="header" href="#basics">Basics</a></h2>
+<h3 id="01-hello-world"><a class="header" href="#01-hello-world">01 Hello World</a></h3>
+<p><a href="../examples/basics/01-hello-world">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span>#![no_std]
+
+<span class="boring">fn main() {
+</span>use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
+
+#[contract]
+pub struct HelloContract;          // (1) plain unit struct — no fields needed
+
+#[contractimpl]
+impl HelloContract {
+    pub fn hello(env: Env, to: Symbol) -&gt; Vec&lt;Symbol&gt; {   // (2) Env is always first
+        vec![&amp;env, symbol_short!("Hello"), to]            // (3) host-allocated Vec
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="02-storage-patterns"><a class="header" href="#02-storage-patterns">02 Storage Patterns</a></h3>
+<p><a href="../examples/basics/02-storage-patterns">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Persistent: Per-key TTL
+env.storage().persistent().set(&amp;key, &amp;value);
+env.storage().persistent().extend_ttl(&amp;key, 100, 100);
+
+// Instance: Shared TTL for all instance data
+env.storage().instance().set(&amp;key, &amp;value);
+env.storage().instance().extend_ttl(100, 100);
+
+// Temporary: Ephemeral, no rent
+env.storage().temporary().set(&amp;key, &amp;value);
+<span class="boring">}</span></code></pre>
+<h3 id="03-authentication"><a class="header" href="#03-authentication">03 Authentication</a></h3>
+<p><a href="../examples/basics/03-authentication">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Owner grants spender the right to move up to 500 tokens.
+pub fn approve(env: Env, from: Address, spender: Address, amount: i128)
+    -&gt; Result&lt;(), AuthError&gt;
+{
+    from.require_auth();                                    // owner signs
+    env.storage().persistent()
+        .set(&amp;DataKey::Allowance(from, spender), &amp;amount);
+    Ok(())
+}
+
+// Spender exercises the allowance.
+pub fn transfer_from(
+    env: Env, spender: Address, from: Address, to: Address, amount: i128,
+) -&gt; Result&lt;(), AuthError&gt; {
+    spender.require_auth();                                 // spender signs
+    let allowance: i128 = env.storage().persistent()
+        .get(&amp;DataKey::Allowance(from.clone(), spender.clone()))
+        .unwrap_or(0);
+    if allowance &lt; amount { return Err(AuthError::Unauthorized); }
+    // … update balances and reduce allowance …
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-custom-errors"><a class="header" href="#03-custom-errors">03 Custom Errors</a></h3>
+<p><a href="../examples/basics/03-custom-errors">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{contracterror, contractimpl, Env};
+
+#[contracterror]
+#[repr(u32)]
+pub enum ContractError {
+    InvalidInput = 1,
+    Unauthorized = 2,
+    NotFound = 3,
+}
+
+#[contractimpl]
+impl MyContract {
+    pub fn my_function(env: Env, value: u64) -&gt; Result&lt;(), ContractError&gt; {
+        if value == 0 {
+            return Err(ContractError::InvalidInput);
+        }
+        // ... function logic
+        Ok(())
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="04-events"><a class="header" href="#04-events">04 Events</a></h3>
+<p><a href="../examples/basics/04-events">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env.events().publish(
+    (topic_0, topic_1, topic_2, topic_3),  // up to 4 indexed topics
+    data_payload,                           // arbitrary SCVal; not indexed
+);
+<span class="boring">}</span></code></pre>
+<h3 id="05-auth-context"><a class="header" href="#05-auth-context">05 Auth Context</a></h3>
+<p><a href="../examples/basics/05-auth-context">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="05-error-handling"><a class="header" href="#05-error-handling">05 Error Handling</a></h3>
+<p><a href="../examples/basics/05-error-handling">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum Error {
+    InvalidAmount       = 1,
+    InsufficientBalance = 2,
+    Unauthorized        = 3,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="06-validation-patterns"><a class="header" href="#06-validation-patterns">06 Validation Patterns</a></h3>
+<p><a href="../examples/basics/06-validation-patterns">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>ValidationError::InvalidAmount = 100,
+ValidationError::AmountTooSmall = 101,
+ValidationError::AmountTooLarge = 102,
+ValidationError::InvalidAddress = 103,
+ValidationError::InvalidString = 104,
+ValidationError::StringTooShort = 105,
+ValidationError::StringTooLong = 106,
+<span class="boring">}</span></code></pre>
+<h3 id="07-type-conversions"><a class="header" href="#07-type-conversions">07 Type Conversions</a></h3>
+<p><a href="../examples/basics/07-type-conversions">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// native → Val
+let val: Val = 42u32.into_val(&amp;env);
+
+// Val → native (safe, returns Result)
+let n: u32 = u32::try_from_val(&amp;env, &amp;val).unwrap_or(0);
+<span class="boring">}</span></code></pre>
+<h3 id="08-soroban-types"><a class="header" href="#08-soroban-types">08 Soroban Types</a></h3>
+<p><a href="../examples/basics/08-soroban-types">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// ✅ Use Symbol for short identifiers
+let token_symbol = symbol_short!("USDC");
+let action = Symbol::from_str(&amp;env, "transfer");
+
+// ✅ Use String for longer text
+let message = String::from_str(&amp;env, "Transaction completed successfully");
+let username = String::from_str(&amp;env, "alice_blockchain_dev");
+
+// ✅ Use Bytes for variable binary data
+let signature = Bytes::from_slice(&amp;env, &amp;signature_data);
+let serialized_object = Bytes::from_slice(&amp;env, &amp;encoded_data);
+
+// ✅ Use BytesN for fixed-size data
+let hash = BytesN::&lt;32&gt;::from_array(&amp;env, &amp;sha256_result);
+let address_hash = BytesN::&lt;20&gt;::from_array(&amp;env, &amp;address_bytes);
+
+// ✅ Use Address for accounts and contracts
+let user = Address::generate(&amp;env);
+let contract_address = env.current_contract_address();
+
+// ✅ Use Vec for ordered collections
+let mut numbers = Vec::new(&amp;env);
+numbers.push_back(1);
+
+// ✅ Use Map for key-value associations
+let mut settings = Map::new(&amp;env);
+settings.set(symbol_short!("theme"), 1);
+<span class="boring">}</span></code></pre>
+<h3 id="09-enum-types"><a class="header" href="#09-enum-types">09 Enum Types</a></h3>
+<p><a href="../examples/basics/09-enum-types">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum UserRole {
+    None = 0,
+    User = 1,
+    Moderator = 2,
+    Admin = 3,
+    Owner = 4,
+}
+
+#[contracttype]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+pub enum ContractState {
+    Uninitialized = 0,
+    Active = 1,
+    Paused = 2,
+    Frozen = 3,
+    Shutdown = 4,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="10-custom-structs"><a class="header" href="#10-custom-structs">10 Custom Structs</a></h3>
+<p><a href="../examples/basics/10-custom-structs">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct UserProfile {
+    pub address: Address,
+    pub name: String,
+    pub email: Option&lt;String&gt;,
+    pub reputation: u32,
+    pub verified: bool,
+    pub created_at: u64,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="11-primitive-types"><a class="header" href="#11-primitive-types">11 Primitive Types</a></h3>
+<p><a href="../examples/basics/11-primitive-types">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Use u32 for small counters, flags, and indices
+let counter: u32 = 100;
+let flags: u32 = 0b1010;
+
+// Use u64 for timestamps, large counters, and IDs
+let timestamp: u64 = env.ledger().timestamp();
+let user_id: u64 = 1234567890;
+
+// Use i128 for financial calculations (balances, amounts)
+let balance: i128 = 1000000; // $1M in smallest unit
+let amount: i128 = -500; // Negative amount for refunds
+<span class="boring">}</span></code></pre>
+<h3 id="12-data-types"><a class="header" href="#12-data-types">12 Data Types</a></h3>
+<p><a href="../examples/basics/12-data-types">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let count: u32  = 42;
+let timestamp: u64 = 1_700_000_000;
+let amount: i128 = 1_000_000_000; // 100 XLM in stroops
+<span class="boring">}</span></code></pre>
+<h3 id="13-collection-types"><a class="header" href="#13-collection-types">13 Collection Types</a></h3>
+<p><a href="../examples/basics/13-collection-types">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Create and populate a Vec
+let mut items: Vec&lt;i128&gt; = Vec::new(&amp;env);
+items.push_back(10);
+items.push_back(20);
+items.push_back(30);
+
+// Random access — O(1)
+let first = items.get(0); // Some(10)
+let len   = items.len();  // 3
+
+// Remove the last element
+let last = items.pop_back(); // Some(30)
+<span class="boring">}</span></code></pre>
+<h3 id="13-compressed-storage"><a class="header" href="#13-compressed-storage">13 Compressed Storage</a></h3>
+<p><a href="../examples/basics/13-compressed-storage">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="13-queue-variants"><a class="header" href="#13-queue-variants">13 Queue Variants</a></h3>
+<p><a href="../examples/basics/13-queue-variants">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="14-event-filtering"><a class="header" href="#14-event-filtering">14 Event Filtering</a></h3>
+<p><a href="../examples/basics/14-event-filtering">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="14-fifo-queue"><a class="header" href="#14-fifo-queue">14 Fifo Queue</a></h3>
+<p><a href="../examples/basics/14-fifo-queue">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="lazy-cache"><a class="header" href="#lazy-cache">Lazy Cache</a></h3>
+<p><a href="../examples/basics/lazy-cache">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h2 id="intermediate"><a class="header" href="#intermediate">Intermediate</a></h2>
+<h3 id="02-role-based-access-control"><a class="header" href="#02-role-based-access-control">02 Role Based Access Control</a></h3>
+<p><a href="../examples/intermediate/02-role-based-access-control">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="03-pause-unpause"><a class="header" href="#03-pause-unpause">03 Pause Unpause</a></h3>
+<p><a href="../examples/intermediate/03-pause-unpause">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), PauseError&gt; {
+    let paused: bool = env.storage().instance().get(&amp;DataKey::Paused).unwrap_or(false);
+    if paused { return Err(PauseError::ContractPaused); }
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-priority-queue"><a class="header" href="#03-priority-queue">03 Priority Queue</a></h3>
+<p><a href="../examples/intermediate/03-priority-queue">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="ajo-factory"><a class="header" href="#ajo-factory">Ajo Factory</a></h3>
+<p><a href="../examples/intermediate/ajo-factory">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let wasm_hash = env.deployer().upload_contract_wasm(template_wasm);
+
+factory_client.register_template(
+    &amp;admin,
+    &amp;symbol_short!("savings"),
+    &amp;symbol_short!("v1"),
+    &amp;wasm_hash,
+);
+<span class="boring">}</span></code></pre>
+<h3 id="event-history"><a class="header" href="#event-history">Event History</a></h3>
+<p><a href="../examples/intermediate/event-history">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="iterable-mappings"><a class="header" href="#iterable-mappings">Iterable Mappings</a></h3>
+<p><a href="../examples/intermediate/iterable-mappings">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="multi-sig-patterns"><a class="header" href="#multi-sig-patterns">Multi Sig Patterns</a></h3>
+<p><a href="../examples/intermediate/multi-sig-patterns">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn initialize(env: Env, threshold: u32, signers: Vec&lt;Address&gt;) -&gt; Result&lt;(), AuthError&gt;
+pub fn create_proposal(env: Env, proposer: Address) -&gt; Result&lt;u32, AuthError&gt;
+pub fn approve(env: Env, proposal_id: u32, signer: Address) -&gt; Result&lt;(), AuthError&gt;
+pub fn cancel(env: Env, proposal_id: u32, signer: Address) -&gt; Result&lt;(), AuthError&gt;
+pub fn execute(env: Env, proposal_id: u32, executor: Address) -&gt; Result&lt;bool, AuthError&gt;
+pub fn get_proposal(env: Env, proposal_id: u32) -&gt; Option&lt;Proposal&gt;
+<span class="boring">}</span></code></pre>
+<h3 id="storage-migration"><a class="header" href="#storage-migration">Storage Migration</a></h3>
+<p><a href="../examples/intermediate/storage-migration">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="storage-pagination"><a class="header" href="#storage-pagination">Storage Pagination</a></h3>
+<p><a href="../examples/intermediate/storage-pagination">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h2 id="advanced"><a class="header" href="#advanced">Advanced</a></h2>
+<h3 id="01-multi-party-auth"><a class="header" href="#01-multi-party-auth">01 Multi Party Auth</a></h3>
+<p><a href="../examples/advanced/01-multi-party-auth">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn multi_sig_transfer(env: Env, signers: Vec&lt;Address&gt;, to: Address, amount: i128)
+<span class="boring">}</span></code></pre>
+<h3 id="02-timelock"><a class="header" href="#02-timelock">02 Timelock</a></h3>
+<p><a href="../examples/advanced/02-timelock">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>client.initialize(&amp;admin_address);
+<span class="boring">}</span></code></pre>
+<h3 id="03-cross-contract-optimization"><a class="header" href="#03-cross-contract-optimization">03 Cross Contract Optimization</a></h3>
+<p><a href="../examples/advanced/03-cross-contract-optimization">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="03-oracle-pattern"><a class="header" href="#03-oracle-pattern">03 Oracle Pattern</a></h3>
+<p><a href="../examples/advanced/03-oracle-pattern">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn submit(env: Env, updater: Address, value: i128) -&gt; Result&lt;(), OracleError&gt; {
+    updater.require_auth();
+    env.storage().instance().set(&amp;DataKey::Value, &amp;value);
+    env.storage().instance().set(&amp;DataKey::Timestamp, &amp;env.ledger().timestamp());
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-proxy-admin"><a class="header" href="#03-proxy-admin">03 Proxy Admin</a></h3>
+<p><a href="../examples/advanced/03-proxy-admin">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn deposit(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
+    require_unpaused(&amp;env)?;   // blocks when paused
+    user.require_auth();
+    // ... rest of logic
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-rbac-modifiers"><a class="header" href="#03-rbac-modifiers">03 Rbac Modifiers</a></h3>
+<p><a href="../examples/advanced/03-rbac-modifiers">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>client.grant_role(&amp;admin, &amp;ROLE_MINTER, &amp;alice);
+<span class="boring">}</span></code></pre>
+<h3 id="03-registry-access-controls"><a class="header" href="#03-registry-access-controls">03 Registry Access Controls</a></h3>
+<p><a href="../examples/advanced/03-registry-access-controls">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="04-upgradeable-proxy"><a class="header" href="#04-upgradeable-proxy">04 Upgradeable Proxy</a></h3>
+<p><a href="../examples/advanced/04-upgradeable-proxy">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="05-batch-transfer"><a class="header" href="#05-batch-transfer">05 Batch Transfer</a></h3>
+<p><a href="../examples/advanced/05-batch-transfer">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Transfer {
+    pub to: Address,   // recipient
+    pub amount: i128,  // must be &gt; 0
+}
+<span class="boring">}</span></code></pre>
+<h3 id="05-bridge-security"><a class="header" href="#05-bridge-security">05 Bridge Security</a></h3>
+<p><a href="../examples/advanced/05-bridge-security">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="05-diamond-facets"><a class="header" href="#05-diamond-facets">05 Diamond Facets</a></h3>
+<p><a href="../examples/advanced/05-diamond-facets">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Router atomically calls TokenFacet then RegistryFacet.
+// If either fails, the whole transaction reverts.
+router.mint_and_register(&amp;admin, &amp;recipient, &amp;750, &amp;key, &amp;"metadata");
+<span class="boring">}</span></code></pre>
+<h3 id="contract-registry"><a class="header" href="#contract-registry">Contract Registry</a></h3>
+<p><a href="../examples/advanced/contract-registry">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h2 id="defi"><a class="header" href="#defi">Defi</a></h2>
+<h3 id="01-simple-swap"><a class="header" href="#01-simple-swap">01 Simple Swap</a></h3>
+<p><a href="../examples/defi/01-simple-swap">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="01-vault-strategies"><a class="header" href="#01-vault-strategies">01 Vault Strategies</a></h3>
+<p><a href="../examples/defi/01-vault-strategies">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct StrategyParams {
+    pub name: Symbol,
+    pub max_allocation_bps: i128,
+    pub expected_apy_bps: i128,
+    pub risk_level: RiskLevel,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="02-constant-product-amm"><a class="header" href="#02-constant-product-amm">02 Constant Product Amm</a></h3>
+<p><a href="../examples/defi/02-constant-product-amm">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="02-swap-liquidity"><a class="header" href="#02-swap-liquidity">02 Swap Liquidity</a></h3>
+<p><a href="../examples/defi/02-swap-liquidity">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="03-amm-price-oracle"><a class="header" href="#03-amm-price-oracle">03 Amm Price Oracle</a></h3>
+<p><a href="../examples/defi/03-amm-price-oracle">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="03-farming-pool"><a class="header" href="#03-farming-pool">03 Farming Pool</a></h3>
+<p><a href="../examples/defi/03-farming-pool">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn add_pool(env: Env, admin: Address, ...) {
+    admin.require_auth();
+    let stored_admin: Address = env.storage().instance().get(&amp;DataKey::Admin).unwrap();
+    if admin != stored_admin { panic!("Unauthorized"); }
+    // ...
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-lending-pool"><a class="header" href="#03-lending-pool">03 Lending Pool</a></h3>
+<p><a href="../examples/defi/03-lending-pool">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>client.initialize(&amp;base_rate, &amp;kink_rate, &amp;kink_utilization);
+<span class="boring">}</span></code></pre>
+<h3 id="04-collateralized-lending"><a class="header" href="#04-collateralized-lending">04 Collateralized Lending</a></h3>
+<p><a href="../examples/defi/04-collateralized-lending">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>client.initialize(&amp;ltv_ratio, &amp;liquidation_threshold, &amp;liquidation_incentive, &amp;partial_liquidation_ratio);
+<span class="boring">}</span></code></pre>
+<h3 id="05-amm-router"><a class="header" href="#05-amm-router">05 Amm Router</a></h3>
+<p><a href="../examples/defi/05-amm-router">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>client.initialize();
+<span class="boring">}</span></code></pre>
+<h3 id="05-flash-loans"><a class="header" href="#05-flash-loans">05 Flash Loans</a></h3>
+<p><a href="../examples/defi/05-flash-loans">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub trait FlashLoanReceiver {
+    fn on_flash_loan(env: Env, initiator: Address, token: Address, amount: i128, fee: i128);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="06-flash-loan-use-cases"><a class="header" href="#06-flash-loan-use-cases">06 Flash Loan Use Cases</a></h3>
+<p><a href="../examples/defi/06-flash-loan-use-cases">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="07-staking-pool"><a class="header" href="#07-staking-pool">07 Staking Pool</a></h3>
+<p><a href="../examples/defi/07-staking-pool">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="08-liquidity-mining"><a class="header" href="#08-liquidity-mining">08 Liquidity Mining</a></h3>
+<p><a href="../examples/defi/08-liquidity-mining">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// One-time setup
+fn initialize(env: Env, admin: Address);
+
+// Create a new pool
+fn add_pool(env: Env, pool_id: u32, lp_token: Address, reward_token: Address, reward_rate: i128);
+
+// Change the reward rate (settles existing rewards first)
+fn set_reward_rate(env: Env, pool_id: u32, new_rate: i128);
+
+// Pause or resume a pool
+fn set_pool_active(env: Env, pool_id: u32, active: bool);
+<span class="boring">}</span></code></pre>
+<h2 id="nfts"><a class="header" href="#nfts">Nfts</a></h2>
+<h3 id="01-basic-nft"><a class="header" href="#01-basic-nft">01 Basic Nft</a></h3>
+<p><a href="../examples/nfts/01-basic-nft">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="01-nft-metadata"><a class="header" href="#01-nft-metadata">01 Nft Metadata</a></h3>
+<p><a href="../examples/nfts/01-nft-metadata">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn initialize(
+    env: Env,
+    admin: Address,
+    name: String,
+    symbol: String,
+    base_uri: String,   // pass "" to use per-token image URIs
+) -&gt; Result&lt;(), NftError&gt;
+<span class="boring">}</span></code></pre>
+<h3 id="02-nft-marketplace"><a class="header" href="#02-nft-marketplace">02 Nft Marketplace</a></h3>
+<p><a href="../examples/nfts/02-nft-marketplace">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="02-nft-metadata"><a class="header" href="#02-nft-metadata">02 Nft Metadata</a></h3>
+<p><a href="../examples/nfts/02-nft-metadata">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h2 id="governance"><a class="header" href="#governance">Governance</a></h2>
+<h3 id="01-voting-time-constraints"><a class="header" href="#01-voting-time-constraints">01 Voting Time Constraints</a></h3>
+<p><a href="../examples/governance/01-voting-time-constraints">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="04-proposal-lifecycle"><a class="header" href="#04-proposal-lifecycle">04 Proposal Lifecycle</a></h3>
+<p><a href="../examples/governance/04-proposal-lifecycle">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h2 id="tokens"><a class="header" href="#tokens">Tokens</a></h2>
+<h3 id="01-sep41-token"><a class="header" href="#01-sep41-token">01 Sep41 Token</a></h3>
+<p><a href="../examples/tokens/01-sep41-token">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="02-sep41-extensions"><a class="header" href="#02-sep41-extensions">02 Sep41 Extensions</a></h3>
+<p><a href="../examples/tokens/02-sep41-extensions">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub struct Transfer {
+    pub to: Address,
+    pub amount: i128,  // must be &gt; 0
+}
+<span class="boring">}</span></code></pre>
+<h3 id="03-optimized-operations"><a class="header" href="#03-optimized-operations">03 Optimized Operations</a></h3>
+<p><a href="../examples/tokens/03-optimized-operations">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn batch_transfer(
+    env: Env,
+    user: Address,
+    recipients: Vec&lt;BatchTransfer&gt;,
+) -&gt; Result&lt;(), OptimizedError&gt; {
+    // Process all transfers in ONE contract call
+    for recipient_data in recipients.iter() {
+        // Update balances
+    }
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="allowance-pattern"><a class="header" href="#allowance-pattern">Allowance Pattern</a></h3>
+<p><a href="../examples/tokens/allowance-pattern">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="mint-burn"><a class="header" href="#mint-burn">Mint Burn</a></h3>
+<p><a href="../examples/tokens/mint-burn">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="multi-token-balance-manager"><a class="header" href="#multi-token-balance-manager">Multi Token Balance Manager</a></h3>
+<p><a href="../examples/tokens/multi-token-balance-manager">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>manager.register_token(
+    &amp;admin,
+    &amp;token_address,
+    &amp;TokenMetadata {
+        name,
+        symbol,
+        decimals: 7,
+        standard: MetadataStandard::Sep41,
+    },
+);
+<span class="boring">}</span></code></pre>
+<h3 id="optimized-token-ops"><a class="header" href="#optimized-token-ops">Optimized Token Ops</a></h3>
+<p><a href="../examples/tokens/optimized-token-ops">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Code snippet coming soon
+<span class="boring">}</span></code></pre>
+<h3 id="token-metadata"><a class="header" href="#token-metadata">Token Metadata</a></h3>
+<p><a href="../examples/tokens/token-metadata">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Decimals are set once and never exposed through an update path.
+// Changing decimals after tokens are in circulation would mean that
+// a balance of 1_000_0000000 (7 decimals = 1000.0) silently becomes
+// 1_000_0000000 (6 decimals = 10000.0) — a 10× reinterpretation with
+// no on-chain record of the change.
+pub fn decimals(env: Env) -&gt; Result&lt;u32, MetadataError&gt; {
+    read_decimals(&amp;env)
+}
+<span class="boring">}</span></code></pre>
+<h3 id="token-wrapper"><a class="header" href="#token-wrapper">Token Wrapper</a></h3>
+<p><a href="../examples/tokens/token-wrapper">View Source</a></p>
+<p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn wrap(env: Env, user: Address, amount: i128) -&gt; Result&lt;i128, WrapperError&gt; {
+    user.require_auth();
+
+    let wrapper = env.current_contract_address();
+    TokenClient::new(&amp;env, &amp;underlying).transfer(&amp;user, &amp;wrapper, &amp;amount);
+
+    // Mint exactly `amount` wrapped shares after validating arithmetic.
+    // The full contract stores per-user balances and total supply.
+    Ok(new_balance)
+}
+<span class="boring">}</span></code></pre>
+<h2 id="storage"><a class="header" href="#storage">Storage</a></h2>
+<h2 id="hello-world"><a class="header" href="#hello-world">Hello-world</a></h2>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="basic-examples"><a class="header" href="#basic-examples">Basic Examples</a></h1>
 <p>Core Soroban fundamentals, one concept per example. Perfect for beginners.</p>
 <h2 id="examples"><a class="header" href="#examples">Examples</a></h2>
-<h3 id="01-hello-world"><a class="header" href="#01-hello-world"><a href="examples/basics/01-hello-world">01-hello-world</a></a></h3>
+<h3 id="01-hello-world-1"><a class="header" href="#01-hello-world-1"><a href="examples/basics/01-hello-world">01-hello-world</a></a></h3>
 <p>Basic contract structure — <code>#[contract]</code>, <code>#[contractimpl]</code>, <code>Env</code>, <code>Symbol</code>, <code>Vec</code>.</p>
-<h3 id="02-storage-patterns"><a class="header" href="#02-storage-patterns"><a href="examples/basics/02-storage-patterns">02-storage-patterns</a></a></h3>
+<h3 id="02-storage-patterns-1"><a class="header" href="#02-storage-patterns-1"><a href="examples/basics/02-storage-patterns">02-storage-patterns</a></a></h3>
 <p>All three storage tiers (persistent, instance, temporary) with TTL management.</p>
 <p><strong><a href="storage-patterns.html">Full Guide →</a></strong></p>
-<h3 id="03-custom-errors"><a class="header" href="#03-custom-errors"><a href="examples/basics/03-custom-errors">03-custom-errors</a></a></h3>
+<h3 id="03-custom-errors-1"><a class="header" href="#03-custom-errors-1"><a href="examples/basics/03-custom-errors">03-custom-errors</a></a></h3>
 <p>Custom error enums with structured codes.</p>
 <p><strong><a href="error-handling.html">Full Guide →</a></strong></p>
-<h3 id="03-authentication"><a class="header" href="#03-authentication"><a href="examples/basics/03-authentication">03-authentication</a></a></h3>
+<h3 id="03-authentication-1"><a class="header" href="#03-authentication-1"><a href="examples/basics/03-authentication">03-authentication</a></a></h3>
 <p>Authorization with <code>require_auth()</code>, admin checks, and RBAC.</p>
-<h3 id="04-events"><a class="header" href="#04-events"><a href="examples/basics/04-events">04-events</a></a></h3>
+<h3 id="04-events-1"><a class="header" href="#04-events-1"><a href="examples/basics/04-events">04-events</a></a></h3>
 <p>Structured events with multi-topic indexing.</p>
 <p><strong><a href="events.html">Full Guide →</a></strong></p>
-<h3 id="05-error-handling"><a class="header" href="#05-error-handling"><a href="examples/basics/05-error-handling">05-error-handling</a></a></h3>
+<h3 id="05-error-handling-1"><a class="header" href="#05-error-handling-1"><a href="examples/basics/05-error-handling">05-error-handling</a></a></h3>
 <p>Result-based error handling and propagation.</p>
-<h3 id="05-auth-context"><a class="header" href="#05-auth-context"><a href="examples/basics/05-auth-context">05-auth-context</a></a></h3>
+<h3 id="05-auth-context-1"><a class="header" href="#05-auth-context-1"><a href="examples/basics/05-auth-context">05-auth-context</a></a></h3>
 <p>Invocation context across cross-contract call chains.</p>
-<h3 id="06-validation-patterns"><a class="header" href="#06-validation-patterns"><a href="examples/basics/06-validation-patterns">06-validation-patterns</a></a></h3>
+<h3 id="06-validation-patterns-1"><a class="header" href="#06-validation-patterns-1"><a href="examples/basics/06-validation-patterns">06-validation-patterns</a></a></h3>
 <p>Input validation with checked arithmetic.</p>
-<h3 id="07-type-conversions"><a class="header" href="#07-type-conversions"><a href="examples/basics/07-type-conversions">07-type-conversions</a></a></h3>
+<h3 id="07-type-conversions-1"><a class="header" href="#07-type-conversions-1"><a href="examples/basics/07-type-conversions">07-type-conversions</a></a></h3>
 <p>Safe type conversions with <code>TryFromVal</code> and <code>IntoVal</code>.</p>
-<h3 id="08-soroban-types"><a class="header" href="#08-soroban-types"><a href="examples/basics/08-soroban-types">08-soroban-types</a></a></h3>
+<h3 id="08-soroban-types-1"><a class="header" href="#08-soroban-types-1"><a href="examples/basics/08-soroban-types">08-soroban-types</a></a></h3>
 <p>Core SDK types: Address, Symbol, Map, Vec, bytes.</p>
-<h3 id="09-enum-types"><a class="header" href="#09-enum-types"><a href="examples/basics/09-enum-types">09-enum-types</a></a></h3>
+<h3 id="09-enum-types-1"><a class="header" href="#09-enum-types-1"><a href="examples/basics/09-enum-types">09-enum-types</a></a></h3>
 <p>Contract enums for state machines and dispatch.</p>
-<h3 id="10-custom-structs"><a class="header" href="#10-custom-structs"><a href="examples/basics/10-custom-structs">10-custom-structs</a></a></h3>
+<h3 id="10-custom-structs-1"><a class="header" href="#10-custom-structs-1"><a href="examples/basics/10-custom-structs">10-custom-structs</a></a></h3>
 <p>Nested <code>#[contracttype]</code> structs and composite storage keys.</p>
-<h3 id="11-primitive-types"><a class="header" href="#11-primitive-types"><a href="examples/basics/11-primitive-types">11-primitive-types</a></a></h3>
+<h3 id="11-primitive-types-1"><a class="header" href="#11-primitive-types-1"><a href="examples/basics/11-primitive-types">11-primitive-types</a></a></h3>
 <p>Integer handling and overflow safety.</p>
-<h3 id="12-data-types"><a class="header" href="#12-data-types"><a href="examples/basics/12-data-types">12-data-types</a></a></h3>
+<h3 id="12-data-types-1"><a class="header" href="#12-data-types-1"><a href="examples/basics/12-data-types">12-data-types</a></a></h3>
 <p>Comprehensive type system reference.</p>
-<h3 id="13-collection-types"><a class="header" href="#13-collection-types"><a href="examples/basics/13-collection-types">13-collection-types</a></a></h3>
+<h3 id="13-collection-types-1"><a class="header" href="#13-collection-types-1"><a href="examples/basics/13-collection-types">13-collection-types</a></a></h3>
 <p>Vec and Map collection patterns.</p>
-<h3 id="14-event-filtering"><a class="header" href="#14-event-filtering"><a href="examples/basics/14-event-filtering">14-event-filtering</a></a></h3>
+<h3 id="14-event-filtering-1"><a class="header" href="#14-event-filtering-1"><a href="examples/basics/14-event-filtering">14-event-filtering</a></a></h3>
 <p>Indexer-friendly event topic design.</p>
 <h2 id="quick-start-1"><a class="header" href="#quick-start-1">Quick Start</a></h2>
 <pre><code class="language-bash">cd examples/basics/01-hello-world
@@ -4112,7 +4860,7 @@ fn test_factory() {
 <h1 id="advanced-examples"><a class="header" href="#advanced-examples">Advanced Examples</a></h1>
 <p>Complex protocols &amp; optimizations for production systems.</p>
 <h2 id="-examples-2-currently"><a class="header" href="#-examples-2-currently">📋 Examples (2 currently)</a></h2>
-<h3 id="01-multi-party-auth"><a class="header" href="#01-multi-party-auth"><a href="examples/advanced/01-multi-party-auth">01-multi-party-auth</a></a></h3>
+<h3 id="01-multi-party-auth-1"><a class="header" href="#01-multi-party-auth-1"><a href="examples/advanced/01-multi-party-auth">01-multi-party-auth</a></a></h3>
 <p><strong>Advanced multi-party authorization</strong> beyond simple multisig.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
@@ -4121,7 +4869,7 @@ fn test_factory() {
 <li>Time-bound approvals</li>
 </ul>
 <hr>
-<h3 id="02-timelock"><a class="header" href="#02-timelock"><a href="examples/advanced/02-timelock">02-timelock</a></a></h3>
+<h3 id="02-timelock-1"><a class="header" href="#02-timelock-1"><a href="examples/advanced/02-timelock">02-timelock</a></a></h3>
 <p><strong>Delayed execution</strong> for governance &amp; security.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
@@ -4137,7 +4885,7 @@ fn test_factory() {
 }
 <span class="boring">}</span></code></pre>
 <hr>
-<h3 id="03-oracle-pattern"><a class="header" href="#03-oracle-pattern"><a href="examples/advanced/03-oracle-pattern">03-oracle-pattern</a></a></h3>
+<h3 id="03-oracle-pattern-1"><a class="header" href="#03-oracle-pattern-1"><a href="examples/advanced/03-oracle-pattern">03-oracle-pattern</a></a></h3>
 <p><strong>Single-source oracle</strong> with authorized submission and freshness validation.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
@@ -4170,7 +4918,7 @@ let value = client.get_value_strict(); // errors if stale
 <h1 id="defi-examples"><a class="header" href="#defi-examples">DeFi Examples</a></h1>
 <p>Decentralized finance on Soroban: AMMs, lending, yield protocols.</p>
 <h2 id="-examples-1-currently"><a class="header" href="#-examples-1-currently">📋 Examples (1 currently)</a></h2>
-<h3 id="01-vault-strategies"><a class="header" href="#01-vault-strategies"><a href="examples/vault-strategies">01-vault-strategies</a></a></h3>
+<h3 id="01-vault-strategies-1"><a class="header" href="#01-vault-strategies-1"><a href="examples/vault-strategies">01-vault-strategies</a></a></h3>
 <p><strong>Multi-strategy yield vault</strong> with pluggable strategies and risk management.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
@@ -6296,7 +7044,7 @@ soroban contract invoke
 <p><strong>See also:</strong> <a href="#ttl--time-to-live">TTL / Time To Live</a>, <a href="#bump">Bump</a></p>
 <h3 id="stellar"><a class="header" href="#stellar">Stellar</a></h3>
 <p>The blockchain network that Soroban contracts run on. Known for fast, low-cost transactions and built-in asset support.</p>
-<h3 id="storage"><a class="header" href="#storage">Storage</a></h3>
+<h3 id="storage-1"><a class="header" href="#storage-1">Storage</a></h3>
 <p>Persistent data storage for contracts. Soroban provides three storage types: Persistent, Temporary, and Instance.</p>
 <p><strong>See also:</strong> <a href="#persistent-storage-1">Persistent Storage</a>, <a href="#instance-storage-1">Instance Storage</a>, <a href="#temporary-storage-1">Temporary Storage</a></p>
 <h3 id="stroop"><a class="header" href="#stroop">Stroop</a></h3>
@@ -6326,7 +7074,7 @@ let long_key = Symbol::new(&amp;env, "longer_identifier");
 <p>A Stellar concept where an account explicitly trusts and can hold a specific asset issued by another account.</p>
 <h3 id="ttl--time-to-live"><a class="header" href="#ttl--time-to-live">TTL / Time To Live</a></h3>
 <p>The number of ledgers that contract data will persist before expiring. Must be extended to keep data alive.</p>
-<p><strong>See also:</strong> <a href="#storage">Storage</a>, <a href="#bump">Bump</a>, <a href="#state-archival">State Archival</a></p>
+<p><strong>See also:</strong> <a href="#storage-1">Storage</a>, <a href="#bump">Bump</a>, <a href="#state-archival">State Archival</a></p>
 <h2 id="u"><a class="header" href="#u">U</a></h2>
 <h3 id="unit-test"><a class="header" href="#unit-test">Unit Test</a></h3>
 <p>Tests that verify individual contract functions in isolation. Soroban provides test utilities for writing comprehensive tests.</p>
@@ -7452,7 +8200,7 @@ pub fn accept_admin(env: Env, new_admin: Address) -&gt; Result&lt;(), Error&gt; 
 <li><input disabled="" type="checkbox"> Multiplication and division on financial values use checked variants</li>
 <li><input disabled="" type="checkbox"> Division-by-zero cases are guarded explicitly</li>
 </ul>
-<h3 id="storage-1"><a class="header" href="#storage-1">Storage</a></h3>
+<h3 id="storage-2"><a class="header" href="#storage-2">Storage</a></h3>
 <ul>
 <li><input disabled="" type="checkbox"> All storage keys use a <code>#[contracttype]</code> enum — no raw <code>symbol_short!</code> for keys that include variable data</li>
 <li><input disabled="" type="checkbox"> Storage types match data lifetime: <code>persistent()</code> for balances, <code>instance()</code> for contract config, <code>temporary()</code> for nonces/locks</li>
