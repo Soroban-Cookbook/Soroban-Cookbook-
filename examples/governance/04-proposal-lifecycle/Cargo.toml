@@ -1,5 +1,5 @@
 [package]
-name = "collection-types"
+name = "proposal-lifecycle"
 version = "0.1.0"
 edition = "2021"
 publish = false

@@ -199,6 +199,9 @@ Reference docs in [docs/](./docs/):
 - [Glossary](./docs/glossary.md) — Key terms and concepts
 - [Troubleshooting](./docs/troubleshooting.md) — Common build, test, and deployment issues with solutions
 
+- [Wallet Ecosystem Survey](./book/src/docs/wallet-ecosystem.md) — Research, features comparison, and integration priority list for Soroban-compatible wallets
+
+
 The full documentation site is built with [mdBook](https://rust-lang.github.io/mdBook/) and deployed to GitHub Pages on every push to `main`.
 
 ## Web Application
