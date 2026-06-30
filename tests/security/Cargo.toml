@@ -6,4 +6,4 @@ publish = false
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
-token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+token-wrapper = { path = "../../examples/tokens/06-token-wrapper" }

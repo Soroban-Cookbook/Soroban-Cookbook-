@@ -18,7 +18,7 @@ ajo_factory = { path = "../../examples/intermediate/ajo-factory", package = "ajo
 multi_sig_patterns = { path = "../../examples/intermediate/multi-sig-patterns", package = "multi-sig-patterns" }
 multi_party_auth = { path = "../../examples/advanced/01-multi-party-auth", package = "multi-party-auth" }
 timelock = { path = "../../examples/advanced/02-timelock", package = "timelock" }
-token_wrapper = { path = "../../examples/tokens/token-wrapper", package = "token-wrapper" }
+token_wrapper = { path = "../../examples/tokens/06-token-wrapper", package = "token-wrapper" }
 error_handling = { path = "../../examples/basics/05-error-handling", package = "soroban-error-handling-example" }
 auth_context = { path = "../../examples/basics/05-auth-context", package = "auth-context" }
 type_conversions = { path = "../../examples/basics/07-type-conversions", package = "type-conversions" }
@@ -29,6 +29,6 @@ primitive_types = { path = "../../examples/basics/11-primitive-types", package =
 data_types = { path = "../../examples/basics/12-data-types", package = "data-types" }
 collection_types = { path = "../../examples/basics/13-collection-types", package = "collection-types" }
 basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
-nft_marketplace = { path = "../../examples/nfts/02-nft-marketplace", package = "nft-marketplace" }
-proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
+nft_marketplace = { path = "../../examples/nfts/04-nft-marketplace", package = "nft-marketplace" }
+proposal_lifecycle = { path = "../../examples/governance/03-proposal-lifecycle", package = "proposal-lifecycle" }
 simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }
