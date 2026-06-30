@@ -31,4 +31,9 @@ collection_types = { path = "../../examples/basics/13-collection-types", package
 basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
 nft_marketplace = { path = "../../examples/nfts/02-nft-marketplace", package = "nft-marketplace" }
 proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
+role_based_access_control = { path = "../../examples/intermediate/02-role-based-access-control", package = "role-based-access-control" }
+rbac_modifiers = { path = "../../examples/advanced/03-rbac-modifiers", package = "rbac-modifiers" }
+pause_unpause = { path = "../../examples/intermediate/03-pause-unpause", package = "pause-unpause" }
+registry_access_controls = { path = "../../examples/advanced/03-registry-access-controls", package = "registry-access-controls" }
+proxy_admin = { path = "../../examples/advanced/03-proxy-admin", package = "proxy-admin" }
 simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }
