@@ -15,6 +15,8 @@
 
 # Examples
 
+- [All Examples Index](./examples-index.md)
+
 ## Basics (14 examples)
 - [Overview & listing](./examples/basics.md)
 - [Interactive Playground](./examples/playground.md)
