@@ -230,8 +230,11 @@ jobs:
           node-version: 20
           cache: npm
 
-      - name: Install cspell
-        run: npm install -g cspell
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: cd webapp && bun install
 
       - name: Run spell check
-        run: cspell --config cspell.json "**/*.md" "**/*.rs" "**/*.toml" "**/*.yml" "**/*.yaml" "**/*.tsx" "**/*.ts"
+        run: cd webapp && bun run spellcheck
