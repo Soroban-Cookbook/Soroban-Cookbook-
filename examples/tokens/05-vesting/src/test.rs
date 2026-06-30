@@ -222,19 +222,6 @@ fn test_claim_after_completion() {
 }
 
 #[test]
-fn test_unauthorized_claim() {
-    let env = Env::default();
-    let (client, admin, _token_address, _token_client) = setup_test(&env);
-    let beneficiary = Address::generate(&env);
-    let _attacker = Address::generate(&env);
-
-    env.mock_all_auths();
-    client.create_schedule(&admin, &beneficiary, &1000, &0, &0, &100);
-
-    env.ledger().with_mut(|li| li.timestamp = 50);
-}
-
-#[test]
 fn test_claim_auth_failure() {
     let env = Env::default();
     let (client, admin, _, _) = setup_test(&env);
