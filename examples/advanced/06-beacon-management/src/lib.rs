@@ -1,6 +1,8 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Map, Symbol, Vec};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, Address, Env, Map, Symbol, Vec,
+};
 
 const ADMIN_KEY: Symbol = symbol_short!("admin");
 const BEACONS_KEY: Symbol = symbol_short!("beacons");
@@ -33,7 +35,9 @@ impl BeaconManagementContract {
         }
 
         env.storage().instance().set(&ADMIN_KEY, &admin);
-        env.storage().instance().set(&BEACONS_KEY, &Map::<Symbol, BeaconState>::new(&env));
+        env.storage()
+            .instance()
+            .set(&BEACONS_KEY, &Map::<Symbol, BeaconState>::new(&env));
         env.storage()
             .instance()
             .set(&BEACON_NAMES_KEY, &Vec::<Symbol>::new(&env));
