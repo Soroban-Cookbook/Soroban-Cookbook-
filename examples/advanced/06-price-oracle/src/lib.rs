@@ -118,7 +118,9 @@ impl PriceOracleContract {
         if !updaters.contains(&updater) {
             let mut new_updaters = updaters;
             new_updaters.push_back(updater);
-            env.storage().instance().set(&DataKey::Updaters, &new_updaters);
+            env.storage()
+                .instance()
+                .set(&DataKey::Updaters, &new_updaters);
         }
 
         Ok(())
@@ -148,7 +150,9 @@ impl PriceOracleContract {
                 new_updaters.push_back(u);
             }
         }
-        env.storage().instance().set(&DataKey::Updaters, &new_updaters);
+        env.storage()
+            .instance()
+            .set(&DataKey::Updaters, &new_updaters);
 
         Ok(())
     }
@@ -181,24 +185,34 @@ impl PriceOracleContract {
             let asset_clone = asset.clone();
 
             // Check if asset is configured
-            if !env.storage().instance().has(&DataKey::AssetConfig(asset_clone.clone())) {
+            if !env
+                .storage()
+                .instance()
+                .has(&DataKey::AssetConfig(asset_clone.clone()))
+            {
                 return Err(OracleError::InvalidAsset);
             }
 
             // Store price in history for this updater
-            env.storage().temporary().set(&DataKey::UpdaterPrice(asset_clone.clone(), updater.clone()), &PriceData {
-                price,
-                timestamp: now,
-            });
+            env.storage().temporary().set(
+                &DataKey::UpdaterPrice(asset_clone.clone(), updater.clone()),
+                &PriceData {
+                    price,
+                    timestamp: now,
+                },
+            );
 
             // Perform aggregation (Median)
             let aggregated_price = aggregate_median(&env, asset_clone.clone())?;
 
             // Update latest price
-            env.storage().instance().set(&DataKey::LatestPrice(asset_clone.clone()), &PriceData {
-                price: aggregated_price,
-                timestamp: now,
-            });
+            env.storage().instance().set(
+                &DataKey::LatestPrice(asset_clone.clone()),
+                &PriceData {
+                    price: aggregated_price,
+                    timestamp: now,
+                },
+            );
 
             // Add to history for TWAP
             let history: Vec<PriceData> = env
@@ -214,7 +228,11 @@ impl PriceOracleContract {
             });
 
             // Prune history based on twap_window
-            let config: AssetConfig = env.storage().instance().get(&DataKey::AssetConfig(asset_clone.clone())).unwrap();
+            let config: AssetConfig = env
+                .storage()
+                .instance()
+                .get(&DataKey::AssetConfig(asset_clone.clone()))
+                .unwrap();
             let mut pruned_history = Vec::new(&env);
             for p in new_history.iter() {
                 if p.timestamp >= now.saturating_sub(config.twap_window) {
@@ -222,7 +240,9 @@ impl PriceOracleContract {
                 }
             }
 
-            env.storage().persistent().set(&DataKey::PriceHistory(asset_clone.clone()), &pruned_history);
+            env.storage()
+                .persistent()
+                .set(&DataKey::PriceHistory(asset_clone.clone()), &pruned_history);
 
             #[allow(deprecated)]
             env.events().publish(
@@ -300,7 +320,11 @@ impl PriceOracleContract {
             let duration = prev_ts.saturating_sub(window_start);
             let weight = duration as i128;
             total_weighted_price = total_weighted_price
-                .checked_add(prev_price.checked_mul(weight).ok_or(OracleError::ArithmeticOverflow)?)
+                .checked_add(
+                    prev_price
+                        .checked_mul(weight)
+                        .ok_or(OracleError::ArithmeticOverflow)?,
+                )
                 .ok_or(OracleError::ArithmeticOverflow)?;
             total_time = total_time.saturating_add(duration);
         }
@@ -310,11 +334,17 @@ impl PriceOracleContract {
 
             // Current price 'p.price' was active from 'prev_ts' to 'p.timestamp'
             // Wait, usually it's the OTHER way around: 'prev_price' was active from 'prev_ts' to 'p.timestamp'
-            let duration = p.timestamp.saturating_sub(core::cmp::max(prev_ts, window_start));
+            let duration = p
+                .timestamp
+                .saturating_sub(core::cmp::max(prev_ts, window_start));
             if duration > 0 {
                 let weight = duration as i128;
                 total_weighted_price = total_weighted_price
-                    .checked_add(prev_price.checked_mul(weight).ok_or(OracleError::ArithmeticOverflow)?)
+                    .checked_add(
+                        prev_price
+                            .checked_mul(weight)
+                            .ok_or(OracleError::ArithmeticOverflow)?,
+                    )
                     .ok_or(OracleError::ArithmeticOverflow)?;
                 total_time = total_time.saturating_add(duration);
             }
@@ -328,7 +358,11 @@ impl PriceOracleContract {
             let duration = now.saturating_sub(core::cmp::max(prev_ts, window_start));
             let weight = duration as i128;
             total_weighted_price = total_weighted_price
-                .checked_add(prev_price.checked_mul(weight).ok_or(OracleError::ArithmeticOverflow)?)
+                .checked_add(
+                    prev_price
+                        .checked_mul(weight)
+                        .ok_or(OracleError::ArithmeticOverflow)?,
+                )
                 .ok_or(OracleError::ArithmeticOverflow)?;
             total_time = total_time.saturating_add(duration);
         }
@@ -353,10 +387,18 @@ fn aggregate_median(env: &Env, asset: Symbol) -> Result<i128, OracleError> {
 
     let mut prices = Vec::new(env);
     let now = env.ledger().timestamp();
-    let config: AssetConfig = env.storage().instance().get(&DataKey::AssetConfig(asset.clone())).unwrap();
+    let config: AssetConfig = env
+        .storage()
+        .instance()
+        .get(&DataKey::AssetConfig(asset.clone()))
+        .unwrap();
 
     for updater in updaters.iter() {
-        if let Some(data) = env.storage().temporary().get::<_, PriceData>(&DataKey::UpdaterPrice(asset.clone(), updater)) {
+        if let Some(data) = env
+            .storage()
+            .temporary()
+            .get::<_, PriceData>(&DataKey::UpdaterPrice(asset.clone(), updater))
+        {
             // Only include non-stale prices in aggregation
             if now.saturating_sub(data.timestamp) <= config.max_age {
                 prices.push_back(data.price);
