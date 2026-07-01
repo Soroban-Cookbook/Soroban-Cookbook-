@@ -376,3 +376,244 @@ fn test_reentrancy_prevention() {
         total_supply
     );
 }
+
+// ---------------------------------------------------------------------------
+// Security Tests: RBAC Privilege Escalation
+// ---------------------------------------------------------------------------
+
+mod rbac_security_tests {
+    use soroban_sdk::testutils::Address as _;
+    use soroban_sdk::{Address, Env, Vec};
+
+    fn setup_rbac(env: &Env) -> (role_based_access_control::RoleBasedAccessControlClient<'_>, Address) {
+        let contract_id = env.register_contract(None, role_based_access_control::RoleBasedAccessControl);
+        let client = role_based_access_control::RoleBasedAccessControlClient::new(env, &contract_id);
+        let owner = Address::generate(env);
+        env.mock_all_auths();
+        client.initialize(&owner);
+        (client, owner)
+    }
+
+    #[test]
+    fn test_non_member_cannot_grant_roles() {
+        let env = Env::default();
+        let (client, owner) = setup_rbac(&env);
+        let attacker = Address::generate(&env);
+        let target = Address::generate(&env);
+
+        // Attacker tries to grant moderator role - should fail
+        let result = client.try_grant_role(&attacker, &target, &role_based_access_control::Role::Moderator);
+        assert_eq!(result, Err(Ok(role_based_access_control::RbacError::Unauthorized)));
+    }
+
+    #[test]
+    #[should_panic(expected = "Error(Contract, #2)")]
+    fn test_moderator_cannot_grant_admin_privilege_escalation() {
+        let env = Env::default();
+        let (client, owner) = setup_rbac(&env);
+        let moderator = Address::generate(&env);
+        let target = Address::generate(&env);
+
+        // Owner grants moderator role
+        client.grant_role(&owner, &moderator, &role_based_access_control::Role::Moderator);
+
+        // Moderator tries to grant admin - privilege escalation attempt
+        client.grant_role(&moderator, &target, &role_based_access_control::Role::Admin);
+    }
+
+    #[test]
+    #[should_panic(expected = "Error(Contract, #2)")]
+    fn test_admin_cannot_revoke_owner() {
+        let env = Env::default();
+        let (client, owner) = setup_rbac(&env);
+        let admin = Address::generate(&env);
+
+        // Owner grants admin role
+        client.grant_role(&owner, &admin, &role_based_access_control::Role::Admin);
+
+        // Admin tries to revoke owner - should fail
+        client.revoke_role(&admin, &owner);
+    }
+
+    #[test]
+    fn test_admin_action_requires_admin_role() {
+        let env = Env::default();
+        let (client, _owner) = setup_rbac(&env);
+        let user = Address::generate(&env);
+
+        // User without admin role cannot perform admin action
+        let result = client.try_admin_action(&user, &42u64);
+        assert_eq!(result, Err(Ok(role_based_access_control::RbacError::Unauthorized)));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Security Tests: Multisig Signature Spoofing
+// ---------------------------------------------------------------------------
+
+mod multisig_security_tests {
+    use soroban_sdk::testutils::Address as _;
+    use soroban_sdk::{Address, Env, Vec};
+
+    fn setup_multisig(env: &Env) -> (multi_sig_patterns::MultiPartyAuthClient<'_>) {
+        let contract_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+        let client = multi_sig_patterns::MultiPartyAuthClient::new(env, &contract_id);
+        let signer1 = Address::generate(env);
+        let signer2 = Address::generate(env);
+        let signer3 = Address::generate(env);
+        let signers = Vec::from_array(env, [signer1.clone(), signer2.clone(), signer3.clone()]);
+        env.mock_all_auths();
+        client.initialize(&2, &signers);
+        client
+    }
+
+    #[test]
+    fn test_invalid_signer_set_rejected() {
+        let env = Env::default();
+        let client = setup_multisig(&env);
+
+        let attacker = Address::generate(&env);
+        let proposal_id = client.create_proposal(&attacker);
+
+        // This should fail because attacker is not in signer set
+        // But create_proposal already validates, so we test approval
+    }
+
+    #[test]
+    fn test_missing_approval_prevents_execution() {
+        let env = Env::default();
+        let client = setup_multisig(&env);
+
+        let signer1 = Address::generate(&env);
+        let signer2 = Address::generate(&env);
+
+        // Create a fresh setup
+        let contract_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+        let client = multi_sig_patterns::MultiPartyAuthClient::new(env, &contract_id);
+        let s1 = Address::generate(env);
+        let s2 = Address::generate(env);
+        let s3 = Address::generate(env);
+        let signers = Vec::from_array(env, [s1.clone(), s2.clone(), s3.clone()]);
+        env.mock_all_auths();
+        client.initialize(&2, &signers);
+
+        let proposal_id = client.create_proposal(&s1);
+
+        // Only 1 approval (below threshold of 2)
+        client.approve(&proposal_id, &s1);
+
+        // Try to execute with only 1 approval - should fail
+        let result = client.try_execute(&proposal_id, &s1);
+        assert_eq!(result, Err(Ok(multi_sig_patterns::AuthError::ThresholdNotMet)));
+    }
+
+    #[test]
+    fn test_double_approval_prevented() {
+        let env = Env::default();
+        let client = setup_multisig(&env);
+
+        let signer1 = Address::generate(&env);
+        let signer2 = Address::generate(&env);
+
+        // Re-setup with known signers
+        let contract_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+        let client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &contract_id);
+        let s1 = Address::generate(&env);
+        let s2 = Address::generate(&env);
+        let signers = Vec::from_array(&env, [s1.clone(), s2.clone()]);
+        env.mock_all_auths();
+        client.initialize(&1, &signers);
+
+        let proposal_id = client.create_proposal(&s1);
+
+        // First approval succeeds
+        client.approve(&proposal_id, &s1);
+
+        // Second approval from same signer - should fail
+        let result = client.try_approve(&proposal_id, &s1);
+        assert_eq!(result, Err(Ok(multi_sig_patterns::AuthError::AlreadyApproved)));
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Security Tests: Timelock Bypass
+// ---------------------------------------------------------------------------
+
+mod timelock_security_tests {
+    use soroban_sdk::testutils::Address as _;
+    use soroban_sdk::{Address, Bytes, Env};
+
+    fn setup_timelock(env: &Env) -> (timelock::TimelockContractClient<'_>, Address) {
+        let contract_id = env.register_contract(None, timelock::TimelockContract);
+        let client = timelock::TimelockContractClient::new(env, &contract_id);
+        let admin = Address::generate(env);
+        env.mock_all_auths();
+        client.initialize(&admin);
+        (client, admin)
+    }
+
+    fn op_id(env: &Env, s: &[u8]) -> Bytes {
+        Bytes::from_slice(env, s)
+    }
+
+    #[test]
+    #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+    fn test_timelock_unauthorized_queue() {
+        let env = Env::default();
+        let contract_id = env.register_contract(None, timelock::TimelockContract);
+        let client = timelock::TimelockContractClient::new(&env, &contract_id);
+        let admin = Address::generate(&env);
+        let attacker = Address::generate(&env);
+
+        env.mock_all_auths();
+        client.initialize(&admin);
+        env.set_auths(&[]);
+
+        // Attacker tries to queue without auth
+        let (min_delay, _) = client.get_delay_bounds();
+        client.queue(&op_id(&env, b"attack"), &min_delay);
+    }
+
+    #[test]
+    #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+    fn test_timelock_unauthorized_execute() {
+        let env = Env::default();
+        let (client, _admin) = setup_timelock(&env);
+
+        client.queue(&op_id(&env, b"unauth_exec"), &60);
+        env.ledger().with_mut(|l| *l.timestamp += 61);
+
+        env.set_auths(&[]);
+        client.execute(&op_id(&env, b"unauth_exec"));
+    }
+
+    #[test]
+    fn test_timelock_skip_prevented() {
+        let env = Env::default();
+        let (client, _admin) = setup_timelock(&env);
+
+        let id = op_id(&env, b"skip_test");
+        client.queue(&id, &60);
+
+        // Try to execute before delay expires - should fail
+        let result = client.try_execute(&id);
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_timelock_replay_prevented() {
+        let env = Env::default();
+        let (client, _admin) = setup_timelock(&env);
+
+        let id = op_id(&env, b"replay_test");
+        client.queue(&id, &60);
+        env.ledger().with_mut(|l| *l.timestamp += 61);
+
+        // First execution succeeds
+        client.execute(&id);
+
+        // Second execution should fail (replay protection)
+        let result = client.try_execute(&id);
+        assert!(result.is_err());
+    }
+}

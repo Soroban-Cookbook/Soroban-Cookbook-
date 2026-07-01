@@ -212,6 +212,44 @@ impl MultiPartyAuth {
         Ok(true)
     }
 
+    /// Cancel a proposal before it is executed.
+    ///
+    /// Only an authorized signer can cancel.
+    pub fn cancel(env: Env, proposal_id: u32, signer: Address) -> Result<(), AuthError> {
+        signer.require_auth();
+
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers)
+            .ok_or(AuthError::NotAuthorized)?;
+
+        if !signers.contains(&signer) {
+            return Err(AuthError::NotAuthorized);
+        }
+
+        let mut proposal: Proposal = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Proposal(proposal_id))
+            .ok_or(AuthError::ProposalNotFound)?;
+
+        if proposal.executed {
+            return Err(AuthError::AlreadyExecuted);
+        }
+
+        if proposal.cancelled {
+            return Err(AuthError::AlreadyCancelled);
+        }
+
+        proposal.cancelled = true;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(proposal_id), &proposal);
+
+        Ok(())
+    }
+
     /// Get proposal status
     pub fn get_proposal(env: Env, proposal_id: u32) -> Result<Option<Proposal>, AuthError> {
         let proposal = env

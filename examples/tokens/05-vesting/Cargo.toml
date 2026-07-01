@@ -1,0 +1,16 @@
+[package]
+name = "vesting-contract"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+soroban-validation = { path = "../../../shared" }
+
+[dev-dependencies]
+soroban-validation = { path = "../../../shared", features = ["testutils"] }
+soroban-sdk = { workspace = true, features = ["testutils"] }
