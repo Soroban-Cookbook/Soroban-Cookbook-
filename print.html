@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-9089f8c8.js";
+            window.path_to_searchindex_js = "searchindex-ca887a76.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-df3b3ab5.js"></script>
@@ -5016,6 +5016,16 @@ let value = client.get_value_strict(); // errors if stale
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="defi-examples"><a class="header" href="#defi-examples">DeFi Examples</a></h1>
 <p>Decentralized finance on Soroban: AMMs, lending, yield protocols.</p>
+<h2 id="staking-pool"><a class="header" href="#staking-pool">Staking Pool</a></h2>
+<p>A working staking example demonstrates how to build lockup duration options, calculate boost rewards, and enforce early withdrawal penalties.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Lockup tiers and term-based incentives</li>
+<li>Withdrawals before maturity incur a fixed penalty</li>
+<li>Longer lockups earn higher boost rewards</li>
+<li>State tracking per staker via durable storage</li>
+</ul>
+<h2 id="-coming-soon"><a class="header" href="#-coming-soon">📋 Coming Soon</a></h2>
 <h2 id="-examples-1-currently"><a class="header" href="#-examples-1-currently">📋 Examples (1 currently)</a></h2>
 <h3 id="01-vault-strategies-1"><a class="header" href="#01-vault-strategies-1"><a href="examples/vault-strategies">01-vault-strategies</a></a></h3>
 <p><strong>Multi-strategy yield vault</strong> with pluggable strategies and risk management.</p>
@@ -5037,7 +5047,7 @@ client.switch_strategy(&amp;admin, &amp;StrategyType::Balanced);
 let yield_amount = client.estimate_yield(&amp;10_000, &amp;365);
 <span class="boring">}</span></code></pre>
 <hr>
-<h2 id="-coming-soon"><a class="header" href="#-coming-soon">📋 Coming Soon</a></h2>
+<h2 id="-coming-soon-1"><a class="header" href="#-coming-soon-1">📋 Coming Soon</a></h2>
 <h3 id="automated-market-maker-amm"><a class="header" href="#automated-market-maker-amm">Automated Market Maker (AMM)</a></h3>
 <p><strong>Constant product pools</strong> (x*y=k).</p>
 <p><strong>Key Concepts:</strong></p>
@@ -5054,7 +5064,19 @@ let yield_amount = client.estimate_yield(&amp;10_000, &amp;365);
 <li>Liquidation thresholds</li>
 <li>Interest accrual</li>
 </ul>
+<h3 id="yield-vault"><a class="header" href="#yield-vault">Yield Vault</a></h3>
+<p><strong>Automated yield optimization</strong>.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Strategy rotation</li>
+<li>Performance fees</li>
+<li>Emergency withdrawal</li>
+</ul>
 <h2 id="prerequisites-7"><a class="header" href="#prerequisites-7">Prerequisites</a></h2>
+<ul>
+<li><a href="basics.html">Basics</a>, <a href="tokens.html">Tokens</a></li>
+</ul>
+<h2 id="prerequisites-1-1"><a class="header" href="#prerequisites-1-1">Prerequisites</a></h2>
 <ul>
 <li><a href="basics.html">Basics</a>, <a href="tokens.html">Tokens</a></li>
 </ul>
@@ -5389,7 +5411,7 @@ token_id = 7
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="governance-examples"><a class="header" href="#governance-examples">Governance Examples</a></h1>
 <p>DAOs, voting, treasury management.</p>
-<h2 id="-coming-soon-1"><a class="header" href="#-coming-soon-1">📋 Coming Soon</a></h2>
+<h2 id="-coming-soon-2"><a class="header" href="#-coming-soon-2">📋 Coming Soon</a></h2>
 <h3 id="simple-dao"><a class="header" href="#simple-dao">Simple DAO</a></h3>
 <p><strong>Token-weighted voting</strong>.</p>
 <p><strong>Key Concepts:</strong></p>
