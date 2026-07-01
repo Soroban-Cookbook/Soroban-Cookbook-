@@ -216,6 +216,54 @@ npm install
 npm run dev
 ```
 
+## Governance Integration Tests
+
+The governance integration test suite lives in `tests/integration/tests/governance_tests.rs` and covers the three governance contracts in `examples/governance/`.
+
+### Running the tests
+
+```bash
+# Run only the governance integration tests
+cargo test -p integration-tests governance
+
+# Run the full integration test suite
+cargo test -p integration-tests
+
+# Run all workspace tests
+cargo test
+```
+
+### Test coverage summary
+
+30 integration tests across 8 categories:
+
+| # | Category | Tests |
+|---|----------|-------|
+| 1 | Proposal lifecycle | creation, not-initialized error, submit, execute, reject |
+| 2 | Voting | successful vote, duplicate prevention, deadline enforcement, quorum |
+| 3 | DAO treasury | deposit, withdrawal via governance, over-withdrawal guard |
+| 4 | Authorization | invalid proposer cancel, invalid executor while active |
+| 5 | Multiple / concurrent proposals | independent IDs, concurrent vote outcomes |
+| 6 | Delegation | create, remove, delegated weight voting, zero-weight edge case |
+| 7 | Voting-time-constraints | proposal creation, post-deadline rejection, full lifecycle |
+| 8 | End-to-end | cross-contract governance action, full community vote workflow |
+
+### Governance scenarios covered
+
+- Full proposal lifecycle: `Draft → Active → Passed/Failed → Executed`
+- DAO treasury operations via governance-dispatched cross-contract calls
+- Delegation registry: delegates vote with accumulated weight
+- `simple-voting` one-address-one-vote with timestamp deadlines
+- `voting-time-constraints` grace-period lifecycle with early-closure
+- Authorization failures (unauthorized cancel, premature execution, over-withdrawal)
+
+### Test environment assumptions
+
+- Tests run natively (no WASM compilation required) using `env.mock_all_auths()`.
+- `proposal-lifecycle` uses **ledger sequence numbers** for timing; tests advance with `env.ledger().set_sequence_number(...)`.
+- `simple-voting` and `voting-time-constraints` use **ledger timestamps**; tests advance with `env.ledger().set_timestamp(...)`.
+- Treasury and delegation functionality is provided by lightweight mock contracts defined in the test file (`MockTreasury`, `MockDelegation`), because dedicated treasury/delegation contracts are not yet in the repo.
+
 ## Contributing
 
 Contributions are welcome. Whether you're fixing a typo, improving docs, or adding a new example — see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines. Please also read our [Code of Conduct](./CODE_OF_CONDUCT.md).
