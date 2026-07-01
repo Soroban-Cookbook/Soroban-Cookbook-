@@ -65,6 +65,7 @@
 - [DeFi Development Walkthrough](./docs/defi-development-video.md)
 - [Wallet Ecosystem Survey](./docs/wallet-ecosystem.md)
 - [Security Best Practices](./docs/security-best-practices.md)
+- [Site Search](./docs/search.md)
 
 
 # Contributing
