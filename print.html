@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-ca887a76.js";
+            window.path_to_searchindex_js = "searchindex-7d28de3d.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-df3b3ab5.js"></script>
+        <script src="toc-51ecbba3.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -6447,6 +6447,31 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 </ul>
 <hr>
 <p>For more detailed examples, see our <a href="examples">examples directory</a> and specific guides.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="testing-best-practices"><a class="header" href="#testing-best-practices">Testing Best Practices</a></h1>
+<p>Testing is a critical part of developing smart contracts on Soroban. A comprehensive testing strategy ensures that your contracts behave as expected and protects against regressions and security vulnerabilities.</p>
+<h2 id="unit-test-patterns"><a class="header" href="#unit-test-patterns">Unit Test Patterns</a></h2>
+<ul>
+<li><strong>Test each function in isolation:</strong> Ensure you test the happy path and edge cases.</li>
+<li><strong>Mock dependencies:</strong> Use <code>Env::mock_all_auths()</code> to simplify authorization testing when not explicitly testing <code>require_auth()</code>.</li>
+<li><strong>Test error handling:</strong> Use <code>#[should_panic(expected = "...")]</code> to verify that your contracts fail correctly.</li>
+</ul>
+<h2 id="integration-testing"><a class="header" href="#integration-testing">Integration Testing</a></h2>
+<ul>
+<li><strong>Cross-contract calls:</strong> Test workflows spanning multiple contracts using integration tests.</li>
+<li><strong>State transitions:</strong> Ensure that sequences of actions transition the contract state correctly.</li>
+<li><strong>Integration Test Suite:</strong> Keep integration tests in the <code>tests/integration/</code> directory, using <code>env.register_contract()</code> to load and execute contracts.</li>
+</ul>
+<h2 id="fuzz-testing"><a class="header" href="#fuzz-testing">Fuzz Testing</a></h2>
+<ul>
+<li><strong>Property-based testing:</strong> Fuzz inputs using tools like <code>proptest</code> to automatically verify contract invariants across thousands of random inputs.</li>
+<li><strong>Boundary conditions:</strong> Fuzzers often find edge cases near the limits of integer sizes (<code>u32::MAX</code>, <code>i128::MAX</code>).</li>
+</ul>
+<h2 id="coverage-goals"><a class="header" href="#coverage-goals">Coverage Goals</a></h2>
+<ul>
+<li><strong>Target &gt;90% coverage:</strong> Utilize <code>cargo tarpaulin</code> to measure test coverage.</li>
+<li><strong>Cover all branches:</strong> Ensure that conditional branches are evaluated for both truthy and falsy states.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="documentation-platform-evaluation"><a class="header" href="#documentation-platform-evaluation">Documentation Platform Evaluation</a></h1>
 <p>This note compares the repository’s current <code>mdBook</code> setup with a possible move to Docusaurus.</p>
