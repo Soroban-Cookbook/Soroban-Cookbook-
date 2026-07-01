@@ -9,9 +9,10 @@
 #![cfg(test)]
 
 use soroban_sdk::{
-    symbol_short, testutils::Address as _, testutils::Ledger as _, Address, Env, IntoVal, Symbol,
+    symbol_short, testutils::Address as _, testutils::Ledger as _, Address, Bytes, Env, IntoVal, Symbol,
     Vec,
 };
+mod access_control_fuzz;
 
 // ---------------------------------------------------------------------------
 // Test 1: Multi-Contract Workflow — Hello World + Storage + Events counter
