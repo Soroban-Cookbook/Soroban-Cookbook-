@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-91a76d89.js";
+            window.path_to_searchindex_js = "searchindex-74eb755b.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-6e36cc74.js"></script>
+        <script src="toc-12e98a4d.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -8320,6 +8320,93 @@ pub fn transfer(
 <li><a href="https://docs.rs/soroban-sdk">Soroban SDK Documentation</a></li>
 <li><a href="https://www.stellar.org/security">Stellar Security Disclosure Policy</a></li>
 </ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="site-search"><a class="header" href="#site-search">Site Search</a></h1>
+<p>The Soroban Cookbook has full-text search built in via <a href="https://rust-lang.github.io/mdBook/guide/reading.html#search">mdBook’s search feature</a>.</p>
+<h2 id="how-to-search"><a class="header" href="#how-to-search">How to Search</a></h2>
+<p>Press <strong><code>S</code></strong> or click the <strong>magnifying glass</strong> icon in the top-left toolbar to open the search bar.</p>
+<p>Type any keyword, function name, concept, or code snippet — results appear instantly as you type.</p>
+<h2 id="search-features"><a class="header" href="#search-features">Search Features</a></h2>
+<h3 id="full-text-search"><a class="header" href="#full-text-search">Full-Text Search</a></h3>
+<p>Every page, heading, and paragraph in the cookbook is indexed at build time. Queries match anywhere in the content.</p>
+<h3 id="code-search"><a class="header" href="#code-search">Code Search</a></h3>
+<p>Code blocks are included in the search index. You can search for:</p>
+<ul>
+<li>Soroban macros: <code>contractimpl</code>, <code>contracttype</code>, <code>symbol_short</code></li>
+<li>Function names: <code>invoke_contract</code>, <code>get_ledger_timestamp</code></li>
+<li>Error types: <code>ContractError</code>, <code>AuthError</code></li>
+<li>Crate names: <code>soroban-sdk</code>, <code>stellar-xdr</code></li>
+</ul>
+<p>Example searches:</p>
+<pre><code>token transfer
+invoke_contract auth
+storage get put
+</code></pre>
+<h3 id="search-suggestions-auto-expand"><a class="header" href="#search-suggestions-auto-expand">Search Suggestions (Auto-Expand)</a></h3>
+<p>The search engine automatically expands partial words. Searching for <code>token</code> also matches <code>tokenize</code>, <code>tokenomics</code>, etc. This is powered by the <code>expand = true</code> setting in <code>book.toml</code>.</p>
+<h3 id="boolean-and-mode"><a class="header" href="#boolean-and-mode">Boolean AND Mode</a></h3>
+<p>By default, all search terms must appear in a result (AND logic). A search for <code>storage persistent</code> only returns pages that contain <strong>both</strong> words.</p>
+<h3 id="result-ranking"><a class="header" href="#result-ranking">Result Ranking</a></h3>
+<p>Results are ranked by relevance using boost weights:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Match location</th><th>Boost</th></tr>
+</thead>
+<tbody>
+<tr><td>Page title</td><td>2×</td></tr>
+<tr><td>Section heading</td><td>1×</td></tr>
+<tr><td>Paragraph text</td><td>1×</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="keyboard-navigation"><a class="header" href="#keyboard-navigation">Keyboard Navigation</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Key</th><th>Action</th></tr>
+</thead>
+<tbody>
+<tr><td><code>S</code></td><td>Open search</td></tr>
+<tr><td><code>↑</code> / <code>↓</code></td><td>Move through results</td></tr>
+<tr><td><code>Enter</code></td><td>Open highlighted result</td></tr>
+<tr><td><code>Escape</code></td><td>Close search</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="search-index"><a class="header" href="#search-index">Search Index</a></h2>
+<p>The search index (<code>searchindex.json</code>) is generated automatically during <code>mdbook build</code> and is stored alongside the HTML output. It contains:</p>
+<ul>
+<li>All page titles and headings</li>
+<li>Full paragraph text</li>
+<li>Code block contents</li>
+<li>Hierarchical section paths (used for breadcrumb display in results)</li>
+</ul>
+<p>No external service is required — search runs entirely in the browser using the bundled JavaScript.</p>
+<h2 id="tips-for-better-results"><a class="header" href="#tips-for-better-results">Tips for Better Results</a></h2>
+<ul>
+<li>Use <strong>specific terms</strong> — <code>pause_contract</code> finds more targeted results than <code>pause</code></li>
+<li>Search for <strong>error messages</strong> you encounter to jump directly to troubleshooting content</li>
+<li>Search by <strong>pattern name</strong> — <code>factory</code>, <code>proxy</code>, <code>oracle</code>, <code>vault</code></li>
+<li>Combine terms — <code>defi vault fee</code> narrows results across DeFi vault examples</li>
+</ul>
+<h2 id="configuration-1"><a class="header" href="#configuration-1">Configuration</a></h2>
+<p>Search is configured in <code>book/book.toml</code>:</p>
+<pre><code class="language-toml">[output.html.search]
+enable = true
+limit-results = 30
+teaser-word-count = 30
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 3
+copy-js = true
+</code></pre>
+<p>To rebuild the search index after adding new content:</p>
+<pre><code class="language-bash">cd book &amp;&amp; mdbook build
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="contributing-to-soroban-cookbook"><a class="header" href="#contributing-to-soroban-cookbook">Contributing to Soroban Cookbook</a></h1>
 <p>Thank you for your interest in contributing to the Soroban Cookbook! This project aims to be a comprehensive resource for Soroban developers, and your contributions are what make it great.</p>
