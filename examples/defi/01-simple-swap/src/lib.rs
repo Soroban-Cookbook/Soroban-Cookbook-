@@ -28,8 +28,8 @@ pub struct SwapEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap");
-const EVENT_SWAP: Symbol = symbol_short!("swap_executed");
-const EVENT_PAIR: Symbol = symbol_short!("pair_updated");
+const EVENT_SWAP: Symbol = symbol_short!("swap_exec");
+const EVENT_PAIR: Symbol = symbol_short!("pair_updt");
 
 impl SimpleSwapContract {
     fn require_owner(&self, env: &Env) {

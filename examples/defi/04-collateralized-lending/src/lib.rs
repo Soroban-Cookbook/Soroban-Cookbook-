@@ -1,6 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, Symbol};
 
 #[derive(Clone, Copy)]
 #[contracttype]
@@ -258,7 +258,7 @@ impl LendingContract {
         if !env
             .storage()
             .instance()
-            .get(&Symbol::new(&env, "emergency_paused"))
+            .get::<Symbol, bool>(&Symbol::new(&env, "emergency_paused"))
             .unwrap()
         {
             panic!("not in emergency mode");

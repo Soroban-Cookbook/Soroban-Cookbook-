@@ -1,21 +1,10 @@
-# Active Tasks
+# TODO
 
-## #165 Document Storage Patterns
-✅ COMPLETE
+- [ ] Create new token-lock example contract under `examples/tokens/token-lock/`.
+- [ ] Implement APIs: `lock`, `unlock`, `locked_balance`, and lock schedule queries.
+- [ ] Implement time-based unlock logic using `unlock_time` per lock entry.
+- [ ] Add events for `locked` and `unlocked`.
+- [ ] Add unit/integration tests validating unlock conditions and balances.
+- [ ] Add README documenting usage and design tradeoffs.
+- [ ] Ensure workspace builds/tests for the new package.
 
-## #69 Document Error Handling  
-✅ COMPLETE
-
----
-
-## #196 Document Event Patterns
-✅ Planned and approved
-
-### Steps
-- [x] 1. Create book/src/examples/events.md
-- [x] 2. Update book/src/SUMMARY.md to add Events under Basics
-- [x] 3. Update book/src/examples/basics.md to expand 04-events section
-- [x] 4. Preview with mdbook serve (book/)
-- [x] 5. Mark #196 complete
-
-✅ COMPLETE - Outstanding 04-events example integrated (structured topics/payloads, guidelines).
