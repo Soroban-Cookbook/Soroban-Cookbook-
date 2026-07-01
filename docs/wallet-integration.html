@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Setup Environment - Soroban Cookbook</title>
+        <title>Wallet Integration Guide - Soroban Cookbook</title>
 
 
         <!-- Custom HTML head -->
@@ -146,7 +146,7 @@
                         <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
                             <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
                         </a>
-                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/guides/getting-started.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/src/docs/wallet-integration.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
                             <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
                         </a>
 
@@ -180,354 +180,376 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="getting-started-with-soroban"><a class="header" href="#getting-started-with-soroban">Getting Started with Soroban</a></h1>
-<p>This guide walks you through everything you need to write, test, and deploy your first Soroban smart contract — from a fresh machine to a live contract on testnet.</p>
-<hr>
+                        <h1 id="wallet-integration-guide"><a class="header" href="#wallet-integration-guide">Wallet Integration Guide</a></h1>
+<p>This guide helps Soroban developers add wallet support to web applications, dashboards, and frontends that interact with Stellar smart contracts. It focuses on practical integration patterns, expected user flows, and production recommendations for common wallets in the Stellar ecosystem.</p>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#network-configuration">Network Configuration</a></li>
+<li><a href="#supported-wallets">Supported Wallets</a></li>
+<li><a href="#integration-examples">Integration Examples</a></li>
+<li><a href="#example-workflow">Example Workflow</a></li>
+<li><a href="#testing-guide">Testing Guide</a></li>
+<li><a href="#best-practices">Best Practices</a></li>
+<li><a href="#common-problems">Common Problems</a></li>
+<li><a href="#external-resources">External Resources</a></li>
+</ul>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>Wallet integration is the layer that lets users connect their account, authorize contract calls, and approve transactions from an application. In Soroban, this matters because most contract interactions require a signed transaction or an authorization payload. A smooth wallet experience improves trust, reduces onboarding friction, and helps users understand what they are signing.</p>
+<p>For many teams, the wallet experience is part of the product itself. If users cannot connect, cannot switch networks, or receive confusing errors, adoption drops quickly. Good integration should be reliable, secure, and easy to test.</p>
+<p>The wallet ecosystem is evolving quickly. In practice, the most common starting points are:</p>
+<ul>
+<li>Freighter for browser-based development and testing</li>
+<li>xBull for desktop and mobile coverage</li>
+<li>Albedo for web-based signing flows</li>
+<li>WalletConnect-compatible wallets for mobile and browser-based DApps</li>
+</ul>
 <h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
-<p>Before you start, make sure you have:</p>
+<p>Before you integrate wallets into a Soroban app, make sure your development environment is ready.</p>
+<h3 id="required-tools"><a class="header" href="#required-tools">Required tools</a></h3>
 <ul>
-<li>A Unix-like terminal (macOS, Linux, or WSL2 on Windows)</li>
-<li>Basic familiarity with the command line</li>
-<li>No prior Rust experience required, but the <a href="https://doc.rust-lang.org/book/">Rust Book</a> is a great companion</li>
+<li>A recent Node.js installation for frontend work</li>
+<li>The Soroban / Stellar CLI for local testing and deployment</li>
+<li>The Soroban Rust SDK when building or calling contracts from Rust-based tooling</li>
+<li>A wallet extension or mobile wallet installed for manual testing</li>
 </ul>
-<hr>
-<h2 id="step-1--install-rust"><a class="header" href="#step-1--install-rust">Step 1 — Install Rust</a></h2>
-<p>Soroban contracts are written in Rust and compiled to WebAssembly. Install the Rust toolchain via <code>rustup</code>:</p>
-<pre><code class="language-bash">curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+<h3 id="recommended-packages"><a class="header" href="#recommended-packages">Recommended packages</a></h3>
+<p>For a JavaScript or TypeScript frontend, you will typically need:</p>
+<pre><code class="language-bash">npm install @stellar/stellar-sdk
 </code></pre>
-<p>Follow the on-screen prompts (the default installation is fine). Then reload your shell:</p>
-<pre><code class="language-bash">source "$HOME/.cargo/env"
+<p>If you are using Freighter-style browser APIs, install the wallet SDK that matches your target wallet:</p>
+<pre><code class="language-bash">npm install @stellar/freighter-api
 </code></pre>
-<p>Verify the installation:</p>
-<pre><code class="language-bash">rustc --version   # e.g. rustc 1.78.0
-cargo --version   # e.g. cargo 1.78.0
-</code></pre>
+<h3 id="environment-setup"><a class="header" href="#environment-setup">Environment setup</a></h3>
+<ol>
+<li>Install the Stellar CLI and confirm that it runs.</li>
+<li>Configure your preferred network, such as Testnet or Futurenet.</li>
+<li>Create a funded test account for manual testing.</li>
+<li>Keep the contract ID, network passphrase, and RPC endpoint in a shared config file so your frontend can use them consistently.</li>
+</ol>
 <blockquote>
-<p>Soroban requires <strong>Rust 1.74 or later</strong>. Run <code>rustup update stable</code> if your version is older.</p>
+<p>Wallet support changes quickly. Always check the official provider documentation before relying on a specific API or network flow.</p>
 </blockquote>
-<hr>
-<h2 id="step-2--add-the-webassembly-target"><a class="header" href="#step-2--add-the-webassembly-target">Step 2 — Add the WebAssembly Target</a></h2>
-<p>Soroban contracts compile to WebAssembly (WASM). Add the target:</p>
-<pre><code class="language-bash">rustup target add wasm32-unknown-unknown
-</code></pre>
-<p>Verify it was added:</p>
-<pre><code class="language-bash">rustup target list --installed | grep wasm32
-# wasm32-unknown-unknown
-</code></pre>
-<hr>
-<h2 id="step-3--install-the-soroban-cli"><a class="header" href="#step-3--install-the-soroban-cli">Step 3 — Install the Soroban CLI</a></h2>
-<p>The Soroban CLI handles building, testing, deploying, and invoking contracts:</p>
-<pre><code class="language-bash">cargo install --locked stellar-cli --features opt
-</code></pre>
-<blockquote>
-<p>The package is now published as <code>stellar-cli</code> (which includes the <code>soroban</code> subcommand). If you have an older <code>soroban-cli</code> installed, uninstall it first: <code>cargo uninstall soroban-cli</code>.</p>
-</blockquote>
-<p>Verify the installation:</p>
-<pre><code class="language-bash">stellar --version        # e.g. stellar 21.x.x
-stellar contract --help  # should list contract subcommands
-</code></pre>
-<hr>
-<h2 id="step-4--configure-your-editor-recommended"><a class="header" href="#step-4--configure-your-editor-recommended">Step 4 — Configure Your Editor (Recommended)</a></h2>
-<h3 id="vs-code"><a class="header" href="#vs-code">VS Code</a></h3>
-<p>Install <a href="https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer">rust-analyzer</a> for inline type hints, auto-complete, and error highlighting. It works out of the box with Soroban projects.</p>
-<h3 id="jetbrains-ides-intellij--clion--rustrover"><a class="header" href="#jetbrains-ides-intellij--clion--rustrover">JetBrains IDEs (IntelliJ / CLion / RustRover)</a></h3>
-<p>Install the <a href="https://plugins.jetbrains.com/plugin/8182-rust">Rust plugin</a>.</p>
-<hr>
-<h2 id="step-5--set-up-a-testnet-identity"><a class="header" href="#step-5--set-up-a-testnet-identity">Step 5 — Set Up a Testnet Identity</a></h2>
-<p>You need a funded account to deploy contracts. Create one now so it’s ready when you reach the deployment step.</p>
-<h3 id="add-the-testnet-network"><a class="header" href="#add-the-testnet-network">Add the testnet network</a></h3>
-<pre><code class="language-bash">stellar network add \
-  --global testnet \
-  --rpc-url https://soroban-testnet.stellar.org:443 \
-  --network-passphrase "Test SDF Network ; September 2015"
-</code></pre>
-<h3 id="generate-a-keypair"><a class="header" href="#generate-a-keypair">Generate a keypair</a></h3>
-<pre><code class="language-bash">stellar keys generate alice --network testnet
-</code></pre>
-<h3 id="print-your-public-key"><a class="header" href="#print-your-public-key">Print your public key</a></h3>
-<pre><code class="language-bash">stellar keys address alice
-# G... (56-character Stellar address)
-</code></pre>
-<h3 id="fund-the-account-testnet-only--free"><a class="header" href="#fund-the-account-testnet-only--free">Fund the account (testnet only — free)</a></h3>
-<pre><code class="language-bash">stellar keys fund alice --network testnet
-</code></pre>
-<p>This calls Friendbot, Stellar’s testnet faucet, and deposits 10,000 XLM into your account.</p>
-<hr>
-<h2 id="step-6--your-first-contract"><a class="header" href="#step-6--your-first-contract">Step 6 — Your First Contract</a></h2>
-<h3 id="61-create-the-project"><a class="header" href="#61-create-the-project">6.1 Create the project</a></h3>
-<pre><code class="language-bash">cargo new --lib my-first-contract
-cd my-first-contract
-</code></pre>
-<h3 id="62-configure-cargotoml"><a class="header" href="#62-configure-cargotoml">6.2 Configure <code>Cargo.toml</code></a></h3>
-<p>Replace the generated <code>Cargo.toml</code> with:</p>
-<pre><code class="language-toml">[package]
-name = "my-first-contract"
-version = "0.1.0"
-edition = "2021"
-
-[lib]
-# cdylib produces the .wasm file the Soroban host loads.
-# rlib lets the test harness link against the crate.
-crate-type = ["cdylib", "rlib"]
-
-[dependencies]
-soroban-sdk = "21.7.0"
-
-[dev-dependencies]
-soroban-sdk = { version = "21.7.0", features = ["testutils"] }
-
-[profile.release]
-opt-level = "z"          # optimise for binary size
-overflow-checks = true   # keep overflow traps in release builds
-debug = 0
-strip = "symbols"
-debug-assertions = false
-panic = "abort"
-codegen-units = 1
-lto = true
-</code></pre>
-<p>Key points:</p>
-<ul>
-<li><code>crate-type = ["cdylib", "rlib"]</code> — <code>cdylib</code> produces the <code>.wasm</code> binary; <code>rlib</code> is needed so tests can import the crate.</li>
-<li>The <code>[profile.release]</code> block is the standard Soroban size-optimisation profile. Copy it into every contract you write.</li>
-</ul>
-<h3 id="63-write-the-contract"><a class="header" href="#63-write-the-contract">6.3 Write the contract</a></h3>
-<p>Replace <code>src/lib.rs</code> with:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span>#![no_std]
-<span class="boring">fn main() {
-</span>//  ^^^^^^^ Soroban contracts run in a no_std Wasm sandbox.
-//          The standard library is not available.
-
-use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
-//                ^^^^^^^   ^^^^^^^^^^^^  ^^^^^^^^^^^^   ^^^
-//                |         |             |              Soroban's Vec (not std::vec::Vec)
-//                |         |             Creates a Symbol from a short string literal
-//                |         Marks the impl block as the contract's public interface
-//                Marks this struct as a Soroban contract
-
-/// The contract type — a plain unit struct.
-/// Soroban routes invocations to the #[contractimpl] block below.
-#[contract]
-pub struct HelloContract;
-
-#[contractimpl]
-impl HelloContract {
-    /// Returns a greeting: ["Hello", &lt;to&gt;]
-    ///
-    /// `env` is the execution environment injected by the host.
-    /// `to`  is the name to greet, passed as a Symbol.
-    pub fn hello(env: Env, to: Symbol) -&gt; Vec&lt;Symbol&gt; {
-        vec![&amp;env, symbol_short!("Hello"), to]
-        //   ^^^^  ^^^^^^^^^^^^^^^^^^^^^^  ^^
-        //   |     A compile-time Symbol   The caller-supplied name
-        //   Required by Soroban's vec! macro
-    }
-}
-
-#[cfg(test)]
-mod test;
-<span class="boring">}</span></code></pre>
-<p>Why <code>Vec&lt;Symbol&gt;</code> instead of a <code>String</code>? <code>soroban_sdk::String</code> is an immutable host object — there is no <code>format!</code> or string concatenation in the Wasm sandbox. Returning a <code>Vec&lt;Symbol&gt;</code> is idiomatic: it is cheap, composable, and easy for frontends to decode.</p>
-<h3 id="64-write-the-tests"><a class="header" href="#64-write-the-tests">6.4 Write the tests</a></h3>
-<p>Create <code>src/test.rs</code>:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span>#![cfg(test)]
-
-<span class="boring">fn main() {
-</span>use super::*;
-use soroban_sdk::{symbol_short, vec, Env};
-
-#[test]
-fn test_hello_returns_greeting() {
-    // 1. Create a fresh test environment.
-    let env = Env::default();
-
-    // 2. Register the contract — this gives it an on-chain address.
-    let contract_id = env.register_contract(None, HelloContract);
-
-    // 3. Create a typed client. The SDK generates HelloContractClient
-    //    automatically from the #[contractimpl] block.
-    let client = HelloContractClient::new(&amp;env, &amp;contract_id);
-
-    // 4. Invoke the contract function through the client.
-    let result = client.hello(&amp;symbol_short!("World"));
-
-    // 5. Assert the expected output.
-    assert_eq!(
-        result,
-        vec![&amp;env, symbol_short!("Hello"), symbol_short!("World")]
-    );
-}
-<span class="boring">}</span></code></pre>
-<h3 id="65-run-the-tests"><a class="header" href="#65-run-the-tests">6.5 Run the tests</a></h3>
-<pre><code class="language-bash">cargo test
-</code></pre>
-<p>Expected output:</p>
-<pre><code>running 1 test
-test test::test_hello_returns_greeting ... ok
-
-test result: ok. 1 passed; 0 failed
-</code></pre>
-<h3 id="66-build-the-contract"><a class="header" href="#66-build-the-contract">6.6 Build the contract</a></h3>
-<pre><code class="language-bash">cargo build --target wasm32-unknown-unknown --release
-</code></pre>
-<p>The compiled contract lands at:</p>
-<pre><code>target/wasm32-unknown-unknown/release/my_first_contract.wasm
-</code></pre>
-<p>You can also use the Stellar CLI, which wraps the build and applies the workspace profile automatically:</p>
-<pre><code class="language-bash">stellar contract build
-</code></pre>
-<h3 id="67-deploy-to-testnet"><a class="header" href="#67-deploy-to-testnet">6.7 Deploy to testnet</a></h3>
-<pre><code class="language-bash">stellar contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/my_first_contract.wasm \
-  --source alice \
-  --network testnet
-</code></pre>
-<p>The CLI prints a contract ID — a 56-character address starting with <code>C</code>. Save it:</p>
-<pre><code>CA3D5KRYM6CB7OWQ6TWYRR3Z4T7GNZLKERYNZGGA5SOAOPIFY6YQGAXE
-</code></pre>
-<h3 id="68-invoke-the-deployed-contract"><a class="header" href="#68-invoke-the-deployed-contract">6.8 Invoke the deployed contract</a></h3>
-<pre><code class="language-bash">stellar contract invoke \
-  --id &lt;CONTRACT_ID&gt; \
-  --source alice \
-  --network testnet \
-  -- hello \
-  --to World
-</code></pre>
-<p>Expected output:</p>
-<pre><code class="language-json">["Hello","World"]
-</code></pre>
-<p>You just deployed and invoked your first Soroban smart contract.</p>
-<hr>
-<h2 id="what-just-happened"><a class="header" href="#what-just-happened">What Just Happened?</a></h2>
-<p>Here is a quick map of the pieces:</p>
+<h2 id="network-configuration"><a class="header" href="#network-configuration">Network Configuration</a></h2>
+<p>Handling multiple networks correctly is crucial for a smooth developer and user experience. Each Stellar network (Mainnet, Testnet, Futurenet) has a unique passphrase and RPC endpoint.</p>
+<h3 id="network-passphrases"><a class="header" href="#network-passphrases">Network Passphrases</a></h3>
 <div class="table-wrapper">
 <table>
 <thead>
-<tr><th>Piece</th><th>Role</th></tr>
+<tr><th>Network</th><th>Passphrase</th></tr>
 </thead>
 <tbody>
-<tr><td><code>#[contract]</code></td><td>Registers <code>HelloContract</code> with the Soroban host</td></tr>
-<tr><td><code>#[contractimpl]</code></td><td>Exposes <code>hello</code> as a callable contract function</td></tr>
-<tr><td><code>Env</code></td><td>The gateway to the blockchain: storage, events, crypto, ledger info</td></tr>
-<tr><td><code>Symbol</code></td><td>A gas-efficient short string (≤ 32 alphanumeric/underscore chars)</td></tr>
-<tr><td><code>Vec&lt;Symbol&gt;</code></td><td>A host-allocated vector — the idiomatic multi-value return type</td></tr>
-<tr><td><code>HelloContractClient</code></td><td>Auto-generated typed client used in tests and off-chain tooling</td></tr>
-<tr><td><code>cdylib</code> crate type</td><td>Produces the <code>.wasm</code> binary the Soroban VM loads</td></tr>
-<tr><td><code>rlib</code> crate type</td><td>Lets the test harness import the crate’s types</td></tr>
+<tr><td><strong>Mainnet</strong></td><td><code>Public Global Stellar Network ; September 2015</code></td></tr>
+<tr><td><strong>Testnet</strong></td><td><code>Test SDF Network ; September 2015</code></td></tr>
+<tr><td><strong>Futurenet</strong></td><td><code>Test SDF Future Network ; October 2022</code></td></tr>
 </tbody>
 </table>
 </div>
-<hr>
-<h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
+<h3 id="rpc-endpoints"><a class="header" href="#rpc-endpoints">RPC Endpoints</a></h3>
+<p>Apps should allow users to connect to different RPC providers. Standard SDF endpoints include:</p>
+<ul>
+<li><strong>Testnet:</strong> <code>https://soroban-testnet.stellar.org</code></li>
+<li><strong>Futurenet:</strong> <code>https://rpc-futurenet.stellar.org</code></li>
+</ul>
+<h3 id="handling-networks-in-code"><a class="header" href="#handling-networks-in-code">Handling Networks in Code</a></h3>
+<p>When building transactions, you must use the correct passphrase:</p>
+<pre><code class="language-ts">import { Networks } from "@stellar/stellar-sdk";
+
+const networkPassphrase = Networks.TESTNET; // Or custom string for Futurenet
+</code></pre>
+<h2 id="supported-wallets"><a class="header" href="#supported-wallets">Supported Wallets</a></h2>
+<h3 id="freighter"><a class="header" href="#freighter">Freighter</a></h3>
+<ul>
+<li>Overview: Freighter is the most commonly used browser extension for Stellar and Soroban development. It is a strong default choice for local development and Testnet testing.</li>
+<li>Installation: Install the official extension from the Freighter website and confirm it is enabled in your browser.</li>
+<li>Configuration: Add your target network, such as Testnet, and allow the app to connect to it.</li>
+<li>Connection flow: Request access to the wallet, read the public address, and store the result in app state.</li>
+<li>Authentication: Use the wallet to approve account access and to sign Soroban transactions.</li>
+<li>Signing transactions: Build a transaction or contract invocation, then pass it to the wallet for signing.</li>
+<li>Sending transactions: Submit the signed XDR to a Soroban RPC endpoint.</li>
+<li>Disconnecting: Clear local application state and remove the connected address from memory.</li>
+</ul>
+<h3 id="xbull"><a class="header" href="#xbull">xBull</a></h3>
+<ul>
+<li>Overview: xBull is a broader wallet option that supports desktop and mobile use and is useful when you want a more flexible wallet experience.</li>
+<li>Installation: Install the browser extension or mobile app from the official xBull documentation.</li>
+<li>Configuration: Configure networks, RPC endpoints, and account settings for your preferred environment.</li>
+<li>Connection flow: Connect the app to the wallet and request an address or account selection.</li>
+<li>Authentication: Approve the connection request when the app first accesses the account.</li>
+<li>Signing transactions: Sign transactions through the wallet provider interface.</li>
+<li>Sending transactions: Broadcast the signed transaction using the network RPC.</li>
+<li>Disconnecting: Clear the connection from the app and prompt the user to reconnect if needed.</li>
+</ul>
+<h3 id="albedo"><a class="header" href="#albedo">Albedo</a></h3>
+<ul>
+<li>Overview: Albedo provides a web-based signing experience that can be helpful for users who prefer not to install a browser extension.</li>
+<li>Installation: No extension is required. Open the wallet flow from your app and follow the web-based sign-in experience.</li>
+<li>Configuration: Configure the app redirect and network details according to the official instructions.</li>
+<li>Connection flow: Redirect the user to the Albedo flow, confirm the requested scopes, and receive the response.</li>
+<li>Authentication: Approve the application access request in the Albedo UI.</li>
+<li>Signing transactions: Request a transaction signature and receive the signed output.</li>
+<li>Sending transactions: Submit the signed transaction to the network after the wallet returns the signature.</li>
+<li>Disconnecting: Clear the session state in your app and instruct the user to start a new signing flow if needed.</li>
+</ul>
+<h3 id="walletconnect-compatible-solutions"><a class="header" href="#walletconnect-compatible-solutions">WalletConnect-compatible solutions</a></h3>
+<ul>
+<li>Overview: WalletConnect is commonly used for connecting web apps to mobile wallets or other provider ecosystems.</li>
+<li>Installation: Use the official WalletConnect SDK in your frontend and ensure the wallet supports the same protocol version.</li>
+<li>Configuration: Configure a project ID and the required chain metadata for your app.</li>
+<li>Connection flow: Open a connection modal, choose the wallet, and approve the session.</li>
+<li>Authentication: Ask the wallet to approve the session and any required account scopes.</li>
+<li>Signing transactions: Use the WalletConnect signing flow and return the signed transaction payload.</li>
+<li>Sending transactions: Broadcast the signed transaction using your RPC client.</li>
+<li>Disconnecting: End the session in your app and prompt the user to reconnect as needed.</li>
+</ul>
+<h2 id="integration-examples"><a class="header" href="#integration-examples">Integration Examples</a></h2>
+<p>The examples below are intentionally simple and follow the same mental model across wallets: connect, inspect the wallet state, sign, submit, and handle errors.</p>
+<h3 id="connecting-a-wallet"><a class="header" href="#connecting-a-wallet">Connecting a wallet</a></h3>
+<pre><code class="language-ts">import { requestAccess, getAddress } from "@stellar/freighter-api";
+
+async function connectWallet() {
+  const allowed = await requestAccess();
+  if (!allowed) {
+    throw new Error("Wallet access denied by the user");
+  }
+
+  const address = await getAddress();
+  return address;
+}
+</code></pre>
+<h3 id="checking-connection-status"><a class="header" href="#checking-connection-status">Checking connection status</a></h3>
+<pre><code class="language-ts">async function getConnectionStatus() {
+  // Use the wallet SDK or provider method that exposes connectivity state.
+  // The exact API varies by wallet.
+  return {
+    connected: true,
+    network: "TESTNET"
+  };
+}
+</code></pre>
+<h3 id="signing-a-transaction"><a class="header" href="#signing-a-transaction">Signing a transaction</a></h3>
+<pre><code class="language-ts">import { signTransaction } from "@stellar/freighter-api";
+
+async function signSorobanTx(xdr: string) {
+  const signedXdr = await signTransaction(xdr, { network: "TESTNET" });
+  return signedXdr;
+}
+</code></pre>
+<h3 id="submitting-a-transaction"><a class="header" href="#submitting-a-transaction">Submitting a transaction</a></h3>
+<pre><code class="language-ts">import { Server, TransactionBuilder, Networks } from "@stellar/stellar-sdk";
+
+async function submitTransaction(signedXdr: string) {
+  const server = new Server("https://soroban-testnet.stellar.org");
+  const tx = TransactionBuilder.fromXDR(signedXdr, Networks.TESTNET);
+  const result = await server.sendTransaction(tx);
+  return result;
+}
+</code></pre>
+<h3 id="handling-user-rejection"><a class="header" href="#handling-user-rejection">Handling user rejection</a></h3>
+<pre><code class="language-ts">try {
+  await connectWallet();
+} catch (error) {
+  console.warn("User rejected the connection request", error);
+}
+</code></pre>
+<h3 id="handling-network-errors"><a class="header" href="#handling-network-errors">Handling network errors</a></h3>
+<pre><code class="language-ts">try {
+  await submitTransaction("signed-xdr");
+} catch (error) {
+  console.error("Transaction submission failed", error);
+}
+</code></pre>
+<h3 id="switching-networks"><a class="header" href="#switching-networks">Switching networks</a></h3>
+<p>If your app supports multiple networks, check the wallet state before sending a transaction. Some wallets let the user switch networks manually, while others require you to prompt the user to switch to the correct network in the wallet UI.</p>
+<pre><code class="language-ts">function ensureNetwork(targetNetwork: string) {
+  if (targetNetwork !== "TESTNET") {
+    throw new Error("This example only supports TESTNET");
+  }
+}
+</code></pre>
+<h2 id="example-workflow"><a class="header" href="#example-workflow">Example Workflow</a></h2>
+<p>The following example demonstrates a complete flow: connecting the wallet, building a transaction, signing it, and submitting it to the network.</p>
+<pre><code class="language-ts">import {
+  requestAccess,
+  getAddress,
+  signTransaction
+} from "@stellar/freighter-api";
+import {
+  Server,
+  TransactionBuilder,
+  Networks,
+  Address,
+  Contract
+} from "@stellar/stellar-sdk";
+
+async function runExampleWorkflow(contractId: string, method: string, args: any[]) {
+  try {
+    // 1. Connect Wallet
+    const allowed = await requestAccess();
+    if (!allowed) throw new Error("Wallet access denied");
+    const userAddress = await getAddress();
+
+    // 2. Initialize Server and Network
+    const server = new Server("https://soroban-testnet.stellar.org");
+    const networkPassphrase = Networks.TESTNET;
+
+    // 3. Fetch Account Details
+    const account = await server.getAccount(userAddress);
+
+    // 4. Build Contract Invocation
+    const contract = new Contract(contractId);
+    let tx = new TransactionBuilder(account, {
+      fee: "100", // Placeholder fee, will be updated during preparation
+      networkPassphrase,
+    })
+    .addOperation(contract.call(method, ...args))
+    .setTimeout(30)
+    .build();
+
+    // 5. Prepare Transaction (Simulation)
+    // This step is critical for Soroban to calculate resource usage (footprint, instructions)
+    tx = await server.prepareTransaction(tx);
+
+    // 6. Sign Transaction
+    const signedXdr = await signTransaction(tx.toXDR(), {
+      network: "TESTNET"
+    });
+
+    // 7. Submit Transaction
+    const result = await server.sendTransaction(
+      TransactionBuilder.fromXDR(signedXdr, networkPassphrase)
+    );
+
+    console.log("Transaction Success:", result.hash);
+    return result;
+
+  } catch (error) {
+    console.error("Workflow failed:", error);
+    throw error;
+  }
+}
+</code></pre>
+<h2 id="testing-guide"><a class="header" href="#testing-guide">Testing Guide</a></h2>
+<p>Testing wallet flows is critical because they involve user consent, network configuration, and external providers.</p>
+<h3 id="local-testing"><a class="header" href="#local-testing">Local testing</a></h3>
+<ul>
+<li>Use a local development wallet account and a funded test account.</li>
+<li>Prefer Testnet for manual integration checks.</li>
+<li>Keep your RPC endpoints and network passphrases in a config file.</li>
+<li>Test both success and failure flows.</li>
+</ul>
+<h3 id="testnet-testing"><a class="header" href="#testnet-testing">Testnet testing</a></h3>
+<ul>
+<li>Use Testnet contracts and test accounts rather than mainnet funds.</li>
+<li>Verify that signatures and submitted transactions behave as expected on the network.</li>
+<li>Track the transaction hash and inspect the result through the Stellar explorer or RPC response.</li>
+</ul>
+<h3 id="mock-wallets-where-applicable"><a class="header" href="#mock-wallets-where-applicable">Mock wallets where applicable</a></h3>
+<p>If you are building a frontend test suite, mock the wallet provider interface instead of trying to depend on the real wallet during automated tests. Keep the mock close to the provider boundary and verify that the app responds correctly to connection success, rejection, and network errors.</p>
+<h3 id="common-debugging-steps"><a class="header" href="#common-debugging-steps">Common debugging steps</a></h3>
 <ol>
-<li>
-<p><strong>Explore the examples</strong> — start with the basics:</p>
-<ul>
-<li><a href="../../examples/basics/01-hello-world/">01-hello-world</a> — the contract you just wrote, fully annotated</li>
-<li><a href="../../examples/basics/02-storage-patterns/">02-storage-patterns</a> — persistent, instance, and temporary storage</li>
-<li><a href="../../examples/basics/03-authentication/">03-authentication</a> — <code>require_auth()</code>, admin checks, RBAC</li>
-<li><a href="../../examples/basics/04-events/">04-events</a> — structured event emission</li>
-<li><a href="../../examples/basics/05-error-handling/">05-error-handling</a> — <code>Result</code> vs <code>panic!</code></li>
-</ul>
-</li>
-<li>
-<p><strong>Learn to test well</strong> — read the <a href="./testing.html">Testing Guide</a></p>
-</li>
-<li>
-<p><strong>Deploy with confidence</strong> — read the <a href="./deployment.html">Deployment Guide</a></p>
-</li>
-<li>
-<p><strong>Coming from Ethereum?</strong> — read the <a href="./ethereum-to-soroban.html">Ethereum → Soroban Migration Guide</a></p>
-</li>
+<li>Check whether the wallet is installed and enabled.</li>
+<li>Confirm that the network selected in the wallet matches your app’s target network.</li>
+<li>Verify the transaction XDR is built for the same network and passphrase.</li>
+<li>Inspect RPC errors and wallet error messages for clues.</li>
+<li>Log the request object and the wallet error before retrying.</li>
 </ol>
-<hr>
-<h2 id="troubleshooting"><a class="header" href="#troubleshooting">Troubleshooting</a></h2>
-<h3 id="error-linker-rust-lld-not-found"><a class="header" href="#error-linker-rust-lld-not-found"><code>error: linker 'rust-lld' not found</code></a></h3>
-<p>The LLVM linker component is missing.</p>
-<pre><code class="language-bash">rustup component add llvm-tools-preview
-</code></pre>
-<h3 id="errore0463-cant-find-crate-for-std"><a class="header" href="#errore0463-cant-find-crate-for-std"><code>error[E0463]: can't find crate for 'std'</code></a></h3>
-<p>The <code>wasm32-unknown-unknown</code> target is not installed.</p>
-<pre><code class="language-bash">rustup target add wasm32-unknown-unknown
-</code></pre>
-<h3 id="error-no-such-command-soroban"><a class="header" href="#error-no-such-command-soroban"><code>error: no such command: 'soroban'</code></a></h3>
-<p>The CLI binary is not in your <code>PATH</code>. Either reload your shell or add <code>~/.cargo/bin</code> manually:</p>
-<pre><code class="language-bash">export PATH="$HOME/.cargo/bin:$PATH"
-</code></pre>
-<p>If you installed the old <code>soroban-cli</code> package, uninstall it and reinstall as <code>stellar-cli</code>:</p>
-<pre><code class="language-bash">cargo uninstall soroban-cli
-cargo install --locked stellar-cli --features opt
-</code></pre>
-<h3 id="error-package-soroban-cli--failed-to-compile"><a class="header" href="#error-package-soroban-cli--failed-to-compile"><code>error: package 'soroban-cli ...' failed to compile</code></a></h3>
-<p>A dependency failed to build. Try:</p>
-<pre><code class="language-bash">cargo clean
-cargo install --locked stellar-cli --features opt
-</code></pre>
-<p>If the error mentions OpenSSL, install the system headers:</p>
-<pre><code class="language-bash"># Ubuntu / Debian
-sudo apt-get install pkg-config libssl-dev
-
-# macOS (Homebrew)
-brew install openssl
-export OPENSSL_DIR=$(brew --prefix openssl)
-</code></pre>
-<h3 id="network-timeout--rpc-error-during-deploy-or-invoke"><a class="header" href="#network-timeout--rpc-error-during-deploy-or-invoke"><code>Network timeout</code> / <code>RPC error</code> during deploy or invoke</a></h3>
+<h3 id="troubleshooting-common-integration-issues"><a class="header" href="#troubleshooting-common-integration-issues">Troubleshooting common integration issues</a></h3>
 <ul>
-<li>Check your internet connection.</li>
-<li>The testnet RPC may be temporarily overloaded. Wait a minute and retry.</li>
-<li>Try an alternate RPC endpoint with <code>--rpc-url https://rpc-futurenet.stellar.org:443</code>.</li>
-<li>Check the <a href="https://status.stellar.org">Stellar status page</a> for outages.</li>
+<li>Wallet not detected: confirm the extension is installed and the app is running in a supported browser context.</li>
+<li>User rejected signature: treat this as a normal user flow and show a clear message.</li>
+<li>Wrong network selected: prompt the user to switch to the correct network.</li>
+<li>Transaction failed: inspect the RPC response, fee, and submitted operations.</li>
+<li>RPC connection issues: verify the endpoint and retry with a fallback node if available.</li>
 </ul>
-<h3 id="error-account-not-found-during-deploy"><a class="header" href="#error-account-not-found-during-deploy"><code>error: account not found</code> during deploy</a></h3>
-<p>Your account has not been funded yet.</p>
-<pre><code class="language-bash">stellar keys fund alice --network testnet
-</code></pre>
-<h3 id="error-transaction-simulation-failed-hosterror-errorvalue-invalidinput"><a class="header" href="#error-transaction-simulation-failed-hosterror-errorvalue-invalidinput"><code>error: transaction simulation failed: HostError: Error(Value, InvalidInput)</code></a></h3>
-<p>The contract function arguments are wrong. Double-check the <code>--</code> separator and argument names:</p>
-<pre><code class="language-bash"># Correct
-stellar contract invoke --id &lt;ID&gt; --source alice --network testnet \
-  -- hello --to World
-
-# Wrong (missing --)
-stellar contract invoke --id &lt;ID&gt; --source alice --network testnet \
-  hello --to World
-</code></pre>
-<h3 id="wasm-validation-error-reference-types-not-supported"><a class="header" href="#wasm-validation-error-reference-types-not-supported"><code>wasm validation error: reference-types not supported</code></a></h3>
-<p>The WASM binary was compiled with reference-types enabled, which the Soroban VM rejects. Add a <code>.cargo/config.toml</code> at the workspace root:</p>
-<pre><code class="language-toml">[target.wasm32-unknown-unknown]
-rustflags = ["-C", "target-feature=-reference-types"]
-</code></pre>
-<p>Then rebuild:</p>
-<pre><code class="language-bash">cargo clean
-cargo build --target wasm32-unknown-unknown --release
-</code></pre>
-<h3 id="tests-compile-but-the-contract-client-type-is-not-found"><a class="header" href="#tests-compile-but-the-contract-client-type-is-not-found">Tests compile but the contract client type is not found</a></h3>
-<p>Make sure <code>Cargo.toml</code> includes <code>"rlib"</code> in <code>crate-type</code>:</p>
-<pre><code class="language-toml">[lib]
-crate-type = ["cdylib", "rlib"]
-</code></pre>
-<p>Without <code>rlib</code>, the test harness cannot import the crate’s types and the generated client will not be visible.</p>
-<hr>
-<h2 id="getting-help"><a class="header" href="#getting-help">Getting Help</a></h2>
+<h2 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h2>
+<h3 id="security"><a class="header" href="#security">Security</a></h3>
 <ul>
-<li><a href="https://discord.gg/stellardev">Stellar Discord</a> — <code>#soroban-dev</code> channel</li>
-<li><a href="https://stellar.stackexchange.com/">Stack Exchange</a> — tagged <code>soroban</code></li>
-<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/discussions">GitHub Discussions</a></li>
-<li><a href="https://developers.stellar.org/docs/smart-contracts">Official Soroban Docs</a></li>
-<li><a href="https://docs.rs/soroban-sdk/21.7.0/soroban_sdk/">Soroban SDK API Reference</a></li>
+<li>Never store private keys in frontend code.</li>
+<li>Treat every transaction as a user-authorized action, even if the request is generated locally.</li>
+<li>Verify the transaction details before asking the user to sign.</li>
+<li>Prefer explicit user confirmation for high-impact operations.</li>
 </ul>
+<h3 id="private-key-safety"><a class="header" href="#private-key-safety">Private key safety</a></h3>
+<ul>
+<li>Keep signing keys and seed phrases offline whenever possible.</li>
+<li>Use hardware-backed or secure key storage for administrative accounts.</li>
+<li>Avoid exposing secret material through logs, browser devtools, or analytics.</li>
+</ul>
+<h3 id="transaction-verification"><a class="header" href="#transaction-verification">Transaction verification</a></h3>
+<ul>
+<li>Confirm the source account, network passphrase, contract ID, and fee before signing.</li>
+<li>Validate the transaction preconditions and any parameters passed to the contract.</li>
+<li>Make sure the user understands what they are authorizing.</li>
+</ul>
+<h3 id="error-handling"><a class="header" href="#error-handling">Error handling</a></h3>
+<ul>
+<li>Show actionable error messages instead of generic failures.</li>
+<li>Distinguish between user rejection, network issues, and invalid transaction input.</li>
+<li>Retry only when the failure is transient and safe.</li>
+</ul>
+<h3 id="user-experience"><a class="header" href="#user-experience">User experience</a></h3>
+<ul>
+<li>Keep the connection flow short and explain why the app needs access.</li>
+<li>Provide a fallback when the wallet extension is missing.</li>
+<li>Show clear loading and success states for signing and submission.</li>
+</ul>
+<h3 id="network-selection"><a class="header" href="#network-selection">Network selection</a></h3>
+<ul>
+<li>Default to Testnet for development and staging.</li>
+<li>Make the active network visible in the UI.</li>
+<li>Detect and warn the user when the wallet is on a different network than the app.</li>
+</ul>
+<h3 id="session-management"><a class="header" href="#session-management">Session management</a></h3>
+<ul>
+<li>Store only the minimal wallet state needed for the current session.</li>
+<li>Clear stale account state when the user disconnects or switches accounts.</li>
+<li>Reconnect gracefully when the tab or page is refreshed.</li>
+</ul>
+<h3 id="dependency-management"><a class="header" href="#dependency-management">Dependency management</a></h3>
+<ul>
+<li>Pin wallet-related packages to versions that have been tested in your environment.</li>
+<li>Revisit wallet SDK compatibility when upgrading dependencies.</li>
+<li>Keep provider integrations behind a small abstraction so wallet-specific code is isolated.</li>
+</ul>
+<h2 id="common-problems"><a class="header" href="#common-problems">Common Problems</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Problem</th><th>Likely cause</th><th>Suggested fix</th></tr>
+</thead>
+<tbody>
+<tr><td>Wallet not detected</td><td>Extension is not installed or the browser context is unsupported</td><td>Verify installation and browser support, then retry</td></tr>
+<tr><td>User rejected signature</td><td>The user canceled the signing request</td><td>Show a clear message and let the user retry</td></tr>
+<tr><td>Wrong network selected</td><td>The wallet and app are on different networks</td><td>Prompt the user to switch networks</td></tr>
+<tr><td>Transaction failed</td><td>Bad parameters, bad fee, or invalid contract invocation</td><td>Inspect the RPC response and rebuild the transaction</td></tr>
+<tr><td>RPC connection issues</td><td>The node is unavailable or the network endpoint is misconfigured</td><td>Retry with another RPC provider or update the endpoint</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="external-resources"><a class="header" href="#external-resources">External Resources</a></h2>
+<ul>
+<li><a href="https://developers.stellar.org/">Stellar Developer Documentation</a></li>
+<li><a href="https://developers.stellar.org/docs/smart-contracts">Soroban Documentation</a></li>
+<li><a href="https://docs.rs/soroban-sdk/">Soroban Rust SDK</a></li>
+<li><a href="https://www.freighter.app/">Freighter Documentation</a></li>
+<li><a href="https://xbull.app/">xBull Wallet Documentation</a></li>
+<li><a href="https://albedo.link/">Albedo Documentation</a></li>
+<li><a href="https://docs.walletconnect.com/">WalletConnect Documentation</a></li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>A good wallet integration experience is a combination of reliable provider support, clear error handling, and careful testing. Start with the wallet that best matches your audience and your development environment, then expand coverage as your app matures.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/wallet-ecosystem.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../guides/macos-setup.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/security-best-practices.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -537,11 +559,11 @@ crate-type = ["cdylib", "rlib"]
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/wallet-ecosystem.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../guides/macos-setup.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/security-best-practices.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>

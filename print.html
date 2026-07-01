@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7d28de3d.js";
+            window.path_to_searchindex_js = "searchindex-e0dc217d.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-51ecbba3.js"></script>
+        <script src="toc-9dee982d.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -7962,10 +7962,371 @@ async function signTx(xdrString) {
 <li><strong>Lobstr (Priority 4 - Low/Future)</strong>: Integrate once your application is deployed to Mainnet and target retail users holding standard Stellar/Soroban assets.</li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="wallet-integration-guide"><a class="header" href="#wallet-integration-guide">Wallet Integration Guide</a></h1>
+<p>This guide helps Soroban developers add wallet support to web applications, dashboards, and frontends that interact with Stellar smart contracts. It focuses on practical integration patterns, expected user flows, and production recommendations for common wallets in the Stellar ecosystem.</p>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#prerequisites-12">Prerequisites</a></li>
+<li><a href="#network-configuration-1">Network Configuration</a></li>
+<li><a href="#supported-wallets">Supported Wallets</a></li>
+<li><a href="#integration-examples">Integration Examples</a></li>
+<li><a href="#example-workflow">Example Workflow</a></li>
+<li><a href="#testing-guide-1">Testing Guide</a></li>
+<li><a href="#best-practices-2">Best Practices</a></li>
+<li><a href="#common-problems">Common Problems</a></li>
+<li><a href="#external-resources">External Resources</a></li>
+</ul>
+<h2 id="introduction"><a class="header" href="#introduction">Introduction</a></h2>
+<p>Wallet integration is the layer that lets users connect their account, authorize contract calls, and approve transactions from an application. In Soroban, this matters because most contract interactions require a signed transaction or an authorization payload. A smooth wallet experience improves trust, reduces onboarding friction, and helps users understand what they are signing.</p>
+<p>For many teams, the wallet experience is part of the product itself. If users cannot connect, cannot switch networks, or receive confusing errors, adoption drops quickly. Good integration should be reliable, secure, and easy to test.</p>
+<p>The wallet ecosystem is evolving quickly. In practice, the most common starting points are:</p>
+<ul>
+<li>Freighter for browser-based development and testing</li>
+<li>xBull for desktop and mobile coverage</li>
+<li>Albedo for web-based signing flows</li>
+<li>WalletConnect-compatible wallets for mobile and browser-based DApps</li>
+</ul>
+<h2 id="prerequisites-12"><a class="header" href="#prerequisites-12">Prerequisites</a></h2>
+<p>Before you integrate wallets into a Soroban app, make sure your development environment is ready.</p>
+<h3 id="required-tools"><a class="header" href="#required-tools">Required tools</a></h3>
+<ul>
+<li>A recent Node.js installation for frontend work</li>
+<li>The Soroban / Stellar CLI for local testing and deployment</li>
+<li>The Soroban Rust SDK when building or calling contracts from Rust-based tooling</li>
+<li>A wallet extension or mobile wallet installed for manual testing</li>
+</ul>
+<h3 id="recommended-packages"><a class="header" href="#recommended-packages">Recommended packages</a></h3>
+<p>For a JavaScript or TypeScript frontend, you will typically need:</p>
+<pre><code class="language-bash">npm install @stellar/stellar-sdk
+</code></pre>
+<p>If you are using Freighter-style browser APIs, install the wallet SDK that matches your target wallet:</p>
+<pre><code class="language-bash">npm install @stellar/freighter-api
+</code></pre>
+<h3 id="environment-setup-1"><a class="header" href="#environment-setup-1">Environment setup</a></h3>
+<ol>
+<li>Install the Stellar CLI and confirm that it runs.</li>
+<li>Configure your preferred network, such as Testnet or Futurenet.</li>
+<li>Create a funded test account for manual testing.</li>
+<li>Keep the contract ID, network passphrase, and RPC endpoint in a shared config file so your frontend can use them consistently.</li>
+</ol>
+<blockquote>
+<p>Wallet support changes quickly. Always check the official provider documentation before relying on a specific API or network flow.</p>
+</blockquote>
+<h2 id="network-configuration-1"><a class="header" href="#network-configuration-1">Network Configuration</a></h2>
+<p>Handling multiple networks correctly is crucial for a smooth developer and user experience. Each Stellar network (Mainnet, Testnet, Futurenet) has a unique passphrase and RPC endpoint.</p>
+<h3 id="network-passphrases"><a class="header" href="#network-passphrases">Network Passphrases</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Network</th><th>Passphrase</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Mainnet</strong></td><td><code>Public Global Stellar Network ; September 2015</code></td></tr>
+<tr><td><strong>Testnet</strong></td><td><code>Test SDF Network ; September 2015</code></td></tr>
+<tr><td><strong>Futurenet</strong></td><td><code>Test SDF Future Network ; October 2022</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="rpc-endpoints"><a class="header" href="#rpc-endpoints">RPC Endpoints</a></h3>
+<p>Apps should allow users to connect to different RPC providers. Standard SDF endpoints include:</p>
+<ul>
+<li><strong>Testnet:</strong> <code>https://soroban-testnet.stellar.org</code></li>
+<li><strong>Futurenet:</strong> <code>https://rpc-futurenet.stellar.org</code></li>
+</ul>
+<h3 id="handling-networks-in-code"><a class="header" href="#handling-networks-in-code">Handling Networks in Code</a></h3>
+<p>When building transactions, you must use the correct passphrase:</p>
+<pre><code class="language-ts">import { Networks } from "@stellar/stellar-sdk";
+
+const networkPassphrase = Networks.TESTNET; // Or custom string for Futurenet
+</code></pre>
+<h2 id="supported-wallets"><a class="header" href="#supported-wallets">Supported Wallets</a></h2>
+<h3 id="freighter"><a class="header" href="#freighter">Freighter</a></h3>
+<ul>
+<li>Overview: Freighter is the most commonly used browser extension for Stellar and Soroban development. It is a strong default choice for local development and Testnet testing.</li>
+<li>Installation: Install the official extension from the Freighter website and confirm it is enabled in your browser.</li>
+<li>Configuration: Add your target network, such as Testnet, and allow the app to connect to it.</li>
+<li>Connection flow: Request access to the wallet, read the public address, and store the result in app state.</li>
+<li>Authentication: Use the wallet to approve account access and to sign Soroban transactions.</li>
+<li>Signing transactions: Build a transaction or contract invocation, then pass it to the wallet for signing.</li>
+<li>Sending transactions: Submit the signed XDR to a Soroban RPC endpoint.</li>
+<li>Disconnecting: Clear local application state and remove the connected address from memory.</li>
+</ul>
+<h3 id="xbull"><a class="header" href="#xbull">xBull</a></h3>
+<ul>
+<li>Overview: xBull is a broader wallet option that supports desktop and mobile use and is useful when you want a more flexible wallet experience.</li>
+<li>Installation: Install the browser extension or mobile app from the official xBull documentation.</li>
+<li>Configuration: Configure networks, RPC endpoints, and account settings for your preferred environment.</li>
+<li>Connection flow: Connect the app to the wallet and request an address or account selection.</li>
+<li>Authentication: Approve the connection request when the app first accesses the account.</li>
+<li>Signing transactions: Sign transactions through the wallet provider interface.</li>
+<li>Sending transactions: Broadcast the signed transaction using the network RPC.</li>
+<li>Disconnecting: Clear the connection from the app and prompt the user to reconnect if needed.</li>
+</ul>
+<h3 id="albedo"><a class="header" href="#albedo">Albedo</a></h3>
+<ul>
+<li>Overview: Albedo provides a web-based signing experience that can be helpful for users who prefer not to install a browser extension.</li>
+<li>Installation: No extension is required. Open the wallet flow from your app and follow the web-based sign-in experience.</li>
+<li>Configuration: Configure the app redirect and network details according to the official instructions.</li>
+<li>Connection flow: Redirect the user to the Albedo flow, confirm the requested scopes, and receive the response.</li>
+<li>Authentication: Approve the application access request in the Albedo UI.</li>
+<li>Signing transactions: Request a transaction signature and receive the signed output.</li>
+<li>Sending transactions: Submit the signed transaction to the network after the wallet returns the signature.</li>
+<li>Disconnecting: Clear the session state in your app and instruct the user to start a new signing flow if needed.</li>
+</ul>
+<h3 id="walletconnect-compatible-solutions"><a class="header" href="#walletconnect-compatible-solutions">WalletConnect-compatible solutions</a></h3>
+<ul>
+<li>Overview: WalletConnect is commonly used for connecting web apps to mobile wallets or other provider ecosystems.</li>
+<li>Installation: Use the official WalletConnect SDK in your frontend and ensure the wallet supports the same protocol version.</li>
+<li>Configuration: Configure a project ID and the required chain metadata for your app.</li>
+<li>Connection flow: Open a connection modal, choose the wallet, and approve the session.</li>
+<li>Authentication: Ask the wallet to approve the session and any required account scopes.</li>
+<li>Signing transactions: Use the WalletConnect signing flow and return the signed transaction payload.</li>
+<li>Sending transactions: Broadcast the signed transaction using your RPC client.</li>
+<li>Disconnecting: End the session in your app and prompt the user to reconnect as needed.</li>
+</ul>
+<h2 id="integration-examples"><a class="header" href="#integration-examples">Integration Examples</a></h2>
+<p>The examples below are intentionally simple and follow the same mental model across wallets: connect, inspect the wallet state, sign, submit, and handle errors.</p>
+<h3 id="connecting-a-wallet"><a class="header" href="#connecting-a-wallet">Connecting a wallet</a></h3>
+<pre><code class="language-ts">import { requestAccess, getAddress } from "@stellar/freighter-api";
+
+async function connectWallet() {
+  const allowed = await requestAccess();
+  if (!allowed) {
+    throw new Error("Wallet access denied by the user");
+  }
+
+  const address = await getAddress();
+  return address;
+}
+</code></pre>
+<h3 id="checking-connection-status"><a class="header" href="#checking-connection-status">Checking connection status</a></h3>
+<pre><code class="language-ts">async function getConnectionStatus() {
+  // Use the wallet SDK or provider method that exposes connectivity state.
+  // The exact API varies by wallet.
+  return {
+    connected: true,
+    network: "TESTNET"
+  };
+}
+</code></pre>
+<h3 id="signing-a-transaction"><a class="header" href="#signing-a-transaction">Signing a transaction</a></h3>
+<pre><code class="language-ts">import { signTransaction } from "@stellar/freighter-api";
+
+async function signSorobanTx(xdr: string) {
+  const signedXdr = await signTransaction(xdr, { network: "TESTNET" });
+  return signedXdr;
+}
+</code></pre>
+<h3 id="submitting-a-transaction"><a class="header" href="#submitting-a-transaction">Submitting a transaction</a></h3>
+<pre><code class="language-ts">import { Server, TransactionBuilder, Networks } from "@stellar/stellar-sdk";
+
+async function submitTransaction(signedXdr: string) {
+  const server = new Server("https://soroban-testnet.stellar.org");
+  const tx = TransactionBuilder.fromXDR(signedXdr, Networks.TESTNET);
+  const result = await server.sendTransaction(tx);
+  return result;
+}
+</code></pre>
+<h3 id="handling-user-rejection"><a class="header" href="#handling-user-rejection">Handling user rejection</a></h3>
+<pre><code class="language-ts">try {
+  await connectWallet();
+} catch (error) {
+  console.warn("User rejected the connection request", error);
+}
+</code></pre>
+<h3 id="handling-network-errors"><a class="header" href="#handling-network-errors">Handling network errors</a></h3>
+<pre><code class="language-ts">try {
+  await submitTransaction("signed-xdr");
+} catch (error) {
+  console.error("Transaction submission failed", error);
+}
+</code></pre>
+<h3 id="switching-networks"><a class="header" href="#switching-networks">Switching networks</a></h3>
+<p>If your app supports multiple networks, check the wallet state before sending a transaction. Some wallets let the user switch networks manually, while others require you to prompt the user to switch to the correct network in the wallet UI.</p>
+<pre><code class="language-ts">function ensureNetwork(targetNetwork: string) {
+  if (targetNetwork !== "TESTNET") {
+    throw new Error("This example only supports TESTNET");
+  }
+}
+</code></pre>
+<h2 id="example-workflow"><a class="header" href="#example-workflow">Example Workflow</a></h2>
+<p>The following example demonstrates a complete flow: connecting the wallet, building a transaction, signing it, and submitting it to the network.</p>
+<pre><code class="language-ts">import {
+  requestAccess,
+  getAddress,
+  signTransaction
+} from "@stellar/freighter-api";
+import {
+  Server,
+  TransactionBuilder,
+  Networks,
+  Address,
+  Contract
+} from "@stellar/stellar-sdk";
+
+async function runExampleWorkflow(contractId: string, method: string, args: any[]) {
+  try {
+    // 1. Connect Wallet
+    const allowed = await requestAccess();
+    if (!allowed) throw new Error("Wallet access denied");
+    const userAddress = await getAddress();
+
+    // 2. Initialize Server and Network
+    const server = new Server("https://soroban-testnet.stellar.org");
+    const networkPassphrase = Networks.TESTNET;
+
+    // 3. Fetch Account Details
+    const account = await server.getAccount(userAddress);
+
+    // 4. Build Contract Invocation
+    const contract = new Contract(contractId);
+    let tx = new TransactionBuilder(account, {
+      fee: "100", // Placeholder fee, will be updated during preparation
+      networkPassphrase,
+    })
+    .addOperation(contract.call(method, ...args))
+    .setTimeout(30)
+    .build();
+
+    // 5. Prepare Transaction (Simulation)
+    // This step is critical for Soroban to calculate resource usage (footprint, instructions)
+    tx = await server.prepareTransaction(tx);
+
+    // 6. Sign Transaction
+    const signedXdr = await signTransaction(tx.toXDR(), {
+      network: "TESTNET"
+    });
+
+    // 7. Submit Transaction
+    const result = await server.sendTransaction(
+      TransactionBuilder.fromXDR(signedXdr, networkPassphrase)
+    );
+
+    console.log("Transaction Success:", result.hash);
+    return result;
+
+  } catch (error) {
+    console.error("Workflow failed:", error);
+    throw error;
+  }
+}
+</code></pre>
+<h2 id="testing-guide-1"><a class="header" href="#testing-guide-1">Testing Guide</a></h2>
+<p>Testing wallet flows is critical because they involve user consent, network configuration, and external providers.</p>
+<h3 id="local-testing"><a class="header" href="#local-testing">Local testing</a></h3>
+<ul>
+<li>Use a local development wallet account and a funded test account.</li>
+<li>Prefer Testnet for manual integration checks.</li>
+<li>Keep your RPC endpoints and network passphrases in a config file.</li>
+<li>Test both success and failure flows.</li>
+</ul>
+<h3 id="testnet-testing"><a class="header" href="#testnet-testing">Testnet testing</a></h3>
+<ul>
+<li>Use Testnet contracts and test accounts rather than mainnet funds.</li>
+<li>Verify that signatures and submitted transactions behave as expected on the network.</li>
+<li>Track the transaction hash and inspect the result through the Stellar explorer or RPC response.</li>
+</ul>
+<h3 id="mock-wallets-where-applicable"><a class="header" href="#mock-wallets-where-applicable">Mock wallets where applicable</a></h3>
+<p>If you are building a frontend test suite, mock the wallet provider interface instead of trying to depend on the real wallet during automated tests. Keep the mock close to the provider boundary and verify that the app responds correctly to connection success, rejection, and network errors.</p>
+<h3 id="common-debugging-steps"><a class="header" href="#common-debugging-steps">Common debugging steps</a></h3>
+<ol>
+<li>Check whether the wallet is installed and enabled.</li>
+<li>Confirm that the network selected in the wallet matches your app’s target network.</li>
+<li>Verify the transaction XDR is built for the same network and passphrase.</li>
+<li>Inspect RPC errors and wallet error messages for clues.</li>
+<li>Log the request object and the wallet error before retrying.</li>
+</ol>
+<h3 id="troubleshooting-common-integration-issues"><a class="header" href="#troubleshooting-common-integration-issues">Troubleshooting common integration issues</a></h3>
+<ul>
+<li>Wallet not detected: confirm the extension is installed and the app is running in a supported browser context.</li>
+<li>User rejected signature: treat this as a normal user flow and show a clear message.</li>
+<li>Wrong network selected: prompt the user to switch to the correct network.</li>
+<li>Transaction failed: inspect the RPC response, fee, and submitted operations.</li>
+<li>RPC connection issues: verify the endpoint and retry with a fallback node if available.</li>
+</ul>
+<h2 id="best-practices-2"><a class="header" href="#best-practices-2">Best Practices</a></h2>
+<h3 id="security"><a class="header" href="#security">Security</a></h3>
+<ul>
+<li>Never store private keys in frontend code.</li>
+<li>Treat every transaction as a user-authorized action, even if the request is generated locally.</li>
+<li>Verify the transaction details before asking the user to sign.</li>
+<li>Prefer explicit user confirmation for high-impact operations.</li>
+</ul>
+<h3 id="private-key-safety"><a class="header" href="#private-key-safety">Private key safety</a></h3>
+<ul>
+<li>Keep signing keys and seed phrases offline whenever possible.</li>
+<li>Use hardware-backed or secure key storage for administrative accounts.</li>
+<li>Avoid exposing secret material through logs, browser devtools, or analytics.</li>
+</ul>
+<h3 id="transaction-verification"><a class="header" href="#transaction-verification">Transaction verification</a></h3>
+<ul>
+<li>Confirm the source account, network passphrase, contract ID, and fee before signing.</li>
+<li>Validate the transaction preconditions and any parameters passed to the contract.</li>
+<li>Make sure the user understands what they are authorizing.</li>
+</ul>
+<h3 id="error-handling-3"><a class="header" href="#error-handling-3">Error handling</a></h3>
+<ul>
+<li>Show actionable error messages instead of generic failures.</li>
+<li>Distinguish between user rejection, network issues, and invalid transaction input.</li>
+<li>Retry only when the failure is transient and safe.</li>
+</ul>
+<h3 id="user-experience"><a class="header" href="#user-experience">User experience</a></h3>
+<ul>
+<li>Keep the connection flow short and explain why the app needs access.</li>
+<li>Provide a fallback when the wallet extension is missing.</li>
+<li>Show clear loading and success states for signing and submission.</li>
+</ul>
+<h3 id="network-selection"><a class="header" href="#network-selection">Network selection</a></h3>
+<ul>
+<li>Default to Testnet for development and staging.</li>
+<li>Make the active network visible in the UI.</li>
+<li>Detect and warn the user when the wallet is on a different network than the app.</li>
+</ul>
+<h3 id="session-management"><a class="header" href="#session-management">Session management</a></h3>
+<ul>
+<li>Store only the minimal wallet state needed for the current session.</li>
+<li>Clear stale account state when the user disconnects or switches accounts.</li>
+<li>Reconnect gracefully when the tab or page is refreshed.</li>
+</ul>
+<h3 id="dependency-management"><a class="header" href="#dependency-management">Dependency management</a></h3>
+<ul>
+<li>Pin wallet-related packages to versions that have been tested in your environment.</li>
+<li>Revisit wallet SDK compatibility when upgrading dependencies.</li>
+<li>Keep provider integrations behind a small abstraction so wallet-specific code is isolated.</li>
+</ul>
+<h2 id="common-problems"><a class="header" href="#common-problems">Common Problems</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Problem</th><th>Likely cause</th><th>Suggested fix</th></tr>
+</thead>
+<tbody>
+<tr><td>Wallet not detected</td><td>Extension is not installed or the browser context is unsupported</td><td>Verify installation and browser support, then retry</td></tr>
+<tr><td>User rejected signature</td><td>The user canceled the signing request</td><td>Show a clear message and let the user retry</td></tr>
+<tr><td>Wrong network selected</td><td>The wallet and app are on different networks</td><td>Prompt the user to switch networks</td></tr>
+<tr><td>Transaction failed</td><td>Bad parameters, bad fee, or invalid contract invocation</td><td>Inspect the RPC response and rebuild the transaction</td></tr>
+<tr><td>RPC connection issues</td><td>The node is unavailable or the network endpoint is misconfigured</td><td>Retry with another RPC provider or update the endpoint</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="external-resources"><a class="header" href="#external-resources">External Resources</a></h2>
+<ul>
+<li><a href="https://developers.stellar.org/">Stellar Developer Documentation</a></li>
+<li><a href="https://developers.stellar.org/docs/smart-contracts">Soroban Documentation</a></li>
+<li><a href="https://docs.rs/soroban-sdk/">Soroban Rust SDK</a></li>
+<li><a href="https://www.freighter.app/">Freighter Documentation</a></li>
+<li><a href="https://xbull.app/">xBull Wallet Documentation</a></li>
+<li><a href="https://albedo.link/">Albedo Documentation</a></li>
+<li><a href="https://docs.walletconnect.com/">WalletConnect Documentation</a></li>
+</ul>
+<h2 id="summary"><a class="header" href="#summary">Summary</a></h2>
+<p>A good wallet integration experience is a combination of reliable provider support, clear error handling, and careful testing. Start with the wallet that best matches your audience and your development environment, then expand coverage as your app matures.</p>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="security-best-practices-for-soroban-smart-contracts"><a class="header" href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices for Soroban Smart Contracts</a></h1>
 <p>A practical guide to writing secure Soroban contracts, covering common vulnerabilities, defensive patterns, and a pre-deployment audit checklist with real contract examples.</p>
 <hr>
-<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<h2 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of Contents</a></h2>
 <ol>
 <li><a href="#1-common-vulnerabilities">Common Vulnerabilities</a></li>
 <li><a href="#2-secure-patterns">Secure Patterns</a></li>
