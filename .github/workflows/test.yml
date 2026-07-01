@@ -217,3 +217,24 @@ jobs:
           name: soroban-cookbook
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  spell-check:
+    name: Spell Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: cd webapp && bun install
+
+      - name: Run spell check
+        run: cd webapp && bun run spellcheck
