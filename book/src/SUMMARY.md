@@ -55,6 +55,7 @@
 
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
+- [Testing Best Practices](./docs/testing-best-practices.md)
 - [Documentation Platform Evaluation](./docs/documentation-platform-evaluation.md)
 - [DeFi Best Practices](./docs/defi-best-practices.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)

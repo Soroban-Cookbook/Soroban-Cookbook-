@@ -139,7 +139,7 @@ impl RoleBasedAccessControl {
 
         let user_role = Self::get_role_internal(&env, &caller);
         for allowed_role in allowed.iter() {
-            if user_role as u32 >= *allowed_role as u32 {
+            if user_role as u32 >= allowed_role as u32 {
                 return Ok(());
             }
         }

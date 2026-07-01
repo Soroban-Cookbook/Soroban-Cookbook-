@@ -40,8 +40,8 @@ pub struct OracleUpdateEventData {
 }
 
 const POOL_NS: Symbol = symbol_short!("amm_pool");
-const ORACLE_NS: Symbol = symbol_short!("amm_oracle");
-const EVENT_ORACLE_UPDATED: Symbol = symbol_short!("price_updated");
+const ORACLE_NS: Symbol = symbol_short!("amm_oracl");
+const EVENT_ORACLE_UPDATED: Symbol = symbol_short!("price_upd");
 
 impl AmmPoolContract {
     fn require_owner(&self, env: &Env) {
