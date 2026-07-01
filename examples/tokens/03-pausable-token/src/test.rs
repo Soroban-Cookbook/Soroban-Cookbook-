@@ -87,6 +87,30 @@ fn transfer_fails_when_paused() {
 }
 
 #[test]
+fn transfer_rejects_insufficient_balance() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_transfer(&f.alice, &f.bob, &1),
+        Err(Ok(TokenError::InsufficientBalance))
+    );
+}
+
+#[test]
+fn transfer_rejects_zero_and_negative_amounts() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_transfer(&f.admin, &f.alice, &0),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+    assert_eq!(
+        f.token.try_transfer(&f.admin, &f.alice, &-1),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+}
+
+#[test]
 fn approve_and_transfer_from_work_when_unpaused() {
     let f = setup();
 
@@ -97,6 +121,29 @@ fn approve_and_transfer_from_work_when_unpaused() {
     assert_eq!(f.token.balance(&f.admin), 750_000);
     assert_eq!(f.token.balance(&f.bob), 250_000);
     assert_eq!(f.token.allowance(&f.admin, &f.alice), 50_000);
+}
+
+#[test]
+fn approve_emits_approval_event() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &123_456).unwrap();
+
+    let events = EventList::new(&f.env, f.env.events().all());
+    assert_eq!(events.len(), 1);
+
+    let (_id, topics, data) = events.get(0).unwrap();
+    let namespace: Symbol = Symbol::try_from_val(&f.env, &topics.get(0).unwrap()).unwrap();
+    let action: Symbol = Symbol::try_from_val(&f.env, &topics.get(1).unwrap()).unwrap();
+    let owner: Address = Address::try_from_val(&f.env, &topics.get(2).unwrap()).unwrap();
+    let spender: Address = Address::try_from_val(&f.env, &topics.get(3).unwrap()).unwrap();
+    let payload: ApprovalEventData = ApprovalEventData::try_from_val(&f.env, &data).unwrap();
+
+    assert_eq!(namespace, EVENT_NAMESPACE);
+    assert_eq!(action, EVENT_APPROVE);
+    assert_eq!(owner, f.admin);
+    assert_eq!(spender, f.alice);
+    assert_eq!(payload.amount, 123_456);
 }
 
 #[test]
@@ -203,6 +250,104 @@ fn operations_again_after_unpause() {
 
     assert_eq!(f.token.balance(&f.alice), 50_000);
     assert_eq!(f.token.balance(&f.bob), 50_000);
+}
+
+#[test]
+fn transfer_from_rejects_over_allowance() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &101),
+        Err(Ok(TokenError::AllowanceExceeded))
+    );
+}
+
+#[test]
+fn transfer_from_rejects_zero_amount() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &0),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+}
+
+#[test]
+fn transfer_from_rejects_when_owner_balance_is_too_low() {
+    let f = setup();
+
+    f.token.transfer(&f.admin, &f.bob, &999_950).unwrap();
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.bob, &100),
+        Err(Ok(TokenError::InsufficientBalance))
+    );
+}
+
+#[test]
+fn burn_rejects_insufficient_balance() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_burn(&f.alice, &1),
+        Err(Ok(TokenError::InsufficientBalance))
+    );
+}
+
+#[test]
+fn burn_rejects_zero_amount() {
+    let f = setup();
+
+    assert_eq!(f.token.try_burn(&f.admin, &0), Err(Ok(TokenError::InvalidAmount)));
+}
+
+#[test]
+fn approve_rejects_negative_amount() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_approve(&f.admin, &f.alice, &-1),
+        Err(Ok(TokenError::InvalidAmount))
+    );
+}
+
+#[test]
+fn balance_and_allowance_default_to_zero() {
+    let f = setup();
+    let carol = Address::generate(&f.env);
+
+    assert_eq!(f.token.balance(&carol), 0);
+    assert_eq!(f.token.allowance(&f.admin, &carol), 0);
+}
+
+#[test]
+fn double_initialize_is_rejected() {
+    let f = setup();
+
+    let name = String::from_str(&f.env, "Pausable USD");
+    let symbol = Symbol::new(&f.env, "PUSD");
+    assert_eq!(
+        f.token.try_initialize(&f.admin, &name, &symbol, &2u32, &1_000_000i128),
+        Err(Ok(TokenError::AlreadyInitialized))
+    );
+}
+
+#[test]
+fn uninitialized_contract_returns_not_initialized_for_metadata() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let token_id = env.register_contract(None, PausableToken);
+    let token = PausableTokenClient::new(&env, &token_id);
+
+    assert_eq!(token.try_total_supply(), Err(Ok(TokenError::NotInitialized)));
+    assert_eq!(token.try_name(), Err(Ok(TokenError::NotInitialized)));
+    assert_eq!(token.try_symbol(), Err(Ok(TokenError::NotInitialized)));
+    assert_eq!(token.try_decimals(), Err(Ok(TokenError::NotInitialized)));
+    assert_eq!(token.try_admin(), Err(Ok(TokenError::NotInitialized)));
 }
 
 #[test]
