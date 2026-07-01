@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-74eb755b.js";
+            window.path_to_searchindex_js = "searchindex-9089f8c8.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-12e98a4d.js"></script>
+        <script src="toc-df3b3ab5.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,45 +181,144 @@
                         <h1 id="soroban-cookbook"><a class="header" href="#soroban-cookbook">Soroban Cookbook</a></h1>
 <p><strong>A comprehensive guide to building smart contracts on Stellar with Soroban</strong></p>
 <h2 id="about"><a class="header" href="#about">About</a></h2>
-<p>The Soroban Cookbook is a developer’s guide to building smart contracts on the Stellar network using Soroban. This documentation provides clear, well-documented examples and practical patterns for developers at every level—from your first “Hello World” contract to complex DeFi protocols.</p>
-<h2 id="what-youll-find-here"><a class="header" href="#what-youll-find-here">What You’ll Find Here</a></h2>
-<h3 id="examples-by-difficulty"><a class="header" href="#examples-by-difficulty">Examples by Difficulty</a></h3>
-<ul>
-<li><strong>Basics</strong> - Core concepts: storage, auth, events, and data types</li>
-<li><strong>Intermediate</strong> - Tokens, NFTs, multi-contract interactions</li>
-<li><strong>Advanced</strong> - DeFi protocols, governance systems, cross-chain patterns</li>
-</ul>
-<h3 id="examples-by-use-case"><a class="header" href="#examples-by-use-case">Examples by Use Case</a></h3>
-<ul>
-<li><strong>DeFi</strong> - AMMs, lending, vaults, escrow, and yield protocols</li>
-<li><strong>NFTs</strong> - Minting, marketplaces, and metadata standards</li>
-<li><strong>Governance</strong> - DAOs, voting systems, and proposals</li>
-<li><strong>Tokens</strong> - Custom tokens, wrappers, and token standards</li>
-</ul>
-<h2 id="video-walkthrough"><a class="header" href="#video-walkthrough">Video Walkthrough</a></h2>
-<blockquote>
-<p><strong>Getting Started — Examples 01–03</strong> <em>(coming soon)</em>
-A 10–15 minute video covering Hello World, Storage Patterns, and Custom Errors.
-Subscribe to be notified when it’s published, or check the
-<a href="https://www.youtube.com/@SorobanCookbook">Soroban Cookbook YouTube channel</a> directly.</p>
-<p>Once published, the link will appear here and in each example’s README.</p>
-</blockquote>
+<p>The Soroban Cookbook is a developer’s guide to building smart contracts on the Stellar network using Soroban. This documentation provides clear, well-documented examples and practical patterns for developers at every level — from your first “Hello World” contract to complex DeFi protocols.</p>
 <h2 id="quick-start"><a class="header" href="#quick-start">Quick Start</a></h2>
-<pre><code class="language-bash"># Install Rust and Soroban CLI
+<pre><code class="language-bash"># Install Rust
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-cargo install --locked soroban-cli
+source "$HOME/.cargo/env"
+
+# Add WebAssembly target
+rustup target add wasm32-unknown-unknown
+
+# Install Stellar CLI
+cargo install --locked stellar-cli --version 22.1.0
 
 # Clone the repository
-git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook.git
-cd Soroban-Cookbook
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
+cd Soroban-Cookbook-
 
-# Try a basic example
+# Run a basic example
 cd examples/basics/01-hello-world
 cargo test
-soroban contract build
 </code></pre>
+<h2 id="repository-structure"><a class="header" href="#repository-structure">Repository Structure</a></h2>
+<pre><code>Soroban-Cookbook/
+├── examples/               # Smart contract examples
+│   ├── basics/             # Beginner-friendly fundamentals
+│   ├── intermediate/       # Common patterns and use cases
+│   ├── advanced/           # Complex systems and protocols
+│   ├── defi/               # DeFi-specific examples
+│   ├── nfts/               # NFT implementations
+│   ├── governance/         # DAO and voting systems
+│   └── tokens/             # Token standards and patterns
+├── book/                   # mdBook documentation source
+│   └── src/
+│       ├── guides/         # Step-by-step tutorials
+│       ├── examples/       # Example write-ups
+│       └── docs/           # Reference documentation
+├── tests/                  # Integration and security tests
+└── scripts/                # Build and deployment scripts
+</code></pre>
+<h2 id="examples-by-difficulty"><a class="header" href="#examples-by-difficulty">Examples by Difficulty</a></h2>
+<h3 id="basics"><a class="header" href="#basics">Basics</a></h3>
+<p>Core Soroban concepts, one at a time.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Example</th><th>Concepts</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="../examples/basics/01-hello-world">01-hello-world</a></td><td>Contract struct, <code>#[contract]</code> / <code>#[contractimpl]</code>, unit tests</td></tr>
+<tr><td><a href="../examples/basics/02-storage-patterns">02-storage-patterns</a></td><td><code>persistent</code>, <code>instance</code>, <code>temporary</code> storage, TTL</td></tr>
+<tr><td><a href="../examples/basics/03-authentication">03-authentication</a></td><td><code>require_auth()</code>, admin roles, balances</td></tr>
+<tr><td><a href="../examples/basics/03-custom-errors">03-custom-errors</a></td><td><code>#[contracterror]</code>, error codes</td></tr>
+<tr><td><a href="../examples/basics/04-events">04-events</a></td><td><code>env.events().publish()</code>, topic design</td></tr>
+<tr><td><a href="../examples/basics/05-error-handling">05-error-handling</a></td><td>Error enums, validation, propagation</td></tr>
+<tr><td><a href="../examples/basics/06-validation-patterns">06-validation-patterns</a></td><td>Precondition checks, overflow-safe arithmetic</td></tr>
+<tr><td><a href="../examples/basics/07-type-conversions">07-type-conversions</a></td><td><code>TryFromVal</code>, <code>IntoVal</code>, safe narrowing</td></tr>
+<tr><td><a href="../examples/basics/08-soroban-types">08-soroban-types</a></td><td><code>Address</code>, <code>Symbol</code>, <code>Bytes</code>, <code>Map</code>, <code>Vec</code></td></tr>
+<tr><td><a href="../examples/basics/09-enum-types">09-enum-types</a></td><td><code>#[contracttype]</code> enums, role dispatch</td></tr>
+<tr><td><a href="../examples/basics/10-custom-structs">10-custom-structs</a></td><td><code>#[contracttype]</code> structs, nested types</td></tr>
+<tr><td><a href="../examples/basics/11-primitive-types">11-primitive-types</a></td><td><code>u32</code>, <code>u64</code>, <code>i128</code>, arithmetic safety</td></tr>
+<tr><td><a href="../examples/basics/12-data-types">12-data-types</a></td><td>Full type system reference</td></tr>
+<tr><td><a href="../examples/basics/13-collection-types">13-collection-types</a></td><td><code>Vec</code>, <code>Map</code> collection patterns</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="intermediate"><a class="header" href="#intermediate">Intermediate</a></h3>
+<p>Common patterns and real-world use cases.</p>
+<ul>
+<li>Cross-contract patterns: factory, proxy, registry</li>
+<li>Access control: multi-sig patterns, RBAC, timelocks</li>
+<li>Token interactions and wrappers</li>
+</ul>
+<h3 id="advanced"><a class="header" href="#advanced">Advanced</a></h3>
+<p>Complex systems for experienced developers.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Example</th><th>Concepts</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="../examples/advanced/01-multi-party-auth">01-multi-party-auth</a></td><td>Threshold signatures, multi-party authorization</td></tr>
+<tr><td><a href="../examples/advanced/02-timelock">02-timelock</a></td><td>Time-delayed execution, queue/cancel/execute</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="examples-by-use-case"><a class="header" href="#examples-by-use-case">Examples by Use Case</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Category</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td>DeFi</td><td>AMMs, lending pools, vaults, escrow, yield protocols</td></tr>
+<tr><td>NFTs</td><td>Minting, marketplaces, metadata standards</td></tr>
+<tr><td>Governance</td><td>DAOs, voting systems, proposals</td></tr>
+<tr><td>Tokens</td><td>SEP-41 tokens, wrappers, vesting, airdrops</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="guides"><a class="header" href="#guides">Guides</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Guide</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="#getting-started-with-soroban">Getting Started</a></td><td>Set up your development environment</td></tr>
+<tr><td><a href="#testing-guide">Testing</a></td><td>Unit tests, integration tests, best practices</td></tr>
+<tr><td><a href="#deployment-guide">Deployment</a></td><td>Deploy to testnet and mainnet</td></tr>
+<tr><td><a href="#local-simulation-guide">Local Simulation</a></td><td>Run contracts locally with the Stellar CLI</td></tr>
+<tr><td><a href="#migrating-from-ethereum-to-soroban">Ethereum to Soroban</a></td><td>Solidity → Rust pattern translation</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="api-reference"><a class="header" href="#api-reference">API Reference</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Document</th><th>Description</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="#soroban-quick-reference">Quick Reference</a></td><td>Cheat sheet for common patterns</td></tr>
+<tr><td><a href="#soroban-smart-contract-best-practices">Best Practices</a></td><td>Security, storage, and code quality guidelines</td></tr>
+<tr><td><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls</a></td><td>Mistakes to avoid</td></tr>
+<tr><td><a href="#soroban--stellar-glossary">Glossary</a></td><td>Key terms and concepts</td></tr>
+<tr><td><a href="#troubleshooting-guide">Troubleshooting</a></td><td>Common build, test, and deployment issues</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="code-quality-standards"><a class="header" href="#code-quality-standards">Code Quality Standards</a></h2>
+<p>Every example in this cookbook:</p>
+<ul>
+<li>Compiles successfully using the latest stable Soroban SDK</li>
+<li>Contains comprehensive unit and integration tests</li>
+<li>Enforces strict security boundaries and Rust/Soroban best practices</li>
+<li>Passes all CI/CD pipelines including formatting, Clippy, and test suites</li>
+</ul>
 <h2 id="contributing"><a class="header" href="#contributing">Contributing</a></h2>
-<p>Contributions are welcome. Whether you’re fixing a typo, improving docs, or adding a new example — see <a href="#contributing-to-soroban-cookbook">CONTRIBUTING.md</a> for guidelines. Please also read our <a href="#contributor-covenant-code-of-conduct">Code of Conduct</a>.</p>
+<p>Contributions are welcome. See <a href="#contributing-to-soroban-cookbook">CONTRIBUTING.md</a> for guidelines and <a href="#community-guidelines">Community Guidelines</a> for participation norms. Please also read our <a href="#contributor-covenant-code-of-conduct">Code of Conduct</a>.</p>
 <h2 id="additional-resources"><a class="header" href="#additional-resources">Additional Resources</a></h2>
 <ul>
 <li><a href="https://developers.stellar.org/docs/smart-contracts">Soroban Documentation</a></li>
@@ -2811,7 +2910,7 @@ cargo test --workspace
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="all-examples-index"><a class="header" href="#all-examples-index">All Examples Index</a></h1>
 <p>Search-optimized index of all examples with formatted code snippets and live demos.</p>
-<h2 id="basics"><a class="header" href="#basics">Basics</a></h2>
+<h2 id="basics-1"><a class="header" href="#basics-1">Basics</a></h2>
 <h3 id="01-hello-world"><a class="header" href="#01-hello-world">01 Hello World</a></h3>
 <p><a href="../examples/basics/01-hello-world">View Source</a></p>
 <p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
@@ -3109,7 +3208,7 @@ let last = items.pop_back(); // Some(30)
 </span><span class="boring">fn main() {
 </span>// Code snippet coming soon
 <span class="boring">}</span></code></pre>
-<h2 id="intermediate"><a class="header" href="#intermediate">Intermediate</a></h2>
+<h2 id="intermediate-1"><a class="header" href="#intermediate-1">Intermediate</a></h2>
 <h3 id="02-role-based-access-control"><a class="header" href="#02-role-based-access-control">02 Role Based Access Control</a></h3>
 <p><a href="../examples/intermediate/02-role-based-access-control">View Source</a></p>
 <p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
@@ -3189,7 +3288,7 @@ pub fn get_proposal(env: Env, proposal_id: u32) -&gt; Option&lt;Proposal&gt;
 </span><span class="boring">fn main() {
 </span>// Code snippet coming soon
 <span class="boring">}</span></code></pre>
-<h2 id="advanced"><a class="header" href="#advanced">Advanced</a></h2>
+<h2 id="advanced-1"><a class="header" href="#advanced-1">Advanced</a></h2>
 <h3 id="01-multi-party-auth"><a class="header" href="#01-multi-party-auth">01 Multi Party Auth</a></h3>
 <p><a href="../examples/advanced/01-multi-party-auth">View Source</a></p>
 <p><a href="https://soroban.stellar.org/docs">Live Demo</a></p>
@@ -8407,6 +8506,70 @@ copy-js = true
 <p>To rebuild the search index after adding new content:</p>
 <pre><code class="language-bash">cd book &amp;&amp; mdbook build
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="community-guidelines"><a class="header" href="#community-guidelines">Community Guidelines</a></h1>
+<p>Welcome to the Soroban Cookbook community. These guidelines exist to keep our spaces welcoming, productive, and safe for everyone.</p>
+<h2 id="our-values"><a class="header" href="#our-values">Our Values</a></h2>
+<ul>
+<li><strong>Openness</strong> — We welcome contributors of all backgrounds and experience levels.</li>
+<li><strong>Respect</strong> — We treat every person with dignity in every interaction.</li>
+<li><strong>Collaboration</strong> — We share knowledge freely and help each other grow.</li>
+<li><strong>Quality</strong> — We take pride in correct, well-tested, clearly documented work.</li>
+</ul>
+<h2 id="participation-standards"><a class="header" href="#participation-standards">Participation Standards</a></h2>
+<h3 id="what-we-encourage"><a class="header" href="#what-we-encourage">What we encourage</a></h3>
+<ul>
+<li>Asking questions, no matter how basic they may seem.</li>
+<li>Giving and receiving constructive feedback on code and documentation.</li>
+<li>Sharing real-world usage patterns, gotchas, and lessons learned.</li>
+<li>Helping newcomers find their footing in the Soroban ecosystem.</li>
+<li>Linking to upstream Stellar or Soroban resources when relevant.</li>
+</ul>
+<h3 id="what-is-not-acceptable"><a class="header" href="#what-is-not-acceptable">What is not acceptable</a></h3>
+<ul>
+<li>Harassment, intimidation, or personal attacks of any kind.</li>
+<li>Discriminatory language or behaviour related to age, disability, ethnicity, gender identity, nationality, religion, sexual orientation, or any other personal characteristic.</li>
+<li>Publishing private information (contact details, location, etc.) of others without consent.</li>
+<li>Spam, off-topic promotion, or low-effort contributions intended only to game metrics.</li>
+<li>Deliberately submitting broken, insecure, or plagiarised code as original work.</li>
+</ul>
+<p>These standards apply in all community spaces: GitHub issues, pull requests, code review comments, discussions, Discord channels, and any public forum where the cookbook is represented.</p>
+<h2 id="code-of-conduct"><a class="header" href="#code-of-conduct">Code of Conduct</a></h2>
+<p>This project is governed by the <a href="#contributor-covenant-code-of-conduct">Contributor Covenant Code of Conduct</a>. All community members are expected to uphold it. The Code of Conduct describes our standards in detail and the escalating enforcement actions available to maintainers.</p>
+<h2 id="reporting-unacceptable-behaviour"><a class="header" href="#reporting-unacceptable-behaviour">Reporting Unacceptable Behaviour</a></h2>
+<p>If you witness or experience behaviour that violates these guidelines or the Code of Conduct, please report it through one of the following channels:</p>
+<ol>
+<li><strong>GitHub</strong> — Open a <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues">confidential issue</a> labelled <code>conduct</code> or contact a maintainer directly via GitHub.</li>
+<li><strong>Email</strong> — Reach the maintainer team at <strong>maintainers@sorobancookbook.dev</strong>.</li>
+</ol>
+<p>All reports are reviewed promptly and in confidence. The identity of the reporter will not be shared without explicit consent.</p>
+<h2 id="enforcement"><a class="header" href="#enforcement">Enforcement</a></h2>
+<p>Maintainers are responsible for clarifying and enforcing these guidelines. Upon receiving a report, they will:</p>
+<ol>
+<li>Acknowledge the report within <strong>two business days</strong>.</li>
+<li>Review the incident privately with the relevant maintainers.</li>
+<li>Determine an appropriate response according to the severity levels below.</li>
+<li>Communicate the outcome to the reporter.</li>
+</ol>
+<h3 id="severity-levels-and-consequences"><a class="header" href="#severity-levels-and-consequences">Severity levels and consequences</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Level</th><th>Behaviour</th><th>Consequence</th></tr>
+</thead>
+<tbody>
+<tr><td>1 — Correction</td><td>Isolated inappropriate language or minor misconduct</td><td>Private written warning; public apology may be requested</td></tr>
+<tr><td>2 — Warning</td><td>Pattern of minor violations or a single significant incident</td><td>Formal warning; temporary restriction from community spaces</td></tr>
+<tr><td>3 — Temporary ban</td><td>Serious violation or sustained disruptive behaviour</td><td>Temporary ban from all community interaction</td></tr>
+<tr><td>4 — Permanent ban</td><td>Repeated severe violations or targeted harassment</td><td>Permanent removal from all community spaces</td></tr>
+</tbody>
+</table>
+</div>
+<p>Maintainers exercise judgement in applying these levels; the table is a guide, not a rigid formula.</p>
+<h2 id="contributing-2"><a class="header" href="#contributing-2">Contributing</a></h2>
+<p>Before submitting a pull request, please review <a href="#contributing-to-soroban-cookbook">CONTRIBUTING.md</a> for technical requirements and workflow expectations.</p>
+<h2 id="acknowledgements"><a class="header" href="#acknowledgements">Acknowledgements</a></h2>
+<p>These guidelines are informed by the <a href="https://www.contributor-covenant.org/">Contributor Covenant</a> and the practices of other open-source communities in the Rust and Stellar ecosystems.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="contributing-to-soroban-cookbook"><a class="header" href="#contributing-to-soroban-cookbook">Contributing to Soroban Cookbook</a></h1>
 <p>Thank you for your interest in contributing to the Soroban Cookbook! This project aims to be a comprehensive resource for Soroban developers, and your contributions are what make it great.</p>
