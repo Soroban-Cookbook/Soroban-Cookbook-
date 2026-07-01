@@ -21,7 +21,7 @@ fn setup() -> Fixture {
     let token = PausableTokenClient::new(&env, &token_id);
     let name = String::from_str(&env, "Pausable USD");
     let symbol = Symbol::new(&env, "PUSD");
-    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128);
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
 
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -39,11 +39,11 @@ fn setup() -> Fixture {
 fn initialize_sets_metadata_and_unpaused_state() {
     let f = setup();
 
-    assert_eq!(f.token.name(), String::from_str(&f.env, "Pausable USD"));
-    assert_eq!(f.token.symbol(), Symbol::new(&f.env, "PUSD"));
-    assert_eq!(f.token.decimals(), 2);
-    assert_eq!(f.token.admin(), f.admin);
-    assert_eq!(f.token.total_supply(), 1_000_000);
+    assert_eq!(f.token.name().unwrap(), String::from_str(&f.env, "Pausable USD"));
+    assert_eq!(f.token.symbol().unwrap(), Symbol::new(&f.env, "PUSD"));
+    assert_eq!(f.token.decimals().unwrap(), 2);
+    assert_eq!(f.token.admin().unwrap(), f.admin);
+    assert_eq!(f.token.total_supply().unwrap(), 1_000_000);
     assert_eq!(f.token.balance(&f.admin), 1_000_000);
     assert!(!f.token.is_paused());
 }
@@ -52,7 +52,7 @@ fn initialize_sets_metadata_and_unpaused_state() {
 fn transfer_works_when_unpaused() {
     let f = setup();
 
-    f.token.transfer(&f.admin, &f.alice, &500_000);
+    f.token.transfer(&f.admin, &f.alice, &500_000).unwrap();
 
     assert_eq!(f.token.balance(&f.admin), 500_000);
     assert_eq!(f.token.balance(&f.alice), 500_000);
@@ -79,7 +79,7 @@ fn transfer_works_when_unpaused() {
 fn transfer_fails_when_paused() {
     let f = setup();
 
-    f.token.pause();
+    f.token.pause().unwrap();
     assert!(f.token.is_paused());
 
     let result = f.token.try_transfer(&f.admin, &f.alice, &100);
@@ -90,10 +90,10 @@ fn transfer_fails_when_paused() {
 fn approve_and_transfer_from_work_when_unpaused() {
     let f = setup();
 
-    f.token.approve(&f.admin, &f.alice, &300_000);
+    f.token.approve(&f.admin, &f.alice, &300_000).unwrap();
     assert_eq!(f.token.allowance(&f.admin, &f.alice), 300_000);
 
-    f.token.transfer_from(&f.alice, &f.admin, &f.bob, &250_000);
+    f.token.transfer_from(&f.alice, &f.admin, &f.bob, &250_000).unwrap();
     assert_eq!(f.token.balance(&f.admin), 750_000);
     assert_eq!(f.token.balance(&f.bob), 250_000);
     assert_eq!(f.token.allowance(&f.admin, &f.alice), 50_000);
@@ -103,7 +103,7 @@ fn approve_and_transfer_from_work_when_unpaused() {
 fn approve_and_transfer_from_fail_when_paused() {
     let f = setup();
 
-    f.token.pause();
+    f.token.pause().unwrap();
 
     let approve_result = f.token.try_approve(&f.admin, &f.alice, &300_000);
     assert_eq!(approve_result, Err(Ok(TokenError::ContractPaused)));
@@ -116,27 +116,27 @@ fn approve_and_transfer_from_fail_when_paused() {
 fn mint_and_burn_work_when_unpaused() {
     let f = setup();
 
-    f.token.mint(&f.admin, &f.alice, &250_000);
+    f.token.mint(&f.admin, &f.alice, &250_000).unwrap();
     assert_eq!(f.token.balance(&f.alice), 250_000);
-    assert_eq!(f.token.total_supply(), 1_250_000);
+    assert_eq!(f.token.total_supply().unwrap(), 1_250_000);
 
-    f.token.burn(&f.alice, &50_000);
+    f.token.burn(&f.alice, &50_000).unwrap();
     assert_eq!(f.token.balance(&f.alice), 200_000);
-    assert_eq!(f.token.total_supply(), 1_200_000);
+    assert_eq!(f.token.total_supply().unwrap(), 1_200_000);
 }
 
 #[test]
 fn mint_and_burn_fail_when_paused() {
     let f = setup();
 
-    f.token.pause();
+    f.token.pause().unwrap();
 
     let mint_result = f.token.try_mint(&f.admin, &f.alice, &100);
     assert_eq!(mint_result, Err(Ok(TokenError::ContractPaused)));
 
-    f.token.unpause();
-    f.token.mint(&f.admin, &f.alice, &100);
-    f.token.pause();
+    f.token.unpause().unwrap();
+    f.token.mint(&f.admin, &f.alice, &100).unwrap();
+    f.token.pause().unwrap();
 
     let burn_result = f.token.try_burn(&f.alice, &50);
     assert_eq!(burn_result, Err(Ok(TokenError::ContractPaused)));
@@ -148,10 +148,10 @@ fn admin_can_pause_and_unpause() {
 
     assert!(!f.token.is_paused());
 
-    f.token.pause();
+    f.token.pause().unwrap();
     assert!(f.token.is_paused());
 
-    f.token.unpause();
+    f.token.unpause().unwrap();
     assert!(!f.token.is_paused());
 }
 
@@ -159,7 +159,7 @@ fn admin_can_pause_and_unpause() {
 fn pause_emits_event() {
     let f = setup();
 
-    f.token.pause();
+    f.token.pause().unwrap();
 
     let events = EventList::new(&f.env, f.env.events().all());
     let pause_event = events.iter().find(|(_, topics, _)| {
@@ -174,10 +174,10 @@ fn pause_emits_event() {
 fn unpause_emits_event() {
     let f = setup();
 
-    f.token.pause();
+    f.token.pause().unwrap();
     f.env.events().all(); // Clear events
 
-    f.token.unpause();
+    f.token.unpause().unwrap();
 
     let events = EventList::new(&f.env, f.env.events().all());
     let unpause_event = events.iter().find(|(_, topics, _)| {
@@ -192,14 +192,14 @@ fn unpause_emits_event() {
 fn operations_again_after_unpause() {
     let f = setup();
 
-    f.token.transfer(&f.admin, &f.alice, &100_000);
-    f.token.pause();
+    f.token.transfer(&f.admin, &f.alice, &100_000).unwrap();
+    f.token.pause().unwrap();
 
     let result = f.token.try_transfer(&f.alice, &f.bob, &50_000);
     assert_eq!(result, Err(Ok(TokenError::ContractPaused)));
 
-    f.token.unpause();
-    f.token.transfer(&f.alice, &f.bob, &50_000);
+    f.token.unpause().unwrap();
+    f.token.transfer(&f.alice, &f.bob, &50_000).unwrap();
 
     assert_eq!(f.token.balance(&f.alice), 50_000);
     assert_eq!(f.token.balance(&f.bob), 50_000);
@@ -209,12 +209,12 @@ fn operations_again_after_unpause() {
 fn read_only_works_while_paused() {
     let f = setup();
 
-    f.token.transfer(&f.admin, &f.alice, &100_000);
-    f.token.pause();
+    f.token.transfer(&f.admin, &f.alice, &100_000).unwrap();
+    f.token.pause().unwrap();
 
     assert_eq!(f.token.balance(&f.alice), 100_000);
     assert_eq!(f.token.balance(&f.bob), 0);
-    assert_eq!(f.token.total_supply(), 1_000_000);
-    assert_eq!(f.token.decimals(), 2);
+    assert_eq!(f.token.total_supply().unwrap(), 1_000_000);
+    assert_eq!(f.token.decimals().unwrap(), 2);
     assert!(f.token.is_paused());
 }
