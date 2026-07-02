@@ -14,7 +14,8 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, token::TokenClient, Address, Env, Map, Vec,
+    contract, contracterror, contractimpl, contracttype, token::TokenClient, vec, Address, Env,
+    Map, Vec,
 };
 
 // ============================================================================
@@ -48,7 +49,7 @@ pub struct StandardTokenOps;
 #[cfg(any(not(target_arch = "wasm32"), test, feature = "testutils"))]
 #[contractimpl]
 impl StandardTokenOps {
-    pub fn standard_initialize(env: Env, underlying: Address) -> Result<(), StandardError> {
+    pub fn initialize(env: Env, underlying: Address) -> Result<(), StandardError> {
         env.storage()
             .instance()
             .set(&StandardDataKey::Underlying, &underlying);
@@ -58,7 +59,7 @@ impl StandardTokenOps {
         Ok(())
     }
 
-    pub fn standard_wrap(env: Env, user: Address, amount: i128) -> Result<i128, StandardError> {
+    pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, StandardError> {
         if amount <= 0 {
             return Err(StandardError::InvalidAmount);
         }
@@ -104,7 +105,7 @@ impl StandardTokenOps {
         Ok(new_balance)
     }
 
-    pub fn standard_balance(env: Env, user: Address) -> i128 {
+    pub fn balance(env: Env, user: Address) -> i128 {
         env.storage()
             .persistent()
             .get(&StandardDataKey::Balance(user))

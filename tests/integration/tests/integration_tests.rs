@@ -7,6 +7,7 @@
 
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     symbol_short, testutils::Address as _, testutils::Ledger as _, Address, Bytes, BytesN, Env,
@@ -280,7 +281,7 @@ fn test_ajo_factory_lifecycle_integration() {
     .unwrap();
 
     // Step 3: Register Ajo template natively and verify auth + factory state
-    let ajo_id = env.register_contract(None, ajo_factory::Ajo);
+    let ajo_id = env.register_contract(None, ajo::Ajo);
     env.invoke_contract::<Result<(), ajo::AjoError>>(
         &ajo_id,
         &Symbol::new(&env, "initialize"),

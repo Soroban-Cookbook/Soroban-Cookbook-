@@ -662,26 +662,22 @@ impl NftMetadataContract {
     }
 
     /// Execute the token transfer: update owner, balances, clear approval.
-    fn do_transfer(env: &Env, from: &Address, to: &Address, token_id: u32) -> Result<(), NftError> {
+    fn do_transfer(env: &Env, _from: &Address, to: &Address, token_id: u32) -> Result<(), NftError> {
         let owner: Address = env
             .storage()
             .persistent()
             .get(&DataKey::Owner(token_id))
             .ok_or(NftError::TokenNotFound)?;
 
-        if from != &owner {
-            return Err(NftError::NotOwner);
-        }
-
-        // Decrement sender balance
-        let from_bal: u32 = env
+        // Decrement owner balance
+        let owner_bal: u32 = env
             .storage()
             .persistent()
-            .get(&DataKey::Balance(from.clone()))
+            .get(&DataKey::Balance(owner.clone()))
             .unwrap_or(0);
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(from.clone()), &from_bal.saturating_sub(1));
+            .set(&DataKey::Balance(owner.clone()), &owner_bal.saturating_sub(1));
 
         // Increment recipient balance
         let to_bal: u32 = env
@@ -729,7 +725,7 @@ fn is_valid_uri(_env: &Env, uri: &String) -> bool {
     // Copy up to 10 bytes to check the scheme prefix
     let check_len = if len < 10 { len } else { 10 };
     let mut buf = [0u8; 10];
-    uri.copy_into_slice(&mut buf[..check_len]);
+    uri.to_bytes().slice(0..check_len as u32).copy_into_slice(&mut buf[..check_len]);
 
     // ipfs://  (7 bytes)
     if check_len >= 7 && &buf[..7] == b"ipfs://" {

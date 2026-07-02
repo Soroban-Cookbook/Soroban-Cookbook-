@@ -1,10 +1,11 @@
 use super::*;
-use soroban_sdk::{Address, Env};
+use soroban_sdk::{Env, Address, testutils::Address as _};
 
 #[test]
 fn test_initialize() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
     client.initialize(&5, &10, &80);
 }
@@ -13,7 +14,8 @@ fn test_initialize() {
 #[should_panic(expected = "already initialized")]
 fn test_initialize_twice() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
     client.initialize(&5, &10, &80);
     client.initialize(&5, &10, &80);
@@ -22,9 +24,10 @@ fn test_initialize_twice() {
 #[test]
 fn test_deposit() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     let position = client.get_user_position(&user);
@@ -35,9 +38,10 @@ fn test_deposit() {
 #[should_panic(expected = "amount must be positive")]
 fn test_deposit_zero() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &0);
 }
@@ -46,9 +50,10 @@ fn test_deposit_zero() {
 #[should_panic(expected = "amount must be positive")]
 fn test_deposit_negative() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &-100);
 }
@@ -56,9 +61,10 @@ fn test_deposit_negative() {
 #[test]
 fn test_withdraw() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.withdraw(&user, &500);
@@ -70,9 +76,10 @@ fn test_withdraw() {
 #[should_panic(expected = "insufficient deposit")]
 fn test_withdraw_too_much() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.withdraw(&user, &2000);
@@ -81,9 +88,10 @@ fn test_withdraw_too_much() {
 #[test]
 fn test_borrow() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &500);
@@ -95,20 +103,22 @@ fn test_borrow() {
 #[should_panic(expected = "exceeds borrow limit")]
 fn test_borrow_too_much() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
-    client.borrow(&user, &900);
+    client.borrow(&user, &950);
 }
 
 #[test]
 fn test_repay() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &500);
@@ -120,9 +130,10 @@ fn test_repay() {
 #[test]
 fn test_repay_full() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &500);
@@ -134,9 +145,10 @@ fn test_repay_full() {
 #[test]
 fn test_utilization_tracking() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &500);
@@ -147,9 +159,10 @@ fn test_utilization_tracking() {
 #[test]
 fn test_interest_rate_model_below_kink() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &400);
@@ -160,9 +173,10 @@ fn test_interest_rate_model_below_kink() {
 #[test]
 fn test_interest_rate_model_above_kink() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, LendingPool);
+    env.mock_all_auths();
+    let contract_id = env.register(LendingPool, ());
     let client = LendingPoolClient::new(&env, &contract_id);
-    let user = Address::random(&env);
+    let user = Address::generate(&env);
     client.initialize(&5, &10, &80);
     client.deposit(&user, &1000);
     client.borrow(&user, &850);

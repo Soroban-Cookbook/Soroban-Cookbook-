@@ -26,7 +26,8 @@ impl PriorityQueueContract {
     pub fn push(env: Env, item: Symbol, priority: i128) {
         let mut heap = Self::load_heap(&env);
         heap.push_back(HeapEntry { item, priority });
-        Self::sift_up(&mut heap, heap.len() - 1);
+        let last_index = heap.len() - 1;
+        Self::sift_up(&mut heap, last_index);
         Self::save_heap(&env, &heap);
     }
 

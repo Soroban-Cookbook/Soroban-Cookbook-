@@ -36,7 +36,9 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol,
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -127,7 +129,7 @@ pub struct StrategyParams {
 ///
 /// This function acts as the strategy registry / factory.  Adding a new
 /// strategy means adding a new variant to [`StrategyType`] and a new arm here.
-pub fn strategy_params(_env: &Env, strategy: &StrategyType) -> StrategyParams {
+pub fn strategy_params(env: &Env, strategy: &StrategyType) -> StrategyParams {
     match strategy {
         // ── Conservative ────────────────────────────────────────────────────
         // Deposits into a stable money-market; principal is protected.
@@ -253,7 +255,9 @@ impl VaultContract {
         // max_allowed = new_total * max_allocation_bps / BPS_DENOM
         // We want: amount <= new_total * max_allocation_bps / BPS_DENOM
         // Rearranged: amount * BPS_DENOM <= new_total * max_allocation_bps
-        if amount.checked_mul(BPS_DENOM).expect("Overflow")
+        if amount
+            .checked_mul(BPS_DENOM)
+            .expect("Overflow")
             > new_total
                 .checked_mul(params.max_allocation_bps)
                 .expect("Overflow")

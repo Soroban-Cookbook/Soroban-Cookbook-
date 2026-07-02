@@ -167,7 +167,7 @@ impl FarmingPoolContract {
 
         if amount > 0 {
             let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
-            client.transfer(&user, env.current_contract_address(), &amount);
+            client.transfer(&user, &env.current_contract_address(), &amount);
             user_info.amount += amount;
             pool.total_staked += amount;
         }

@@ -15,6 +15,11 @@ This category contains examples related to on-chain governance, including Decent
 *   **[01-vote-delegation](./01-vote-delegation/) — 🟡 Intermediate**
     Liquid voting delegation with chain delegation, loop prevention (cycle detection), and recursion depth limits.
 
+## Examples
+
+*   **[01-vote-delegation](./01-vote-delegation/) — 🟡 Intermediate**
+    Liquid voting delegation with chain delegation, loop prevention (cycle detection), and recursion depth limits.
+
 ## Planned Examples
 
 - `03-treasury`: A contract for managing a DAO's funds, controlled by governance.

@@ -7,16 +7,16 @@ fn test_cross_contract_integration_and_upgrade_simulation() {
     env.mock_all_auths();
 
     // Deploy registry and factory
-    let registry_id = env.register_contract(None, Registry);
+    let registry_id = env.register(Registry, ());
     let registry_client = RegistryClient::new(&env, &registry_id);
 
-    // Upload a placeholder WASM for factory initialization (example pattern)
-    let template_wasm: [u8; 0] = [0u8; 0];
+    // Upload the compiled contract WASM for factory initialization
+    const WASM: &[u8] = include_bytes!("../../../../target/wasm32v1-none/release/cross_contract_integration_testing.wasm");
     let wasm_hash = env
         .deployer()
-        .upload_contract_wasm(template_wasm.as_slice());
+        .upload_contract_wasm(WASM);
 
-    let factory_id = env.register_contract(None, Factory);
+    let factory_id = env.register(Factory, ());
     let factory_client = FactoryClient::new(&env, &factory_id);
     factory_client.initialize(&wasm_hash, &registry_id);
 
@@ -32,7 +32,7 @@ fn test_cross_contract_integration_and_upgrade_simulation() {
 
     // Now simulate a live upgrade flow on an actual target contract instance:
     // - Register a concrete `Target` contract
-    let target_id = env.register_contract(None, Target);
+    let target_id = env.register(Target, ());
     let target_client = TargetClient::new(&env, &target_id);
 
     // Set some instance-local state

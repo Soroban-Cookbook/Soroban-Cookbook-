@@ -257,14 +257,18 @@ fn test_authorization_validation() {
         env.storage()
             .instance()
             .set(&DataKey::UserRole(admin.clone()), &UserRole::Admin);
-        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::Admin, &admin.clone());
         assert_eq!(
             ValidationContract::validate_role(&env, admin.clone(), UserRole::Moderator),
             Ok(())
         );
 
         // Test ownership validation: set owner first so validate_ownership can find it
-        env.storage().instance().set(&DataKey::Owner, &owner);
+        env.storage()
+            .instance()
+            .set(&DataKey::Owner, &owner.clone());
         assert_eq!(
             ValidationContract::validate_ownership(&env, owner.clone()),
             Ok(())
@@ -363,7 +367,9 @@ fn test_admin_functions() {
     env.as_contract(&contract_id, || {
         let owner = <soroban_sdk::Address as AddressTest>::generate(&env);
         env.storage().instance().set(&DataKey::Owner, &owner);
-        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::Admin, &admin.clone());
         env.storage()
             .instance()
             .set(&DataKey::State, &ContractState::Active);

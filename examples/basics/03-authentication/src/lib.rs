@@ -19,6 +19,7 @@
 //! - **State-Based Authorization**: Contract state gating (Active/Paused/Frozen)
 
 #![no_std]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, Symbol,

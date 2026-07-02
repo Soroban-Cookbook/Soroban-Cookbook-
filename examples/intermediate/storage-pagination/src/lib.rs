@@ -5,7 +5,7 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, Env, Vec, Symbol};
 
 const ITEMS_KEY: u32 = 0;
 

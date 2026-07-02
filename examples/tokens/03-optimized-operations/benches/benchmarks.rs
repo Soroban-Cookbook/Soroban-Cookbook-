@@ -42,7 +42,7 @@ fn benchmark_standard_vs_optimized() {
     // Register standard contract
     let standard_id = env.register_contract(None, StandardTokenOps);
     let standard = StandardTokenOpsClient::new(&env, &standard_id);
-    let _ = standard.standard_initialize(&underlying);
+    let _ = standard.initialize(&underlying);
 
     // Register optimized contract
     let optimized_id = env.register_contract(None, OptimizedTokenOps);
@@ -58,7 +58,7 @@ fn benchmark_standard_vs_optimized() {
     BenchmarkResult::print_header();
 
     let budget_before = env.budget().get_budget();
-    let _ = standard.standard_balance(&alice);
+    let _ = standard.balance(&alice);
     let budget_after = env.budget().get_budget();
     let standard_balance_cpu = budget_before.cpu_instructions - budget_after.cpu_instructions;
     let standard_balance_mem =
@@ -98,7 +98,7 @@ fn benchmark_standard_vs_optimized() {
     for i in 0..3 {
         let recipient = Address::generate(&env);
         let budget_before = env.budget().get_budget();
-        let _ = standard.standard_balance(&recipient);
+        let _ = standard.balance(&recipient);
         let budget_after = env.budget().get_budget();
         standard_total_cpu += budget_before.cpu_instructions - budget_after.cpu_instructions;
         standard_total_mem +=

@@ -1,5 +1,5 @@
 [package]
-name = "nft-metadata-v2"
+name = "nft-metadata-advanced"
 version.workspace = true
 edition.workspace = true
 publish = false

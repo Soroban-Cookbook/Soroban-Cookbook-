@@ -110,4 +110,6 @@
 - [Video Tutorials](./examples/video-tutorials.md)
 - [Pause / Unpause](./examples/intermediate.md)
 - [Oracle Pattern](./examples/advanced.md)
+- [Diamond Security](./examples/advanced/05-diamond-security/README.md)
+- [Vote Delegation](./examples/governance/01-vote-delegation/README.md)
 

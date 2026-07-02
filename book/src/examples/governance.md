@@ -2,15 +2,21 @@
 
 DAOs, voting, treasury management.
 
-## 📋 Coming Soon
+## Examples
 
-### Simple DAO
-**Token-weighted voting**.
+### [01-vote-delegation](../examples/governance/01-vote-delegation/)
+**Liquid voting delegation** with cycle/loop detection, self-delegation prevention, and recursion depth limits.
 
 **Key Concepts:**
-- Proposal creation
-- Quadratic voting option
-- Execution thresholds
+- Dynamic recursive voting power computation
+- Self-delegation checks
+- Cycle detection to prevent infinite delegation loops
+- Delegation depth limits for gas exhaustion safety
+
+## Planned Examples
+
+- `01-simple-dao`: A basic DAO with token-based voting on proposals.
+- `03-quadratic-voting`: An implementation of a quadratic voting mechanism.
 
 ### Treasury
 **Multi-sig spending**.
@@ -19,9 +25,6 @@ DAOs, voting, treasury management.
 - Timelock delays
 - Spending limits
 - Veto mechanisms
-
-## Placeholder
-`examples/governance/` awaiting content.
 
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)
