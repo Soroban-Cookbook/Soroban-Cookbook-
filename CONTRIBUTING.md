@@ -1,25 +1,37 @@
-## Community Discussions
+# Contributing to Soroban-Cookbook
 
-In addition to our feedback system above, we use [GitHub Discussions](../../discussions) for open-ended, non-actionable conversation — questions, ideas, and community show-and-tell.
+Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
 
-### Categories
+## Feedback System
 
-| Category | Use it for |
-|---|---|
-| 📣 Announcements | Maintainer updates on releases and roadmap |
-| 💡 Ideas | Recipe or feature suggestions before they become issues |
-| 🙏 Q&A | Usage questions and troubleshooting |
-| 🍳 Show and Tell | Things the community has built using the cookbook |
-| 🛠️ Contributing | Coordinating on contribution work, claiming open issues |
-| 🗳️ Polls | Quick community votes |
+We have implemented a comprehensive feedback system to collect and manage input from our community. The system is located in the `docs/feedback-system/` directory.
 
-### Discussions vs. Issues
+### How to Provide Feedback
 
-- **Use Discussions** for questions, ideas, and conversation.
-- **Use Issues** for concrete, actionable bugs or work items.
+1. **Use the Feedback Form**: Copy the template from `docs/feedback-system/forms/feedback-form-template.md` and fill it out.
+2. **Submit via GitHub**: Create an issue or pull request with your feedback.
+3. **Participate in Surveys**: Watch for survey announcements in our communication channels.
 
-A maintainer may convert a Discussion into an Issue (or vice versa) if it turns out to need the other format.
+### Review Process
 
-### Moderation
+All feedback and contributions go through our review process:
+1. Initial acknowledgment within 2 business days
+2. Content and quality review
+3. Decision and communication
+4. Action tracking and implementation
 
-All Discussions are subject to our [Moderation Guidelines](../../discussions/<pinned-moderation-post-number>). Acknowledgment and response targets match our feedback process: within 2 business days.
+### Action Tracking
+
+We track all feedback-driven actions using:
+- GitHub Issues for individual tasks
+- Project boards for status visualization
+- Regular status updates in our community channels
+
+### Communication
+
+We commit to:
+- Acknowledging all feedback within 2 business days
+- Providing regular status updates
+- Closing the loop on all submitted feedback
+
+For more details, see the [Feedback System Documentation](docs/feedback-system/README.md).

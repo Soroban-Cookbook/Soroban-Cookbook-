@@ -7,3 +7,6 @@ publish = false
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
 token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+role-based-access-control = { path = "../../examples/intermediate/02-role-based-access-control" }
+multi-sig-patterns = { path = "../../examples/intermediate/multi-sig-patterns" }
+timelock = { path = "../../examples/advanced/02-timelock" }
