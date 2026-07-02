@@ -2,7 +2,7 @@
 
 use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, Symbol};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[contracttype]
 pub struct Position {
     pub collateral: i128,
@@ -255,12 +255,12 @@ impl LendingContract {
 
     pub fn emergency_liquidate(env: Env, admin: Address, borrower: Address) {
         admin.require_auth();
-        if !env
+        let paused: bool = env
             .storage()
             .instance()
-            .get::<Symbol, bool>(&Symbol::new(&env, "emergency_paused"))
-            .unwrap()
-        {
+            .get(&Symbol::new(&env, "emergency_paused"))
+            .unwrap();
+        if !paused {
             panic!("not in emergency mode");
         }
         let mut positions: Map<Address, Position> = env

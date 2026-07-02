@@ -22,5 +22,5 @@ jobs:
 
       - name: Run example_fuzz for 30 seconds
         run: |
-          cd tests/fuzz
+          cd fuzz
           cargo +nightly fuzz run example_fuzz -- -max_total_time=30

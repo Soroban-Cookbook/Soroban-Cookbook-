@@ -13,10 +13,8 @@ This category contains examples related to fungible tokens, including implementa
 
 ## Examples
 
-- `01-sep41-token`: A complete SEP-41 fungible token with metadata, approvals, events, and comprehensive tests.
 - `01-sep41-token`: A minimal SEP-41-compliant fungible token contract.
-- `02-sep41-extensions`: Optional SEP-41 extensions — permit (EIP-2612 equivalent), batch transfer, and batch approve.
+- `02-minting-strategies`: A token contract showing fixed cap, unlimited, and scheduled issuance patterns.
 - `02-vesting-contract`: A contract that releases tokens to a beneficiary over time.
 - `04-airdrop-contract`: A contract to efficiently distribute tokens to a list of addresses.
-- `05-vesting`: A complete Token Vesting example with schedules, cliffs, and linear vesting.
 - `05-wrapped-asset`: A contract that creates a Soroban-native representation of a classic Stellar asset.
