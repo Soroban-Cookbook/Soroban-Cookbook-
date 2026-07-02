@@ -42,3 +42,7 @@ lending_pool = { path = "../../examples/defi/03-lending-pool", package = "lendin
 collateralized_lending = { path = "../../examples/defi/04-collateralized-lending", package = "collateralized-lending" }
 proptest = "1.6"
 voting_time_constraints = { path = "../../examples/governance/01-voting-time-constraints", package = "voting-time-constraints" }
+oracle_pattern = { path = "../../examples/advanced/03-oracle-pattern", package = "oracle-pattern" }
+cross_contract_integration_testing = { path = "../../examples/advanced/04-cross-contract-integration-testing", package = "cross_contract_integration_testing" }
+upgradeable_proxy = { path = "../../examples/advanced/04-upgradeable-proxy", package = "upgradeable-proxy" }
+contract_registry = { path = "../../examples/advanced/contract-registry", package = "contract-registry" }
