@@ -154,10 +154,16 @@ pub fn is_approved_for_all(env: Env, owner: Address, operator: Address) -> bool
 | `DataKey::Approved(id)`      | persistent | Single-token approval address      |
 | `DataKey::ApproveAll(o, op)` | persistent | Operator approval flag             |
 
-## Running the Tests
+## How to Run
 
 ```bash
-cargo test -p nft-metadata
+cd examples/nfts/03-nft-metadata-standards
+
+# Run all tests
+cargo test
+
+# Build the WASM contract
+cargo build --target wasm32-unknown-unknown --release
 ```
 
 ## Key Concepts
@@ -167,3 +173,17 @@ cargo test -p nft-metadata
 - **URI validation** — the contract enforces that image URIs use a recognised scheme at mint time, preventing garbage data from entering storage.
 - **Admin-controlled updates** — metadata can be updated post-mint by the admin, enabling dynamic NFTs while keeping a clear authority model.
 - **TTL management** — all persistent entries call `extend_ttl` to prevent premature expiry on Soroban's ledger.
+- **Authentication** — every admin action uses `require_auth()` following the `examples/basics/03-authentication` pattern.
+- **Structured events** — `mint`, `transfer`, and `update_metadata` emit `(action, "nft", token_id)` topics following the `examples/basics/04-events` topic layout convention.
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `src/lib.rs` | Contract with full metadata standard, validation, and approval expiry |
+| `src/test.rs` | Tests for metadata validation, URI schemes, attribute constraints |
+| `Cargo.toml` | Crate metadata (`nft-metadata-standards`) and workspace dependencies |
+
+## Next Steps
+
+- **[04-nft-marketplace](../04-nft-marketplace/)** — Combine this metadata standard with a full marketplace: fixed-price listings, auctions, bundles, and royalties

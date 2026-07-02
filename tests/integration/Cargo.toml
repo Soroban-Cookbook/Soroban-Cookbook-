@@ -52,3 +52,6 @@ liquidity_mining = { path = "../../examples/defi/08-liquidity-mining", package =
 events-counter = { path = "../../examples/basics/events", package = "events_example" }
 batch-operations = { path = "../../examples/advanced/08-batch-operations" }
 proposal-validation = { path = "../../examples/governance/01-proposal-validation" }
+token_wrapper = { path = "../../examples/tokens/06-token-wrapper", package = "token-wrapper" }
+nft_marketplace = { path = "../../examples/nfts/04-nft-marketplace", package = "nft-marketplace" }
+proposal_lifecycle = { path = "../../examples/governance/03-proposal-lifecycle", package = "proposal-lifecycle" }

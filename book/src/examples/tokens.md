@@ -1,27 +1,23 @@
 # Token Examples
 
-Fungible tokens, standards, wrappers, and portfolio utilities.
+Soroban fungible token contracts from a minimal SEP-41 implementation to advanced extensions, mint/burn flows, allowances, wrappers, and optimized batch operations.
 
-### Mint/Burn Token [./mint-burn/](../examples/tokens/mint-burn/)
-**Controlled issuance and destruction.** Demonstrates admin-only minting, user burn rights, total supply tracking, and optional maximum supply caps.
+## Examples
 
-**Key Concepts:**
-- Admin authorization for minting
-- Safe burn semantics
-- Total supply invariants
-- Optional supply cap enforcement
-- Event emission for mint/burn operations
-
-### Token Wrapper [./token-wrapper/](../examples/tokens/token-wrapper/)
-**Wrap native assets.** Deposit an existing SEP-41 token and mint 1:1 wrapper shares.
-
-**Key Concepts:**
-- Cross-contract token transfers
-- Backing invariant maintenance
-- Mint/burn wrapper shares
-- Withdrawal and collateral accounting
+| # | Example | Pattern | Difficulty |
+|---|---------|---------|------------|
+| 01 | [SEP-41 Token](./tokens/01-sep41-token.md) | Complete SEP-41 fungible token with metadata, approvals, events | Beginner |
+| 02 | [SEP-41 Extensions](./tokens/02-sep41-extensions.md) | Permit, batch transfer, batch approve | Intermediate |
+| 03 | [Optimized Operations](./tokens/03-optimized-operations.md) | Storage layout and batching with benchmarks | Advanced |
+| 04 | [Mint / Burn](./tokens/04-mint-burn.md) | Admin mint + user burn with supply cap | Beginner |
+| 05 | [Allowance Pattern](./tokens/05-allowance-pattern.md) | `approve` / `transfer_from` with expiration | Intermediate |
+| 06 | [Token Wrapper](./tokens/06-token-wrapper.md) | 1:1 wrapper with peg invariant | Intermediate |
+| 07 | [Token Metadata](./tokens/07-token-metadata.md) | Mutable and immutable on-chain metadata | Beginner |
+| 08 | [Multi-Token Balance Manager](./tokens/08-multi-token-balance-manager.md) | Portfolio contract across multiple tokens | Intermediate |
+| 09 | [Optimized Token Ops](./tokens/09-optimized-token-ops.md) | Micro-optimization patterns for transfers | Intermediate |
 
 ## Prerequisites
-- [Basics](../basics.md), [Auth](../basics/03-authentication/)
+
+- [Basics](./basics.md)
 
 ## End of Examples Section
