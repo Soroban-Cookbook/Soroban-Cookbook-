@@ -152,9 +152,9 @@ impl SimpleSwapContract {
         min_buy_amount: i128,
         recipient: Address,
     ) {
+        trader.require_auth();
         assert!(sell_amount > 0, "sell amount must be positive");
         assert!(min_buy_amount > 0, "min buy amount must be positive");
-        trader.require_auth();
 
         let this = SimpleSwapContract;
         let token_a = this.token_a(&env);
@@ -186,7 +186,8 @@ impl SimpleSwapContract {
 
         let contract_addr = this.contract_address(&env);
 
-        token::Client::new(&env, &sell_token).transfer(
+        token::Client::new(&env, &sell_token).transfer_from(
+            &contract_addr,
             &trader,
             &contract_addr,
             &sell_amount,

@@ -29,6 +29,8 @@ pub struct LiquidityEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap_liq");
+const EVENT_ADD: Symbol = symbol_short!("liq_added");
+const EVENT_REMOVE: Symbol = symbol_short!("liq_rmvd");
 
 impl SwapLiquidityContract {
     fn require_owner(&self, env: &Env) {
@@ -155,7 +157,7 @@ impl SwapLiquidityContract {
             .set(&DataKey::TotalShares, &(total_shares + minted_shares));
 
         env.events().publish(
-            (EVENT_NS, Symbol::new(&env, "liquidity_added")),
+            (EVENT_NS, EVENT_ADD),
             LiquidityEventData {
                 provider,
                 amount_a,
@@ -203,7 +205,7 @@ impl SwapLiquidityContract {
             .set(&DataKey::TotalShares, &(total_shares - shares));
 
         env.events().publish(
-            (EVENT_NS, Symbol::new(&env, "liquidity_removed")),
+            (EVENT_NS, EVENT_REMOVE),
             LiquidityEventData {
                 provider,
                 amount_a,

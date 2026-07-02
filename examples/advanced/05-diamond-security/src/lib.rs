@@ -9,11 +9,10 @@
 //!    namespaced-isolated key-value storage managed by the Proxy contract.
 
 #![no_std]
-#![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env,
-    Symbol, Val, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, IntoVal,
+    Symbol, TryIntoVal, Val, Vec,
 };
 
 #[contracterror]

@@ -1,0 +1,18 @@
+[package]
+name = "token-lock"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true }
+
+[lib]
+crate-type = ["cdylib"]
+
+[features]
+default = []
+

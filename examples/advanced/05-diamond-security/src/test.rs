@@ -1,9 +1,9 @@
-#![allow(deprecated)]
+//! Security tests for the Diamond Security pattern.
 
 use super::*;
 use facet_adder::{FacetAdderContract, FacetAdderContractClient};
 use facet_multiplier::{FacetMultiplierContract, FacetMultiplierContractClient};
-use soroban_sdk::{testutils::Address as _, Env, IntoVal, TryIntoVal};
+use soroban_sdk::{testutils::Address as _, Env, IntoVal};
 
 #[test]
 fn test_proxy_initialization() {

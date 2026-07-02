@@ -19,7 +19,7 @@ jobs:
     name: Rust Format Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -30,11 +30,20 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
+  typos:
+    name: Spelling Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check spelling
+        uses: crate-ci/typos@v1.28.0
+
   clippy:
     name: Clippy Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -52,7 +61,7 @@ jobs:
     # Only test on stable. Rust 1.74 cannot compile transitive deps that use
     # edition 2024 (e.g. base64ct ≥ 1.8) — so we drop the old matrix entry.
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -63,7 +72,7 @@ jobs:
           target: wasm32-unknown-unknown
 
       - name: Cache cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -89,6 +98,9 @@ jobs:
       - name: Run security tests
         run: cargo test --package security-tests --target x86_64-unknown-linux-gnu
 
+      - name: Run integration tests
+        run: cargo test -p integration-tests --target x86_64-unknown-linux-gnu
+
       - name: Run tests (fallback)
         if: github.event_name != 'pull_request'
         run: ./scripts/ci-workspace.sh test --target x86_64-unknown-linux-gnu
@@ -97,7 +109,7 @@ jobs:
     name: Build Contracts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -106,7 +118,7 @@ jobs:
           target: wasm32v1-none
 
       - name: Cache cargo registry
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -125,7 +137,7 @@ jobs:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -151,7 +163,7 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -162,7 +174,7 @@ jobs:
       # Cache the Cargo registry AND the compiled tarpaulin binary together
       # so repeated runs don't rebuild tarpaulin from source every time.
       - name: Cache Cargo registry and tarpaulin binary
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.cargo/registry
@@ -207,10 +219,31 @@ jobs:
       # Upload Cobertura XML to Codecov for badge + historical trend graphs.
       # CODECOV_TOKEN is required for private repos; harmless for public ones.
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           files: ./coverage/cobertura.xml
           flags: workspace
           name: soroban-cookbook
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  spell-check:
+    name: Spell Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+
+      - name: Install dependencies
+        run: cd webapp && bun install
+
+      - name: Run spell check
+        run: cd webapp && bun run spellcheck
