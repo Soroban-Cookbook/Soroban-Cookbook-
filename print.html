@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e0dc217d.js";
+            window.path_to_searchindex_js = "searchindex-b42b4b1e.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-9dee982d.js"></script>
+        <script src="toc-b5b68aa7.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -287,8 +287,8 @@ cargo test
 </thead>
 <tbody>
 <tr><td><a href="#getting-started-with-soroban">Getting Started</a></td><td>Set up your development environment</td></tr>
-<tr><td><a href="#testing-guide">Testing</a></td><td>Unit tests, integration tests, best practices</td></tr>
-<tr><td><a href="#deployment-guide">Deployment</a></td><td>Deploy to testnet and mainnet</td></tr>
+<tr><td><a href="#testing-guide-2">Testing</a></td><td>Unit tests, integration tests, best practices</td></tr>
+<tr><td><a href="#deployment-guide-1">Deployment</a></td><td>Deploy to testnet and mainnet</td></tr>
 <tr><td><a href="#local-simulation-guide">Local Simulation</a></td><td>Run contracts locally with the Stellar CLI</td></tr>
 <tr><td><a href="#migrating-from-ethereum-to-soroban">Ethereum to Soroban</a></td><td>Solidity → Rust pattern translation</td></tr>
 </tbody>
@@ -580,10 +580,10 @@ test result: ok. 1 passed; 0 failed
 </ul>
 </li>
 <li>
-<p><strong>Learn to test well</strong> — read the <a href="#testing-guide">Testing Guide</a></p>
+<p><strong>Learn to test well</strong> — read the <a href="#testing-guide-2">Testing Guide</a></p>
 </li>
 <li>
-<p><strong>Deploy with confidence</strong> — read the <a href="#deployment-guide">Deployment Guide</a></p>
+<p><strong>Deploy with confidence</strong> — read the <a href="#deployment-guide-1">Deployment Guide</a></p>
 </li>
 <li>
 <p><strong>Coming from Ethereum?</strong> — read the <a href="#migrating-from-ethereum-to-soroban">Ethereum → Soroban Migration Guide</a></p>
@@ -863,13 +863,13 @@ with your public key as the <code>addr</code> parameter.</p>
 <h2 id="next-steps-1"><a class="header" href="#next-steps-1">Next Steps</a></h2>
 <ul>
 <li><a href="#getting-started-with-soroban">Getting Started Guide</a> — write and deploy your first contract</li>
-<li><a href="#testing-guide">Testing Guide</a> — unit tests, fixtures, and error testing</li>
+<li><a href="#testing-guide-2">Testing Guide</a> — unit tests, fixtures, and error testing</li>
 <li><a href="#basic-examples">Hello World Example</a> — the simplest possible contract</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="testing-guide"><a class="header" href="#testing-guide">Testing Guide</a></h1>
+<h1 id="testing-guide"><a class="header" href="#testing-guide-2">Testing Guide</a></h1>
 <p>Comprehensive guide to testing Soroban smart contracts effectively.</p>
-<h2 id="-overview"><a class="header" href="#-overview">📖 Overview</a></h2>
+<h2 id="-overview"><a class="header" href="#-overview-3">📖 Overview</a></h2>
 <p>Testing is crucial for smart contract development. This guide covers:</p>
 <ul>
 <li>Unit testing individual functions</li>
@@ -879,10 +879,10 @@ with your public key as the <code>addr</code> parameter.</p>
 <li>Snapshot testing and coverage tools</li>
 <li>Common testing patterns and anti-patterns</li>
 </ul>
-<h2 id="-test-types"><a class="header" href="#-test-types">🧪 Test Types</a></h2>
-<h3 id="unit-tests"><a class="header" href="#unit-tests">Unit Tests</a></h3>
+<h2 id="-test-types"><a class="header" href="#-test-types-1">🧪 Test Types</a></h2>
+<h3 id="unit-tests"><a class="header" href="#unit-tests-1">Unit Tests</a></h3>
 <p>Test individual contract functions in isolation.</p>
-<h4 id="example-from-hello-world-contract"><a class="header" href="#example-from-hello-world-contract">Example from Hello World Contract</a></h4>
+<h4 id="example-from-hello-world-contract"><a class="header" href="#example-from-hello-world-contract-1">Example from Hello World Contract</a></h4>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use super::*;
@@ -920,7 +920,7 @@ fn test_hello_with_different_names() {
     }
 }
 <span class="boring">}</span></code></pre>
-<h3 id="integration-tests"><a class="header" href="#integration-tests">Integration Tests</a></h3>
+<h3 id="integration-tests"><a class="header" href="#integration-tests-1">Integration Tests</a></h3>
 <p>Test interactions between multiple contracts.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -942,8 +942,8 @@ fn test_multi_contract_interaction() {
     assert_eq!(vault.balance(&amp;user), 500);
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-test-structure"><a class="header" href="#-test-structure">🏗️ Test Structure</a></h2>
-<h3 id="recommended-organization"><a class="header" href="#recommended-organization">Recommended Organization</a></h3>
+<h2 id="-test-structure"><a class="header" href="#-test-structure-1">🏗️ Test Structure</a></h2>
+<h3 id="recommended-organization"><a class="header" href="#recommended-organization-1">Recommended Organization</a></h3>
 <pre><code>src/
 ├── lib.rs           # Contract code
 └── test.rs          # Unit tests
@@ -953,7 +953,7 @@ tests/
 └── common/
     └── mod.rs       # Shared test utilities
 </code></pre>
-<h3 id="test-module-pattern"><a class="header" href="#test-module-pattern">Test Module Pattern</a></h3>
+<h3 id="test-module-pattern"><a class="header" href="#test-module-pattern-1">Test Module Pattern</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// In src/lib.rs
@@ -987,8 +987,8 @@ fn test_add() {
     assert_eq!(client.add(&amp;2, &amp;3), 5);
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-testing-utilities"><a class="header" href="#-testing-utilities">🛠️ Testing Utilities</a></h2>
-<h3 id="environment-setup"><a class="header" href="#environment-setup">Environment Setup</a></h3>
+<h2 id="-testing-utilities"><a class="header" href="#-testing-utilities-1">🛠️ Testing Utilities</a></h2>
+<h3 id="environment-setup"><a class="header" href="#environment-setup-2">Environment Setup</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::{Env, Address, testutils::Address as _};
@@ -1007,7 +1007,7 @@ fn setup_test() {
     // ... test logic
 }
 <span class="boring">}</span></code></pre>
-<h3 id="time-manipulation"><a class="header" href="#time-manipulation">Time Manipulation</a></h3>
+<h3 id="time-manipulation"><a class="header" href="#time-manipulation-1">Time Manipulation</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
@@ -1025,7 +1025,7 @@ fn test_with_time() {
     });
 }
 <span class="boring">}</span></code></pre>
-<h3 id="authorization-mocking"><a class="header" href="#authorization-mocking">Authorization Mocking</a></h3>
+<h3 id="authorization-mocking"><a class="header" href="#authorization-mocking-1">Authorization Mocking</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::testutils::MockAuth;
@@ -1053,8 +1053,8 @@ fn test_auth() {
     );
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-best-practices"><a class="header" href="#-best-practices">✅ Best Practices</a></h2>
-<h3 id="1-use-descriptive-test-names"><a class="header" href="#1-use-descriptive-test-names">1. Use Descriptive Test Names</a></h3>
+<h2 id="-best-practices"><a class="header" href="#-best-practices-3">✅ Best Practices</a></h2>
+<h3 id="1-use-descriptive-test-names"><a class="header" href="#1-use-descriptive-test-names-1">1. Use Descriptive Test Names</a></h3>
 <p>Test names should clearly describe what is being tested and the expected outcome.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1080,7 +1080,7 @@ fn test_1() { }
 #[test]
 fn test_error() { }
 <span class="boring">}</span></code></pre>
-<h3 id="2-test-both-happy-path-and-error-cases"><a class="header" href="#2-test-both-happy-path-and-error-cases">2. Test Both Happy Path and Error Cases</a></h3>
+<h3 id="2-test-both-happy-path-and-error-cases"><a class="header" href="#2-test-both-happy-path-and-error-cases-1">2. Test Both Happy Path and Error Cases</a></h3>
 <p>Every function should have tests for success and failure scenarios.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1096,7 +1096,7 @@ fn test_withdraw_fails_with_insufficient_balance() {
     // ... test withdrawal failure
 }
 <span class="boring">}</span></code></pre>
-<h3 id="3-use-assertions-with-descriptive-messages"><a class="header" href="#3-use-assertions-with-descriptive-messages">3. Use Assertions with Descriptive Messages</a></h3>
+<h3 id="3-use-assertions-with-descriptive-messages"><a class="header" href="#3-use-assertions-with-descriptive-messages-1">3. Use Assertions with Descriptive Messages</a></h3>
 <p>Include context in assertion messages to aid debugging.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1109,7 +1109,7 @@ fn test_withdraw_fails_with_insufficient_balance() {
     balance
 );
 <span class="boring">}</span></code></pre>
-<h3 id="4-keep-tests-focused-and-independent"><a class="header" href="#4-keep-tests-focused-and-independent">4. Keep Tests Focused and Independent</a></h3>
+<h3 id="4-keep-tests-focused-and-independent"><a class="header" href="#4-keep-tests-focused-and-independent-1">4. Keep Tests Focused and Independent</a></h3>
 <p>Each test should verify one behavior. Tests should not depend on other tests.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1136,7 +1136,7 @@ fn test_persistent_storage() {
     assert_eq!(client.get_persistent(&amp;key), Some(value));
 }
 <span class="boring">}</span></code></pre>
-<h3 id="5-mock-authorization-appropriately"><a class="header" href="#5-mock-authorization-appropriately">5. Mock Authorization Appropriately</a></h3>
+<h3 id="5-mock-authorization-appropriately"><a class="header" href="#5-mock-authorization-appropriately-1">5. Mock Authorization Appropriately</a></h3>
 <p>Use <code>env.mock_all_auths()</code> for unit tests, but test authorization logic explicitly when needed.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1163,7 +1163,7 @@ fn test_transfer_requires_sender_authorization() {
     // Test that unauthorized transfers fail
 }
 <span class="boring">}</span></code></pre>
-<h3 id="6-test-edge-cases"><a class="header" href="#6-test-edge-cases">6. Test Edge Cases</a></h3>
+<h3 id="6-test-edge-cases"><a class="header" href="#6-test-edge-cases-1">6. Test Edge Cases</a></h3>
 <p>Include tests for boundary conditions and edge cases.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1197,7 +1197,7 @@ fn test_zero_and_boundary_values() {
     assert_eq!(client.get_persistent(&amp;key), Some(u64::MAX));
 }
 <span class="boring">}</span></code></pre>
-<h3 id="7-use-fixtures-for-common-setup"><a class="header" href="#7-use-fixtures-for-common-setup">7. Use Fixtures for Common Setup</a></h3>
+<h3 id="7-use-fixtures-for-common-setup"><a class="header" href="#7-use-fixtures-for-common-setup-1">7. Use Fixtures for Common Setup</a></h3>
 <p>Create helper functions to reduce test boilerplate.</p>
 <p>✅ <strong>DO</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
@@ -1218,7 +1218,7 @@ fn test_transfer() {
     // ... test logic
 }
 <span class="boring">}</span></code></pre>
-<h3 id="8-test-storage-behavior"><a class="header" href="#8-test-storage-behavior">8. Test Storage Behavior</a></h3>
+<h3 id="8-test-storage-behavior"><a class="header" href="#8-test-storage-behavior-1">8. Test Storage Behavior</a></h3>
 <p>Example from Storage Patterns Contract:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1273,7 +1273,7 @@ fn test_persistent_storage() {
     assert!(!client.has_persistent(&amp;key));
 }
 <span class="boring">}</span></code></pre>
-<h3 id="9-test-error-conditions"><a class="header" href="#9-test-error-conditions">9. Test Error Conditions</a></h3>
+<h3 id="9-test-error-conditions"><a class="header" href="#9-test-error-conditions-1">9. Test Error Conditions</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
@@ -1289,7 +1289,7 @@ fn test_insufficient_balance() {
     client.transfer(&amp;user, &amp;recipient, &amp;1000);
 }
 <span class="boring">}</span></code></pre>
-<h3 id="10-test-events"><a class="header" href="#10-test-events">10. Test Events</a></h3>
+<h3 id="10-test-events"><a class="header" href="#10-test-events-1">10. Test Events</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
@@ -1308,8 +1308,8 @@ fn test_events() {
     // ... verify event data
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-common-testing-pitfalls"><a class="header" href="#-common-testing-pitfalls">⚠️ Common Testing Pitfalls</a></h2>
-<h3 id="1-forgetting-to-mock-authorization"><a class="header" href="#1-forgetting-to-mock-authorization">1. Forgetting to Mock Authorization</a></h3>
+<h2 id="-common-testing-pitfalls"><a class="header" href="#-common-testing-pitfalls-1">⚠️ Common Testing Pitfalls</a></h2>
+<h3 id="1-forgetting-to-mock-authorization"><a class="header" href="#1-forgetting-to-mock-authorization-1">1. Forgetting to Mock Authorization</a></h3>
 <p>❌ <strong>DON’T</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1339,7 +1339,7 @@ fn test_transfer() {
     client.transfer(&amp;from, &amp;to, &amp;100);
 }
 <span class="boring">}</span></code></pre>
-<h3 id="2-not-extending-ttl-for-persistent-storage"><a class="header" href="#2-not-extending-ttl-for-persistent-storage">2. Not Extending TTL for Persistent Storage</a></h3>
+<h3 id="2-not-extending-ttl-for-persistent-storage"><a class="header" href="#2-not-extending-ttl-for-persistent-storage-1">2. Not Extending TTL for Persistent Storage</a></h3>
 <p>❌ <strong>DON’T</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1370,7 +1370,7 @@ fn test_persistent_storage() {
     assert_eq!(value, 1000);
 }
 <span class="boring">}</span></code></pre>
-<h3 id="3-testing-multiple-behaviors-in-one-test"><a class="header" href="#3-testing-multiple-behaviors-in-one-test">3. Testing Multiple Behaviors in One Test</a></h3>
+<h3 id="3-testing-multiple-behaviors-in-one-test"><a class="header" href="#3-testing-multiple-behaviors-in-one-test-1">3. Testing Multiple Behaviors in One Test</a></h3>
 <p>❌ <strong>DON’T</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1392,7 +1392,7 @@ fn test_transfer() {}
 #[test]
 fn test_withdrawal() {}
 <span class="boring">}</span></code></pre>
-<h3 id="4-ignoring-error-cases"><a class="header" href="#4-ignoring-error-cases">4. Ignoring Error Cases</a></h3>
+<h3 id="4-ignoring-error-cases"><a class="header" href="#4-ignoring-error-cases-1">4. Ignoring Error Cases</a></h3>
 <p>❌ <strong>DON’T</strong>:</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1418,7 +1418,7 @@ fn test_transfer_fails_with_insufficient_balance() {
     client.transfer(&amp;from, &amp;to, &amp;1000000);
 }
 <span class="boring">}</span></code></pre>
-<h2 id="-shared-test-utilities"><a class="header" href="#-shared-test-utilities">🧩 Shared Test Utilities</a></h2>
+<h2 id="-shared-test-utilities"><a class="header" href="#-shared-test-utilities-1">🧩 Shared Test Utilities</a></h2>
 <p>For multi-file test suites, keep reusable setup code in <code>tests/common/mod.rs</code>.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1448,7 +1448,7 @@ fn deposit_updates_balance() {
 }
 <span class="boring">}</span></code></pre>
 <p>This pattern keeps contract behavior assertions focused while avoiding duplicated setup logic.</p>
-<h2 id="-snapshot-testing"><a class="header" href="#-snapshot-testing">📸 Snapshot Testing</a></h2>
+<h2 id="-snapshot-testing"><a class="header" href="#-snapshot-testing-1">📸 Snapshot Testing</a></h2>
 <p>Snapshot testing helps lock down serialized outputs, event topics/data, and human-readable responses.</p>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -1485,9 +1485,9 @@ fn emits_expected_event_shape() {
 <pre><code class="language-toml">[dev-dependencies]
 insta = "1"
 </code></pre>
-<h2 id="-coverage-tools"><a class="header" href="#-coverage-tools">📊 Coverage Tools</a></h2>
+<h2 id="-coverage-tools"><a class="header" href="#-coverage-tools-1">📊 Coverage Tools</a></h2>
 <p>The repository CI already uses <code>cargo-tarpaulin</code> and uploads Cobertura XML to Codecov.</p>
-<h3 id="cargo-tarpaulin"><a class="header" href="#cargo-tarpaulin">Cargo Tarpaulin</a></h3>
+<h3 id="cargo-tarpaulin"><a class="header" href="#cargo-tarpaulin-1">Cargo Tarpaulin</a></h3>
 <p><strong>Installation</strong>:</p>
 <pre><code class="language-bash">cargo install cargo-tarpaulin --locked
 </code></pre>
@@ -1732,7 +1732,7 @@ stellar contract invoke \
 <h2 id="moving-to-testnet"><a class="header" href="#moving-to-testnet">Moving to Testnet</a></h2>
 <p>Once your local loop is clean:</p>
 <ol>
-<li>Add the testnet network config (see <a href="#network-configuration">Deployment Guide</a>)</li>
+<li>Add the testnet network config (see <a href="#network-configuration-2">Deployment Guide</a>)</li>
 <li>Fund an account via Friendbot</li>
 <li>Re-run the same <code>stellar contract deploy</code> and <code>invoke</code> commands with <code>--network testnet</code></li>
 </ol>
@@ -1757,11 +1757,11 @@ stellar contract invoke \
 </table>
 </div>
 <hr>
-<p><strong>Next:</strong> <a href="#deployment-guide">Deployment Guide</a> — deploy to testnet and mainnet.</p>
+<p><strong>Next:</strong> <a href="#deployment-guide-1">Deployment Guide</a> — deploy to testnet and mainnet.</p>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="deployment-guide"><a class="header" href="#deployment-guide">Deployment Guide</a></h1>
+<h1 id="deployment-guide"><a class="header" href="#deployment-guide-1">Deployment Guide</a></h1>
 <p>Complete guide for deploying Soroban smart contracts to Testnet and Mainnet.</p>
-<h2 id="prerequisites-3"><a class="header" href="#prerequisites-3">Prerequisites</a></h2>
+<h2 id="prerequisites-3"><a class="header" href="#prerequisites-14">Prerequisites</a></h2>
 <ul>
 <li>Rust installed with <code>wasm32-unknown-unknown</code> target</li>
 <li>Soroban CLI installed: <code>cargo install --locked soroban-cli</code></li>
@@ -1774,8 +1774,8 @@ rustup target add wasm32-unknown-unknown
 soroban --version
 </code></pre>
 <hr>
-<h2 id="network-configuration"><a class="header" href="#network-configuration">Network Configuration</a></h2>
-<h3 id="testnet"><a class="header" href="#testnet">Testnet</a></h3>
+<h2 id="network-configuration"><a class="header" href="#network-configuration-2">Network Configuration</a></h2>
+<h3 id="testnet"><a class="header" href="#testnet-2">Testnet</a></h3>
 <pre><code class="language-bash"># Add testnet network configuration
 soroban network add \
   --global testnet \
@@ -1785,7 +1785,7 @@ soroban network add \
 # Verify
 soroban network ls
 </code></pre>
-<h3 id="mainnet"><a class="header" href="#mainnet">Mainnet</a></h3>
+<h3 id="mainnet"><a class="header" href="#mainnet-3">Mainnet</a></h3>
 <pre><code class="language-bash"># Add mainnet network configuration
 soroban network add \
   --global mainnet \
@@ -1796,8 +1796,8 @@ soroban network add \
 soroban network ls
 </code></pre>
 <hr>
-<h2 id="identity-management"><a class="header" href="#identity-management">Identity Management</a></h2>
-<h3 id="create-an-identity"><a class="header" href="#create-an-identity">Create an Identity</a></h3>
+<h2 id="identity-management"><a class="header" href="#identity-management-1">Identity Management</a></h2>
+<h3 id="create-an-identity"><a class="header" href="#create-an-identity-1">Create an Identity</a></h3>
 <pre><code class="language-bash"># Generate a new keypair and store it locally
 soroban keys generate alice --network testnet
 
@@ -1807,7 +1807,7 @@ soroban keys address alice
 # List all stored identities
 soroban keys ls
 </code></pre>
-<h3 id="security-best-practices"><a class="header" href="#security-best-practices">Security Best Practices</a></h3>
+<h3 id="security-best-practices"><a class="header" href="#security-best-practices-1">Security Best Practices</a></h3>
 <blockquote>
 <p>Never commit private keys to version control.</p>
 </blockquote>
@@ -1823,8 +1823,8 @@ echo "*.key" &gt;&gt; .gitignore
 <li>Consider multi-signature setups for high-value contracts</li>
 </ul>
 <hr>
-<h2 id="funding-your-account"><a class="header" href="#funding-your-account">Funding Your Account</a></h2>
-<h3 id="testnet-friendbot"><a class="header" href="#testnet-friendbot">Testnet (Friendbot)</a></h3>
+<h2 id="funding-your-account"><a class="header" href="#funding-your-account-1">Funding Your Account</a></h2>
+<h3 id="testnet-friendbot"><a class="header" href="#testnet-friendbot-1">Testnet (Friendbot)</a></h3>
 <pre><code class="language-bash"># Fund your testnet account via friendbot
 soroban keys fund alice --network testnet
 
@@ -1832,14 +1832,14 @@ soroban keys fund alice --network testnet
 soroban keys balance alice --network testnet
 </code></pre>
 <p>You can also fund via the web: <code>https://friendbot.stellar.org?addr=&lt;YOUR_PUBLIC_KEY&gt;</code></p>
-<h3 id="mainnet-1"><a class="header" href="#mainnet-1">Mainnet</a></h3>
+<h3 id="mainnet-1"><a class="header" href="#mainnet-1-1">Mainnet</a></h3>
 <ol>
 <li>Purchase XLM from an exchange</li>
 <li>Send to your Stellar address (<code>soroban keys address alice</code>)</li>
 <li>Maintain enough XLM for transaction fees and storage rent</li>
 </ol>
 <hr>
-<h2 id="building-your-contract"><a class="header" href="#building-your-contract">Building Your Contract</a></h2>
+<h2 id="building-your-contract"><a class="header" href="#building-your-contract-1">Building Your Contract</a></h2>
 <pre><code class="language-bash"># From your contract directory
 soroban contract build
 
@@ -1849,11 +1849,11 @@ cargo build --target wasm32-unknown-unknown --release
 <p>The compiled WASM will be at:
 <code>target/wasm32-unknown-unknown/release/&lt;contract_name&gt;.wasm</code></p>
 <hr>
-<h2 id="testnet-deployment-steps"><a class="header" href="#testnet-deployment-steps">Testnet Deployment Steps</a></h2>
-<h3 id="step-1-build"><a class="header" href="#step-1-build">Step 1: Build</a></h3>
+<h2 id="testnet-deployment-steps"><a class="header" href="#testnet-deployment-steps-1">Testnet Deployment Steps</a></h2>
+<h3 id="step-1-build"><a class="header" href="#step-1-build-1">Step 1: Build</a></h3>
 <pre><code class="language-bash">soroban contract build
 </code></pre>
-<h3 id="step-2-deploy"><a class="header" href="#step-2-deploy">Step 2: Deploy</a></h3>
+<h3 id="step-2-deploy"><a class="header" href="#step-2-deploy-2">Step 2: Deploy</a></h3>
 <pre><code class="language-bash">CONTRACT_ID=$(soroban contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
   --source alice \
@@ -1861,13 +1861,13 @@ cargo build --target wasm32-unknown-unknown --release
 
 echo "Deployed contract ID: $CONTRACT_ID"
 </code></pre>
-<h3 id="step-3-verify"><a class="header" href="#step-3-verify">Step 3: Verify</a></h3>
+<h3 id="step-3-verify"><a class="header" href="#step-3-verify-1">Step 3: Verify</a></h3>
 <pre><code class="language-bash"># Fetch contract info
 soroban contract info \
   --id $CONTRACT_ID \
   --network testnet
 </code></pre>
-<h3 id="step-4-initialize-if-required"><a class="header" href="#step-4-initialize-if-required">Step 4: Initialize (if required)</a></h3>
+<h3 id="step-4-initialize-if-required"><a class="header" href="#step-4-initialize-if-required-1">Step 4: Initialize (if required)</a></h3>
 <pre><code class="language-bash">soroban contract invoke \
   --id $CONTRACT_ID \
   --source alice \
@@ -1876,7 +1876,7 @@ soroban contract info \
   initialize \
   --admin $(soroban keys address alice)
 </code></pre>
-<h3 id="step-5-invoke-functions"><a class="header" href="#step-5-invoke-functions">Step 5: Invoke Functions</a></h3>
+<h3 id="step-5-invoke-functions"><a class="header" href="#step-5-invoke-functions-1">Step 5: Invoke Functions</a></h3>
 <pre><code class="language-bash"># Call a read function (no fee required)
 soroban contract invoke \
   --id $CONTRACT_ID \
@@ -1897,11 +1897,11 @@ soroban contract invoke \
   --amount 1000
 </code></pre>
 <hr>
-<h2 id="mainnet-deployment-steps"><a class="header" href="#mainnet-deployment-steps">Mainnet Deployment Steps</a></h2>
+<h2 id="mainnet-deployment-steps"><a class="header" href="#mainnet-deployment-steps-1">Mainnet Deployment Steps</a></h2>
 <blockquote>
 <p>Ensure your contract is thoroughly tested on testnet before proceeding.</p>
 </blockquote>
-<h3 id="pre-deployment-checklist"><a class="header" href="#pre-deployment-checklist">Pre-deployment Checklist</a></h3>
+<h3 id="pre-deployment-checklist"><a class="header" href="#pre-deployment-checklist-1">Pre-deployment Checklist</a></h3>
 <ul>
 <li><input disabled="" type="checkbox"> All tests passing (<code>cargo test</code>)</li>
 <li><input disabled="" type="checkbox"> Security audit completed</li>
@@ -1910,10 +1910,10 @@ soroban contract invoke \
 <li><input disabled="" type="checkbox"> Sufficient XLM balance confirmed</li>
 <li><input disabled="" type="checkbox"> Monitoring plan in place</li>
 </ul>
-<h3 id="step-1-build-optimized"><a class="header" href="#step-1-build-optimized">Step 1: Build (optimized)</a></h3>
+<h3 id="step-1-build-optimized"><a class="header" href="#step-1-build-optimized-1">Step 1: Build (optimized)</a></h3>
 <pre><code class="language-bash">soroban contract build
 </code></pre>
-<h3 id="step-2-deploy-1"><a class="header" href="#step-2-deploy-1">Step 2: Deploy</a></h3>
+<h3 id="step-2-deploy-1"><a class="header" href="#step-2-deploy-1-1">Step 2: Deploy</a></h3>
 <pre><code class="language-bash"># CAUTION: This deploys to production
 CONTRACT_ID=$(soroban contract deploy \
   --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
@@ -1923,12 +1923,12 @@ CONTRACT_ID=$(soroban contract deploy \
 echo "Mainnet contract ID: $CONTRACT_ID"
 # Save this ID — it cannot be recovered if lost
 </code></pre>
-<h3 id="step-3-verify-on-mainnet"><a class="header" href="#step-3-verify-on-mainnet">Step 3: Verify on Mainnet</a></h3>
+<h3 id="step-3-verify-on-mainnet"><a class="header" href="#step-3-verify-on-mainnet-1">Step 3: Verify on Mainnet</a></h3>
 <pre><code class="language-bash">soroban contract info \
   --id $CONTRACT_ID \
   --network mainnet
 </code></pre>
-<h3 id="step-4-initialize"><a class="header" href="#step-4-initialize">Step 4: Initialize</a></h3>
+<h3 id="step-4-initialize"><a class="header" href="#step-4-initialize-1">Step 4: Initialize</a></h3>
 <pre><code class="language-bash">soroban contract invoke \
   --id $CONTRACT_ID \
   --source mainnet-deployer \
@@ -1937,7 +1937,7 @@ echo "Mainnet contract ID: $CONTRACT_ID"
   initialize \
   --admin $(soroban keys address mainnet-deployer)
 </code></pre>
-<h3 id="step-5-invoke-and-validate"><a class="header" href="#step-5-invoke-and-validate">Step 5: Invoke and Validate</a></h3>
+<h3 id="step-5-invoke-and-validate"><a class="header" href="#step-5-invoke-and-validate-1">Step 5: Invoke and Validate</a></h3>
 <pre><code class="language-bash"># Verify a read function returns expected state
 soroban contract invoke \
   --id $CONTRACT_ID \
@@ -1946,8 +1946,8 @@ soroban contract invoke \
   get_admin
 </code></pre>
 <hr>
-<h2 id="contract-invocation-examples"><a class="header" href="#contract-invocation-examples">Contract Invocation Examples</a></h2>
-<h3 id="basic-invocation"><a class="header" href="#basic-invocation">Basic Invocation</a></h3>
+<h2 id="contract-invocation-examples"><a class="header" href="#contract-invocation-examples-1">Contract Invocation Examples</a></h2>
+<h3 id="basic-invocation"><a class="header" href="#basic-invocation-1">Basic Invocation</a></h3>
 <pre><code class="language-bash">soroban contract invoke \
   --id &lt;CONTRACT_ID&gt; \
   --source alice \
@@ -1956,7 +1956,7 @@ soroban contract invoke \
   &lt;function_name&gt; \
   --param_name value
 </code></pre>
-<h3 id="passing-different-argument-types"><a class="header" href="#passing-different-argument-types">Passing Different Argument Types</a></h3>
+<h3 id="passing-different-argument-types"><a class="header" href="#passing-different-argument-types-1">Passing Different Argument Types</a></h3>
 <pre><code class="language-bash"># u64 / i128
 soroban contract invoke ... -- my_fn --amount 1000000
 
@@ -1972,7 +1972,7 @@ soroban contract invoke ... -- my_fn --label "hello"
 # Bytes (hex-encoded)
 soroban contract invoke ... -- my_fn --data 0xdeadbeef
 </code></pre>
-<h3 id="simulating-without-submitting"><a class="header" href="#simulating-without-submitting">Simulating Without Submitting</a></h3>
+<h3 id="simulating-without-submitting"><a class="header" href="#simulating-without-submitting-1">Simulating Without Submitting</a></h3>
 <pre><code class="language-bash"># Dry-run to estimate fees and check for errors
 soroban contract invoke \
   --id &lt;CONTRACT_ID&gt; \
@@ -1983,15 +1983,15 @@ soroban contract invoke \
   transfer \
   --amount 500
 </code></pre>
-<h3 id="reading-events-after-invocation"><a class="header" href="#reading-events-after-invocation">Reading Events After Invocation</a></h3>
+<h3 id="reading-events-after-invocation"><a class="header" href="#reading-events-after-invocation-1">Reading Events After Invocation</a></h3>
 <pre><code class="language-bash">soroban events \
   --start-ledger &lt;LEDGER_NUMBER&gt; \
   --id &lt;CONTRACT_ID&gt; \
   --network testnet
 </code></pre>
 <hr>
-<h2 id="contract-upgrades"><a class="header" href="#contract-upgrades">Contract Upgrades</a></h2>
-<h3 id="upgradeable-contract-pattern"><a class="header" href="#upgradeable-contract-pattern">Upgradeable Contract Pattern</a></h3>
+<h2 id="contract-upgrades"><a class="header" href="#contract-upgrades-1">Contract Upgrades</a></h2>
+<h3 id="upgradeable-contract-pattern"><a class="header" href="#upgradeable-contract-pattern-1">Upgradeable Contract Pattern</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn upgrade(env: Env, new_wasm_hash: BytesN&lt;32&gt;) {
@@ -2002,7 +2002,7 @@ soroban contract invoke \
     env.deployer().update_current_contract_wasm(new_wasm_hash);
 }
 <span class="boring">}</span></code></pre>
-<h3 id="upgrade-process"><a class="header" href="#upgrade-process">Upgrade Process</a></h3>
+<h3 id="upgrade-process"><a class="header" href="#upgrade-process-1">Upgrade Process</a></h3>
 <pre><code class="language-bash"># 1. Install the new WASM and capture its hash
 NEW_HASH=$(soroban contract install \
   --wasm target/wasm32-unknown-unknown/release/my_contract_v2.wasm \
@@ -2019,7 +2019,7 @@ soroban contract invoke \
   --new_wasm_hash $NEW_HASH
 </code></pre>
 <hr>
-<h2 id="fee-estimation"><a class="header" href="#fee-estimation">Fee Estimation</a></h2>
+<h2 id="fee-estimation"><a class="header" href="#fee-estimation-1">Fee Estimation</a></h2>
 <pre><code class="language-bash"># Simulate to see resource usage and fees
 soroban contract invoke \
   --id &lt;CONTRACT_ID&gt; \
@@ -2037,8 +2037,8 @@ soroban contract invoke \
 <li>Rent: storage TTL extension costs</li>
 </ul>
 <hr>
-<h2 id="emergency-procedures"><a class="header" href="#emergency-procedures">Emergency Procedures</a></h2>
-<h3 id="pause--unpause-pattern"><a class="header" href="#pause--unpause-pattern">Pause / Unpause Pattern</a></h3>
+<h2 id="emergency-procedures"><a class="header" href="#emergency-procedures-1">Emergency Procedures</a></h2>
+<h3 id="pause--unpause-pattern"><a class="header" href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a></h3>
 <pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn pause(env: Env) {
@@ -2058,7 +2058,7 @@ fn check_not_paused(env: &amp;Env) {
 }
 <span class="boring">}</span></code></pre>
 <hr>
-<h2 id="additional-resources-1"><a class="header" href="#additional-resources-1">Additional Resources</a></h2>
+<h2 id="additional-resources-1"><a class="header" href="#additional-resources-2">Additional Resources</a></h2>
 <ul>
 <li><a href="https://developers.stellar.org/docs/tools/developer-tools/cli">Soroban CLI Reference</a></li>
 <li><a href="https://developers.stellar.org/docs/networks">Network Configuration</a></li>
@@ -4407,7 +4407,7 @@ soroban contract invoke \
 <ul>
 <li><a href="#intermediate-examples">Intermediate Examples →</a> — tokens, multi-sig, pause/unpause</li>
 <li><a href="#advanced-examples">Advanced Examples →</a> — cross-contract calls, oracle patterns, upgradeable proxies</li>
-<li><a href="#testing-guide">Testing Guide →</a> — mocking auth, time manipulation, event assertions</li>
+<li><a href="#testing-guide-2">Testing Guide →</a> — mocking auth, time manipulation, event assertions</li>
 <li><a href="#soroban-smart-contract-best-practices">Best Practices →</a> — production-ready patterns</li>
 <li><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls →</a> — mistakes to avoid</li>
 </ul>
@@ -5870,7 +5870,7 @@ map![&amp;env, (k1, v1), (k2, v2)] // Map
 <li><a href="https://developers.stellar.org/docs/smart-contracts">Soroban Developer Docs</a></li>
 <li><a href="https://docs.rs/soroban-sdk/">soroban-sdk API Reference</a></li>
 <li><a href="examples">Examples</a></li>
-<li><a href="#deployment-guide">Deployment Guide</a></li>
+<li><a href="#deployment-guide-1">Deployment Guide</a></li>
 <li><a href="https://discord.gg/stellardev">Stellar Discord</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -9396,6 +9396,1053 @@ Translations are available at
 </ul>
 <h2 id="notes-1"><a class="header" href="#notes-1">Notes</a></h2>
 <!-- Any additional information, implementation details, or future considerations -->
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="quick-start-2"><a class="header" href="#quick-start-2">Quick Start</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="prerequisites-13"><a class="header" href="#prerequisites-13">Prerequisites</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="core-concepts"><a class="header" href="#core-concepts">Core Concepts</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="smart-contracts"><a class="header" href="#smart-contracts">Smart Contracts</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="tokens-1"><a class="header" href="#tokens-1">Tokens</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="transactions"><a class="header" href="#transactions">Transactions</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="guides-1"><a class="header" href="#guides-1">Guides</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="contract-development"><a class="header" href="#contract-development">Contract Development</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="testing-guide-2"><a class="header" href="#testing-guide-2">Testing Guide</a></h1>
+<p>Comprehensive guide to testing Soroban smart contracts effectively.</p>
+<h2 id="-overview-3"><a class="header" href="#-overview-3">📖 Overview</a></h2>
+<p>Testing is crucial for smart contract development. This guide covers:</p>
+<ul>
+<li>Unit testing individual functions</li>
+<li>Integration testing multi-contract interactions</li>
+<li>Test organization and best practices</li>
+<li>Advanced testing techniques</li>
+<li>Snapshot testing and coverage tools</li>
+<li>Common testing patterns and anti-patterns</li>
+</ul>
+<h2 id="-test-types-1"><a class="header" href="#-test-types-1">🧪 Test Types</a></h2>
+<h3 id="unit-tests-1"><a class="header" href="#unit-tests-1">Unit Tests</a></h3>
+<p>Test individual contract functions in isolation.</p>
+<h4 id="example-from-hello-world-contract-1"><a class="header" href="#example-from-hello-world-contract-1">Example from Hello World Contract</a></h4>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use super::*;
+use soroban_sdk::{symbol_short, vec, Env, Symbol};
+
+#[test]
+fn test_hello_returns_greeting_vec() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&amp;env, &amp;contract_id);
+
+    let result = client.hello(&amp;symbol_short!("World"));
+
+    assert_eq!(
+        result,
+        vec![&amp;env, symbol_short!("Hello"), symbol_short!("World")]
+    );
+}
+
+#[test]
+fn test_hello_with_different_names() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&amp;env, &amp;contract_id);
+
+    for name in [
+        symbol_short!("Alice"),
+        symbol_short!("Bob"),
+        symbol_short!("Dev"),
+    ] {
+        let result = client.hello(&amp;name);
+        assert_eq!(result.len(), 2);
+        assert_eq!(result.get(0).unwrap(), symbol_short!("Hello"));
+        assert_eq!(result.get(1).unwrap(), name);
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="integration-tests-1"><a class="header" href="#integration-tests-1">Integration Tests</a></h3>
+<p>Test interactions between multiple contracts.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_multi_contract_interaction() {
+    let env = Env::default();
+
+    // Deploy multiple contracts
+    let token_id = env.register_contract(None, TokenContract);
+    let vault_id = env.register_contract(None, VaultContract);
+
+    let token = TokenContractClient::new(&amp;env, &amp;token_id);
+    let vault = VaultContractClient::new(&amp;env, &amp;vault_id);
+
+    // Test interaction
+    token.mint(&amp;user, &amp;1000);
+    vault.deposit(&amp;user, &amp;token_id, &amp;500);
+
+    assert_eq!(vault.balance(&amp;user), 500);
+}
+<span class="boring">}</span></code></pre>
+<h2 id="-test-structure-1"><a class="header" href="#-test-structure-1">🏗️ Test Structure</a></h2>
+<h3 id="recommended-organization-1"><a class="header" href="#recommended-organization-1">Recommended Organization</a></h3>
+<pre><code>src/
+├── lib.rs           # Contract code
+└── test.rs          # Unit tests
+
+tests/
+├── integration.rs   # Integration tests
+└── common/
+    └── mod.rs       # Shared test utilities
+</code></pre>
+<h3 id="test-module-pattern-1"><a class="header" href="#test-module-pattern-1">Test Module Pattern</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// In src/lib.rs
+#[contract]
+pub struct MyContract;
+
+#[contractimpl]
+impl MyContract {
+    pub fn add(a: i32, b: i32) -&gt; i32 {
+        a + b
+    }
+}
+
+// Keep tests in separate file
+#[cfg(test)]
+mod test;
+<span class="boring">}</span></code></pre>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// In src/test.rs
+#![cfg(test)]
+use super::*;
+use soroban_sdk::Env;
+
+#[test]
+fn test_add() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&amp;env, &amp;contract_id);
+
+    assert_eq!(client.add(&amp;2, &amp;3), 5);
+}
+<span class="boring">}</span></code></pre>
+<h2 id="-testing-utilities-1"><a class="header" href="#-testing-utilities-1">🛠️ Testing Utilities</a></h2>
+<h3 id="environment-setup-2"><a class="header" href="#environment-setup-2">Environment Setup</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{Env, Address, testutils::Address as _};
+
+#[test]
+fn setup_test() {
+    let env = Env::default();
+
+    // Mock the ledger to enable authorization
+    env.mock_all_auths();
+
+    // Create test addresses
+    let admin = Address::generate(&amp;env);
+    let user = Address::generate(&amp;env);
+
+    // ... test logic
+}
+<span class="boring">}</span></code></pre>
+<h3 id="time-manipulation-1"><a class="header" href="#time-manipulation-1">Time Manipulation</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_with_time() {
+    let env = Env::default();
+
+    // Set specific ledger timestamp
+    env.ledger().with_mut(|li| {
+        li.timestamp = 1640000000;
+    });
+
+    // Advance time by 100 seconds
+    env.ledger().with_mut(|li| {
+        li.timestamp += 100;
+    });
+}
+<span class="boring">}</span></code></pre>
+<h3 id="authorization-mocking-1"><a class="header" href="#authorization-mocking-1">Authorization Mocking</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::testutils::MockAuth;
+
+#[test]
+fn test_auth() {
+    let env = Env::default();
+    env.mock_all_auths(); // Mock all authorization checks
+
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&amp;env, &amp;contract_id);
+
+    let user = Address::generate(&amp;env);
+
+    // This will succeed even without real auth
+    client.transfer(&amp;user, &amp;recipient, &amp;100);
+
+    // Verify auth was called
+    assert_eq!(
+        env.auths(),
+        std::vec![(
+            user.clone(),
+            AuthorizedInvocation { ... }
+        )]
+    );
+}
+<span class="boring">}</span></code></pre>
+<h2 id="-best-practices-3"><a class="header" href="#-best-practices-3">✅ Best Practices</a></h2>
+<h3 id="1-use-descriptive-test-names-1"><a class="header" href="#1-use-descriptive-test-names-1">1. Use Descriptive Test Names</a></h3>
+<p>Test names should clearly describe what is being tested and the expected outcome.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer_succeeds_with_sufficient_balance() { }
+
+#[test]
+fn test_transfer_fails_with_insufficient_balance() { }
+
+#[test]
+fn test_transfer_fails_when_sender_not_authorized() { }
+<span class="boring">}</span></code></pre>
+<p>❌ <strong>DON’T</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer() { }
+
+#[test]
+fn test_1() { }
+
+#[test]
+fn test_error() { }
+<span class="boring">}</span></code></pre>
+<h3 id="2-test-both-happy-path-and-error-cases-1"><a class="header" href="#2-test-both-happy-path-and-error-cases-1">2. Test Both Happy Path and Error Cases</a></h3>
+<p>Every function should have tests for success and failure scenarios.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_withdraw_succeeds_with_sufficient_balance() {
+    // ... test successful withdrawal
+}
+
+#[test]
+#[should_panic(expected = "insufficient balance")]
+fn test_withdraw_fails_with_insufficient_balance() {
+    // ... test withdrawal failure
+}
+<span class="boring">}</span></code></pre>
+<h3 id="3-use-assertions-with-descriptive-messages-1"><a class="header" href="#3-use-assertions-with-descriptive-messages-1">3. Use Assertions with Descriptive Messages</a></h3>
+<p>Include context in assertion messages to aid debugging.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>assert_eq!(
+    balance,
+    expected_balance,
+    "Balance should be {} after transfer, got {}",
+    expected_balance,
+    balance
+);
+<span class="boring">}</span></code></pre>
+<h3 id="4-keep-tests-focused-and-independent-1"><a class="header" href="#4-keep-tests-focused-and-independent-1">4. Keep Tests Focused and Independent</a></h3>
+<p>Each test should verify one behavior. Tests should not depend on other tests.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&amp;env, &amp;contract_id);
+
+    let key = symbol_short!("balance");
+    let value = 1000u64;
+
+    // Initially, key should not exist
+    assert!(!client.has_persistent(&amp;key));
+
+    // Set value
+    client.set_persistent(&amp;key, &amp;value);
+
+    // Key should now exist
+    assert!(client.has_persistent(&amp;key));
+
+    // Retrieved value should match
+    assert_eq!(client.get_persistent(&amp;key), Some(value));
+}
+<span class="boring">}</span></code></pre>
+<h3 id="5-mock-authorization-appropriately-1"><a class="header" href="#5-mock-authorization-appropriately-1">5. Mock Authorization Appropriately</a></h3>
+<p>Use <code>env.mock_all_auths()</code> for unit tests, but test authorization logic explicitly when needed.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer_logic_with_mocked_auth() {
+    let env = Env::default();
+    env.mock_all_auths();  // Focus on transfer logic
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&amp;env, &amp;contract_id);
+
+    // Test transfer logic
+}
+
+#[test]
+fn test_transfer_requires_sender_authorization() {
+    let env = Env::default();
+    // Don't mock auth - test authorization explicitly
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&amp;env, &amp;contract_id);
+
+    // Test that unauthorized transfers fail
+}
+<span class="boring">}</span></code></pre>
+<h3 id="6-test-edge-cases-1"><a class="header" href="#6-test-edge-cases-1">6. Test Edge Cases</a></h3>
+<p>Include tests for boundary conditions and edge cases.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_hello_with_single_character_name() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, HelloContract);
+    let client = HelloContractClient::new(&amp;env, &amp;contract_id);
+
+    let name = symbol_short!("A");
+    let result = client.hello(&amp;name);
+
+    assert_eq!(result, vec![&amp;env, symbol_short!("Hello"), name]);
+}
+
+#[test]
+fn test_zero_and_boundary_values() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&amp;env, &amp;contract_id);
+
+    let key = symbol_short!("boundary");
+
+    // Test zero value
+    client.set_persistent(&amp;key, &amp;0);
+    assert_eq!(client.get_persistent(&amp;key), Some(0));
+
+    // Test max u64 value
+    client.set_persistent(&amp;key, &amp;u64::MAX);
+    assert_eq!(client.get_persistent(&amp;key), Some(u64::MAX));
+}
+<span class="boring">}</span></code></pre>
+<h3 id="7-use-fixtures-for-common-setup-1"><a class="header" href="#7-use-fixtures-for-common-setup-1">7. Use Fixtures for Common Setup</a></h3>
+<p>Create helper functions to reduce test boilerplate.</p>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn setup_test_env() -&gt; (Env, Address, Address) {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user1 = Address::generate(&amp;env);
+    let user2 = Address::generate(&amp;env);
+
+    (env, user1, user2)
+}
+
+#[test]
+fn test_transfer() {
+    let (env, user1, user2) = setup_test_env();
+    // ... test logic
+}
+<span class="boring">}</span></code></pre>
+<h3 id="8-test-storage-behavior-1"><a class="header" href="#8-test-storage-behavior-1">8. Test Storage Behavior</a></h3>
+<p>Example from Storage Patterns Contract:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, StorageContract);
+    let client = StorageContractClient::new(&amp;env, &amp;contract_id);
+
+    let key = symbol_short!("balance");
+    let value = 1000u64;
+
+    // Initially, key should not exist
+    assert!(!client.has_persistent(&amp;key));
+
+    // Set value
+    client.set_persistent(&amp;key, &amp;value);
+
+    // Verify set event
+    let events = env.events().all();
+    let (_, topics, data) = events.last().unwrap();
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&amp;env, &amp;topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&amp;env, &amp;topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("set"));
+    let (d_key, d_value): (Symbol, u64) = &lt;(Symbol, u64)&gt;::try_from_val(&amp;env, &amp;data).unwrap();
+    assert_eq!(d_key, key);
+    assert_eq!(d_value, value);
+
+    // Key should now exist
+    assert!(client.has_persistent(&amp;key));
+
+    // Retrieved value should match
+    assert_eq!(client.get_persistent(&amp;key), Some(value));
+
+    // Remove value
+    client.remove_persistent(&amp;key);
+
+    // Verify remove event
+    let events = env.events().all();
+    let (_, topics, data) = events.last().unwrap();
+    assert_eq!(topics.len(), 2);
+    let t0: Symbol = Symbol::try_from_val(&amp;env, &amp;topics.get(0).unwrap()).unwrap();
+    let t1: Symbol = Symbol::try_from_val(&amp;env, &amp;topics.get(1).unwrap()).unwrap();
+    assert_eq!(t0, symbol_short!("persist"));
+    assert_eq!(t1, symbol_short!("remove"));
+    let d_key: Symbol = Symbol::try_from_val(&amp;env, &amp;data).unwrap();
+    assert_eq!(d_key, key);
+
+    // Key should no longer exist
+    assert!(!client.has_persistent(&amp;key));
+}
+<span class="boring">}</span></code></pre>
+<h3 id="9-test-error-conditions-1"><a class="header" href="#9-test-error-conditions-1">9. Test Error Conditions</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+#[should_panic(expected = "insufficient balance")]
+fn test_insufficient_balance() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, TokenContract);
+    let client = TokenContractClient::new(&amp;env, &amp;contract_id);
+
+    let user = Address::generate(&amp;env);
+
+    // Should panic
+    client.transfer(&amp;user, &amp;recipient, &amp;1000);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="10-test-events-1"><a class="header" href="#10-test-events-1">10. Test Events</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_events() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&amp;env, &amp;contract_id);
+
+    client.transfer(&amp;from, &amp;to, &amp;100);
+
+    // Get emitted events
+    let events = env.events().all();
+
+    // Verify event was emitted
+    assert_eq!(events.len(), 1);
+    // ... verify event data
+}
+<span class="boring">}</span></code></pre>
+<h2 id="-common-testing-pitfalls-1"><a class="header" href="#-common-testing-pitfalls-1">⚠️ Common Testing Pitfalls</a></h2>
+<h3 id="1-forgetting-to-mock-authorization-1"><a class="header" href="#1-forgetting-to-mock-authorization-1">1. Forgetting to Mock Authorization</a></h3>
+<p>❌ <strong>DON’T</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer() {
+    let env = Env::default();
+    // Forgot env.mock_all_auths()!
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&amp;env, &amp;contract_id);
+
+    // This will fail due to missing authorization
+    client.transfer(&amp;from, &amp;to, &amp;100);
+}
+<span class="boring">}</span></code></pre>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer() {
+    let env = Env::default();
+    env.mock_all_auths();  // Always mock auth for unit tests
+
+    let contract_id = env.register_contract(None, Token);
+    let client = TokenClient::new(&amp;env, &amp;contract_id);
+
+    client.transfer(&amp;from, &amp;to, &amp;100);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="2-not-extending-ttl-for-persistent-storage-1"><a class="header" href="#2-not-extending-ttl-for-persistent-storage-1">2. Not Extending TTL for Persistent Storage</a></h3>
+<p>❌ <strong>DON’T</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&amp;key, &amp;1000);
+    // Forgot to extend TTL!
+
+    let value: u64 = env.storage().persistent().get(&amp;key).unwrap();
+    assert_eq!(value, 1000);
+}
+<span class="boring">}</span></code></pre>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_persistent_storage() {
+    let env = Env::default();
+
+    let key = symbol_short!("balance");
+    env.storage().persistent().set(&amp;key, &amp;1000);
+    env.storage().persistent().extend_ttl(&amp;key, 100, 100);  // Extend TTL
+
+    let value: u64 = env.storage().persistent().get(&amp;key).unwrap();
+    assert_eq!(value, 1000);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="3-testing-multiple-behaviors-in-one-test-1"><a class="header" href="#3-testing-multiple-behaviors-in-one-test-1">3. Testing Multiple Behaviors in One Test</a></h3>
+<p>❌ <strong>DON’T</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_everything() {
+    // Tests initialization, transfer, and withdrawal in one test
+    // Hard to debug when it fails
+}
+<span class="boring">}</span></code></pre>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_initialization() {}
+
+#[test]
+fn test_transfer() {}
+
+#[test]
+fn test_withdrawal() {}
+<span class="boring">}</span></code></pre>
+<h3 id="4-ignoring-error-cases-1"><a class="header" href="#4-ignoring-error-cases-1">4. Ignoring Error Cases</a></h3>
+<p>❌ <strong>DON’T</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer() {
+    // Only test the happy path
+    client.transfer(&amp;from, &amp;to, &amp;100);
+    assert_eq!(client.balance(&amp;to), 100);
+}
+<span class="boring">}</span></code></pre>
+<p>✅ <strong>DO</strong>:</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn test_transfer_succeeds() {
+    client.transfer(&amp;from, &amp;to, &amp;100);
+    assert_eq!(client.balance(&amp;to), 100);
+}
+
+#[test]
+#[should_panic]
+fn test_transfer_fails_with_insufficient_balance() {
+    client.transfer(&amp;from, &amp;to, &amp;1000000);
+}
+<span class="boring">}</span></code></pre>
+<h2 id="-shared-test-utilities-1"><a class="header" href="#-shared-test-utilities-1">🧩 Shared Test Utilities</a></h2>
+<p>For multi-file test suites, keep reusable setup code in <code>tests/common/mod.rs</code>.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// tests/common/mod.rs
+use soroban_sdk::{Address, Env, testutils::Address as _};
+
+pub fn setup_env() -&gt; Env {
+    let env = Env::default();
+    env.mock_all_auths();
+    env
+}
+
+pub fn test_user(env: &amp;Env) -&gt; Address {
+    Address::generate(env)
+}
+<span class="boring">}</span></code></pre>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// tests/integration.rs
+mod common;
+
+#[test]
+fn deposit_updates_balance() {
+    let env = common::setup_env();
+    let user = common::test_user(&amp;env);
+    // ... contract setup + assertions
+}
+<span class="boring">}</span></code></pre>
+<p>This pattern keeps contract behavior assertions focused while avoiding duplicated setup logic.</p>
+<h2 id="-snapshot-testing-1"><a class="header" href="#-snapshot-testing-1">📸 Snapshot Testing</a></h2>
+<p>Snapshot testing helps lock down serialized outputs, event topics/data, and human-readable responses.</p>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[test]
+fn emits_expected_event_shape() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, MyContract);
+    let client = MyContractClient::new(&amp;env, &amp;contract_id);
+
+    client.create_order(&amp;42);
+
+    let events = env.events().all();
+    assert_eq!(events.len(), 1);
+
+    // Keep snapshots stable by comparing deterministic debug output.
+    let rendered = format!("{events:?}");
+    insta::assert_snapshot!(rendered);
+}
+<span class="boring">}</span></code></pre>
+<p><strong>When to use</strong>:</p>
+<ul>
+<li>Testing complex data structures</li>
+<li>Verifying serialization/deserialization</li>
+<li>Regression testing for output changes</li>
+<li>Testing event emissions</li>
+</ul>
+<p><strong>Tips</strong>:</p>
+<ul>
+<li>Prefer deterministic inputs (fixed timestamps/amounts) before snapshot assertions.</li>
+<li>Snapshot only stable values (avoid non-deterministic IDs unless normalized first).</li>
+<li>Review snapshot diffs in PRs the same way you review code diffs.</li>
+</ul>
+<p>Add to dev-dependencies when using <code>insta</code>:</p>
+<pre><code class="language-toml">[dev-dependencies]
+insta = "1"
+</code></pre>
+<h2 id="-coverage-tools-1"><a class="header" href="#-coverage-tools-1">📊 Coverage Tools</a></h2>
+<p>The repository CI already uses <code>cargo-tarpaulin</code> and uploads Cobertura XML to Codecov.</p>
+<h3 id="cargo-tarpaulin-1"><a class="header" href="#cargo-tarpaulin-1">Cargo Tarpaulin</a></h3>
+<p><strong>Installation</strong>:</p>
+<pre><code class="language-bash">cargo install cargo-tarpaulin --locked
+</code></pre>
+<p><strong>Usage</strong>:</p>
+<pre><code class="language-bash">cargo tarpaulin --out Xml --out Html
+</code></pre>
+<p>Reports are written to <code>coverage/</code>. Open <code>coverage/tarpaulin-report.html</code> in a browser for a line-by-line view of what your tests are (and aren’t) hitting.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="deployment-guide-1"><a class="header" href="#deployment-guide-1">Deployment Guide</a></h1>
+<p>Complete guide for deploying Soroban smart contracts to Testnet and Mainnet.</p>
+<h2 id="prerequisites-14"><a class="header" href="#prerequisites-14">Prerequisites</a></h2>
+<ul>
+<li>Rust installed with <code>wasm32-unknown-unknown</code> target</li>
+<li>Soroban CLI installed: <code>cargo install --locked soroban-cli</code></li>
+<li>A funded Stellar account (testnet: friendbot; mainnet: purchase XLM)</li>
+</ul>
+<pre><code class="language-bash"># Add the WASM target if not already present
+rustup target add wasm32-unknown-unknown
+
+# Verify Soroban CLI installation
+soroban --version
+</code></pre>
+<hr>
+<h2 id="network-configuration-2"><a class="header" href="#network-configuration-2">Network Configuration</a></h2>
+<h3 id="testnet-2"><a class="header" href="#testnet-2">Testnet</a></h3>
+<pre><code class="language-bash"># Add testnet network configuration
+soroban network add \
+  --global testnet \
+  --rpc-url https://soroban-testnet.stellar.org:443 \
+  --network-passphrase "Test SDF Network ; September 2015"
+
+# Verify
+soroban network ls
+</code></pre>
+<h3 id="mainnet-3"><a class="header" href="#mainnet-3">Mainnet</a></h3>
+<pre><code class="language-bash"># Add mainnet network configuration
+soroban network add \
+  --global mainnet \
+  --rpc-url https://soroban-mainnet.stellar.org:443 \
+  --network-passphrase "Public Global Stellar Network ; September 2015"
+
+# Verify
+soroban network ls
+</code></pre>
+<hr>
+<h2 id="identity-management-1"><a class="header" href="#identity-management-1">Identity Management</a></h2>
+<h3 id="create-an-identity-1"><a class="header" href="#create-an-identity-1">Create an Identity</a></h3>
+<pre><code class="language-bash"># Generate a new keypair and store it locally
+soroban keys generate alice --network testnet
+
+# View the public key
+soroban keys address alice
+
+# List all stored identities
+soroban keys ls
+</code></pre>
+<h3 id="security-best-practices-1"><a class="header" href="#security-best-practices-1">Security Best Practices</a></h3>
+<blockquote>
+<p>Never commit private keys to version control.</p>
+</blockquote>
+<pre><code class="language-bash"># Ensure local key storage is gitignored
+echo ".soroban/" &gt;&gt; .gitignore
+echo "*.key" &gt;&gt; .gitignore
+</code></pre>
+<p>For mainnet deployments:</p>
+<ul>
+<li>Use a hardware wallet or encrypted key storage</li>
+<li>Keep separate keys for deployment vs. admin operations</li>
+<li>Implement key rotation policies</li>
+<li>Consider multi-signature setups for high-value contracts</li>
+</ul>
+<hr>
+<h2 id="funding-your-account-1"><a class="header" href="#funding-your-account-1">Funding Your Account</a></h2>
+<h3 id="testnet-friendbot-1"><a class="header" href="#testnet-friendbot-1">Testnet (Friendbot)</a></h3>
+<pre><code class="language-bash"># Fund your testnet account via friendbot
+soroban keys fund alice --network testnet
+
+# Check balance
+soroban keys balance alice --network testnet
+</code></pre>
+<p>You can also fund via the web: <code>https://friendbot.stellar.org?addr=&lt;YOUR_PUBLIC_KEY&gt;</code></p>
+<h3 id="mainnet-1-1"><a class="header" href="#mainnet-1-1">Mainnet</a></h3>
+<ol>
+<li>Purchase XLM from an exchange</li>
+<li>Send to your Stellar address (<code>soroban keys address alice</code>)</li>
+<li>Maintain enough XLM for transaction fees and storage rent</li>
+</ol>
+<hr>
+<h2 id="building-your-contract-1"><a class="header" href="#building-your-contract-1">Building Your Contract</a></h2>
+<pre><code class="language-bash"># From your contract directory
+soroban contract build
+
+# Or manually with cargo
+cargo build --target wasm32-unknown-unknown --release
+</code></pre>
+<p>The compiled WASM will be at:
+<code>target/wasm32-unknown-unknown/release/&lt;contract_name&gt;.wasm</code></p>
+<hr>
+<h2 id="testnet-deployment-steps-1"><a class="header" href="#testnet-deployment-steps-1">Testnet Deployment Steps</a></h2>
+<h3 id="step-1-build-1"><a class="header" href="#step-1-build-1">Step 1: Build</a></h3>
+<pre><code class="language-bash">soroban contract build
+</code></pre>
+<h3 id="step-2-deploy-2"><a class="header" href="#step-2-deploy-2">Step 2: Deploy</a></h3>
+<pre><code class="language-bash">CONTRACT_ID=$(soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
+  --source alice \
+  --network testnet)
+
+echo "Deployed contract ID: $CONTRACT_ID"
+</code></pre>
+<h3 id="step-3-verify-1"><a class="header" href="#step-3-verify-1">Step 3: Verify</a></h3>
+<pre><code class="language-bash"># Fetch contract info
+soroban contract info \
+  --id $CONTRACT_ID \
+  --network testnet
+</code></pre>
+<h3 id="step-4-initialize-if-required-1"><a class="header" href="#step-4-initialize-if-required-1">Step 4: Initialize (if required)</a></h3>
+<pre><code class="language-bash">soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  initialize \
+  --admin $(soroban keys address alice)
+</code></pre>
+<h3 id="step-5-invoke-functions-1"><a class="header" href="#step-5-invoke-functions-1">Step 5: Invoke Functions</a></h3>
+<pre><code class="language-bash"># Call a read function (no fee required)
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --network testnet \
+  -- \
+  get_balance \
+  --address $(soroban keys address alice)
+
+# Call a write function
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  transfer \
+  --from $(soroban keys address alice) \
+  --to GDEST... \
+  --amount 1000
+</code></pre>
+<hr>
+<h2 id="mainnet-deployment-steps-1"><a class="header" href="#mainnet-deployment-steps-1">Mainnet Deployment Steps</a></h2>
+<blockquote>
+<p>Ensure your contract is thoroughly tested on testnet before proceeding.</p>
+</blockquote>
+<h3 id="pre-deployment-checklist-1"><a class="header" href="#pre-deployment-checklist-1">Pre-deployment Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> All tests passing (<code>cargo test</code>)</li>
+<li><input disabled="" type="checkbox"> Security audit completed</li>
+<li><input disabled="" type="checkbox"> Code reviewed by multiple developers</li>
+<li><input disabled="" type="checkbox"> Upgrade/emergency mechanism tested</li>
+<li><input disabled="" type="checkbox"> Sufficient XLM balance confirmed</li>
+<li><input disabled="" type="checkbox"> Monitoring plan in place</li>
+</ul>
+<h3 id="step-1-build-optimized-1"><a class="header" href="#step-1-build-optimized-1">Step 1: Build (optimized)</a></h3>
+<pre><code class="language-bash">soroban contract build
+</code></pre>
+<h3 id="step-2-deploy-1-1"><a class="header" href="#step-2-deploy-1-1">Step 2: Deploy</a></h3>
+<pre><code class="language-bash"># CAUTION: This deploys to production
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm target/wasm32-unknown-unknown/release/my_contract.wasm \
+  --source mainnet-deployer \
+  --network mainnet)
+
+echo "Mainnet contract ID: $CONTRACT_ID"
+# Save this ID — it cannot be recovered if lost
+</code></pre>
+<h3 id="step-3-verify-on-mainnet-1"><a class="header" href="#step-3-verify-on-mainnet-1">Step 3: Verify on Mainnet</a></h3>
+<pre><code class="language-bash">soroban contract info \
+  --id $CONTRACT_ID \
+  --network mainnet
+</code></pre>
+<h3 id="step-4-initialize-1"><a class="header" href="#step-4-initialize-1">Step 4: Initialize</a></h3>
+<pre><code class="language-bash">soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source mainnet-deployer \
+  --network mainnet \
+  -- \
+  initialize \
+  --admin $(soroban keys address mainnet-deployer)
+</code></pre>
+<h3 id="step-5-invoke-and-validate-1"><a class="header" href="#step-5-invoke-and-validate-1">Step 5: Invoke and Validate</a></h3>
+<pre><code class="language-bash"># Verify a read function returns expected state
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --network mainnet \
+  -- \
+  get_admin
+</code></pre>
+<hr>
+<h2 id="contract-invocation-examples-1"><a class="header" href="#contract-invocation-examples-1">Contract Invocation Examples</a></h2>
+<h3 id="basic-invocation-1"><a class="header" href="#basic-invocation-1">Basic Invocation</a></h3>
+<pre><code class="language-bash">soroban contract invoke \
+  --id &lt;CONTRACT_ID&gt; \
+  --source alice \
+  --network testnet \
+  -- \
+  &lt;function_name&gt; \
+  --param_name value
+</code></pre>
+<h3 id="passing-different-argument-types-1"><a class="header" href="#passing-different-argument-types-1">Passing Different Argument Types</a></h3>
+<pre><code class="language-bash"># u64 / i128
+soroban contract invoke ... -- my_fn --amount 1000000
+
+# Address
+soroban contract invoke ... -- my_fn --recipient GABC...XYZ
+
+# Boolean
+soroban contract invoke ... -- my_fn --enabled true
+
+# String
+soroban contract invoke ... -- my_fn --label "hello"
+
+# Bytes (hex-encoded)
+soroban contract invoke ... -- my_fn --data 0xdeadbeef
+</code></pre>
+<h3 id="simulating-without-submitting-1"><a class="header" href="#simulating-without-submitting-1">Simulating Without Submitting</a></h3>
+<pre><code class="language-bash"># Dry-run to estimate fees and check for errors
+soroban contract invoke \
+  --id &lt;CONTRACT_ID&gt; \
+  --source alice \
+  --network testnet \
+  --send no \
+  -- \
+  transfer \
+  --amount 500
+</code></pre>
+<h3 id="reading-events-after-invocation-1"><a class="header" href="#reading-events-after-invocation-1">Reading Events After Invocation</a></h3>
+<pre><code class="language-bash">soroban events \
+  --start-ledger &lt;LEDGER_NUMBER&gt; \
+  --id &lt;CONTRACT_ID&gt; \
+  --network testnet
+</code></pre>
+<hr>
+<h2 id="contract-upgrades-1"><a class="header" href="#contract-upgrades-1">Contract Upgrades</a></h2>
+<h3 id="upgradeable-contract-pattern-1"><a class="header" href="#upgradeable-contract-pattern-1">Upgradeable Contract Pattern</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn upgrade(env: Env, new_wasm_hash: BytesN&lt;32&gt;) {
+    let admin: Address = env.storage().instance()
+        .get(&amp;symbol_short!("admin"))
+        .unwrap();
+    admin.require_auth();
+    env.deployer().update_current_contract_wasm(new_wasm_hash);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="upgrade-process-1"><a class="header" href="#upgrade-process-1">Upgrade Process</a></h3>
+<pre><code class="language-bash"># 1. Install the new WASM and capture its hash
+NEW_HASH=$(soroban contract install \
+  --wasm target/wasm32-unknown-unknown/release/my_contract_v2.wasm \
+  --source alice \
+  --network testnet)
+
+# 2. Call the upgrade function on the existing contract
+soroban contract invoke \
+  --id $CONTRACT_ID \
+  --source alice \
+  --network testnet \
+  -- \
+  upgrade \
+  --new_wasm_hash $NEW_HASH
+</code></pre>
+<hr>
+<h2 id="fee-estimation-1"><a class="header" href="#fee-estimation-1">Fee Estimation</a></h2>
+<pre><code class="language-bash"># Simulate to see resource usage and fees
+soroban contract invoke \
+  --id &lt;CONTRACT_ID&gt; \
+  --source alice \
+  --network testnet \
+  --send no \
+  -- \
+  my_function \
+  --arg 123
+</code></pre>
+<p>Fee components:</p>
+<ul>
+<li>Network fee: base transaction fee</li>
+<li>Resource fee: CPU, memory, and I/O costs</li>
+<li>Rent: storage TTL extension costs</li>
+</ul>
+<hr>
+<h2 id="emergency-procedures-1"><a class="header" href="#emergency-procedures-1">Emergency Procedures</a></h2>
+<h3 id="pause--unpause-pattern-1"><a class="header" href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn pause(env: Env) {
+    require_admin(&amp;env);
+    env.storage().instance().set(&amp;symbol_short!("paused"), &amp;true);
+}
+
+pub fn unpause(env: Env) {
+    require_admin(&amp;env);
+    env.storage().instance().remove(&amp;symbol_short!("paused"));
+}
+
+fn check_not_paused(env: &amp;Env) {
+    if env.storage().instance().has(&amp;symbol_short!("paused")) {
+        panic!("Contract is paused");
+    }
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h2 id="additional-resources-2"><a class="header" href="#additional-resources-2">Additional Resources</a></h2>
+<ul>
+<li><a href="https://developers.stellar.org/docs/tools/developer-tools/cli">Soroban CLI Reference</a></li>
+<li><a href="https://developers.stellar.org/docs/networks">Network Configuration</a></li>
+<li><a href="https://developers.stellar.org/docs/smart-contracts/fees">Fee Documentation</a></li>
+<li><a href="https://developers.stellar.org/docs/smart-contracts/state-archival">State Archival &amp; TTL</a></li>
+<li><a href="https://discord.gg/stellardev">Stellar Discord</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="deployment"><a class="header" href="#deployment">Deployment</a></h1>
+<p>This section covers the deployment configuration for the Soroban Cookbook documentation.</p>
+<h2 id="contents"><a class="header" href="#contents">Contents</a></h2>
+<ul>
+<li><a href="#cicd-setup-for-documentation">CI/CD Setup</a> - How the automated deployment pipeline works</li>
+<li><a href="#deployment-configuration">Configuration</a> - Deployment configuration details</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="cicd-setup-for-documentation"><a class="header" href="#cicd-setup-for-documentation">CI/CD Setup for Documentation</a></h1>
+<p>This guide explains how the automated documentation deployment pipeline works.</p>
+<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<p>The documentation deployment uses GitHub Actions to automatically build and deploy the mdBook documentation whenever changes are pushed to the repository.</p>
+<h2 id="workflow-triggers"><a class="header" href="#workflow-triggers">Workflow Triggers</a></h2>
+<p>The deployment workflow is triggered by:</p>
+<ul>
+<li>Pushes to the <code>main</code> branch (production deployment)</li>
+<li>Pull requests targeting the <code>main</code> branch (preview deployment)</li>
+</ul>
+<h2 id="workflow-steps"><a class="header" href="#workflow-steps">Workflow Steps</a></h2>
+<ol>
+<li><strong>Checkout</strong>: Clones the repository</li>
+<li><strong>Install mdBook</strong>: Sets up the mdBook tool</li>
+<li><strong>Build Documentation</strong>: Runs <code>mdbook build</code> in the <code>book/</code> directory</li>
+<li><strong>Deploy Preview</strong>: For PRs, deploys to a preview URL</li>
+<li><strong>Deploy Production</strong>: For main branch, deploys to the production URL</li>
+</ol>
+<h2 id="preview-deployments"><a class="header" href="#preview-deployments">Preview Deployments</a></h2>
+<p>Pull request previews allow you to review documentation changes before they go live. Each PR gets a unique preview URL that updates as you push changes.</p>
+<h2 id="production-deployment"><a class="header" href="#production-deployment">Production Deployment</a></h2>
+<p>When changes are merged to the <code>main</code> branch, the documentation is automatically deployed to the production URL with a custom domain and SSL certificate.</p>
+<h2 id="custom-domain-configuration"><a class="header" href="#custom-domain-configuration">Custom Domain Configuration</a></h2>
+<p>The documentation is served from a custom domain configured in the GitHub Pages settings. The SSL certificate is automatically provisioned and managed by GitHub Pages.</p>
+<h2 id="verification"><a class="header" href="#verification">Verification</a></h2>
+<p>To verify the deployment works locally:</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="deployment-configuration"><a class="header" href="#deployment-configuration">Deployment Configuration</a></h1>
+<h2 id="github-pages-settings"><a class="header" href="#github-pages-settings">GitHub Pages Settings</a></h2>
+<p>The documentation is deployed to GitHub Pages with the following configuration:</p>
+<ul>
+<li><strong>Source</strong>: GitHub Actions</li>
+<li><strong>Custom domain</strong>: Configured in the repository settings</li>
+<li><strong>SSL</strong>: Enforce HTTPS enabled</li>
+</ul>
+<h2 id="environment-variables"><a class="header" href="#environment-variables">Environment Variables</a></h2>
+<p>The workflow uses the following secrets and variables:</p>
+<ul>
+<li><code>GITHUB_TOKEN</code>: Automatically provided by GitHub Actions</li>
+<li>No additional secrets required for basic deployment</li>
+</ul>
+<h2 id="build-configuration"><a class="header" href="#build-configuration">Build Configuration</a></h2>
+<p>The mdBook is built with the following settings:</p>
+<ul>
+<li><strong>Output directory</strong>: <code>book/book</code></li>
+<li><strong>Build command</strong>: <code>mdbook build</code></li>
+<li><strong>Source directory</strong>: <code>book/src</code></li>
+</ul>
+<h2 id="troubleshooting-3"><a class="header" href="#troubleshooting-3">Troubleshooting</a></h2>
+<h3 id="build-failures"><a class="header" href="#build-failures">Build Failures</a></h3>
+<p>If the build fails, check:</p>
+<ol>
+<li>All markdown files are properly formatted</li>
+<li>All internal links are valid</li>
+<li>The SUMMARY.md file is correctly structured</li>
+</ol>
+<h3 id="deployment-issues-1"><a class="header" href="#deployment-issues-1">Deployment Issues</a></h3>
+<p>If deployment fails:</p>
+<ol>
+<li>Verify GitHub Pages is enabled in repository settings</li>
+<li>Check that the workflow has write permissions</li>
+<li>Ensure the custom domain DNS is properly configured</li>
+</ol>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="api-reference-1"><a class="header" href="#api-reference-1">API Reference</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="soroban-sdk-1"><a class="header" href="#soroban-sdk-1">Soroban SDK</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="rpc-methods"><a class="header" href="#rpc-methods">RPC Methods</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="troubleshooting-4"><a class="header" href="#troubleshooting-4">Troubleshooting</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="common-issues"><a class="header" href="#common-issues">Common Issues</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="faq"><a class="header" href="#faq">FAQ</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="contributing-3"><a class="header" href="#contributing-3">Contributing</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="code-of-conduct-1"><a class="header" href="#code-of-conduct-1">Code of Conduct</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="development-workflow"><a class="header" href="#development-workflow">Development Workflow</a></h1>
 
                     </main>
 
