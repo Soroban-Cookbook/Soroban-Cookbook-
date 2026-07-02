@@ -6,7 +6,6 @@
 
 use soroban_sdk::testutils::{Address as _, Events};
 use soroban_sdk::{symbol_short, Address, Env};
-use soroban_validation::test_events::EventList;
 
 use crate::{ContractError, CustomErrorsContract, CustomErrorsContractClient};
 
@@ -230,14 +229,13 @@ fn test_event_logging_with_errors() {
     let contract_id = env.register_contract(None, CustomErrorsContract);
     let client = CustomErrorsContractClient::new(&env, &contract_id);
 
-    // Trigger a successful operation that logs an event
-    let key = symbol_short!("event_key");
-    client.try_create_entry(&key, &42).unwrap().unwrap();
+    // Trigger an error that should log an event
+    let _ = client.try_validate_input(&0);
 
     // Verify that at least one event was emitted by the contract
-    let events = EventList::new(&env, env.events().all());
+    let events = env.events().all();
     assert!(
-        !events.is_empty(),
+        !events.events().is_empty(),
         "Expected at least one event to be emitted"
     );
 }

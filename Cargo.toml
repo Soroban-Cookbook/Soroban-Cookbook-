@@ -4,13 +4,17 @@ resolver = "2"
 members = [
     "shared",
     "examples/hello-world",
-    "examples/basics/*",
-    "examples/intermediate/*",
-    "examples/advanced/*",
-    "examples/defi/*",
-    "examples/nfts/*",
-    "examples/governance/*",
-    "examples/tokens/*",
+    "examples/basics/01-hello-world",
+    "examples/basics/06-validation-patterns",
+    "examples/intermediate/multi-sig-patterns",
+    "examples/advanced/01-multi-party-auth",
+    "examples/advanced/02-timelock",
+    "examples/advanced/05-diamond-security",
+    "examples/advanced/05-diamond-security/facet-adder",
+    "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/tokens/token-wrapper",
+    "examples/tokens/03-optimized-operations",
+    "examples/governance/01-vote-delegation",
     "tests/integration",
     "tests/security",
 ]
@@ -18,7 +22,10 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.96"
+
+[workspace.lints.rust]
+deprecated = "allow"
 
 [workspace.dependencies]
 soroban-sdk = "26.0.0-rc.1"

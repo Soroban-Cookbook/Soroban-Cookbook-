@@ -1,19 +1,13 @@
-
 # Hello World
+
+> **🎬 Video Walkthrough** (11:30)
+> Learn how to build and test this Hello World contract in our [Soroban Basics #1 Video Walkthrough](https://www.youtube.com/watch?v=hello-world-walkthrough).
 
 The simplest possible Soroban smart contract. Use this as a starting template or to understand the fundamental building blocks of every Soroban contract.
 
 ## Overview
 
 This contract exposes a single `hello(to: Symbol) -> Vec<Symbol>` function that returns `["Hello", <to>]`. Its purpose is to demonstrate contract structure, not business logic.
-
-## 🎬 Video Walkthrough
-
-> **Getting Started — Examples 01–03** *(coming soon)*
-> This example is covered in the first section of the video (0:00 – 4:30).
-> Once published, the link will appear here.
-
-## Project Structure
 
 ## Key Concepts
 

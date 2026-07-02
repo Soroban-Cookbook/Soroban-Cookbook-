@@ -379,3 +379,7 @@ impl NftMarketplaceContract {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test;
+

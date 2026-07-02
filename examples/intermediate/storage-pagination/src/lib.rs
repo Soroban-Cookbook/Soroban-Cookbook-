@@ -5,7 +5,7 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, Env, Vec, Symbol};
 
 const ITEMS_KEY: u32 = 0;
 
@@ -62,7 +62,7 @@ impl PaginationContract {
 
         let start = cursor as usize;
         let page_size_usize = page_size as usize;
-        let end = (start + page_size_usize).min(items.len());
+        let end = (start + page_size_usize).min(items.len() as usize);
 
         let mut page_items = Vec::new(&env);
         for i in start..end {
@@ -71,7 +71,7 @@ impl PaginationContract {
             }
         }
 
-        let next_cursor = if end < items.len() {
+        let next_cursor = if end < items.len() as usize {
             Some(end as u32)
         } else {
             None

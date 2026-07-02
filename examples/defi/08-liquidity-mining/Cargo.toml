@@ -5,10 +5,10 @@ edition = "2021"
 publish = false
 
 [lib]
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-soroban-sdk = { workspace = true, features = ["alloc"] }
+soroban-sdk = { workspace = true, features = ["alloc", "testutils"] }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils", "alloc"] }

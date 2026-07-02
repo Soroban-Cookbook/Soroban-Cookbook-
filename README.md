@@ -18,7 +18,6 @@
 - [Documentation](#documentation)
 - [Web Application](#web-application)
 - [Contributing](#contributing)
-- [Onboarding](#onboarding)
 - [Community & Integration](#community--integration)
 - [Additional Resources](#additional-resources)
 - [License](#license)
@@ -183,6 +182,7 @@ Step-by-step tutorials in the [book](./book/src/guides/):
 | [Testing](./book/src/guides/testing.md) | Unit tests, integration tests, best practices |
 | [Deployment](./book/src/guides/deployment.md) | Deploy to testnet and mainnet |
 | [Ethereum to Soroban](./book/src/guides/ethereum-to-soroban.md) | Solidity → Rust pattern translation |
+| [Freighter Wallet Integration](./guides/freighter-wallet-integration.md) | Practical guide to connecting and interacting with Freighter Wallet |
 
 ## Documentation
 
@@ -194,6 +194,7 @@ Reference docs in [docs/](./docs/):
 - [Quick Reference](./docs/quick-reference.md) — Cheat sheet for common patterns
 - [Glossary](./docs/glossary.md) — Key terms and concepts
 - [Troubleshooting](./docs/troubleshooting.md) — Common build, test, and deployment issues with solutions
+- [Wallet Integration Guide](./docs/wallet-integration.md) — Practical patterns for connecting wallets to Soroban apps
 
 - [Wallet Ecosystem Survey](./book/src/docs/wallet-ecosystem.md) — Research, features comparison, and integration priority list for Soroban-compatible wallets
 
@@ -216,15 +217,53 @@ npm install
 npm run dev
 ```
 
-## Onboarding
+## Governance Integration Tests
 
-New to the Soroban Cookbook community? The **[Community Onboarding Guide](./docs/onboarding.md)** is your starting point. It includes:
+The governance integration test suite lives in `tests/integration/tests/governance_tests.rs` and covers the three governance contracts in `examples/governance/`.
 
-- Learning paths by background (new to Stellar, Rust dev, EVM dev, ready to contribute)
-- A first-steps checklist to get set up and open your first PR
-- Community channels, help resources, and external documentation links
+### Running the tests
 
-Start there, then return here and to [CONTRIBUTING.md](./CONTRIBUTING.md) when you are ready to contribute.
+```bash
+# Run only the governance integration tests
+cargo test -p integration-tests governance
+
+# Run the full integration test suite
+cargo test -p integration-tests
+
+# Run all workspace tests
+cargo test
+```
+
+### Test coverage summary
+
+30 integration tests across 8 categories:
+
+| # | Category | Tests |
+|---|----------|-------|
+| 1 | Proposal lifecycle | creation, not-initialized error, submit, execute, reject |
+| 2 | Voting | successful vote, duplicate prevention, deadline enforcement, quorum |
+| 3 | DAO treasury | deposit, withdrawal via governance, over-withdrawal guard |
+| 4 | Authorization | invalid proposer cancel, invalid executor while active |
+| 5 | Multiple / concurrent proposals | independent IDs, concurrent vote outcomes |
+| 6 | Delegation | create, remove, delegated weight voting, zero-weight edge case |
+| 7 | Voting-time-constraints | proposal creation, post-deadline rejection, full lifecycle |
+| 8 | End-to-end | cross-contract governance action, full community vote workflow |
+
+### Governance scenarios covered
+
+- Full proposal lifecycle: `Draft → Active → Passed/Failed → Executed`
+- DAO treasury operations via governance-dispatched cross-contract calls
+- Delegation registry: delegates vote with accumulated weight
+- `simple-voting` one-address-one-vote with timestamp deadlines
+- `voting-time-constraints` grace-period lifecycle with early-closure
+- Authorization failures (unauthorized cancel, premature execution, over-withdrawal)
+
+### Test environment assumptions
+
+- Tests run natively (no WASM compilation required) using `env.mock_all_auths()`.
+- `proposal-lifecycle` uses **ledger sequence numbers** for timing; tests advance with `env.ledger().set_sequence_number(...)`.
+- `simple-voting` and `voting-time-constraints` use **ledger timestamps**; tests advance with `env.ledger().set_timestamp(...)`.
+- Treasury and delegation functionality is provided by lightweight mock contracts defined in the test file (`MockTreasury`, `MockDelegation`), because dedicated treasury/delegation contracts are not yet in the repo.
 
 ## Contributing
 
@@ -246,6 +285,14 @@ cargo test --workspace --all-features
 cargo build --workspace --target wasm32-unknown-unknown --release
 ```
 
+### Collaborative Content with Stellar
+
+We collaborate closely with the Stellar Development Foundation to provide high-quality developer resources:
+- **Joint Blog Posts**: Watch for our technical deep dives on the [official Stellar blog](https://stellar.org/blog).
+- **Co-hosted Events**: We regularly participate in Stellar community calls and hackathons.
+- **Shared Examples**: Selected cookbook examples are featured in the [Soroban documentation](https://developers.stellar.org/docs/smart-contracts).
+- **Cross-linking**: We ensure our patterns align directly with Stellar's recommended practices.
+- **Regular Sync Meetings**: We align our roadmap with upcoming Soroban releases to provide up-to-date content.
 ## Community & Integration
 
 The Soroban Cookbook is integrated into the official Stellar Developer ecosystem as a featured community resource. We work in tandem with the Stellar Development Foundation (SDF) and community developers to ensure our examples and guides align with the official documentation and best practices.

@@ -48,6 +48,16 @@ client.submit(&updater, &42_i128);
 let value = client.get_value_strict(); // errors if stale
 ```
 
+---
+
+### [05-diamond-security](../examples/advanced/05-diamond-security/)
+**Secure Multi-Facet Proxy (Diamond)** with access controls, upgrade safety, and isolated namespaced storage.
+
+**Key Concepts:**
+- Access control per facet (restricting direct execution to proxy)
+- Upgrade checks & interface supports verification
+- Namespaced key isolation to prevent shared storage collisions
+
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
 ## ⚠️ Warning

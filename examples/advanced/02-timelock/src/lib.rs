@@ -215,8 +215,7 @@ impl TimelockContract {
             .expect("Not initialized");
         admin.require_auth();
 
-        let operation_id_for_event = operation_id.clone();
-        let key = DataKey::Operation(operation_id);
+        let key = DataKey::Operation(operation_id.clone());
         if !env.storage().persistent().has(&key) {
             panic!("Operation not found");
         }
@@ -225,7 +224,7 @@ impl TimelockContract {
 
         // Consistent event emission
         env.events().publish(
-            (CONTRACT_NS, ACTION_ADMIN, admin, operation_id_for_event),
+            (CONTRACT_NS, ACTION_ADMIN, admin, operation_id),
             AdminActionEventData {
                 action: symbol_short!("cancel"),
                 timestamp: env.ledger().timestamp(),

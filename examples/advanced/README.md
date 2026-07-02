@@ -15,10 +15,14 @@ This category contains examples of complex systems and advanced architectural pa
 
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
+- [`03-data-aggregation-oracle`](./03-data-aggregation-oracle/) — Data aggregation with manipulation detection and outlier filtering (Phase 5)
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with freshness checks
 - [`05-bridge-security`](./05-bridge-security/) — Rate limiting, pause, challenge window, and fraud-proof patterns for bridge releases
+- [`06-beacon-management`](./06-beacon-management/) — Versioned beacon management with rollback support
 
 ## Planned Examples
 
-- `04-atomic-swaps`: A trustless, cross-contract asset swap.
+- [`04-bridge-validators`](./04-bridge-validators/) — Bridge validators and multi-sig threshold
+- `05-atomic-swaps`: A trustless, cross-contract asset swap.
 - `05-payment-channels`: A basic state channel implementation for off-chain transactions.
+- `08-batch-operations`: Batch call interface with atomic rollback and partial execution modes.

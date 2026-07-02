@@ -1,0 +1,593 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/ayo-ola/Desktop/Projects/Personal/drips/Soroban-Cookbook-/examples/advanced/04-cross-contract-integration-testing/Cargo.toml
+workspace: /home/ayo-ola/Desktop/Projects/Personal/drips/Soroban-Cookbook-/Cargo.toml
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/basics/03-custom-errors/src/lib.rs:73:18
+   |
+73 | ...   .publish((symbol_short!("inp_err"),), ("Invalid value", value));
+   |        ^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/basics/03-custom-errors/src/lib.rs:94:26
+   |
+94 |             env.events().publish(
+   |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:118:18
+    |
+118 | ...   .publish((symbol_short!("not_found"),), ("Key not found", key));
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:134:26
+    |
+134 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:140:26
+    |
+140 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:148:18
+    |
+148 | ...   .publish((symbol_short!("xfer_ok"),), ("Amount transferred", amou...
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:168:26
+    |
+168 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:174:26
+    |
+174 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:180:26
+    |
+180 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:201:26
+    |
+201 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:208:18
+    |
+208 | ...   .publish((symbol_short!("dup_err"),), ("Entry already exists", ke...
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:213:18
+    |
+213 | ...   .publish((symbol_short!("create_ok"),), ("Entry created", key));
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:237:26
+    |
+237 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:243:26
+    |
+243 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:249:26
+    |
+249 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-custom-errors/src/lib.rs:296:22
+    |
+296 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/advanced/02-timelock/src/lib.rs:93:22
+   |
+93 |         env.events().publish(
+   |                      ^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/02-timelock/src/lib.rs:152:22
+    |
+152 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/02-timelock/src/lib.rs:198:22
+    |
+198 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/02-timelock/src/lib.rs:227:22
+    |
+227 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/02-timelock/src/lib.rs:274:22
+    |
+274 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/02-timelock/src/lib.rs:294:22
+    |
+294 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/01-multi-party-auth/src/lib.rs:151:22
+    |
+151 |         env.events().publish(
+    |                      ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/01-multi-party-auth/src/lib.rs:207:22
+    |
+207 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/01-multi-party-auth/src/lib.rs:234:26
+    |
+234 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/01-multi-party-auth/src/lib.rs:250:26
+    |
+250 |             env.events().publish(
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/advanced/01-multi-party-auth/src/lib.rs:270:22
+    |
+270 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:198:22
+    |
+198 |         env.events().publish(
+    |                      ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:223:22
+    |
+223 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:248:22
+    |
+248 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:276:22
+    |
+276 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:294:22
+    |
+294 |         env.events().publish((symbol_short!("simple"),), value);
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:301:22
+    |
+301 |         env.events().publish((symbol_short!("tagged"), tag), value);
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:309:26
+    |
+309 |             env.events().publish((symbol_short!("multi"), i), i as u64);
+    |                          ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:323:14
+    |
+323 | ...   .publish((symbol_short!("number"), symbol_short!("inc")), num);
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:351:14
+    |
+351 |             .publish((symbol_short!("transfer"), from, to), amount);
+    |              ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:374:22
+    |
+374 |         env.events().publish((category, action, pool_id), amount);
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/04-events/src/lib.rs:390:22
+    |
+390 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: `custom-errors` (lib) generated 16 warnings
+warning: `timelock` (lib) generated 6 warnings
+warning: `multi-party-auth` (lib) generated 5 warnings
+warning: `events` (lib) generated 11 warnings
+warning: use of deprecated method `soroban_sdk::deploy::DeployerWithAddress::deploy`: use deploy_v2
+  --> examples/intermediate/ajo-factory/src/lib.rs:81:75
+   |
+81 | ...().with_current_contract(salt).deploy(wasm_hash);
+   |                                   ^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/intermediate/ajo-factory/src/lib.rs:91:22
+   |
+91 |         env.events().publish(
+   |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:164:22
+    |
+164 |         env.events().publish(
+    |                      ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:202:22
+    |
+202 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:243:22
+    |
+243 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:407:14
+    |
+407 |             .publish((symbol_short!("event"), user), message);
+    |              ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:434:14
+    |
+434 | ...   .publish((CONTRACT_NS, ACTION_AUDIT, account), (old_role, role));
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:456:14
+    |
+456 | ...   .publish((CONTRACT_NS, ACTION_AUDIT, account), (old_role, Role::U...
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:487:22
+    |
+487 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:506:22
+    |
+506 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:536:14
+    |
+536 | ...   .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_time, unlock_ti...
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:576:14
+    |
+576 | ...   .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_period, period));
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/03-authentication/src/lib.rs:627:14
+    |
+627 | ...   .publish((CONTRACT_NS, ACTION_AUDIT, admin), (old_state, state));
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/basics/02-storage-patterns/src/lib.rs:44:22
+   |
+44 |         env.events().publish(
+   |                      ^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/basics/02-storage-patterns/src/lib.rs:68:14
+   |
+68 | ...   .publish((symbol_short!("persist"), symbol_short!("remove")), key);
+   |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/basics/02-storage-patterns/src/lib.rs:81:14
+   |
+81 | ...   .publish((symbol_short!("temp"), symbol_short!("set")), (key, valu...
+   |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/02-storage-patterns/src/lib.rs:105:22
+    |
+105 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/basics/02-storage-patterns/src/lib.rs:129:14
+    |
+129 | ...   .publish((symbol_short!("instance"), symbol_short!("remove")), key);
+    |        ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+  --> examples/nfts/01-basic-nft/src/lib.rs:59:22
+   |
+59 |         env.events().publish(
+   |                      ^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/nfts/01-basic-nft/src/lib.rs:145:22
+    |
+145 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/nfts/01-basic-nft/src/lib.rs:164:22
+    |
+164 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/nfts/01-basic-nft/src/lib.rs:229:22
+    |
+229 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/nfts/01-basic-nft/src/lib.rs:261:22
+    |
+261 |         env.events().publish(
+    |                      ^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::events::Events::publish`: use the #[contractevent] macro on a contract event type
+   --> examples/tokens/01-sep41-token/src/lib.rs:257:18
+    |
+257 |     env.events().publish(
+    |                  ^^^^^^^
+    |
+    = note: `#[warn(deprecated)]` on by default
+
+warning: `ajo-factory` (lib) generated 2 warnings
+warning: `authentication` (lib) generated 11 warnings
+warning: `storage-patterns` (lib) generated 5 warnings
+warning: `basic-nft` (lib) generated 5 warnings
+warning: `sep41-token` (lib) generated 1 warning
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+  --> tests/integration/tests/integration_tests.rs:22:24
+   |
+22 |     let hello_id = env.register_contract(None, hello_world::HelloContract);
+   |                        ^^^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(deprecated)]` on by default
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+  --> tests/integration/tests/integration_tests.rs:23:26
+   |
+23 |     let storage_id = env.register_contract(None, storage_patterns::Stora...
+   |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+  --> tests/integration/tests/integration_tests.rs:24:25
+   |
+24 |     let events_id = env.register_contract(None, events_structured::Event...
+   |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+  --> tests/integration/tests/integration_tests.rs:88:23
+   |
+88 |     let auth_id = env.register_contract(None, authentication::AuthContra...
+   |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+  --> tests/integration/tests/integration_tests.rs:89:26
+   |
+89 |     let storage_id = env.register_contract(None, storage_patterns::Stora...
+   |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:211:29
+    |
+211 |     let validation_id = env.register_contract(None, validation_patterns...
+    |                             ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:212:25
+    |
+212 |     let errors_id = env.register_contract(None, custom_errors::CustomEr...
+    |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:255:26
+    |
+255 |     let factory_id = env.register_contract(None, ajo_factory::AjoFactory);
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:256:23
+    |
+256 |     let auth_id = env.register_contract(None, authentication::AuthContr...
+    |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:279:22
+    |
+279 |     let ajo_id = env.register_contract(None, ajo_factory::Ajo);
+    |                      ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:319:27
+    |
+319 |     let multisig_id = env.register_contract(None, multi_sig_patterns::M...
+    |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:320:25
+    |
+320 |     let events_id = env.register_contract(None, events_structured::Even...
+    |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:391:23
+    |
+391 |     let auth_id = env.register_contract(None, authentication::AuthContr...
+    |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:392:25
+    |
+392 |     let events_id = env.register_contract(None, events_structured::Even...
+    |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:393:26
+    |
+393 |     let storage_id = env.register_contract(None, storage_patterns::Stor...
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:473:26
+    |
+473 |     let storage_id = env.register_contract(None, storage_patterns::Stor...
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:579:23
+    |
+579 |     let auth_id = env.register_contract(None, authentication::AuthContr...
+    |                       ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:580:26
+    |
+580 |     let storage_id = env.register_contract(None, storage_patterns::Stor...
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:581:25
+    |
+581 |     let events_id = env.register_contract(None, events_structured::Even...
+    |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:582:24
+    |
+582 |     let hello_id = env.register_contract(None, hello_world::HelloContra...
+    |                        ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:715:26
+    |
+715 |     let storage_id = env.register_contract(None, storage_patterns::Stor...
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:716:25
+    |
+716 |     let events_id = env.register_contract(None, events_structured::Even...
+    |                         ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:798:27
+    |
+798 |     let contract_id = env.register_contract(None, multi_party_auth::Mul...
+    |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:834:27
+    |
+834 |     let contract_id = env.register_contract(None, multi_party_auth::Mul...
+    |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:869:27
+    |
+869 |     let contract_id = env.register_contract(None, multi_party_auth::Mul...
+    |                           ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:922:22
+    |
+922 |     let nft_id = env.register_contract(None, basic_nft::BasicNftContract);
+    |                      ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:925:26
+    |
+925 |     let lending_id = env.register_contract(None, collateralized_lending...
+    |                          ^^^^^^^^^^^^^^^^^
+
+warning: use of deprecated method `soroban_sdk::Env::register_contract`: use `register`
+   --> tests/integration/tests/integration_tests.rs:928:24
+    |
+928 |     let token_id = env.register_contract(None, sep41_token::Sep41Token);
+    |                        ^^^^^^^^^^^^^^^^^
+
+warning: `integration-tests` (test "integration_tests") generated 28 warnings
+    Finished `test` profile [optimized + debuginfo] target(s) in 0.91s
+     Running tests/integration_tests.rs (target/debug/deps/integration_tests-298ec8149c4092a0)
+
+running 13 tests
+test test_greeting_system_workflow ... ok
+test test_coordinated_state_management ... ok
+test test_audited_examples_registration ... ok
+test test_ajo_factory_lifecycle_integration ... ok
+test test_storage_types_comparison ... ok
+test test_cross_contract_event_tracking ... ok
+test test_multi_party_auth_2_of_3 ... ok
+test test_multi_party_auth_3_of_3 ... ok
+test test_authenticated_storage_workflow ... ok
+test test_validation_and_errors_integration ... ok
+test test_multi_party_workflow ... ok
+test test_multi_party_auth_cross_function ... ok
+test test_multi_sig_governance_integration ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.19s
+

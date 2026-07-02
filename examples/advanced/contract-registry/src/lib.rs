@@ -1,8 +1,6 @@
 #![no_std]
 
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -73,15 +71,12 @@ impl ContractRegistry {
             .persistent()
             .get(&RegistryKey::Categories)
             .unwrap_or(Vec::new(&env));
-        if !cats.iter().any(|s| *s == category) {
+        if !cats.iter().any(|s| s == category) {
             cats.push_back(category.clone());
-            env.storage()
-                .persistent()
-                .set(&RegistryKey::Categories, &cats);
+            env.storage().persistent().set(&RegistryKey::Categories, &cats);
         }
 
-        env.events()
-            .publish((symbol_short!("reg"), name), metadata.clone());
+        env.events().publish((symbol_short!("reg"), name), metadata.clone());
         Ok(())
     }
 

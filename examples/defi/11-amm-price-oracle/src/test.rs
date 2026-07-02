@@ -75,7 +75,7 @@ fn test_oracle_twap_changes_after_time_passes() {
     oracle.update();
 
     env.ledger().set(Ledger::timestamp(1000));
-    pool.swap(&token_a_id, &10i128, &1i128);
+    pool.swap(&bob, &token_a_id, &10i128, &1i128);
     oracle.update();
 
     let twap = oracle.twap_price();

@@ -82,13 +82,13 @@ impl CompressedStorageContract {
         let original_len = (data.len() as u32).to_be_bytes();
         out.extend_from_slice(&original_len);
 
-        let mut i = 0;
+        let mut i = 0u32;
         while i < data.len() {
             let current = data.get(i).unwrap();
             let mut run_length: u8 = 1;
 
-            while run_length < 255 && i + (run_length as usize) < data.len() {
-                let next = data.get(i + run_length as usize).unwrap();
+            while run_length < 255 && i + (run_length as u32) < data.len() {
+                let next = data.get(i + run_length as u32).unwrap();
                 if next != current {
                     break;
                 }
@@ -97,7 +97,7 @@ impl CompressedStorageContract {
 
             out.push_back(current);
             out.push_back(run_length);
-            i += run_length as usize;
+            i += run_length as u32;
         }
 
         out
@@ -105,17 +105,17 @@ impl CompressedStorageContract {
 
     /// Helper: decompress run-length encoded bytes.
     fn decompress_bytes(env: &Env, compressed: Bytes) -> Bytes {
-        let original_len = Self::read_u32(&compressed, 0) as usize;
+        let original_len = Self::read_u32(&compressed, 0);
         let mut out = Bytes::new(env);
-        let mut i = 4;
+        let mut i = 4u32;
 
         while i + 1 < compressed.len() {
             let value = compressed.get(i).unwrap();
             let run_length = compressed.get(i + 1).unwrap();
-            let count = *run_length as usize;
+            let count = run_length as u32;
 
             for _ in 0..count {
-                out.push_back(*value);
+                out.push_back(value);
             }
             i += 2;
         }
@@ -125,10 +125,10 @@ impl CompressedStorageContract {
         out
     }
 
-    fn read_u32(bytes: &Bytes, index: usize) -> u32 {
+    fn read_u32(bytes: &Bytes, index: u32) -> u32 {
         let mut result = 0u32;
         for offset in 0..4 {
-            result = (result << 8) | (*bytes.get(index + offset).unwrap() as u32);
+            result = (result << 8) | (bytes.get(index + offset).unwrap() as u32);
         }
         result
     }
