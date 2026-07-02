@@ -18,7 +18,7 @@ members = [
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
-rust-version = "1.74"
+rust-version = "1.96"
 
 [workspace.dependencies]
 soroban-sdk = "26.0.0-rc.1"

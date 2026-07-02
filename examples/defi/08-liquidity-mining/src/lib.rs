@@ -337,7 +337,7 @@ impl LiquidityMining {
         let info = Self::load_user(&env, pool_id, &user);
 
         // Simulate what update_pool would do
-        let simulated_acc = if pool.total_staked > 0 {
+        let simulated_acc = if pool.total_staked > 0 && pool.active {
             let elapsed = (env.ledger().sequence() - pool.last_update_ledger) as i128;
             let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
             pool.acc_reward_per_share
@@ -372,7 +372,7 @@ impl LiquidityMining {
         if current_ledger <= pool.last_update_ledger {
             return;
         }
-        if pool.total_staked > 0 {
+        if pool.total_staked > 0 && pool.active {
             let elapsed = (current_ledger - pool.last_update_ledger) as i128;
             let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
             pool.acc_reward_per_share = pool

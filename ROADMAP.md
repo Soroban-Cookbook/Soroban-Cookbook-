@@ -70,16 +70,16 @@ The Soroban Cookbook is a community-driven resource for building smart contracts
 
 ## 💰 Phase 3: Use Case Examples (Q3-Q4 2024)
 
-**Status:** 🟡 Partially Completed
+**Status:** ✅ Complete
 
 ### Milestones
 
 | Milestone           | Description                     | Status      |
 | ------------------- | ------------------------------- | ----------- |
-| DeFi Examples       | Swaps, liquidity pools, lending | 🟡 Planned  |
-| NFT Examples        | Minting, transfers, metadata    | 🟡 Planned  |
-| Governance Examples | Voting, DAOs, proposals         | 🟡 Planned  |
-| Token Standards     | Fungible tokens, custom tokens  | 🟡 Planned  |
+| DeFi Examples       | Swaps, liquidity pools, lending | ✅ Complete |
+| NFT Examples        | Minting, transfers, metadata    | ✅ Complete |
+| Governance Examples | Voting, DAOs, proposals         | ✅ Complete |
+| Token Standards     | Fungible tokens, custom tokens  | ✅ Complete |
 | Storage Patterns    | Advanced storage optimization   | ✅ Complete |
 
 ### Success Metrics

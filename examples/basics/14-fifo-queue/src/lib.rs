@@ -6,11 +6,12 @@
 
 #![no_std]
 
-use soroban_sdk::{contract, contractimpl, symbol_short, Env, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, Env, Symbol};
 
 const MAX_QUEUE_SIZE: u32 = 10000;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[contracttype]
 #[repr(u32)]
 enum DataKey {
     Head = 0,
