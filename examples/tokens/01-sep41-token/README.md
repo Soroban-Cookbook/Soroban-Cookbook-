@@ -1,6 +1,6 @@
 # SEP-41 Token Example
 
-A minimal custom token implementation that follows the SEP-41 token standard.
+A complete Soroban fungible token example that follows the SEP-41 token standard and keeps the implementation small enough to study end to end.
 
 This example is intended for intermediate Soroban developers who want a complete, runnable token scaffold with:
 
@@ -11,8 +11,8 @@ This example is intended for intermediate Soroban developers who want a complete
 - `transfer_from(spender, owner, to, amount)`
 - `mint(admin, to, amount)`
 - `burn(owner, amount)`
-- full transfer event emission for on-chain indexers
-- robust error handling and 10+ tests
+- transfer and approval event emission for on-chain indexers
+- robust error handling and 15+ tests
 
 ## Project Structure
 
@@ -61,6 +61,6 @@ cargo test
 - SEP-41-compatible token storage and metadata
 - `require_auth()` guard patterns
 - Safe balance arithmetic and allowance handling
-- Transfer event emission with indexed sender and recipient topics
+- Transfer and approval event emission with indexed account topics
 - Admin-controlled minting and burning
 - Comprehensive end-to-end tests

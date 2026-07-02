@@ -1,0 +1,25 @@
+[package]
+name = "soroban-cookbook-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+soroban-sdk = { workspace = true }
+
+[dependencies.hello-world]
+path = "../../examples/basics/01-hello-world"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[[bin]]
+name = "example_fuzz"
+path = "fuzz_targets/example_fuzz.rs"
+test = false
+doc = false
