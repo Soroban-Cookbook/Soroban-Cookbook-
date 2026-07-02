@@ -49,3 +49,6 @@ contract_registry = { path = "../../examples/advanced/contract-registry", packag
 simple_swap = { path = "../../examples/defi/01-simple-swap", package = "simple-token-swap" }
 soroban_flash_loan = { path = "../../examples/defi/05-flash-loans", package = "soroban-flash-loan" }
 liquidity_mining = { path = "../../examples/defi/08-liquidity-mining", package = "liquidity-mining" }
+events-counter = { path = "../../examples/basics/events", package = "events_example" }
+batch-operations = { path = "../../examples/advanced/08-batch-operations" }
+proposal-validation = { path = "../../examples/governance/01-proposal-validation" }
