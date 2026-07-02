@@ -28,8 +28,6 @@ pub struct SwapEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap");
-const EVENT_SWAP: Symbol = symbol_short!("swap_exec");
-const EVENT_PAIR: Symbol = symbol_short!("pair_updt");
 
 impl SimpleSwapContract {
     fn require_owner(&self, env: &Env) {
@@ -94,7 +92,7 @@ impl SimpleSwapContract {
         env.storage().instance().set(&DataKey::RateDen, &rate_den);
 
         env.events().publish(
-            (EVENT_NS, EVENT_PAIR),
+            (EVENT_NS, Symbol::new(&env, "pair_updated")),
             (token_a, token_b, rate_num, rate_den),
         );
     }
@@ -117,7 +115,7 @@ impl SimpleSwapContract {
         env.storage().instance().set(&DataKey::RateDen, &rate_den);
 
         env.events().publish(
-            (EVENT_NS, EVENT_PAIR),
+            (EVENT_NS, Symbol::new(&env, "pair_updated")),
             (token_a, token_b, rate_num, rate_den),
         );
     }
@@ -148,11 +146,13 @@ impl SimpleSwapContract {
 
     pub fn swap(
         env: Env,
+        trader: Address,
         sell_token: Address,
         sell_amount: i128,
         min_buy_amount: i128,
         recipient: Address,
     ) {
+        trader.require_auth();
         assert!(sell_amount > 0, "sell amount must be positive");
         assert!(min_buy_amount > 0, "min buy amount must be positive");
 
@@ -186,17 +186,18 @@ impl SimpleSwapContract {
 
         let contract_addr = this.contract_address(&env);
 
-        token::Client::new(&env, &sell_token).transfer(
-            &env.invoker(),
+        token::Client::new(&env, &sell_token).transfer_from(
+            &contract_addr,
+            &trader,
             &contract_addr,
             &sell_amount,
         );
         token::Client::new(&env, &buy_token).transfer(&contract_addr, &recipient, &buy_amount);
 
         env.events().publish(
-            (EVENT_NS, EVENT_SWAP),
+            (EVENT_NS, Symbol::new(&env, "swap_executed")),
             SwapEventData {
-                trader: env.invoker(),
+                trader,
                 sell_token,
                 buy_token,
                 sell_amount,

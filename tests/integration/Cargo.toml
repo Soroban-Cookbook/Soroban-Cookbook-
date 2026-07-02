@@ -46,3 +46,6 @@ oracle_pattern = { path = "../../examples/advanced/03-oracle-pattern", package =
 cross_contract_integration_testing = { path = "../../examples/advanced/04-cross-contract-integration-testing", package = "cross_contract_integration_testing" }
 upgradeable_proxy = { path = "../../examples/advanced/04-upgradeable-proxy", package = "upgradeable-proxy" }
 contract_registry = { path = "../../examples/advanced/contract-registry", package = "contract-registry" }
+simple_swap = { path = "../../examples/defi/01-simple-swap", package = "simple-token-swap" }
+soroban_flash_loan = { path = "../../examples/defi/05-flash-loans", package = "soroban-flash-loan" }
+liquidity_mining = { path = "../../examples/defi/08-liquidity-mining", package = "liquidity-mining" }
