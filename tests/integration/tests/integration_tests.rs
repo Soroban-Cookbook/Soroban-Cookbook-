@@ -2859,3 +2859,124 @@ fn test_upgradeable_proxy_get_implementation() {
     let stored_impl = client.get_implementation();
     assert_eq!(stored_impl, impl_addr);
 }
+
+// ---------------------------------------------------------------------------
+// Additional integration tests merged from PR branch
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_multisig_threshold_not_met_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let msig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let admin = Address::generate(&env);
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+
+    let msig_client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &msig_id);
+    msig_client.initialize(
+        &2,
+        &Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]),
+    );
+
+    let proposal_id = msig_client.create_proposal(&admin);
+    msig_client.approve(&proposal_id, &signer1);
+    assert_eq!(
+        msig_client.try_execute(&proposal_id, &admin),
+        Err(Ok(multi_sig_patterns::AuthError::ThresholdNotMet))
+    );
+}
+
+#[test]
+fn test_rbac_multisig_timelock_governance_workflow() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let auth_id = env.register_contract(None, authentication::AuthContract);
+    let msig_id = env.register_contract(None, multi_sig_patterns::MultiPartyAuth);
+    let timelock_id = env.register_contract(None, timelock::TimelockContract);
+
+    let admin = Address::generate(&env);
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let target = Address::generate(&env);
+
+    let auth_client = authentication::AuthContractClient::new(&env, &auth_id);
+    let msig_client = multi_sig_patterns::MultiPartyAuthClient::new(&env, &msig_id);
+    let timelock_client = timelock::TimelockContractClient::new(&env, &timelock_id);
+
+    auth_client.initialize(&admin);
+    msig_client.initialize(
+        &2,
+        &Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]),
+    );
+    timelock_client.initialize(&admin);
+
+    let proposal_id = msig_client.create_proposal(&admin);
+    msig_client.approve(&proposal_id, &signer1);
+    msig_client.approve(&proposal_id, &signer2);
+    assert!(msig_client.execute(&proposal_id, &admin));
+
+    let (min_delay, _) = timelock_client.get_delay_bounds();
+    let op_id = Bytes::from_slice(&env, b"grant_moderator");
+    timelock_client.queue(&op_id, &(min_delay + 1));
+    env.ledger().with_mut(|l| l.timestamp += min_delay + 2);
+    assert_eq!(
+        timelock_client.get_state(&op_id),
+        timelock::OperationState::Ready
+    );
+    timelock_client.execute(&op_id);
+
+    auth_client.grant_role(&admin, &target, &authentication::Role::Moderator);
+    assert!(auth_client.has_role(&target, &authentication::Role::Moderator));
+}
+
+#[test]
+fn test_token_wrapper_multi_user_flow() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let asset = env.register_stellar_asset_contract_v2(admin.clone());
+    asset.issuer().set_flag(IssuerFlags::ClawbackEnabledFlag);
+
+    let underlying_id = asset.address();
+    let underlying = TokenClient::new(&env, &underlying_id);
+    let underlying_admin = StellarAssetClient::new(&env, &underlying_id);
+
+    let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
+    let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);
+    wrapper.initialize(&underlying_id);
+
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+    underlying_admin.mint(&alice, &600);
+    underlying_admin.mint(&bob, &400);
+
+    assert_eq!(wrapper.wrap(&alice, &250), 250);
+    assert_eq!(wrapper.wrap(&bob, &100), 100);
+    wrapper.transfer(&alice, &bob, &50);
+
+    assert_eq!(wrapper.balance(&alice), 200);
+    assert_eq!(wrapper.balance(&bob), 150);
+    assert_eq!(underlying.balance(&alice), 350);
+    assert_eq!(underlying.balance(&bob), 300);
+    assert_eq!(underlying.balance(&wrapper_id), 350);
+
+    assert_eq!(wrapper.unwrap(&bob, &120), 30);
+
+    assert_eq!(wrapper.balance(&bob), 30);
+    assert_eq!(underlying.balance(&bob), 420);
+    assert_eq!(underlying.balance(&wrapper_id), 230);
+
+    let backing = wrapper.backing();
+    assert!(backing.fully_backed);
+    assert!(backing.exactly_backed);
+    assert_eq!(backing.surplus, 0);
+
+    assert_eq!(
+        wrapper.try_unwrap(&alice, &999),
+        Err(Ok(token_wrapper::WrapperError::InsufficientWrappedBalance))
+    );
+}

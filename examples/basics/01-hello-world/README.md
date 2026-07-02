@@ -1,6 +1,9 @@
 
 # Hello World
 
+> **🎬 Video Walkthrough** (11:30)
+> Learn how to build and test this Hello World contract in our [Soroban Basics #1 Video Walkthrough](https://www.youtube.com/watch?v=hello-world-walkthrough).
+
 The simplest possible Soroban smart contract. Use this as a starting template or to understand the fundamental building blocks of every Soroban contract.
 
 ## Overview

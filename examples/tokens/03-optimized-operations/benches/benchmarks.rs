@@ -161,3 +161,5 @@ fn benchmark_standard_vs_optimized() {
     println!("4. ✓ Memory Efficiency: Reuse loaded data across multiple operations");
     println!("{}", "=".repeat(80));
 }
+
+fn main() {}

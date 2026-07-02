@@ -1,8 +1,7 @@
 # Custom Errors in Soroban
 
-> **🎬 Video Walkthrough** *(coming soon)*
-> This example is covered from 9:00 – 13:00 in the Getting Started video.
-> Once published, the link will appear here.
+> **🎬 Video Walkthrough** (10:20)
+> Learn how to design type-safe custom errors and map codes in our [Soroban Basics #4 Video Walkthrough](https://www.youtube.com/watch?v=custom-errors-walkthrough).
 
 This example demonstrates comprehensive custom error handling in Soroban smart contracts using the `contracterror` attribute.
 

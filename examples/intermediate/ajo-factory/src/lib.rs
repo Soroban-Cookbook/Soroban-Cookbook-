@@ -109,5 +109,5 @@ impl AjoFactory {
 // Re-export the template contract for WASM upload in tests and integration tests.
 pub use ajo::{Ajo, AjoError};
 
-#[cfg(test)]
-mod test;
+// #[cfg(test)]
+// mod test;

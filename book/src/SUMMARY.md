@@ -107,4 +107,7 @@
 - [Contributing](contributing/README.md)
   - [Code of Conduct](contributing/code-of-conduct.md)
   - [Development Workflow](contributing/development-workflow.md)
+- [Video Tutorials](./examples/video-tutorials.md)
+- [Pause / Unpause](./examples/intermediate.md)
+- [Oracle Pattern](./examples/advanced.md)
 

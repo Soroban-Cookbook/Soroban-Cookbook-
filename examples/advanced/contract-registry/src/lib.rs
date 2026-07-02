@@ -73,7 +73,7 @@ impl ContractRegistry {
             .persistent()
             .get(&RegistryKey::Categories)
             .unwrap_or(Vec::new(&env));
-        if !cats.iter().any(|s| *s == category) {
+        if !cats.iter().any(|s| s == category) {
             cats.push_back(category.clone());
             env.storage()
                 .persistent()
