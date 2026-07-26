@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-e8f92984.js";
+            window.path_to_searchindex_js = "../searchindex-e5b181a8.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-b61c18f1.js"></script>
+        <script src="../toc-4d4fc9ac.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -447,6 +447,8 @@ async function runExampleWorkflow(contractId: string, method: string, args: any[
 </ul>
 <h3 id="mock-wallets-where-applicable"><a class="header" href="#mock-wallets-where-applicable">Mock wallets where applicable</a></h3>
 <p>If you are building a frontend test suite, mock the wallet provider interface instead of trying to depend on the real wallet during automated tests. Keep the mock close to the provider boundary and verify that the app responds correctly to connection success, rejection, and network errors.</p>
+<h3 id="testing-on-mobile"><a class="header" href="#testing-on-mobile">Testing on mobile</a></h3>
+<p>Mobile wallets (xBull, Lobstr) connect over WalletConnect rather than a browser extension, and most retail users reach dApps through a mobile browser. See the <a href="../guides/mobile-testing.html">Mobile Testing Guide</a> for a responsive-layout checklist, the WalletConnect pairing/sign/reject flow to verify, and a device/browser matrix.</p>
 <h3 id="common-debugging-steps"><a class="header" href="#common-debugging-steps">Common debugging steps</a></h3>
 <ol>
 <li>Check whether the wallet is installed and enabled.</li>

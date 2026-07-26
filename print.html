@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e8f92984.js";
+            window.path_to_searchindex_js = "searchindex-e5b181a8.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-b61c18f1.js"></script>
+        <script src="toc-4d4fc9ac.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -1495,6 +1495,117 @@ insta = "1"
 <pre><code class="language-bash">cargo tarpaulin --out Xml --out Html
 </code></pre>
 <p>Reports are written to <code>coverage/</code>. Open <code>coverage/tarpaulin-report.html</code> in a browser for a line-by-line view of what your tests are (and aren’t) hitting.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="mobile-testing-guide"><a class="header" href="#mobile-testing-guide">Mobile Testing Guide</a></h1>
+<p>How to test the Soroban Cookbook web frontend — and dApps built the same way
+— on mobile browsers and mobile wallets.</p>
+<p>This repository doesn’t ship a native mobile app; “mobile testing” here means
+verifying that the <a href="../../webapp">webapp</a> playground and any Soroban dApp built
+against it work correctly on a phone: the page has to render usably on a
+small screen, and wallet connections have to work through the mobile wallet
+flows described in the <a href="#soroban-wallet-ecosystem-survey">Wallet Ecosystem Survey</a>
+and <a href="#wallet-integration-guide">Wallet Integration Guide</a>.</p>
+<hr>
+<h2 id="why-this-matters"><a class="header" href="#why-this-matters">Why This Matters</a></h2>
+<p>Several wallets in the Stellar ecosystem are mobile-first or mobile-only for
+end users — xBull and Lobstr both ship mobile apps, and users reach dApps
+through a mobile browser far more often than through a desktop extension.
+A dApp that only gets tested with a Freighter browser extension on desktop
+can ship with a broken layout or a wallet flow that never completes on the
+device most retail users actually have.</p>
+<h2 id="responsive-testing-checklist"><a class="header" href="#responsive-testing-checklist">Responsive Testing Checklist</a></h2>
+<p>Test the webapp (or any page built on it) at these breakpoints before
+merging a UI change:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Viewport</th><th>Represents</th></tr>
+</thead>
+<tbody>
+<tr><td>360×640</td><td>Small Android phones</td></tr>
+<tr><td>390×844</td><td>Modern iPhone (iOS Safari)</td></tr>
+<tr><td>768×1024</td><td>Tablet / iPad portrait</td></tr>
+</tbody>
+</table>
+</div>
+<p>Check on each breakpoint:</p>
+<ul>
+<li>No horizontal scroll or clipped content</li>
+<li>Buttons and links are large enough to tap (44×44px minimum touch target)</li>
+<li>Modals/dialogs (e.g. a wallet-connect prompt) stay within the viewport and are dismissible</li>
+<li>Text remains readable without zooming</li>
+</ul>
+<h3 id="local-setup"><a class="header" href="#local-setup">Local Setup</a></h3>
+<pre><code class="language-bash">cd webapp
+bun install
+bun run dev
+</code></pre>
+<p>Open the dev server in your browser’s device emulation mode (Chrome DevTools
+device toolbar or Firefox Responsive Design Mode) and step through the
+breakpoints above. For a final check before a release, test on at least one
+real iOS and one real Android device — emulators don’t reproduce mobile
+Safari’s viewport quirks or a mobile wallet app’s in-app browser behavior.</p>
+<h2 id="testing-mobile-wallet-connections"><a class="header" href="#testing-mobile-wallet-connections">Testing Mobile Wallet Connections</a></h2>
+<p>Mobile wallet connections typically go through <strong>WalletConnect v2</strong> rather
+than a browser extension (see <a href="#3-standards-compliance">Standards Compliance</a>
+in the wallet ecosystem survey). Verify the full flow end to end:</p>
+<ol>
+<li><strong>Connect</strong> — open the dApp on desktop, trigger the wallet-connect flow,
+and scan the resulting QR code with the mobile wallet app (xBull or
+Lobstr). Confirm the session pairs successfully.</li>
+<li><strong>Sign</strong> — trigger a transaction from the dApp and confirm the mobile
+wallet displays a clear signing prompt with the correct network
+(Testnet vs. Mainnet — see <a href="#network-configuration-2">Network Configuration</a>).</li>
+<li><strong>Reject</strong> — decline the signing prompt on the mobile wallet and confirm
+the dApp surfaces a clear “user rejected” state rather than hanging.</li>
+<li><strong>Reconnect</strong> — background the wallet app or lock the phone mid-session,
+then return to the dApp and confirm it recovers or clearly asks the user
+to reconnect rather than silently failing.</li>
+<li><strong>Wrong network</strong> — switch the mobile wallet to the wrong network before
+signing, and confirm the dApp catches the mismatch instead of submitting
+a doomed transaction.</li>
+</ol>
+<p>For automated coverage, follow the same “mock the wallet provider” approach
+described in the <a href="#testing-guide-1">Wallet Integration Guide’s Testing Guide</a> —
+mock at the provider boundary rather than depending on a real mobile device
+in CI.</p>
+<h2 id="device--browser-matrix"><a class="header" href="#device--browser-matrix">Device &amp; Browser Matrix</a></h2>
+<p>Minimum manual QA coverage before a frontend release:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Platform</th><th>Browser</th><th>Priority</th></tr>
+</thead>
+<tbody>
+<tr><td>iOS</td><td>Safari</td><td>Critical — iOS only allows WebKit-based browsers</td></tr>
+<tr><td>Android</td><td>Chrome</td><td>Critical — largest mobile user base</td></tr>
+<tr><td>Android</td><td>Samsung Internet</td><td>Recommended if analytics show meaningful traffic</td></tr>
+<tr><td>iOS / Android</td><td>In-app browser of the wallet app (xBull, Lobstr)</td><td>Critical for WalletConnect deep-link flows</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="common-mobile-specific-issues"><a class="header" href="#common-mobile-specific-issues">Common Mobile-Specific Issues</a></h2>
+<ul>
+<li><strong>Viewport meta tag missing or wrong</strong> — causes desktop-scaled rendering on
+phones. Confirm <code>&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</code>
+is present in the app’s layout.</li>
+<li><strong>QR code too small to scan</strong> — WalletConnect QR modals need to render at a
+large enough size on small screens; test the modal at the 360×640
+breakpoint specifically.</li>
+<li><strong>Deep links not returning to the browser tab</strong> — after signing in a wallet
+app opened via deep link, mobile OSes don’t always return focus to the
+originating browser tab automatically; verify your app’s reconnect/resume
+logic handles this.</li>
+<li><strong>Fixed-position elements covering content</strong> — sticky headers/footers can
+overlap content on short mobile viewports; check with the on-screen
+keyboard open, which shrinks the visible viewport further.</li>
+</ul>
+<h2 id="related-guides"><a class="header" href="#related-guides">Related Guides</a></h2>
+<ul>
+<li><a href="#soroban-wallet-ecosystem-survey">Wallet Ecosystem Survey</a> — which wallets support mobile and how</li>
+<li><a href="#wallet-integration-guide">Wallet Integration Guide</a> — connecting and signing, including the existing Testing Guide section</li>
+<li><a href="#deployment-guide-1">Deployment Guide</a> — network configuration referenced above</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="local-simulation-guide"><a class="header" href="#local-simulation-guide">Local Simulation Guide</a></h1>
 <p>How to build, invoke, and debug Soroban contracts entirely on your machine before touching testnet.</p>
@@ -9040,6 +9151,9 @@ async function signTx(xdrString) {
 <li><strong>Albedo (Priority 3 - Medium)</strong>: Essential fallback for mobile users who want to avoid installing mobile apps or extensions.</li>
 <li><strong>Lobstr (Priority 4 - Low/Future)</strong>: Integrate once your application is deployed to Mainnet and target retail users holding standard Stellar/Soroban assets.</li>
 </ol>
+<hr>
+<h2 id="testing-mobile-wallet-flows"><a class="header" href="#testing-mobile-wallet-flows">Testing Mobile Wallet Flows</a></h2>
+<p>xBull and Lobstr are mobile-first for most end users, so a wallet integration that only works with the Freighter desktop extension is untested for the majority of retail traffic. See the <a href="#mobile-testing-guide">Mobile Testing Guide</a> for the WalletConnect pairing/sign/reject flow to verify and a device/browser QA matrix.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="wallet-integration-guide"><a class="header" href="#wallet-integration-guide">Wallet Integration Guide</a></h1>
 <p>This guide helps Soroban developers add wallet support to web applications, dashboards, and frontends that interact with Stellar smart contracts. It focuses on practical integration patterns, expected user flows, and production recommendations for common wallets in the Stellar ecosystem.</p>
@@ -9308,6 +9422,8 @@ async function runExampleWorkflow(contractId: string, method: string, args: any[
 </ul>
 <h3 id="mock-wallets-where-applicable"><a class="header" href="#mock-wallets-where-applicable">Mock wallets where applicable</a></h3>
 <p>If you are building a frontend test suite, mock the wallet provider interface instead of trying to depend on the real wallet during automated tests. Keep the mock close to the provider boundary and verify that the app responds correctly to connection success, rejection, and network errors.</p>
+<h3 id="testing-on-mobile"><a class="header" href="#testing-on-mobile">Testing on mobile</a></h3>
+<p>Mobile wallets (xBull, Lobstr) connect over WalletConnect rather than a browser extension, and most retail users reach dApps through a mobile browser. See the <a href="#mobile-testing-guide">Mobile Testing Guide</a> for a responsive-layout checklist, the WalletConnect pairing/sign/reject flow to verify, and a device/browser matrix.</p>
 <h3 id="common-debugging-steps"><a class="header" href="#common-debugging-steps">Common debugging steps</a></h3>
 <ol>
 <li>Check whether the wallet is installed and enabled.</li>
