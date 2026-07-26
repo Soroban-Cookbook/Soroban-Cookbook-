@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-e5b181a8.js";
+            window.path_to_searchindex_js = "searchindex-6a07e20d.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-4d4fc9ac.js"></script>
@@ -10109,6 +10109,8 @@ copy-js = true
 <p>To rebuild the search index after adding new content:</p>
 <pre><code class="language-bash">cd book &amp;&amp; mdbook build
 </code></pre>
+<h2 id="rebuild-on-deploy"><a class="header" href="#rebuild-on-deploy">Rebuild on Deploy</a></h2>
+<p>You don’t need to publish the rebuilt index yourself. The <code>Deploy Docs</code> GitHub Actions workflow (<code>.github/workflows/deploy-docs.yml</code>) runs <code>mdbook build</code> and pushes the output — including the freshly generated <code>searchindex.json</code> — to the <code>gh-pages</code> branch on every push to <code>main</code>. So once your content change merges, the live search index picks it up automatically on the next deploy; running <code>mdbook build</code> locally is only needed to preview your changes before opening a PR.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="community-guidelines"><a class="header" href="#community-guidelines">Community Guidelines</a></h1>
 <p>Welcome to the Soroban Cookbook community. These guidelines exist to keep our spaces welcoming, productive, and safe for everyone.</p>
