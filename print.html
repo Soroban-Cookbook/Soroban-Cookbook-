@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-6a07e20d.js";
+            window.path_to_searchindex_js = "searchindex-90237600.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-4d4fc9ac.js"></script>
@@ -2168,6 +2168,57 @@ fn check_not_paused(env: &amp;Env) {
     }
 }
 <span class="boring">}</span></code></pre>
+<hr>
+<h2 id="monitoring--alerting"><a class="header" href="#monitoring--alerting-1">Monitoring &amp; Alerting</a></h2>
+<p>Deploying a contract is not the end of the operational lifecycle — a mainnet
+contract needs ongoing monitoring so the team hears about problems before
+users do.</p>
+<h3 id="what-to-monitor"><a class="header" href="#what-to-monitor-1">What to Monitor</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Signal</th><th>Why it matters</th><th>How to check</th></tr>
+</thead>
+<tbody>
+<tr><td>Invocation failures</td><td>Spikes usually mean a bad client release, an auth regression, or an upstream RPC issue</td><td>Poll <code>soroban events</code> or a Horizon/RPC operations feed for the contract ID and track failure rate over time</td></tr>
+<tr><td>Storage TTL / rent</td><td>Persistent or instance entries that expire mid-operation cause unexpected <code>MissingValue</code> panics</td><td>Track <code>env.storage().*().get_ttl()</code> output for key entries, or query ledger entry TTL via RPC <code>getLedgerEntries</code></td></tr>
+<tr><td>Admin / fee-payer account balance</td><td>A drained fee-payer account blocks every invocation until refunded</td><td>Check balance with <code>soroban keys balance &lt;identity&gt; --network mainnet</code> on a schedule</td></tr>
+<tr><td>Contract paused state</td><td>Confirms an emergency pause (see <a href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a>) was intentional and not accidental</td><td>Invoke a read-only status/<code>paused</code> getter and compare against the expected state</td></tr>
+<tr><td>CI/CD pipeline health</td><td>A red pipeline on <code>main</code> means the next deploy is blocked</td><td>Watch the <strong>Test and Lint</strong> and <strong>Deploy Docs</strong> workflow runs described in <code>.github/workflows/README.md</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="dashboards"><a class="header" href="#dashboards-1">Dashboards</a></h3>
+<ul>
+<li><strong>Stellar Expert</strong> (<code>https://stellar.expert</code>) and <strong>Stellar Laboratory</strong> — inspect contract invocations, events, and balances for a given contract ID without any extra setup.</li>
+<li><strong>GitHub Actions</strong> — the <em>Actions</em> tab on the repository is the dashboard of record for build/test/deploy health; failing runs on <code>main</code> should be treated as a P1 signal.</li>
+<li><strong>Codecov</strong> — the coverage dashboard configured in <code>codecov.yml</code> flags coverage regressions on each PR.</li>
+</ul>
+<p>For teams that need alerting rather than manual dashboard checks, a small
+cron job or scheduled Action that polls <code>soroban events</code> / RPC and posts to
+your existing chat/pager tooling on threshold breaches is enough to start —
+there is no dependency on a specific vendor.</p>
+<h3 id="alert-response-runbook"><a class="header" href="#alert-response-runbook-1">Alert Response Runbook</a></h3>
+<ol>
+<li><strong>Acknowledge</strong> — confirm the alert is real (check the dashboard/RPC query
+named in the “How to check” column above) before taking action.</li>
+<li><strong>Assess blast radius</strong> — is this one failing invocation type, or every
+call to the contract? Check recent events for the contract ID to see
+whether it correlates with a specific function or caller.</li>
+<li><strong>Contain if needed</strong> — if funds or state integrity are at risk, use the
+<a href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a> to stop further writes
+while you investigate.</li>
+<li><strong>Diagnose</strong> — reproduce against Testnet with the same inputs where
+possible, and check the <a href="#fee-estimation-1">Fee Estimation</a> simulate output
+for resource/fee-related failures.</li>
+<li><strong>Resolve</strong> — deploy a fix via the normal <a href="#mainnet-deployment-steps-1">Mainnet Deployment
+Steps</a>, or extend TTL for entries close to
+expiry using <code>extend_ttl</code>.</li>
+<li><strong>Unpause and verify</strong> — once the fix is confirmed on Testnet and deployed,
+unpause and re-run the read-only checks from the monitoring table above.</li>
+<li><strong>Record</strong> — note the trigger, timeline, and resolution somewhere durable
+(issue tracker or incident log) so the next on-call has context.</li>
+</ol>
 <hr>
 <h2 id="additional-resources-1"><a class="header" href="#additional-resources-2">Additional Resources</a></h2>
 <ul>
@@ -11541,6 +11592,57 @@ fn check_not_paused(env: &amp;Env) {
     }
 }
 <span class="boring">}</span></code></pre>
+<hr>
+<h2 id="monitoring--alerting-1"><a class="header" href="#monitoring--alerting-1">Monitoring &amp; Alerting</a></h2>
+<p>Deploying a contract is not the end of the operational lifecycle — a mainnet
+contract needs ongoing monitoring so the team hears about problems before
+users do.</p>
+<h3 id="what-to-monitor-1"><a class="header" href="#what-to-monitor-1">What to Monitor</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Signal</th><th>Why it matters</th><th>How to check</th></tr>
+</thead>
+<tbody>
+<tr><td>Invocation failures</td><td>Spikes usually mean a bad client release, an auth regression, or an upstream RPC issue</td><td>Poll <code>soroban events</code> or a Horizon/RPC operations feed for the contract ID and track failure rate over time</td></tr>
+<tr><td>Storage TTL / rent</td><td>Persistent or instance entries that expire mid-operation cause unexpected <code>MissingValue</code> panics</td><td>Track <code>env.storage().*().get_ttl()</code> output for key entries, or query ledger entry TTL via RPC <code>getLedgerEntries</code></td></tr>
+<tr><td>Admin / fee-payer account balance</td><td>A drained fee-payer account blocks every invocation until refunded</td><td>Check balance with <code>soroban keys balance &lt;identity&gt; --network mainnet</code> on a schedule</td></tr>
+<tr><td>Contract paused state</td><td>Confirms an emergency pause (see <a href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a>) was intentional and not accidental</td><td>Invoke a read-only status/<code>paused</code> getter and compare against the expected state</td></tr>
+<tr><td>CI/CD pipeline health</td><td>A red pipeline on <code>main</code> means the next deploy is blocked</td><td>Watch the <strong>Test and Lint</strong> and <strong>Deploy Docs</strong> workflow runs described in <code>.github/workflows/README.md</code></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="dashboards-1"><a class="header" href="#dashboards-1">Dashboards</a></h3>
+<ul>
+<li><strong>Stellar Expert</strong> (<code>https://stellar.expert</code>) and <strong>Stellar Laboratory</strong> — inspect contract invocations, events, and balances for a given contract ID without any extra setup.</li>
+<li><strong>GitHub Actions</strong> — the <em>Actions</em> tab on the repository is the dashboard of record for build/test/deploy health; failing runs on <code>main</code> should be treated as a P1 signal.</li>
+<li><strong>Codecov</strong> — the coverage dashboard configured in <code>codecov.yml</code> flags coverage regressions on each PR.</li>
+</ul>
+<p>For teams that need alerting rather than manual dashboard checks, a small
+cron job or scheduled Action that polls <code>soroban events</code> / RPC and posts to
+your existing chat/pager tooling on threshold breaches is enough to start —
+there is no dependency on a specific vendor.</p>
+<h3 id="alert-response-runbook-1"><a class="header" href="#alert-response-runbook-1">Alert Response Runbook</a></h3>
+<ol>
+<li><strong>Acknowledge</strong> — confirm the alert is real (check the dashboard/RPC query
+named in the “How to check” column above) before taking action.</li>
+<li><strong>Assess blast radius</strong> — is this one failing invocation type, or every
+call to the contract? Check recent events for the contract ID to see
+whether it correlates with a specific function or caller.</li>
+<li><strong>Contain if needed</strong> — if funds or state integrity are at risk, use the
+<a href="#pause--unpause-pattern-1">Pause / Unpause Pattern</a> to stop further writes
+while you investigate.</li>
+<li><strong>Diagnose</strong> — reproduce against Testnet with the same inputs where
+possible, and check the <a href="#fee-estimation-1">Fee Estimation</a> simulate output
+for resource/fee-related failures.</li>
+<li><strong>Resolve</strong> — deploy a fix via the normal <a href="#mainnet-deployment-steps-1">Mainnet Deployment
+Steps</a>, or extend TTL for entries close to
+expiry using <code>extend_ttl</code>.</li>
+<li><strong>Unpause and verify</strong> — once the fix is confirmed on Testnet and deployed,
+unpause and re-run the read-only checks from the monitoring table above.</li>
+<li><strong>Record</strong> — note the trigger, timeline, and resolution somewhere durable
+(issue tracker or incident log) so the next on-call has context.</li>
+</ol>
 <hr>
 <h2 id="additional-resources-2"><a class="header" href="#additional-resources-2">Additional Resources</a></h2>
 <ul>
