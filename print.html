@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-3a155f3c.js";
+            window.path_to_searchindex_js = "searchindex-fb340c85.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-b69c7e54.js"></script>
+        <script src="toc-6d5c7224.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -3068,6 +3068,52 @@ cargo test --workspace
 <li><code>book/src/README.md</code> (main introduction)</li>
 <li>Repository root <code>README.md</code></li>
 <li>YouTube playlist: “Getting Started with Soroban”</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="playground-infrastructure"><a class="header" href="#playground-infrastructure">Playground Infrastructure</a></h1>
+<p>The Soroban Cookbook playground is the local Cargo workspace at the root of
+this repository. There is no separate service to install — cloning the repo
+gives you a working playground for every example in the book.</p>
+<h2 id="framework"><a class="header" href="#framework">Framework</a></h2>
+<p>The playground is a standard Rust/Cargo workspace (see the root <code>Cargo.toml</code>).
+Every example lives under <code>examples/</code> as its own workspace member, so you can
+build, edit, and test any single example without touching the others.</p>
+<h2 id="soroban-sdk-integration"><a class="header" href="#soroban-sdk-integration">Soroban SDK Integration</a></h2>
+<p>The <code>soroban-sdk</code> version is pinned once, at the workspace level:</p>
+<pre><code class="language-toml">[workspace.dependencies]
+soroban-sdk = "26.0.0-rc.1"
+</code></pre>
+<p>Each example crate depends on <code>soroban-sdk.workspace = true</code>, so every
+contract in the playground builds against the same SDK version.</p>
+<h2 id="build-system"><a class="header" href="#build-system">Build System</a></h2>
+<pre><code class="language-bash"># Add the Wasm target once
+rustup target add wasm32-unknown-unknown
+
+# Build a single example
+cargo build --manifest-path examples/basics/01-hello-world/Cargo.toml \
+            --target wasm32-unknown-unknown --release
+
+# Build every workspace member
+cargo build --workspace --target wasm32-unknown-unknown --release
+</code></pre>
+<h2 id="testing-capability"><a class="header" href="#testing-capability">Testing Capability</a></h2>
+<pre><code class="language-bash"># Test a single example
+cargo test --manifest-path examples/basics/01-hello-world/Cargo.toml
+
+# Test the full workspace
+cargo test --workspace
+</code></pre>
+<p>Cross-example integration and security tests live in <code>tests/integration</code>
+and <code>tests/security</code>, and are included as workspace members so
+<code>cargo test --workspace</code> runs them alongside the individual examples.</p>
+<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
+<ul>
+<li><a href="#interactive-playground--basic-examples">Interactive Playground — Basic Examples</a> walks
+through all 14 basics examples with runnable snippets.</li>
+<li><a href="#getting-started-with-soroban">Setup Environment</a> covers installing Rust,
+the Wasm target, and the Soroban CLI from scratch.</li>
+<li><a href="#testing-guide-2">Testing Guide</a> covers mocking auth, time
+manipulation, and event assertions when writing your own tests.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="all-examples-index"><a class="header" href="#all-examples-index">All Examples Index</a></h1>
