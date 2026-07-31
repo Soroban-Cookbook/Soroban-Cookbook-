@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-10251377.js";
+            window.path_to_searchindex_js = "searchindex-cbfc77fd.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-57ea911b.js"></script>
@@ -5054,13 +5054,13 @@ fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), PauseError&gt; {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="storage-migration-storage-migration"><a class="header" href="#storage-migration-storage-migration">Storage Migration <a href="examples/intermediate/storage-migration">./storage-migration/</a></a></h3>
-<p><strong>Versioned storage upgrades.</strong> Stage migrations, transform legacy storage, and execute in safe batches.</p>
+<p><strong>Versioned storage upgrades.</strong> Stage migrations, transform legacy storage, and execute in safe batches with explicit version checks and rollback-friendly state.</p>
 <p><strong>Key Concepts:</strong></p>
 <ul>
-<li>Explicit version tracking</li>
-<li>Prepared migration state</li>
-<li>Chunked batch execution</li>
-<li>Safe rollback/cancellation</li>
+<li>Explicit version tracking with guarded upgrade paths</li>
+<li>Prepared migration state for staged, batched execution</li>
+<li>Concrete legacy-to-new data transforms such as <code>migrate_v1_to_v2()</code></li>
+<li>Safe rollback/cancellation and migration-safety tests</li>
 </ul>
 <h3 id="event-history-event-history"><a class="header" href="#event-history-event-history">Event History <a href="examples/intermediate/event-history">./event-history/</a></a></h3>
 <p><strong>On-chain audit history.</strong> Record event entries persistently and query them with cursor-based pagination and time filters.</p>
