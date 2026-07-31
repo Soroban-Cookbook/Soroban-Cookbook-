@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-fb340c85.js";
+            window.path_to_searchindex_js = "searchindex-10251377.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-6d5c7224.js"></script>
+        <script src="toc-57ea911b.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -5178,6 +5178,15 @@ fn test_factory() {
 <hr>
 <h3 id="02-timelock-1"><a class="header" href="#02-timelock-1"><a href="examples/advanced/02-timelock">02-timelock</a></a></h3>
 <p><strong>Delayed execution</strong> for governance &amp; security.</p>
+<hr>
+<h3 id="03-permit-pattern"><a class="header" href="#03-permit-pattern"><a href="examples/advanced/03-permit-pattern">03-permit-pattern</a></a></h3>
+<p><strong>Permit-based approvals</strong> with signature-backed authorization and deadline enforcement.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Off-chain authorization envelopes</li>
+<li>Permit-based allowance setup</li>
+<li>Deadline validation and expiry handling</li>
+</ul>
 <p><strong>Key Concepts:</strong></p>
 <ul>
 <li>Ledger-timestamp gates</li>
@@ -8558,6 +8567,44 @@ vec.push_back(42);
 </ul>
 <h2 id="contributing-1"><a class="header" href="#contributing-1">Contributing</a></h2>
 <p>Found a term that’s missing or needs clarification? Please open an issue or submit a PR to help improve this glossary!</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="translation-infrastructure"><a class="header" href="#translation-infrastructure">Translation Infrastructure</a></h1>
+<p>The Soroban Cookbook uses a structured translation process so that the English documentation remains the source of truth while localized content can be introduced safely over time.</p>
+<h2 id="selected-translation-system"><a class="header" href="#selected-translation-system">Selected Translation System</a></h2>
+<p>We recommend using Crowdin as the translation management platform for this repository.</p>
+<p>Why Crowdin fits the project:</p>
+<ul>
+<li>GitHub-friendly workflows for pull requests and review</li>
+<li>Support for glossary and terminology consistency</li>
+<li>Clear translation status tracking for each locale</li>
+<li>A low-friction path for contributors who want to localize docs without changing the main build process</li>
+</ul>
+<h2 id="i18n-framework-configuration"><a class="header" href="#i18n-framework-configuration">i18n Framework Configuration</a></h2>
+<p>The repository now includes a Crowdin configuration file at <a href="../.crowdin.yml">.crowdin.yml</a> to define the translation source and target layout for the mdBook content.</p>
+<p>The current configuration targets the Markdown sources under the mdBook tree so that translations can be managed independently from the build output.</p>
+<h2 id="translation-workflow"><a class="header" href="#translation-workflow">Translation Workflow</a></h2>
+<ol>
+<li>Update the English source content in the mdBook source tree under <code>book/src/</code>.</li>
+<li>Open or update a pull request for the change.</li>
+<li>Upload the new or modified strings to Crowdin for translation.</li>
+<li>Review translated content and resolve any terminology or formatting issues.</li>
+<li>Merge approved translations back into the repository and run the documentation build.</li>
+</ol>
+<h2 id="quality-assurance-process"><a class="header" href="#quality-assurance-process">Quality Assurance Process</a></h2>
+<p>All translation work should follow the same quality checks as regular documentation updates:</p>
+<ul>
+<li>Run <code>cd book &amp;&amp; mdbook build</code> after content changes.</li>
+<li>Verify that links and relative references still resolve correctly.</li>
+<li>Review translated strings for technical accuracy and tone.</li>
+<li>Ensure terminology remains consistent with the glossary and existing docs.</li>
+</ul>
+<h2 id="documentation-ownership"><a class="header" href="#documentation-ownership">Documentation Ownership</a></h2>
+<ul>
+<li>English content remains maintained by repository contributors.</li>
+<li>Locale maintainers review translations for their language.</li>
+<li>New pages should be added to the mdBook summary so they remain discoverable in both source and translated builds.</li>
+</ul>
+<p>This setup gives the repository a practical foundation for translation work while keeping the existing mdBook workflow intact.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="common-patterns"><a class="header" href="#common-patterns">Common Patterns</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
