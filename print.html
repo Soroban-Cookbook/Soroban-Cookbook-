@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-cbfc77fd.js";
+            window.path_to_searchindex_js = "searchindex-2b060419.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-57ea911b.js"></script>
+        <script src="toc-22be0ae8.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -5166,7 +5166,7 @@ fn test_factory() {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="advanced-examples"><a class="header" href="#advanced-examples">Advanced Examples</a></h1>
 <p>Complex protocols &amp; optimizations for production systems.</p>
-<h2 id="-examples-2-currently"><a class="header" href="#-examples-2-currently">📋 Examples (2 currently)</a></h2>
+<h2 id="-examples-5-currently"><a class="header" href="#-examples-5-currently">📋 Examples (5 currently)</a></h2>
 <h3 id="01-multi-party-auth-1"><a class="header" href="#01-multi-party-auth-1"><a href="examples/advanced/01-multi-party-auth">01-multi-party-auth</a></a></h3>
 <p><strong>Advanced multi-party authorization</strong> beyond simple multisig.</p>
 <p><strong>Key Concepts:</strong></p>
@@ -5226,6 +5226,32 @@ let value = client.get_value_strict(); // errors if stale
 <li>Access control per facet (restricting direct execution to proxy)</li>
 <li>Upgrade checks &amp; interface supports verification</li>
 <li>Namespaced key isolation to prevent shared storage collisions</li>
+</ul>
+<h3 id="11-version-registry"><a class="header" href="#11-version-registry"><a href="examples/advanced/11-version-registry">11-version-registry</a></a></h3>
+<p><strong>Contract version tracking</strong> with history and rollback support.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Version registration with metadata</li>
+<li>Per-contract version history</li>
+<li>Admin-controlled rollback</li>
+</ul>
+<hr>
+<h3 id="08-batch-operations"><a class="header" href="#08-batch-operations"><a href="examples/advanced/08-batch-operations">08-batch-operations</a></a></h3>
+<p><strong>Batch operations</strong> with atomic and partial execution.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Batch call interface</li>
+<li>Atomic execution with rollback</li>
+<li>Partial execution mode</li>
+</ul>
+<hr>
+<h3 id="09-storage-optimization"><a class="header" href="#09-storage-optimization"><a href="examples/advanced/09-storage-optimization">09-storage-optimization</a></a></h3>
+<p><strong>Storage optimization</strong> patterns for efficient contracts.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Packed storage (grouping fields)</li>
+<li>Lazy loading patterns</li>
+<li>Batch operations</li>
 </ul>
 <p><strong>[More coming…]</strong> Factories, bonding curves, merkle proofs.</p>
 <h2 id="-warning"><a class="header" href="#-warning">⚠️ Warning</a></h2>
@@ -10572,6 +10598,119 @@ Translations are available at
 <h1 id="qa-process"><a class="header" href="#qa-process">Q&amp;A Process</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="follow-up-process"><a class="header" href="#follow-up-process">Follow-up Process</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="soroban-cookbook-中文文档"><a class="header" href="#soroban-cookbook-中文文档">Soroban Cookbook 中文文档</a></h1>
+<p><strong>使用 Stellar 和 Soroban 构建智能合约的综合指南</strong></p>
+<h2 id="关于"><a class="header" href="#关于">关于</a></h2>
+<p>Soroban Cookbook 是开发者在 Stellar 网络上使用 Soroban 构建智能合约的指南。本文档为各个级别的开发者提供清晰、文档完善的示例和实用模式——从你的第一个 “Hello World” 合约到复杂的 DeFi 协议。</p>
+<h2 id="快速开始"><a class="header" href="#快速开始">快速开始</a></h2>
+<pre><code class="language-bash"># 安装 Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source "$HOME/.cargo/env"
+
+# 添加 WebAssembly 目标
+rustup target add wasm32-unknown-unknown
+
+# 安装 Stellar CLI
+cargo install --locked stellar-cli --version 22.1.0
+
+# 克隆仓库
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
+cd Soroban-Cookbook-
+
+# 运行基础示例
+cd examples/basics/01-hello-world
+cargo test
+</code></pre>
+<h2 id="仓库结构"><a class="header" href="#仓库结构">仓库结构</a></h2>
+<pre><code>Soroban-Cookbook/
+├── examples/               # 智能合约示例
+│   ├── basics/             # 初学者基础
+│   ├── intermediate/       # 常见模式
+│   ├── advanced/           # 复杂系统和协议
+│   ├── defi/               # DeFi 示例
+│   ├── nfts/               # NFT 实现
+│   ├── governance/         # DAO 和投票系统
+│   └── tokens/             # 代币标准
+├── book/                   # mdBook 文档源码
+├── tests/                  # 集成和安全测试
+└── scripts/                # 构建和部署脚本
+</code></pre>
+<h2 id="按难度分类的示例"><a class="header" href="#按难度分类的示例">按难度分类的示例</a></h2>
+<h3 id="基础"><a class="header" href="#基础">基础</a></h3>
+<p>核心 Soroban 概念，逐一学习。</p>
+<ul>
+<li>01-hello-world: 合约结构，<code>#[contract]</code> / <code>#[contractimpl]</code>，单元测试</li>
+<li>02-storage-patterns: <code>persistent</code>，<code>instance</code>，<code>temporary</code> 存储，TTL</li>
+<li>03-authentication: <code>require_auth()</code>，管理员角色，余额管理</li>
+<li>03-custom-errors: <code>#[contracterror]</code>，错误码</li>
+<li>04-events: <code>env.events().publish()</code>，主题设计</li>
+<li>05-error-handling: 错误枚举，验证，传播</li>
+<li>06-validation-patterns: 前置条件检查，溢出安全运算</li>
+</ul>
+<h3 id="中级"><a class="header" href="#中级">中级</a></h3>
+<p>常见模式和实际用例。</p>
+<ul>
+<li>跨合约模式：工厂、代理、注册表</li>
+<li>访问控制：多签模式、RBAC、时间锁</li>
+<li>代币交互和包装器</li>
+</ul>
+<h3 id="高级"><a class="header" href="#高级">高级</a></h3>
+<p>适合有经验开发者的复杂系统。</p>
+<ul>
+<li>01-multi-party-auth: 阈值签名、多方授权</li>
+<li>02-timelock: 延时执行、队列/取消/执行</li>
+</ul>
+<h2 id="代码质量标准"><a class="header" href="#代码质量标准">代码质量标准</a></h2>
+<p>本 Cookbook 中的每个示例：</p>
+<ul>
+<li>使用最新的稳定 Soroban SDK 成功编译</li>
+<li>包含全面的单元测试和集成测试</li>
+<li>强制执行严格的安全边界和 Rust/Soroban 最佳实践</li>
+<li>通过所有 CI/CD 流水线，包括格式化、Clippy 和测试套件</li>
+</ul>
+<h2 id="贡献"><a class="header" href="#贡献">贡献</a></h2>
+<p>欢迎贡献。请参阅贡献指南和社区准则。也请阅读我们的行为准则。</p>
+<h2 id="更多资源"><a class="header" href="#更多资源">更多资源</a></h2>
+<ul>
+<li><a href="https://developers.stellar.org/docs/smart-contracts">Soroban 文档</a></li>
+<li><a href="https://developers.stellar.org">Stellar 开发者门户</a></li>
+<li><a href="https://github.com/stellar/rs-soroban-sdk">Soroban Rust SDK</a></li>
+<li><a href="https://discord.gg/stellardev">Stellar 社区 Discord</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="目录"><a class="header" href="#目录">目录</a></h1>
+<p><a href="zh/README.html">简介</a></p>
+<h1 id="入门指南"><a class="header" href="#入门指南">入门指南</a></h1>
+<ul>
+<li><a href="#getting-started-with-soroban">环境设置</a></li>
+<li><a href="#macos-environment-setup">macOS 设置指南</a></li>
+</ul>
+<h1 id="指南"><a class="header" href="#指南">指南</a></h1>
+<ul>
+<li><a href="#testing-guide-2">测试指南</a></li>
+<li><a href="#deployment-guide-1">部署指南</a></li>
+<li><a href="#local-simulation-guide">本地模拟</a></li>
+</ul>
+<h1 id="示例"><a class="header" href="#示例">示例</a></h1>
+<ul>
+<li><a href="#all-examples-index">所有示例索引</a></li>
+<li><a href="#basic-examples">基础示例</a></li>
+<li><a href="#intermediate-examples">中级示例</a></li>
+<li><a href="#advanced-examples">高级示例</a></li>
+</ul>
+<h1 id="api-参考"><a class="header" href="#api-参考">API 参考</a></h1>
+<ul>
+<li><a href="#soroban-quick-reference">快速参考</a></li>
+<li><a href="#soroban-smart-contract-best-practices">最佳实践</a></li>
+<li><a href="#soroban--stellar-glossary">术语表</a></li>
+</ul>
+<h1 id="社区"><a class="header" href="#社区">社区</a></h1>
+<ul>
+<li><a href="#community-guidelines">社区指南</a></li>
+<li><a href="#contributing-to-soroban-cookbook">如何贡献</a></li>
+<li><a href="#contributor-covenant-code-of-conduct">行为准则</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="architecture-decision-records"><a class="header" href="#architecture-decision-records">Architecture Decision Records</a></h1>
 <p>This section contains Architecture Decision Records (ADRs) for the Soroban Cookbook project.</p>

@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-cbfc77fd.js";
+            window.path_to_searchindex_js = "../searchindex-2b060419.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-57ea911b.js"></script>
+        <script src="../toc-22be0ae8.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -182,7 +182,7 @@
                     <main>
                         <h1 id="advanced-examples"><a class="header" href="#advanced-examples">Advanced Examples</a></h1>
 <p>Complex protocols &amp; optimizations for production systems.</p>
-<h2 id="-examples-2-currently"><a class="header" href="#-examples-2-currently">📋 Examples (2 currently)</a></h2>
+<h2 id="-examples-5-currently"><a class="header" href="#-examples-5-currently">📋 Examples (5 currently)</a></h2>
 <h3 id="01-multi-party-auth"><a class="header" href="#01-multi-party-auth"><a href="../examples/advanced/01-multi-party-auth/">01-multi-party-auth</a></a></h3>
 <p><strong>Advanced multi-party authorization</strong> beyond simple multisig.</p>
 <p><strong>Key Concepts:</strong></p>
@@ -242,6 +242,32 @@ let value = client.get_value_strict(); // errors if stale
 <li>Access control per facet (restricting direct execution to proxy)</li>
 <li>Upgrade checks &amp; interface supports verification</li>
 <li>Namespaced key isolation to prevent shared storage collisions</li>
+</ul>
+<h3 id="11-version-registry"><a class="header" href="#11-version-registry"><a href="../examples/advanced/11-version-registry/">11-version-registry</a></a></h3>
+<p><strong>Contract version tracking</strong> with history and rollback support.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Version registration with metadata</li>
+<li>Per-contract version history</li>
+<li>Admin-controlled rollback</li>
+</ul>
+<hr>
+<h3 id="08-batch-operations"><a class="header" href="#08-batch-operations"><a href="../examples/advanced/08-batch-operations/">08-batch-operations</a></a></h3>
+<p><strong>Batch operations</strong> with atomic and partial execution.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Batch call interface</li>
+<li>Atomic execution with rollback</li>
+<li>Partial execution mode</li>
+</ul>
+<hr>
+<h3 id="09-storage-optimization"><a class="header" href="#09-storage-optimization"><a href="../examples/advanced/09-storage-optimization/">09-storage-optimization</a></a></h3>
+<p><strong>Storage optimization</strong> patterns for efficient contracts.</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li>Packed storage (grouping fields)</li>
+<li>Lazy loading patterns</li>
+<li>Batch operations</li>
 </ul>
 <p><strong>[More coming…]</strong> Factories, bonding curves, merkle proofs.</p>
 <h2 id="-warning"><a class="header" href="#-warning">⚠️ Warning</a></h2>
