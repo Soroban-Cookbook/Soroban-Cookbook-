@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1ff19a26.js";
+            window.path_to_searchindex_js = "searchindex-84cc2e0f.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-c4272aba.js"></script>
+        <script src="toc-e84b672a.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -7898,6 +7898,449 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 <li><strong>Cover all branches:</strong> Ensure that conditional branches are evaluated for both truthy and falsy states.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="testing-pitfalls"><a class="header" href="#testing-pitfalls">Testing Pitfalls</a></h1>
+<p>Common testing mistakes in Soroban smart contract development and how to avoid them.</p>
+<hr>
+<h2 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-insufficient-test-coverage">Insufficient Test Coverage</a></li>
+<li><a href="#2-missing-edge-cases">Missing Edge Cases</a></li>
+<li><a href="#3-flaky-tests">Flaky Tests</a></li>
+<li><a href="#4-poor-test-organization">Poor Test Organization</a></li>
+<li><a href="#5-missing-integration-tests">Missing Integration Tests</a></li>
+<li><a href="#6-best-practices">Best Practices</a></li>
+</ol>
+<hr>
+<h2 id="1-insufficient-test-coverage"><a class="header" href="#1-insufficient-test-coverage">1. Insufficient Test Coverage</a></h2>
+<h3 id="problem"><a class="header" href="#problem">Problem</a></h3>
+<p>Tests only cover happy paths, leaving critical error conditions and edge cases untested.</p>
+<h3 id="examples-4"><a class="header" href="#examples-4">Examples</a></h3>
+<ul>
+<li>Testing only successful transfers, not insufficient balance cases</li>
+<li>Testing only valid inputs, not boundary values or invalid types</li>
+<li>Testing only authorized calls, not unauthorized access attempts</li>
+</ul>
+<h3 id="solution"><a class="header" href="#solution">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Only testing happy path
+#[test]
+fn test_transfer() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    
+    assert_eq!(token.balance(&amp;alice), 900);
+    assert_eq!(token.balance(&amp;bob), 100);
+}
+
+// GOOD: Testing multiple scenarios
+#[test]
+fn test_transfer_happy_path() { /* ... */ }
+
+#[test]
+#[should_panic(expected = "Error(Contract, #3)")] // InsufficientBalance error
+fn test_transfer_insufficient_balance() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Try to transfer more than balance
+    token.transfer(&amp;alice, &amp;bob, &amp;1000);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")] // Unauthorized error  
+fn test_transfer_unauthorized() {
+    let env = create_test_env();
+    // DON'T mock auths - test that unauthorized calls fail
+    let (token, alice, bob) = setup_token(&amp;env);
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist"><a class="header" href="#checklist">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Test every error variant in your <code>#[contracterror]</code> enum</li>
+<li><input disabled="" type="checkbox"> Test boundary values (0, 1, max values)</li>
+<li><input disabled="" type="checkbox"> Test invalid input types and values</li>
+<li><input disabled="" type="checkbox"> Test both authorized and unauthorized access</li>
+<li><input disabled="" type="checkbox"> Use <code>cargo tarpaulin</code> to measure coverage (aim for &gt;90%)</li>
+</ul>
+<hr>
+<h2 id="2-missing-edge-cases"><a class="header" href="#2-missing-edge-cases">2. Missing Edge Cases</a></h2>
+<h3 id="problem-1"><a class="header" href="#problem-1">Problem</a></h3>
+<p>Tests don’t cover edge cases that can lead to security vulnerabilities or incorrect behavior.</p>
+<h3 id="common-missing-edge-cases"><a class="header" href="#common-missing-edge-cases">Common Missing Edge Cases</a></h3>
+<ol>
+<li><strong>Integer overflow/underflow</strong>: Operations near <code>i128::MAX</code> or <code>i128::MIN</code></li>
+<li><strong>Zero values</strong>: Transfers of 0, division by 0</li>
+<li><strong>Duplicate operations</strong>: Same operation called twice</li>
+<li><strong>Concurrent access</strong>: Multiple users interacting simultaneously</li>
+<li><strong>State exhaustion</strong>: Storage limits, TTL expiration</li>
+</ol>
+<h3 id="solution-1"><a class="header" href="#solution-1">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Test integer overflow
+#[test]
+#[should_panic(expected = "Error(Contract, #5)")] // ArithmeticOverflow
+fn test_transfer_overflow() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Transfer amount that would cause overflow when added to bob's balance
+    token.mint(&amp;bob, &amp;i128::MAX);
+    token.transfer(&amp;alice, &amp;bob, &amp;1);
+}
+
+// Test zero amount
+#[test]
+fn test_transfer_zero_amount() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Should either succeed or fail with specific error, not panic unexpectedly
+    token.transfer(&amp;alice, &amp;bob, &amp;0);
+}
+
+// Test duplicate operations
+#[test]
+fn test_double_spend_prevention() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    
+    // First transfer should succeed
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    
+    // Second identical transfer should fail if balance is now insufficient
+    // or succeed with reduced amount depending on logic
+    let alice_balance = token.balance(&amp;alice);
+    if alice_balance &gt;= 100 {
+        token.transfer(&amp;alice, &amp;bob, &amp;100);
+    } else {
+        // Should fail with insufficient balance
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-1"><a class="header" href="#checklist-1">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Test maximum and minimum integer values</li>
+<li><input disabled="" type="checkbox"> Test zero values and empty collections</li>
+<li><input disabled="" type="checkbox"> Test duplicate/sequential operations</li>
+<li><input disabled="" type="checkbox"> Test TTL expiration and storage limits</li>
+<li><input disabled="" type="checkbox"> Test concurrent interactions (simulated with multiple addresses)</li>
+</ul>
+<hr>
+<h2 id="3-flaky-tests"><a class="header" href="#3-flaky-tests">3. Flaky Tests</a></h2>
+<h3 id="problem-2"><a class="header" href="#problem-2">Problem</a></h3>
+<p>Tests that pass sometimes and fail other times, usually due to non-deterministic behavior.</p>
+<h3 id="common-causes"><a class="header" href="#common-causes">Common Causes</a></h3>
+<ol>
+<li><strong>Timestamp dependence</strong>: Tests that rely on <code>env.ledger().timestamp()</code></li>
+<li><strong>Random values</strong>: Tests using random data without fixed seeds</li>
+<li><strong>State leakage</strong>: Tests that don’t clean up between runs</li>
+<li><strong>Order dependence</strong>: Tests that depend on execution order</li>
+</ol>
+<h3 id="solution-2"><a class="header" href="#solution-2">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Flaky due to timestamp
+#[test]
+fn test_time_sensitive_operation() {
+    let env = Env::default();
+    env.set_default_info();
+    // Ledger timestamp is 0 by default, but could change
+    let current_time = env.ledger().timestamp();
+    // ... test logic that depends on timestamp
+}
+
+// GOOD: Fixed timestamp
+#[test]
+fn test_time_sensitive_operation() {
+    let env = create_test_env();
+    env.ledger().with_mut(|li| {
+        li.timestamp = 1234567890; // Fixed timestamp
+        li.sequence_number = 100; // Fixed sequence
+        li.protocol_version = 23; // Fixed protocol version
+    });
+    
+    // Now test is deterministic
+    let contract = deploy_contract(&amp;env);
+    contract.time_sensitive_function();
+}
+
+// BAD: State leakage between tests
+#[test]
+fn test_user_balance() {
+    let env = Env::default(); // Fresh env each test
+    // But contract registration persists in some cases
+}
+
+// GOOD: Fresh environment per test
+fn create_test_env() -&gt; Env {
+    let env = Env::default();
+    env.set_default_info();
+    env.ledger().with_mut(|li| {
+        li.protocol_version = 23;
+        li.timestamp = 1234567890;
+        li.sequence_number = 100;
+    });
+    env
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-2"><a class="header" href="#checklist-2">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Use fixed ledger timestamps and sequence numbers</li>
+<li><input disabled="" type="checkbox"> Use fixed random seeds if randomness is needed</li>
+<li><input disabled="" type="checkbox"> Create fresh <code>Env</code> for each test</li>
+<li><input disabled="" type="checkbox"> Tests are independent and order-independent</li>
+<li><input disabled="" type="checkbox"> No reliance on external state or network</li>
+</ul>
+<hr>
+<h2 id="4-poor-test-organization"><a class="header" href="#4-poor-test-organization">4. Poor Test Organization</a></h2>
+<h3 id="problem-3"><a class="header" href="#problem-3">Problem</a></h3>
+<p>Tests are disorganized, making them hard to maintain and understand.</p>
+<h3 id="symptoms"><a class="header" href="#symptoms">Symptoms</a></h3>
+<ul>
+<li>Giant test functions testing multiple scenarios</li>
+<li>No clear separation of setup, execution, verification</li>
+<li>Duplicated setup code</li>
+<li>Missing descriptive test names</li>
+</ul>
+<h3 id="solution-3"><a class="header" href="#solution-3">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Monolithic test
+#[test]
+fn test_token() {
+    // Setup
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&amp;env);
+    let alice = Address::generate(&amp;env);
+    let bob = Address::generate(&amp;env);
+    
+    // Deploy token
+    let token_id = env.register_stellar_asset_contract(admin.clone());
+    let token = token::Client::new(&amp;env, &amp;token_id);
+    
+    // Test mint
+    token.mint(&amp;alice, &amp;1000);
+    assert_eq!(token.balance(&amp;alice), 1000);
+    
+    // Test transfer
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    assert_eq!(token.balance(&amp;alice), 900);
+    assert_eq!(token.balance(&amp;bob), 100);
+    
+    // Test burn
+    token.burn(&amp;alice, &amp;50);
+    assert_eq!(token.balance(&amp;alice), 850);
+    
+    // Too many assertions in one test!
+}
+
+// GOOD: Organized tests with helper functions
+mod token_tests {
+    use super::*;
+    
+    fn setup_token(env: &amp;Env) -&gt; (Address, token::Client, Address, Address) {
+        let admin = Address::generate(env);
+        let alice = Address::generate(env);
+        let bob = Address::generate(env);
+        
+        let token_id = env.register_stellar_asset_contract(admin.clone());
+        let token = token::Client::new(env, &amp;token_id);
+        
+        (token_id, token, alice, bob)
+    }
+    
+    #[test]
+    fn test_mint_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, _) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        
+        assert_eq!(token.balance(&amp;alice), 1000);
+    }
+    
+    #[test]
+    fn test_transfer_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, bob) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        token.transfer(&amp;alice, &amp;bob, &amp;100);
+        
+        assert_eq!(token.balance(&amp;alice), 900);
+        assert_eq!(token.balance(&amp;bob), 100);
+    }
+    
+    #[test]
+    fn test_burn_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, _) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        token.burn(&amp;alice, &amp;50);
+        
+        assert_eq!(token.balance(&amp;alice), 950);
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-3"><a class="header" href="#checklist-3">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> One test per scenario (not per function)</li>
+<li><input disabled="" type="checkbox"> Descriptive test names that indicate what’s being tested</li>
+<li><input disabled="" type="checkbox"> Helper functions for common setup</li>
+<li><input disabled="" type="checkbox"> Clear Arrange-Act-Assert structure</li>
+<li><input disabled="" type="checkbox"> Tests are in logical modules/groups</li>
+</ul>
+<hr>
+<h2 id="5-missing-integration-tests"><a class="header" href="#5-missing-integration-tests">5. Missing Integration Tests</a></h2>
+<h3 id="problem-4"><a class="header" href="#problem-4">Problem</a></h3>
+<p>Only unit tests exist, missing tests for cross-contract interactions and end-to-end workflows.</p>
+<h3 id="impact"><a class="header" href="#impact">Impact</a></h3>
+<ul>
+<li>Undetected integration issues</li>
+<li>Missing authorization chain testing</li>
+<li>Unverified event emission across contracts</li>
+<li>Untested upgrade paths</li>
+</ul>
+<h3 id="solution-4"><a class="header" href="#solution-4">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD: Integration test example
+#[test]
+fn test_defi_lending_workflow() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    // 1. Setup tokens
+    let usdc = setup_token(&amp;env, "USDC");
+    let eth = setup_token(&amp;env, "ETH");
+    
+    // 2. Deploy lending pool
+    let lending_pool = deploy_lending_pool(&amp;env, &amp;usdc, &amp;eth);
+    
+    // 3. User deposits collateral
+    eth.mint(&amp;alice, &amp;10_000); // 10 ETH
+    eth.approve(&amp;alice, &amp;lending_pool.address(), &amp;10_000, &amp;1000);
+    lending_pool.deposit_collateral(&amp;alice, &amp;10_000);
+    
+    // 4. User borrows against collateral
+    lending_pool.borrow(&amp;alice, &amp;5_000); // 5000 USDC
+    
+    // 5. Verify state
+    assert_eq!(lending_pool.collateral_balance(&amp;alice), 10_000);
+    assert_eq!(lending_pool.debt_balance(&amp;alice), 5_000);
+    assert_eq!(usdc.balance(&amp;alice), 5_000);
+    
+    // 6. Test liquidation scenario
+    // Simulate price drop
+    oracle.update_price(&amp;eth, &amp;900); // ETH price drops
+    lending_pool.liquidate(&amp;liquidator, &amp;alice, &amp;5_000);
+    
+    // 7. Verify liquidation outcomes
+    assert_eq!(lending_pool.collateral_balance(&amp;alice), 5_000); // Half collateral liquidated
+    assert_eq!(lending_pool.debt_balance(&amp;alice), 0); // Debt cleared
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-4"><a class="header" href="#checklist-4">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Cross-contract interaction tests</li>
+<li><input disabled="" type="checkbox"> End-to-end workflow tests</li>
+<li><input disabled="" type="checkbox"> Authorization chain tests (multi-hop auth)</li>
+<li><input disabled="" type="checkbox"> Event emission verification across contracts</li>
+<li><input disabled="" type="checkbox"> Upgrade and migration tests</li>
+<li><input disabled="" type="checkbox"> Integration tests in <code>tests/integration/</code> directory</li>
+</ul>
+<hr>
+<h2 id="6-best-practices"><a class="header" href="#6-best-practices">6. Best Practices</a></h2>
+<h3 id="test-structure"><a class="header" href="#test-structure">Test Structure</a></h3>
+<ol>
+<li><strong>Unit tests</strong>: In <code>#[cfg(test)]</code> modules within each contract</li>
+<li><strong>Integration tests</strong>: In <code>tests/integration/</code> directory</li>
+<li><strong>Property tests</strong>: Using <code>proptest</code> for fuzzing</li>
+<li><strong>Security tests</strong>: Specific tests for security vulnerabilities</li>
+</ol>
+<h3 id="testing-tools"><a class="header" href="#testing-tools">Testing Tools</a></h3>
+<ul>
+<li><strong>cargo test</strong>: Run all tests</li>
+<li><strong>cargo tarpaulin</strong>: Measure code coverage</li>
+<li><strong>proptest</strong>: Property-based testing</li>
+<li><strong>cargo fuzz</strong>: Fuzz testing</li>
+<li><strong>UPDATE_EXPECT=true</strong>: Update snapshot tests</li>
+</ul>
+<h3 id="common-test-helpers"><a class="header" href="#common-test-helpers">Common Test Helpers</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Standard test environment setup
+fn create_test_env() -&gt; Env {
+    let env = Env::default();
+    env.set_default_info();
+    env.ledger().with_mut(|li| {
+        li.protocol_version = 23; // Match SDK version
+        li.timestamp = 1_000_000;
+        li.sequence_number = 100;
+    });
+    env
+}
+
+// Mock auth helper
+fn with_mocked_auths&lt;F&gt;(test_fn: F) 
+where
+    F: FnOnce(&amp;Env),
+{
+    let env = create_test_env();
+    env.mock_all_auths();
+    test_fn(&amp;env);
+}
+
+// Snapshot testing
+#[test]
+fn test_contract_snapshot() {
+    let env = create_test_env();
+    // ... contract operations
+    
+    // Compare against saved snapshot
+    assert_eq!(env.dump_state(), include_str!("../test_snapshots/test_name.json"));
+}
+<span class="boring">}</span></code></pre>
+<h3 id="continuous-integration"><a class="header" href="#continuous-integration">Continuous Integration</a></h3>
+<ul>
+<li>Run tests on every PR and push</li>
+<li>Enforce minimum coverage thresholds</li>
+<li>Run security audits as part of CI</li>
+<li>Use snapshot testing to detect regressions</li>
+</ul>
+<hr>
+<h2 id="related-resources"><a class="header" href="#related-resources">Related Resources</a></h2>
+<ul>
+<li><a href="#testing-best-practices">Testing Best Practices</a></li>
+<li><a href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices</a></li>
+<li><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls</a></li>
+<li><a href="#defi-security-checklist">DeFi Security Checklist</a></li>
+</ul>
+<h2 id="examples-1-1"><a class="header" href="#examples-1-1">Examples</a></h2>
+<p>See the test suites in the examples directory for practical implementations:</p>
+<ul>
+<li><code>examples/basics/</code>: Unit test patterns</li>
+<li><code>tests/integration/</code>: Integration test patterns</li>
+<li><code>tests/fuzz/</code>: Fuzz testing examples</li>
+<li><code>tests/security/</code>: Security test patterns</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="documentation-platform-evaluation"><a class="header" href="#documentation-platform-evaluation">Documentation Platform Evaluation</a></h1>
 <p>This note compares the repository’s current <code>mdBook</code> setup with a possible move to Docusaurus.</p>
 <h2 id="scope"><a class="header" href="#scope">Scope</a></h2>
@@ -8031,6 +8474,217 @@ fn has_admin(env: &amp;Env) -&gt; bool {
 <ul>
 <li><a href="#soroban-smart-contract-best-practices">Best Practices</a></li>
 <li><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="defi-security-checklist"><a class="header" href="#defi-security-checklist">DeFi Security Checklist</a></h1>
+<p>A comprehensive security checklist for DeFi protocols on Soroban, covering economic safety, oracle security, liquidation mechanisms, flash loan protection, and testing requirements.</p>
+<hr>
+<h2 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-economic-security">Economic Security</a></li>
+<li><a href="#2-oracle-security">Oracle Security</a></li>
+<li><a href="#3-liquidation-safety">Liquidation Safety</a></li>
+<li><a href="#4-flash-loan-protection">Flash Loan Protection</a></li>
+<li><a href="#5-testing-coverage">Testing Coverage</a></li>
+<li><a href="#6-audit--deployment">Audit &amp; Deployment</a></li>
+</ol>
+<hr>
+<h2 id="1-economic-security"><a class="header" href="#1-economic-security">1. Economic Security</a></h2>
+<h3 id="11-incentive-alignment"><a class="header" href="#11-incentive-alignment">1.1 Incentive Alignment</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>User incentives:</strong> Protocol rewards align with long-term sustainability, not short-term exploitation</li>
+<li><input disabled="" type="checkbox"> <strong>Liquidator incentives:</strong> Liquidators are sufficiently incentivized without creating harmful profit-seeking behavior</li>
+<li><input disabled="" type="checkbox"> <strong>Staker incentives:</strong> Staking rewards don’t create unsustainable inflation or dilution</li>
+<li><input disabled="" type="checkbox"> <strong>Protocol revenue:</strong> Fee structures don’t create perverse incentives or attack vectors</li>
+</ul>
+<h3 id="12-collateral-management"><a class="header" href="#12-collateral-management">1.2 Collateral Management</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Collateral ratios:</strong> Conservative collateral requirements (e.g., 150%+ for volatile assets)</li>
+<li><input disabled="" type="checkbox"> <strong>Asset diversity:</strong> Support for multiple collateral types with appropriate risk weighting</li>
+<li><input disabled="" type="checkbox"> <strong>Collateral verification:</strong> Valid collateral verification before accepting deposits</li>
+<li><input disabled="" type="checkbox"> <strong>Liquidation thresholds:</strong> Clear thresholds that trigger before insolvency occurs</li>
+<li><input disabled="" type="checkbox"> <strong>Grace periods:</strong> Reasonable timeframes for users to respond to margin calls</li>
+</ul>
+<h3 id="13-interest-rate-models"><a class="header" href="#13-interest-rate-models">1.3 Interest Rate Models</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Rate stability:</strong> Interest rates don’t spike unexpectedly under normal conditions</li>
+<li><input disabled="" type="checkbox"> <strong>Utilization caps:</strong> Maximum utilization rates prevent liquidity crises</li>
+<li><input disabled="" type="checkbox"> <strong>Parameter governance:</strong> Rate parameters can be updated safely with proper governance</li>
+<li><input disabled="" type="checkbox"> <strong>Stress testing:</strong> Rates remain manageable during market volatility</li>
+</ul>
+<h3 id="14-protocol-parameters"><a class="header" href="#14-protocol-parameters">1.4 Protocol Parameters</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Reserve factors:</strong> Adequate reserve buffers for protocol safety</li>
+<li><input disabled="" type="checkbox"> <strong>Max borrow limits:</strong> Per-user and protocol-wide borrow limits</li>
+<li><input disabled="" type="checkbox"> <strong>Deposit/withdrawal limits:</strong> Reasonable limits to prevent manipulation</li>
+<li><input disabled="" type="checkbox"> <strong>Emergency parameters:</strong> Safe values for emergency shutdown if needed</li>
+</ul>
+<hr>
+<h2 id="2-oracle-security"><a class="header" href="#2-oracle-security">2. Oracle Security</a></h2>
+<h3 id="21-oracle-selection"><a class="header" href="#21-oracle-selection">2.1 Oracle Selection</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Multiple sources:</strong> At least 2 independent oracle sources for critical pricing</li>
+<li><input disabled="" type="checkbox"> <strong>Reputation verification:</strong> Oracles from reputable, established providers</li>
+<li><input disabled="" type="checkbox"> <strong>Decentralization:</strong> No single point of failure in oracle infrastructure</li>
+<li><input disabled="" type="checkbox"> <strong>Redundancy:</strong> Fallback mechanisms if primary oracle fails</li>
+</ul>
+<h3 id="22-price-feed-validation"><a class="header" href="#22-price-feed-validation">2.2 Price Feed Validation</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Freshness checks:</strong> Maximum age limits for price updates (e.g., &lt; 1 hour)</li>
+<li><input disabled="" type="checkbox"> <strong>Deviation checks:</strong> Reject prices that deviate too far from recent averages</li>
+<li><input disabled="" type="checkbox"> <strong>Volatility filters:</strong> Filter out anomalous price spikes</li>
+<li><input disabled="" type="checkbox"> <strong>Consensus mechanism:</strong> Require agreement between multiple oracles for critical operations</li>
+</ul>
+<h3 id="23-oracle-manipulation-protection"><a class="header" href="#23-oracle-manipulation-protection">2.3 Oracle Manipulation Protection</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Time-weighted pricing:</strong> Use TWAP (Time-Weighted Average Price) for sensitive operations</li>
+<li><input disabled="" type="checkbox"> <strong>Circuit breakers:</strong> Pause operations during extreme market conditions</li>
+<li><input disabled="" type="checkbox"> <strong>Manipulation detection:</strong> Monitor for suspicious price patterns</li>
+<li><input disabled="" type="checkbox"> <strong>Minimum liquidity:</strong> Require minimum liquidity for price validity</li>
+</ul>
+<h3 id="24-oracle-governance"><a class="header" href="#24-oracle-governance">2.4 Oracle Governance</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Upgrade safety:</strong> Safe mechanisms for updating oracle addresses</li>
+<li><input disabled="" type="checkbox"> <strong>Emergency controls:</strong> Ability to pause oracle usage in emergencies</li>
+<li><input disabled="" type="checkbox"> <strong>Transparency:</strong> Clear documentation of oracle sources and update processes</li>
+<li><input disabled="" type="checkbox"> <strong>Monitoring:</strong> Active monitoring of oracle health and performance</li>
+</ul>
+<hr>
+<h2 id="3-liquidation-safety"><a class="header" href="#3-liquidation-safety">3. Liquidation Safety</a></h2>
+<h3 id="31-liquidation-triggers"><a class="header" href="#31-liquidation-triggers">3.1 Liquidation Triggers</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Clear thresholds:</strong> Precise collateral ratio thresholds for liquidation</li>
+<li><input disabled="" type="checkbox"> <strong>Health factor:</strong> Proper calculation of position health with buffer</li>
+<li><input disabled="" type="checkbox"> <strong>Timely execution:</strong> Liquidations trigger promptly when needed</li>
+<li><input disabled="" type="checkbox"> <strong>Partial liquidation:</strong> Support for partial liquidation to reduce market impact</li>
+</ul>
+<h3 id="32-liquidation-process"><a class="header" href="#32-liquidation-process">3.2 Liquidation Process</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Fair pricing:</strong> Use oracle prices at liquidation time, not manipulated prices</li>
+<li><input disabled="" type="checkbox"> <strong>Slippage protection:</strong> Maximum acceptable slippage during liquidations</li>
+<li><input disabled="" type="checkbox"> <strong>Gas optimization:</strong> Efficient liquidation process to minimize costs</li>
+<li><input disabled="" type="checkbox"> <strong>Batch processing:</strong> Support for batch liquidations during market stress</li>
+</ul>
+<h3 id="33-liquidator-incentives"><a class="header" href="#33-liquidator-incentives">3.3 Liquidator Incentives</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Sufficient rewards:</strong> Rewards high enough to ensure liquidator participation</li>
+<li><input disabled="" type="checkbox"> <strong>Capped rewards:</strong> Maximum rewards to prevent excessive extraction</li>
+<li><input disabled="" type="checkbox"> <strong>Priority system:</strong> Fair system for multiple liquidators</li>
+<li><input disabled="" type="checkbox"> <strong>Penalty distribution:</strong> Clear rules for penalty distribution</li>
+</ul>
+<h3 id="34-user-protection"><a class="header" href="#34-user-protection">3.4 User Protection</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Warning system:</strong> Advance warnings before liquidation</li>
+<li><input disabled="" type="checkbox"> <strong>Grace periods:</strong> Time to add collateral or repay</li>
+<li><input disabled="" type="checkbox"> <strong>Appeal process:</strong> Mechanism to dispute incorrect liquidations</li>
+<li><input disabled="" type="checkbox"> <strong>Transparency:</strong> Clear reporting of liquidation events and outcomes</li>
+</ul>
+<hr>
+<h2 id="4-flash-loan-protection"><a class="header" href="#4-flash-loan-protection">4. Flash Loan Protection</a></h2>
+<h3 id="41-transaction-validation"><a class="header" href="#41-transaction-validation">4.1 Transaction Validation</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Atomicity checks:</strong> Verify entire transaction succeeds before applying state changes</li>
+<li><input disabled="" type="checkbox"> <strong>Reentrancy protection:</strong> Use checks-effects-interactions pattern</li>
+<li><input disabled="" type="checkbox"> <strong>Balance verification:</strong> Confirm actual token balances before accepting operations</li>
+<li><input disabled="" type="checkbox"> <strong>Slippage limits:</strong> Maximum acceptable price impact during flash loan operations</li>
+</ul>
+<h3 id="42-price-manipulation-defense"><a class="header" href="#42-price-manipulation-defense">4.2 Price Manipulation Defense</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>TWAP usage:</strong> Require time-weighted prices for large transactions</li>
+<li><input disabled="" type="checkbox"> <strong>Liquidity checks:</strong> Minimum liquidity requirements for price validity</li>
+<li><input disabled="" type="checkbox"> <strong>Volume limits:</strong> Maximum transaction sizes relative to pool liquidity</li>
+<li><input disabled="" type="checkbox"> <strong>Circuit breakers:</strong> Automatic pauses during abnormal trading activity</li>
+</ul>
+<h3 id="43-state-consistency"><a class="header" href="#43-state-consistency">4.3 State Consistency</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Invariant validation:</strong> Verify protocol invariants hold before/after transactions</li>
+<li><input disabled="" type="checkbox"> <strong>Balance consistency:</strong> Ensure token accounting remains consistent</li>
+<li><input disabled="" type="checkbox"> <strong>Reserve verification:</strong> Validate reserve ratios remain healthy</li>
+<li><input disabled="" type="checkbox"> <strong>Sanity checks:</strong> Final state validation before transaction completion</li>
+</ul>
+<h3 id="44-rate-limiting"><a class="header" href="#44-rate-limiting">4.4 Rate Limiting</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Frequency limits:</strong> Maximum flash loan frequency per address</li>
+<li><input disabled="" type="checkbox"> <strong>Size limits:</strong> Maximum flash loan amounts</li>
+<li><input disabled="" type="checkbox"> <strong>Temporal limits:</strong> Minimum time between flash loans</li>
+<li><input disabled="" type="checkbox"> <strong>Cost barriers:</strong> Sufficient fees to discourage abusive patterns</li>
+</ul>
+<hr>
+<h2 id="5-testing-coverage"><a class="header" href="#5-testing-coverage">5. Testing Coverage</a></h2>
+<h3 id="51-unit-tests"><a class="header" href="#51-unit-tests">5.1 Unit Tests</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Happy paths:</strong> All normal operations work correctly</li>
+<li><input disabled="" type="checkbox"> <strong>Error cases:</strong> All error conditions properly handled</li>
+<li><input disabled="" type="checkbox"> <strong>Edge cases:</strong> Boundary conditions and extreme values</li>
+<li><input disabled="" type="checkbox"> <strong>Authorization:</strong> All access control functions properly tested</li>
+</ul>
+<h3 id="52-integration-tests"><a class="header" href="#52-integration-tests">5.2 Integration Tests</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Cross-contract:</strong> Interactions with other contracts work correctly</li>
+<li><input disabled="" type="checkbox"> <strong>Oracle integration:</strong> Price feed integration properly tested</li>
+<li><input disabled="" type="checkbox"> <strong>Token interactions:</strong> All token transfers and approvals work</li>
+<li><input disabled="" type="checkbox"> <strong>Event emission:</strong> All events properly emitted and structured</li>
+</ul>
+<h3 id="53-property-based-tests"><a class="header" href="#53-property-based-tests">5.3 Property-Based Tests</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Invariant preservation:</strong> Protocol invariants hold under all conditions</li>
+<li><input disabled="" type="checkbox"> <strong>Arithmetic safety:</strong> No overflows, underflows, or rounding errors</li>
+<li><input disabled="" type="checkbox"> <strong>State consistency:</strong> State remains consistent through all operations</li>
+<li><input disabled="" type="checkbox"> <strong>Security properties:</strong> Security guarantees hold under adversarial conditions</li>
+</ul>
+<h3 id="54-scenario-tests"><a class="header" href="#54-scenario-tests">5.4 Scenario Tests</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Market stress:</strong> Protocol behavior during high volatility</li>
+<li><input disabled="" type="checkbox"> <strong>Liquidation scenarios:</strong> Various liquidation conditions and outcomes</li>
+<li><input disabled="" type="checkbox"> <strong>Flash loan attacks:</strong> Simulated flash loan attack scenarios</li>
+<li><input disabled="" type="checkbox"> <strong>Oracle failure:</strong> Behavior when oracles fail or provide bad data</li>
+</ul>
+<h3 id="55-fuzz-testing"><a class="header" href="#55-fuzz-testing">5.5 Fuzz Testing</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Random inputs:</strong> Random valid and invalid inputs</li>
+<li><input disabled="" type="checkbox"> <strong>State fuzzing:</strong> Random protocol state mutations</li>
+<li><input disabled="" type="checkbox"> <strong>Transaction sequences:</strong> Random sequences of operations</li>
+<li><input disabled="" type="checkbox"> <strong>Adversarial fuzzing:</strong> Specifically crafted malicious inputs</li>
+</ul>
+<hr>
+<h2 id="6-audit--deployment"><a class="header" href="#6-audit--deployment">6. Audit &amp; Deployment</a></h2>
+<h3 id="61-pre-deployment"><a class="header" href="#61-pre-deployment">6.1 Pre-Deployment</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Code review:</strong> Independent review by multiple developers</li>
+<li><input disabled="" type="checkbox"> <strong>Security audit:</strong> Professional security audit completed</li>
+<li><input disabled="" type="checkbox"> <strong>Test coverage:</strong> Minimum 90% test coverage achieved</li>
+<li><input disabled="" type="checkbox"> <strong>Documentation:</strong> Complete documentation for users and developers</li>
+</ul>
+<h3 id="62-deployment-safety"><a class="header" href="#62-deployment-safety">6.2 Deployment Safety</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Staged rollout:</strong> Gradual deployment with monitoring</li>
+<li><input disabled="" type="checkbox"> <strong>Emergency pause:</strong> Ability to pause protocol in emergencies</li>
+<li><input disabled="" type="checkbox"> <strong>Upgrade safety:</strong> Safe upgrade mechanisms with rollback capability</li>
+<li><input disabled="" type="checkbox"> <strong>Monitoring:</strong> Comprehensive monitoring and alerting</li>
+</ul>
+<h3 id="63-post-deployment"><a class="header" href="#63-post-deployment">6.3 Post-Deployment</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Bug bounty:</strong> Active bug bounty program</li>
+<li><input disabled="" type="checkbox"> <strong>Incident response:</strong> Documented incident response plan</li>
+<li><input disabled="" type="checkbox"> <strong>User communication:</strong> Clear communication channels for users</li>
+<li><input disabled="" type="checkbox"> <strong>Continuous monitoring:</strong> Ongoing security monitoring and threat detection</li>
+</ul>
+<hr>
+<h2 id="related-resources-1"><a class="header" href="#related-resources-1">Related Resources</a></h2>
+<ul>
+<li><a href="#defi-best-practices">DeFi Best Practices</a></li>
+<li><a href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices</a></li>
+<li><a href="#testing-best-practices">Testing Best Practices</a></li>
+<li><a href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls</a></li>
+</ul>
+<h2 id="implementation-examples"><a class="header" href="#implementation-examples">Implementation Examples</a></h2>
+<p>See the DeFi examples in <code>examples/defi/</code> for practical implementations of these security principles:</p>
+<ul>
+<li><code>01-simple-swap</code>: Basic swap with slippage protection</li>
+<li><code>02-constant-product-amm</code>: AMM with liquidity pool safety</li>
+<li><code>03-lending-pool</code>: Lending protocol with collateral management</li>
+<li><code>05-flash-loans</code>: Flash loan implementation with reentrancy protection</li>
+<li><code>07-staking-pool</code>: Staking mechanism with slashing protection</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="common-pitfalls-in-soroban-smart-contracts"><a class="header" href="#common-pitfalls-in-soroban-smart-contracts">Common Pitfalls in Soroban Smart Contracts</a></h1>
@@ -9430,7 +10084,7 @@ async function signTx(xdrString) {
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="wallet-integration-guide"><a class="header" href="#wallet-integration-guide">Wallet Integration Guide</a></h1>
 <p>This guide helps Soroban developers add wallet support to web applications, dashboards, and frontends that interact with Stellar smart contracts. It focuses on practical integration patterns, expected user flows, and production recommendations for common wallets in the Stellar ecosystem.</p>
-<h2 id="table-of-contents-1"><a class="header" href="#table-of-contents-1">Table of Contents</a></h2>
+<h2 id="table-of-contents-3"><a class="header" href="#table-of-contents-3">Table of Contents</a></h2>
 <ul>
 <li><a href="#introduction">Introduction</a></li>
 <li><a href="#prerequisites-11">Prerequisites</a></li>
@@ -9794,7 +10448,7 @@ async function runExampleWorkflow(contractId: string, method: string, args: any[
 <h1 id="security-best-practices-for-soroban-smart-contracts"><a class="header" href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices for Soroban Smart Contracts</a></h1>
 <p>A practical guide to writing secure Soroban contracts, covering common vulnerabilities, defensive patterns, and a pre-deployment audit checklist with real contract examples.</p>
 <hr>
-<h2 id="table-of-contents-2"><a class="header" href="#table-of-contents-2">Table of Contents</a></h2>
+<h2 id="table-of-contents-4"><a class="header" href="#table-of-contents-4">Table of Contents</a></h2>
 <ol>
 <li><a href="#1-common-vulnerabilities">Common Vulnerabilities</a></li>
 <li><a href="#2-secure-patterns">Secure Patterns</a></li>

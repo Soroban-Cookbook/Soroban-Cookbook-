@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>DeFi Best Practices - Soroban Cookbook</title>
+        <title>Testing Pitfalls - Soroban Cookbook</title>
 
 
         <!-- Custom HTML head -->
@@ -146,7 +146,7 @@
                         <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-" title="Git repository" aria-label="Git repository">
                             <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
                         </a>
-                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/edit/main/book/src/docs/defi-best-practices.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/edit/main/book/src/docs/testing-pitfalls.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
                             <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
                         </a>
 
@@ -180,55 +180,458 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="defi-best-practices"><a class="header" href="#defi-best-practices">DeFi Best Practices</a></h1>
-<p>This page collects DeFi-specific best practices for security, robustness, and maintainability on Soroban.</p>
-<h2 id="economic-security"><a class="header" href="#economic-security">Economic Security</a></h2>
+                        <h1 id="testing-pitfalls"><a class="header" href="#testing-pitfalls">Testing Pitfalls</a></h1>
+<p>Common testing mistakes in Soroban smart contract development and how to avoid them.</p>
+<hr>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-insufficient-test-coverage">Insufficient Test Coverage</a></li>
+<li><a href="#2-missing-edge-cases">Missing Edge Cases</a></li>
+<li><a href="#3-flaky-tests">Flaky Tests</a></li>
+<li><a href="#4-poor-test-organization">Poor Test Organization</a></li>
+<li><a href="#5-missing-integration-tests">Missing Integration Tests</a></li>
+<li><a href="#6-best-practices">Best Practices</a></li>
+</ol>
+<hr>
+<h2 id="1-insufficient-test-coverage"><a class="header" href="#1-insufficient-test-coverage">1. Insufficient Test Coverage</a></h2>
+<h3 id="problem"><a class="header" href="#problem">Problem</a></h3>
+<p>Tests only cover happy paths, leaving critical error conditions and edge cases untested.</p>
+<h3 id="examples"><a class="header" href="#examples">Examples</a></h3>
 <ul>
-<li>Align incentives: ensure users, oracles, and liquidators are incentivized to behave correctly.</li>
-<li>Avoid under-collateralized positions by setting conservative collateral ratios and stress-testing price movements.</li>
-<li>Use time-weighted oracles, multi-source pricing, and buffers to protect against flash crashes and price manipulation.</li>
-<li>Clearly separate accounting from execution logic to reduce the impact of contract upgrades or bug fixes.</li>
-<li>Include liquidation penalties, reserve cushions, and mechanism parameters that remain safe under extreme conditions.</li>
+<li>Testing only successful transfers, not insufficient balance cases</li>
+<li>Testing only valid inputs, not boundary values or invalid types</li>
+<li>Testing only authorized calls, not unauthorized access attempts</li>
 </ul>
-<h2 id="oracle-usage"><a class="header" href="#oracle-usage">Oracle Usage</a></h2>
+<h3 id="solution"><a class="header" href="#solution">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Only testing happy path
+#[test]
+fn test_transfer() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    
+    assert_eq!(token.balance(&amp;alice), 900);
+    assert_eq!(token.balance(&amp;bob), 100);
+}
+
+// GOOD: Testing multiple scenarios
+#[test]
+fn test_transfer_happy_path() { /* ... */ }
+
+#[test]
+#[should_panic(expected = "Error(Contract, #3)")] // InsufficientBalance error
+fn test_transfer_insufficient_balance() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Try to transfer more than balance
+    token.transfer(&amp;alice, &amp;bob, &amp;1000);
+}
+
+#[test]
+#[should_panic(expected = "Error(Contract, #2)")] // Unauthorized error  
+fn test_transfer_unauthorized() {
+    let env = create_test_env();
+    // DON'T mock auths - test that unauthorized calls fail
+    let (token, alice, bob) = setup_token(&amp;env);
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist"><a class="header" href="#checklist">Checklist</a></h3>
 <ul>
-<li>Use trusted, decentralized oracle sources rather than a single price feed.</li>
-<li>Validate oracle data on-chain and reject stale or inconsistent updates.</li>
-<li>Protect against oracle failure modes by setting safe default values, maximum update intervals, and fallback behavior.</li>
-<li>If using automated oracles, restrict who can update feeds and require multi-party confirmation where appropriate.</li>
-<li>Prefer aggregated pricing over single-node or single-source values for economic-critical operations.</li>
+<li><input disabled="" type="checkbox"> Test every error variant in your <code>#[contracterror]</code> enum</li>
+<li><input disabled="" type="checkbox"> Test boundary values (0, 1, max values)</li>
+<li><input disabled="" type="checkbox"> Test invalid input types and values</li>
+<li><input disabled="" type="checkbox"> Test both authorized and unauthorized access</li>
+<li><input disabled="" type="checkbox"> Use <code>cargo tarpaulin</code> to measure coverage (aim for &gt;90%)</li>
 </ul>
-<h2 id="liquidation-design"><a class="header" href="#liquidation-design">Liquidation Design</a></h2>
+<hr>
+<h2 id="2-missing-edge-cases"><a class="header" href="#2-missing-edge-cases">2. Missing Edge Cases</a></h2>
+<h3 id="problem-1"><a class="header" href="#problem-1">Problem</a></h3>
+<p>Tests don’t cover edge cases that can lead to security vulnerabilities or incorrect behavior.</p>
+<h3 id="common-missing-edge-cases"><a class="header" href="#common-missing-edge-cases">Common Missing Edge Cases</a></h3>
+<ol>
+<li><strong>Integer overflow/underflow</strong>: Operations near <code>i128::MAX</code> or <code>i128::MIN</code></li>
+<li><strong>Zero values</strong>: Transfers of 0, division by 0</li>
+<li><strong>Duplicate operations</strong>: Same operation called twice</li>
+<li><strong>Concurrent access</strong>: Multiple users interacting simultaneously</li>
+<li><strong>State exhaustion</strong>: Storage limits, TTL expiration</li>
+</ol>
+<h3 id="solution-1"><a class="header" href="#solution-1">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Test integer overflow
+#[test]
+#[should_panic(expected = "Error(Contract, #5)")] // ArithmeticOverflow
+fn test_transfer_overflow() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Transfer amount that would cause overflow when added to bob's balance
+    token.mint(&amp;bob, &amp;i128::MAX);
+    token.transfer(&amp;alice, &amp;bob, &amp;1);
+}
+
+// Test zero amount
+#[test]
+fn test_transfer_zero_amount() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    // Should either succeed or fail with specific error, not panic unexpectedly
+    token.transfer(&amp;alice, &amp;bob, &amp;0);
+}
+
+// Test duplicate operations
+#[test]
+fn test_double_spend_prevention() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    let (token, alice, bob) = setup_token(&amp;env);
+    
+    // First transfer should succeed
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    
+    // Second identical transfer should fail if balance is now insufficient
+    // or succeed with reduced amount depending on logic
+    let alice_balance = token.balance(&amp;alice);
+    if alice_balance &gt;= 100 {
+        token.transfer(&amp;alice, &amp;bob, &amp;100);
+    } else {
+        // Should fail with insufficient balance
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-1"><a class="header" href="#checklist-1">Checklist</a></h3>
 <ul>
-<li>Design liquidation logic to preserve solvency and avoid cascading failures.</li>
-<li>Keep auctions or liquidator incentives predictable, with clear rules for when, how, and at what costs positions can be closed.</li>
-<li>Use gradual penalties and slippage limits to reduce market impact during deleveraging events.</li>
-<li>Allow sufficient time for borrowers to react to margin or collateral calls before forced closure.</li>
-<li>Test liquidation workflows across edge cases such as rapid price moves, low liquidity, and partial fills.</li>
+<li><input disabled="" type="checkbox"> Test maximum and minimum integer values</li>
+<li><input disabled="" type="checkbox"> Test zero values and empty collections</li>
+<li><input disabled="" type="checkbox"> Test duplicate/sequential operations</li>
+<li><input disabled="" type="checkbox"> Test TTL expiration and storage limits</li>
+<li><input disabled="" type="checkbox"> Test concurrent interactions (simulated with multiple addresses)</li>
 </ul>
-<h2 id="testing-strategies"><a class="header" href="#testing-strategies">Testing Strategies</a></h2>
+<hr>
+<h2 id="3-flaky-tests"><a class="header" href="#3-flaky-tests">3. Flaky Tests</a></h2>
+<h3 id="problem-2"><a class="header" href="#problem-2">Problem</a></h3>
+<p>Tests that pass sometimes and fail other times, usually due to non-deterministic behavior.</p>
+<h3 id="common-causes"><a class="header" href="#common-causes">Common Causes</a></h3>
+<ol>
+<li><strong>Timestamp dependence</strong>: Tests that rely on <code>env.ledger().timestamp()</code></li>
+<li><strong>Random values</strong>: Tests using random data without fixed seeds</li>
+<li><strong>State leakage</strong>: Tests that don’t clean up between runs</li>
+<li><strong>Order dependence</strong>: Tests that depend on execution order</li>
+</ol>
+<h3 id="solution-2"><a class="header" href="#solution-2">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Flaky due to timestamp
+#[test]
+fn test_time_sensitive_operation() {
+    let env = Env::default();
+    env.set_default_info();
+    // Ledger timestamp is 0 by default, but could change
+    let current_time = env.ledger().timestamp();
+    // ... test logic that depends on timestamp
+}
+
+// GOOD: Fixed timestamp
+#[test]
+fn test_time_sensitive_operation() {
+    let env = create_test_env();
+    env.ledger().with_mut(|li| {
+        li.timestamp = 1234567890; // Fixed timestamp
+        li.sequence_number = 100; // Fixed sequence
+        li.protocol_version = 23; // Fixed protocol version
+    });
+    
+    // Now test is deterministic
+    let contract = deploy_contract(&amp;env);
+    contract.time_sensitive_function();
+}
+
+// BAD: State leakage between tests
+#[test]
+fn test_user_balance() {
+    let env = Env::default(); // Fresh env each test
+    // But contract registration persists in some cases
+}
+
+// GOOD: Fresh environment per test
+fn create_test_env() -&gt; Env {
+    let env = Env::default();
+    env.set_default_info();
+    env.ledger().with_mut(|li| {
+        li.protocol_version = 23;
+        li.timestamp = 1234567890;
+        li.sequence_number = 100;
+    });
+    env
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-2"><a class="header" href="#checklist-2">Checklist</a></h3>
 <ul>
-<li>Write unit tests for contract invariants, pricing logic, collateral accounting, and role-based access controls.</li>
-<li>Build integration tests that simulate real-world DeFi flows, including deposits, borrows, rate changes, oracle updates, and liquidations.</li>
-<li>Use fuzz testing and property-based tests for arithmetic safety, bounds checking, and overflow/underflow protection.</li>
-<li>Test failure cases explicitly: stale oracle data, invalid user input, unauthorized access, and emergency pause behavior.</li>
-<li>Consider gas costs and performance in the test suite, verifying that common operations remain within expected limits.</li>
+<li><input disabled="" type="checkbox"> Use fixed ledger timestamps and sequence numbers</li>
+<li><input disabled="" type="checkbox"> Use fixed random seeds if randomness is needed</li>
+<li><input disabled="" type="checkbox"> Create fresh <code>Env</code> for each test</li>
+<li><input disabled="" type="checkbox"> Tests are independent and order-independent</li>
+<li><input disabled="" type="checkbox"> No reliance on external state or network</li>
 </ul>
-<h2 id="related-reading"><a class="header" href="#related-reading">Related Reading</a></h2>
+<hr>
+<h2 id="4-poor-test-organization"><a class="header" href="#4-poor-test-organization">4. Poor Test Organization</a></h2>
+<h3 id="problem-3"><a class="header" href="#problem-3">Problem</a></h3>
+<p>Tests are disorganized, making them hard to maintain and understand.</p>
+<h3 id="symptoms"><a class="header" href="#symptoms">Symptoms</a></h3>
 <ul>
-<li><a href="./best-practices.html">Best Practices</a></li>
+<li>Giant test functions testing multiple scenarios</li>
+<li>No clear separation of setup, execution, verification</li>
+<li>Duplicated setup code</li>
+<li>Missing descriptive test names</li>
+</ul>
+<h3 id="solution-3"><a class="header" href="#solution-3">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BAD: Monolithic test
+#[test]
+fn test_token() {
+    // Setup
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&amp;env);
+    let alice = Address::generate(&amp;env);
+    let bob = Address::generate(&amp;env);
+    
+    // Deploy token
+    let token_id = env.register_stellar_asset_contract(admin.clone());
+    let token = token::Client::new(&amp;env, &amp;token_id);
+    
+    // Test mint
+    token.mint(&amp;alice, &amp;1000);
+    assert_eq!(token.balance(&amp;alice), 1000);
+    
+    // Test transfer
+    token.transfer(&amp;alice, &amp;bob, &amp;100);
+    assert_eq!(token.balance(&amp;alice), 900);
+    assert_eq!(token.balance(&amp;bob), 100);
+    
+    // Test burn
+    token.burn(&amp;alice, &amp;50);
+    assert_eq!(token.balance(&amp;alice), 850);
+    
+    // Too many assertions in one test!
+}
+
+// GOOD: Organized tests with helper functions
+mod token_tests {
+    use super::*;
+    
+    fn setup_token(env: &amp;Env) -&gt; (Address, token::Client, Address, Address) {
+        let admin = Address::generate(env);
+        let alice = Address::generate(env);
+        let bob = Address::generate(env);
+        
+        let token_id = env.register_stellar_asset_contract(admin.clone());
+        let token = token::Client::new(env, &amp;token_id);
+        
+        (token_id, token, alice, bob)
+    }
+    
+    #[test]
+    fn test_mint_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, _) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        
+        assert_eq!(token.balance(&amp;alice), 1000);
+    }
+    
+    #[test]
+    fn test_transfer_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, bob) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        token.transfer(&amp;alice, &amp;bob, &amp;100);
+        
+        assert_eq!(token.balance(&amp;alice), 900);
+        assert_eq!(token.balance(&amp;bob), 100);
+    }
+    
+    #[test]
+    fn test_burn_tokens() {
+        let env = create_test_env();
+        env.mock_all_auths();
+        
+        let (_, token, alice, _) = setup_token(&amp;env);
+        token.mint(&amp;alice, &amp;1000);
+        token.burn(&amp;alice, &amp;50);
+        
+        assert_eq!(token.balance(&amp;alice), 950);
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-3"><a class="header" href="#checklist-3">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> One test per scenario (not per function)</li>
+<li><input disabled="" type="checkbox"> Descriptive test names that indicate what’s being tested</li>
+<li><input disabled="" type="checkbox"> Helper functions for common setup</li>
+<li><input disabled="" type="checkbox"> Clear Arrange-Act-Assert structure</li>
+<li><input disabled="" type="checkbox"> Tests are in logical modules/groups</li>
+</ul>
+<hr>
+<h2 id="5-missing-integration-tests"><a class="header" href="#5-missing-integration-tests">5. Missing Integration Tests</a></h2>
+<h3 id="problem-4"><a class="header" href="#problem-4">Problem</a></h3>
+<p>Only unit tests exist, missing tests for cross-contract interactions and end-to-end workflows.</p>
+<h3 id="impact"><a class="header" href="#impact">Impact</a></h3>
+<ul>
+<li>Undetected integration issues</li>
+<li>Missing authorization chain testing</li>
+<li>Unverified event emission across contracts</li>
+<li>Untested upgrade paths</li>
+</ul>
+<h3 id="solution-4"><a class="header" href="#solution-4">Solution</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// GOOD: Integration test example
+#[test]
+fn test_defi_lending_workflow() {
+    let env = create_test_env();
+    env.mock_all_auths();
+    
+    // 1. Setup tokens
+    let usdc = setup_token(&amp;env, "USDC");
+    let eth = setup_token(&amp;env, "ETH");
+    
+    // 2. Deploy lending pool
+    let lending_pool = deploy_lending_pool(&amp;env, &amp;usdc, &amp;eth);
+    
+    // 3. User deposits collateral
+    eth.mint(&amp;alice, &amp;10_000); // 10 ETH
+    eth.approve(&amp;alice, &amp;lending_pool.address(), &amp;10_000, &amp;1000);
+    lending_pool.deposit_collateral(&amp;alice, &amp;10_000);
+    
+    // 4. User borrows against collateral
+    lending_pool.borrow(&amp;alice, &amp;5_000); // 5000 USDC
+    
+    // 5. Verify state
+    assert_eq!(lending_pool.collateral_balance(&amp;alice), 10_000);
+    assert_eq!(lending_pool.debt_balance(&amp;alice), 5_000);
+    assert_eq!(usdc.balance(&amp;alice), 5_000);
+    
+    // 6. Test liquidation scenario
+    // Simulate price drop
+    oracle.update_price(&amp;eth, &amp;900); // ETH price drops
+    lending_pool.liquidate(&amp;liquidator, &amp;alice, &amp;5_000);
+    
+    // 7. Verify liquidation outcomes
+    assert_eq!(lending_pool.collateral_balance(&amp;alice), 5_000); // Half collateral liquidated
+    assert_eq!(lending_pool.debt_balance(&amp;alice), 0); // Debt cleared
+}
+<span class="boring">}</span></code></pre>
+<h3 id="checklist-4"><a class="header" href="#checklist-4">Checklist</a></h3>
+<ul>
+<li><input disabled="" type="checkbox"> Cross-contract interaction tests</li>
+<li><input disabled="" type="checkbox"> End-to-end workflow tests</li>
+<li><input disabled="" type="checkbox"> Authorization chain tests (multi-hop auth)</li>
+<li><input disabled="" type="checkbox"> Event emission verification across contracts</li>
+<li><input disabled="" type="checkbox"> Upgrade and migration tests</li>
+<li><input disabled="" type="checkbox"> Integration tests in <code>tests/integration/</code> directory</li>
+</ul>
+<hr>
+<h2 id="6-best-practices"><a class="header" href="#6-best-practices">6. Best Practices</a></h2>
+<h3 id="test-structure"><a class="header" href="#test-structure">Test Structure</a></h3>
+<ol>
+<li><strong>Unit tests</strong>: In <code>#[cfg(test)]</code> modules within each contract</li>
+<li><strong>Integration tests</strong>: In <code>tests/integration/</code> directory</li>
+<li><strong>Property tests</strong>: Using <code>proptest</code> for fuzzing</li>
+<li><strong>Security tests</strong>: Specific tests for security vulnerabilities</li>
+</ol>
+<h3 id="testing-tools"><a class="header" href="#testing-tools">Testing Tools</a></h3>
+<ul>
+<li><strong>cargo test</strong>: Run all tests</li>
+<li><strong>cargo tarpaulin</strong>: Measure code coverage</li>
+<li><strong>proptest</strong>: Property-based testing</li>
+<li><strong>cargo fuzz</strong>: Fuzz testing</li>
+<li><strong>UPDATE_EXPECT=true</strong>: Update snapshot tests</li>
+</ul>
+<h3 id="common-test-helpers"><a class="header" href="#common-test-helpers">Common Test Helpers</a></h3>
+<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Standard test environment setup
+fn create_test_env() -&gt; Env {
+    let env = Env::default();
+    env.set_default_info();
+    env.ledger().with_mut(|li| {
+        li.protocol_version = 23; // Match SDK version
+        li.timestamp = 1_000_000;
+        li.sequence_number = 100;
+    });
+    env
+}
+
+// Mock auth helper
+fn with_mocked_auths&lt;F&gt;(test_fn: F) 
+where
+    F: FnOnce(&amp;Env),
+{
+    let env = create_test_env();
+    env.mock_all_auths();
+    test_fn(&amp;env);
+}
+
+// Snapshot testing
+#[test]
+fn test_contract_snapshot() {
+    let env = create_test_env();
+    // ... contract operations
+    
+    // Compare against saved snapshot
+    assert_eq!(env.dump_state(), include_str!("../test_snapshots/test_name.json"));
+}
+<span class="boring">}</span></code></pre>
+<h3 id="continuous-integration"><a class="header" href="#continuous-integration">Continuous Integration</a></h3>
+<ul>
+<li>Run tests on every PR and push</li>
+<li>Enforce minimum coverage thresholds</li>
+<li>Run security audits as part of CI</li>
+<li>Use snapshot testing to detect regressions</li>
+</ul>
+<hr>
+<h2 id="related-resources"><a class="header" href="#related-resources">Related Resources</a></h2>
+<ul>
+<li><a href="./testing-best-practices.html">Testing Best Practices</a></li>
+<li><a href="./security-best-practices.html">Security Best Practices</a></li>
 <li><a href="./common-pitfalls.html">Common Pitfalls</a></li>
+<li><a href="./defi-security-checklist.html">DeFi Security Checklist</a></li>
+</ul>
+<h2 id="examples-1"><a class="header" href="#examples-1">Examples</a></h2>
+<p>See the test suites in the examples directory for practical implementations:</p>
+<ul>
+<li><code>examples/basics/</code>: Unit test patterns</li>
+<li><code>tests/integration/</code>: Integration test patterns</li>
+<li><code>tests/fuzz/</code>: Fuzz testing examples</li>
+<li><code>tests/security/</code>: Security test patterns</li>
 </ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../docs/documentation-platform-evaluation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/testing-best-practices.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/defi-security-checklist.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/documentation-platform-evaluation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -238,11 +641,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../docs/documentation-platform-evaluation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/testing-best-practices.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/defi-security-checklist.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/documentation-platform-evaluation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
