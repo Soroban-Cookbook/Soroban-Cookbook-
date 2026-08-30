@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-84cc2e0f.js";
+            window.path_to_searchindex_js = "searchindex-41d423df.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-e84b672a.js"></script>
+        <script src="toc-ba8784cb.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -2649,6 +2649,81 @@ fn require_admin(env: &amp;Env) -&gt; Address {
 <hr>
 <p><strong>Welcome to Soroban!</strong> The transition from Solidity takes time, but Rust’s safety and Soroban’s design will help you build more secure smart contracts.</p>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="project-templates"><a class="header" href="#project-templates">Project Templates</a></h1>
+<p>The Soroban Cookbook provides three full-stack, production-ready project templates to accelerate smart contract development on Stellar. Each template pairs tested Rust smart contracts with modern web frontends and deployment tooling.</p>
+<hr>
+<h2 id="available-templates"><a class="header" href="#available-templates">Available Templates</a></h2>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                       Soroban Project Templates                             │
+├───────────────────────────────┬─────────────────────────────────────────────┤
+│ 🪙 Fungible Token dApp        │ 🎨 NFT Marketplace dApp                     │
+│ (`templates/token-dapp/`)     │ (`templates/nft-marketplace-dapp/`)         │
+├───────────────────────────────┴─────────────────────────────────────────────┤
+│ 🏛️ DAO Governance &amp; Treasury dApp                                          │
+│ (`templates/dao-governance-dapp/`)                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr>
+<h2 id="1-fungible-token-dapp-templatestoken-dapp"><a class="header" href="#1-fungible-token-dapp-templatestoken-dapp">1. Fungible Token dApp (<code>templates/token-dapp/</code>)</a></h2>
+<h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>A full-stack starter kit for creating, distributing, and managing SEP-41 compliant fungible tokens.</p>
+<h3 id="key-capabilities"><a class="header" href="#key-capabilities">Key Capabilities</a></h3>
+<ul>
+<li><strong>Smart Contract:</strong> SEP-41 token operations (<code>transfer</code>, <code>transfer_from</code>, <code>approve</code>, <code>mint</code>, <code>burn</code>, <code>balance</code>, <code>allowance</code>, <code>decimals</code>, <code>name</code>, <code>symbol</code>).</li>
+<li><strong>Storage Strategy:</strong> Instance storage for global metadata and persistent storage with automated TTL extension for user balances.</li>
+<li><strong>Frontend Dashboard:</strong> Live balance query, token transfer form, admin mint modal, and Freighter wallet integration.</li>
+</ul>
+<h3 id="quick-start-1"><a class="header" href="#quick-start-1">Quick Start</a></h3>
+<pre><code class="language-bash">cd templates/token-dapp/contracts/token
+cargo test
+</code></pre>
+<hr>
+<h2 id="2-nft-marketplace-dapp-templatesnft-marketplace-dapp"><a class="header" href="#2-nft-marketplace-dapp-templatesnft-marketplace-dapp">2. NFT Marketplace dApp (<code>templates/nft-marketplace-dapp/</code>)</a></h2>
+<h3 id="overview-1"><a class="header" href="#overview-1">Overview</a></h3>
+<p>A full-stack digital collectible and marketplace dApp for minting NFTs and trading them at fixed prices.</p>
+<h3 id="key-capabilities-1"><a class="header" href="#key-capabilities-1">Key Capabilities</a></h3>
+<ul>
+<li><strong>Smart Contract:</strong> On-chain NFT minting with URI metadata, fixed-price listing, contract escrow, atomic payment settlement, and listing cancellation.</li>
+<li><strong>Security:</strong> Verified seller ownership, state mutation atomicity, and safe delisting.</li>
+<li><strong>Frontend Gallery:</strong> Visual collectible grid, minting modal, listing cards with price in XLM, and 1-click buy button.</li>
+</ul>
+<h3 id="quick-start-1-1"><a class="header" href="#quick-start-1-1">Quick Start</a></h3>
+<pre><code class="language-bash">cd templates/nft-marketplace-dapp/contracts/marketplace
+cargo test
+</code></pre>
+<hr>
+<h2 id="3-dao-governance--treasury-dapp-templatesdao-governance-dapp"><a class="header" href="#3-dao-governance--treasury-dapp-templatesdao-governance-dapp">3. DAO Governance &amp; Treasury dApp (<code>templates/dao-governance-dapp/</code>)</a></h2>
+<h3 id="overview-2"><a class="header" href="#overview-2">Overview</a></h3>
+<p>A full-stack community governance portal for managing proposals, voting with token weights, and executing treasury disbursements.</p>
+<h3 id="key-capabilities-2"><a class="header" href="#key-capabilities-2">Key Capabilities</a></h3>
+<ul>
+<li><strong>Smart Contract:</strong> Proposal registration, weighted voting, quorum and threshold validation, and execution timelocks.</li>
+<li><strong>Security:</strong> Single-vote per account enforcement, ledger sequence time checks, and status validation.</li>
+<li><strong>Frontend Portal:</strong> Active proposal dashboard, live vote tally bars (For/Against), proposal submission modal, and execution trigger.</li>
+</ul>
+<h3 id="quick-start-2"><a class="header" href="#quick-start-2">Quick Start</a></h3>
+<pre><code class="language-bash">cd templates/dao-governance-dapp/contracts/governance
+cargo test
+</code></pre>
+<hr>
+<h2 id="common-architecture--best-practices"><a class="header" href="#common-architecture--best-practices">Common Architecture &amp; Best Practices</a></h2>
+<p>All templates implement the following architectural guarantees:</p>
+<ol>
+<li><strong>Explicit Authorization:</strong> Critical state mutations require <code>from.require_auth()</code> or <code>admin.require_auth()</code>.</li>
+<li><strong>Checked Arithmetic:</strong> Zero integer overflow or underflow risks using Rust’s checked arithmetic.</li>
+<li><strong>Storage TTL Management:</strong> Both instance and persistent entries have their TTL refreshed to prevent unexpected state archival.</li>
+<li><strong>Auditable Events:</strong> Standard topics emitted for off-chain indexing.</li>
+<li><strong>No Placeholders:</strong> Fully functional contracts, complete unit tests, and interactive demo UIs.</li>
+</ol>
+<hr>
+<h2 id="related-resources"><a class="header" href="#related-resources">Related Resources</a></h2>
+<ul>
+<li><a href="docs/token-security-checklist.html">Token Security Checklist</a></li>
+<li><a href="#testing-best-practices">Testing Best Practices</a></li>
+<li><a href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices</a></li>
+<li><a href="docs/grants-process.html">Grants Application Process</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="video-creation-tools--processes"><a class="header" href="#video-creation-tools--processes">Video Creation Tools &amp; Processes</a></h1>
 <p>This guide documents the tools, processes, and standards for creating video content for the Soroban Cookbook.</p>
 <hr>
@@ -3902,7 +3977,7 @@ pub fn decimals(env: Env) -&gt; Result&lt;u32, MetadataError&gt; {
 <p>Vec and Map collection patterns.</p>
 <h3 id="14-event-filtering-1"><a class="header" href="#14-event-filtering-1"><a href="examples/basics/14-event-filtering">14-event-filtering</a></a></h3>
 <p>Indexer-friendly event topic design.</p>
-<h2 id="quick-start-1"><a class="header" href="#quick-start-1">Quick Start</a></h2>
+<h2 id="quick-start-3"><a class="header" href="#quick-start-3">Quick Start</a></h2>
 <pre><code class="language-bash">cd examples/basics/01-hello-world
 cargo test &amp;&amp; cargo build --target wasm32-unknown-unknown --release
 </code></pre>
@@ -8325,7 +8400,7 @@ fn test_contract_snapshot() {
 <li>Use snapshot testing to detect regressions</li>
 </ul>
 <hr>
-<h2 id="related-resources"><a class="header" href="#related-resources">Related Resources</a></h2>
+<h2 id="related-resources-1"><a class="header" href="#related-resources-1">Related Resources</a></h2>
 <ul>
 <li><a href="#testing-best-practices">Testing Best Practices</a></li>
 <li><a href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices</a></li>
@@ -8670,7 +8745,7 @@ fn test_contract_snapshot() {
 <li><input disabled="" type="checkbox"> <strong>Continuous monitoring:</strong> Ongoing security monitoring and threat detection</li>
 </ul>
 <hr>
-<h2 id="related-resources-1"><a class="header" href="#related-resources-1">Related Resources</a></h2>
+<h2 id="related-resources-2"><a class="header" href="#related-resources-2">Related Resources</a></h2>
 <ul>
 <li><a href="#defi-best-practices">DeFi Best Practices</a></li>
 <li><a href="#security-best-practices-for-soroban-smart-contracts">Security Best Practices</a></li>
@@ -11650,7 +11725,7 @@ cargo test
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
-<h1 id="quick-start-2"><a class="header" href="#quick-start-2">Quick Start</a></h1>
+<h1 id="quick-start-4"><a class="header" href="#quick-start-4">Quick Start</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="prerequisites-12"><a class="header" href="#prerequisites-12">Prerequisites</a></h1>
 <div style="break-before: page; page-break-before: always;"></div>
@@ -12664,7 +12739,7 @@ unpause and re-run the read-only checks from the monitoring table above.</li>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="cicd-setup-for-documentation"><a class="header" href="#cicd-setup-for-documentation">CI/CD Setup for Documentation</a></h1>
 <p>This guide explains how the automated documentation deployment pipeline works.</p>
-<h2 id="overview"><a class="header" href="#overview">Overview</a></h2>
+<h2 id="overview-3"><a class="header" href="#overview-3">Overview</a></h2>
 <p>The documentation deployment uses GitHub Actions to automatically build and deploy the mdBook documentation whenever changes are pushed to the repository.</p>
 <h2 id="workflow-triggers"><a class="header" href="#workflow-triggers">Workflow Triggers</a></h2>
 <p>The deployment workflow is triggered by:</p>
