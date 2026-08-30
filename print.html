@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-2b060419.js";
+            window.path_to_searchindex_js = "searchindex-1ff19a26.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-22be0ae8.js"></script>
+        <script src="toc-c4272aba.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -6386,6 +6386,55 @@ transfer seller_nets  → listing.seller
 </table>
 </div>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="nft-development-video-walkthrough"><a class="header" href="#nft-development-video-walkthrough">NFT Development Video Walkthrough</a></h1>
+<p>This page is the production script and companion guide for a 15–20 minute video that builds an NFT on Soroban, adds metadata, connects it to a marketplace, and reviews the security and interoperability decisions behind the implementation.</p>
+<h2 id="video-1"><a class="header" href="#video-1">Video</a></h2>
+<p><strong>Status:</strong> Ready to record. Replace the placeholder below with the hosted video URL after upload.</p>
+<p><strong>Watch:</strong> <a href="https://www.youtube.com/watch?v=VIDEO_ID">NFT Development on Soroban</a> (15–20 minutes)</p>
+<h2 id="tutorial-outline"><a class="header" href="#tutorial-outline">Tutorial Outline</a></h2>
+<h3 id="1-contract-and-metadata-setup-000500"><a class="header" href="#1-contract-and-metadata-setup-000500">1. Contract and Metadata Setup (0:00–5:00)</a></h3>
+<ul>
+<li>Start with <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/01-basic-nft"><code>examples/nfts/01-basic-nft/</code></a>.</li>
+<li>Show the owner, token identifier, approval, and enumeration model.</li>
+<li>Mint one token using authenticated admin and recipient addresses.</li>
+<li>Move to <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/02-nft-metadata"><code>examples/nfts/02-nft-metadata/</code></a>.</li>
+<li>Explain <code>name</code>, <code>symbol</code>, <code>token_uri</code>, <code>base_uri</code>, and the choice between on-chain and off-chain metadata.</li>
+</ul>
+<h3 id="2-create-and-inspect-an-nft-500900"><a class="header" href="#2-create-and-inspect-an-nft-500900">2. Create and Inspect an NFT (5:00–9:00)</a></h3>
+<p>Demonstrate the test-driven flow:</p>
+<pre><code class="language-bash">cd examples/nfts/02-nft-metadata
+cargo test
+</code></pre>
+<p>Then show a metadata document containing a stable name, description, image URL, and attributes. Explain that an off-chain URI should be immutable or content-addressed when the token promises durable provenance, and that the contract should reject malformed or unauthorized updates.</p>
+<h3 id="3-marketplace-integration-9001400"><a class="header" href="#3-marketplace-integration-9001400">3. Marketplace Integration (9:00–14:00)</a></h3>
+<ul>
+<li>Open <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/04-nft-marketplace"><code>examples/nfts/04-nft-marketplace/</code></a>.</li>
+<li>Create a listing with an asking price and expiration.</li>
+<li>Verify ownership and approval before a sale.</li>
+<li>Buy the NFT and show the atomic transfer of the asset and payment.</li>
+<li>Demonstrate auction, bundle, and royalty paths where supported by the example.</li>
+<li>Explain why a marketplace should never trust a cached owner, stale approval, or client-supplied seller address.</li>
+</ul>
+<h3 id="4-best-practices-and-testing-14001800"><a class="header" href="#4-best-practices-and-testing-14001800">4. Best Practices and Testing (14:00–18:00)</a></h3>
+<ul>
+<li>Require authorization for minting, transfers, approvals, listings, and administrative metadata changes.</li>
+<li>Check ownership and approval immediately before settlement.</li>
+<li>Use checked arithmetic for prices, royalties, and quantities; reject zero or expired listings.</li>
+<li>Prevent replay by making a listing single-use and recording its final state before external calls where the contract design requires it.</li>
+<li>Test unauthorized minting, duplicate token IDs, invalid metadata, expired listings, insufficient payment, royalty limits, and failed transfers.</li>
+<li>Extend storage TTL for long-lived token and listing records.</li>
+</ul>
+<h3 id="5-recap-and-resources-18002000"><a class="header" href="#5-recap-and-resources-18002000">5. Recap and Resources (18:00–20:00)</a></h3>
+<p>Summarize the path from minting to marketplace settlement, then point viewers to the <a href="#nft-patterns-on-soroban">NFT Patterns Reference</a>, <a href="#nft-examples">NFT examples overview</a>, and the repository test suites.</p>
+<h2 id="recording-checklist"><a class="header" href="#recording-checklist">Recording Checklist</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Run the three NFT example test suites on the commit being recorded.</li>
+<li><input disabled="" type="checkbox"> Record at 1080p with readable terminal text and captions enabled.</li>
+<li><input disabled="" type="checkbox"> Upload the final 15–20 minute video to the Soroban Cookbook channel.</li>
+<li><input disabled="" type="checkbox"> Replace <code>VIDEO_ID</code> above with the published URL and verify it opens.</li>
+<li><input disabled="" type="checkbox"> Check every source link and timestamp before publishing.</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="governance-examples"><a class="header" href="#governance-examples">Governance Examples</a></h1>
 <p>DAOs, voting, treasury management.</p>
 <h2 id="examples-2"><a class="header" href="#examples-2">Examples</a></h2>
@@ -6418,6 +6467,58 @@ transfer seller_nets  → listing.seller
 <h2 id="next-tokens"><a class="header" href="#next-tokens">Next: <a href="tokens.html">Tokens</a></a></h2>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="governance-patterns-guide"><a class="header" href="#governance-patterns-guide">Governance Patterns Guide</a></h1>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="governance-security-checklist"><a class="header" href="#governance-security-checklist">Governance Security Checklist</a></h1>
+<p>Use this checklist before deploying a Soroban governance contract or accepting a proposal into production. The examples in this cookbook demonstrate individual controls; a production system should verify every item against its own threat model.</p>
+<h2 id="voting-security"><a class="header" href="#voting-security">Voting Security</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Every voting action requires authorization from the voter, and the contract records votes against the authenticated address.</li>
+<li><input disabled="" type="checkbox"> A voter can vote only once per proposal, unless an explicitly documented vote-change mechanism is used.</li>
+<li><input disabled="" type="checkbox"> Voting is rejected before <code>vote_start</code> and after <code>vote_end</code>.</li>
+<li><input disabled="" type="checkbox"> Vote weights are snapshotted or otherwise resistant to transfers, flash-loan-style acquisition, and delegation changes during a vote.</li>
+<li><input disabled="" type="checkbox"> <code>For</code>, <code>Against</code>, and <code>Abstain</code> are represented distinctly, and tally arithmetic uses checked operations.</li>
+<li><input disabled="" type="checkbox"> Quorum and approval thresholds are defined before voting starts and cannot be changed retroactively.</li>
+</ul>
+<h2 id="proposal-validation"><a class="header" href="#proposal-validation">Proposal Validation</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Proposal creation is restricted to the intended proposer role or threshold.</li>
+<li><input disabled="" type="checkbox"> Proposal identifiers cannot collide, and proposal descriptions or hashes are stored consistently with the off-chain proposal record.</li>
+<li><input disabled="" type="checkbox"> Every target contract, function, argument, amount, and expiration is validated before a proposal becomes active.</li>
+<li><input disabled="" type="checkbox"> Empty actions, unsupported selectors, malformed arguments, and duplicate actions are rejected.</li>
+<li><input disabled="" type="checkbox"> Validation does not depend on mutable off-chain data that voters cannot inspect.</li>
+<li><input disabled="" type="checkbox"> Proposal creation, cancellation, and state changes emit events containing enough data for an indexer to reconstruct history.</li>
+</ul>
+<h2 id="execution-safety"><a class="header" href="#execution-safety">Execution Safety</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Execution is allowed only for a proposal that passed its quorum and approval checks.</li>
+<li><input disabled="" type="checkbox"> Execution is blocked until the voting period and any required grace period or timelock have elapsed.</li>
+<li><input disabled="" type="checkbox"> A proposal is marked as executed before or atomically with its external calls so it cannot be replayed.</li>
+<li><input disabled="" type="checkbox"> The executor cannot replace validated targets or arguments at execution time.</li>
+<li><input disabled="" type="checkbox"> Multi-action proposals define failure behavior: atomic rollback, explicit partial completion, or a compensating action.</li>
+<li><input disabled="" type="checkbox"> External calls use the narrowest required authorization and do not rely on reentrant callbacks.</li>
+<li><input disabled="" type="checkbox"> Cancellation, veto, emergency pause, and expired-proposal paths are tested and emit auditable events.</li>
+</ul>
+<h2 id="timelock-checks"><a class="header" href="#timelock-checks">Timelock Checks</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> The delay is enforced by ledger time in the contract, not only by a UI countdown.</li>
+<li><input disabled="" type="checkbox"> Queueing records the proposal identifier, action hash, queue time, and earliest execution time.</li>
+<li><input disabled="" type="checkbox"> The delay cannot be shortened by the proposer, executor, or a single privileged account without an approved governance action.</li>
+<li><input disabled="" type="checkbox"> Queued actions expire after a documented window and cannot be executed after cancellation.</li>
+<li><input disabled="" type="checkbox"> Any timelock administrator is protected by multisignature or equivalent independent authorization.</li>
+<li><input disabled="" type="checkbox"> Users and monitoring systems can observe queue, cancellation, and execution events before funds or permissions change.</li>
+</ul>
+<h2 id="testing-requirements"><a class="header" href="#testing-requirements">Testing Requirements</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Unit tests cover authorization failures, duplicate votes, invalid time windows, quorum misses, and threshold boundaries.</li>
+<li><input disabled="" type="checkbox"> Tests cover proposal state transitions: Draft, Active, Queued, Executed, Defeated, Cancelled, and Expired where applicable.</li>
+<li><input disabled="" type="checkbox"> Tests advance ledger time across every boundary, including <code>vote_start</code>, <code>vote_end</code>, grace period, timelock, and expiry.</li>
+<li><input disabled="" type="checkbox"> Tests verify replay protection, action validation, external-call failures, and multi-action failure behavior.</li>
+<li><input disabled="" type="checkbox"> Fuzz or property tests exercise proposal inputs, vote weights, arithmetic limits, and action ordering.</li>
+<li><input disabled="" type="checkbox"> Integration tests run the governance contract against every target contract it can call.</li>
+<li><input disabled="" type="checkbox"> A review confirms that storage TTL extension, event fields, and migration behavior are safe for long-lived governance.</li>
+</ul>
+<h2 id="review-record"><a class="header" href="#review-record">Review Record</a></h2>
+<p>Record the contract version, network, reviewers, threat model, and unresolved risks alongside the deployment. Re-run this checklist whenever governance parameters, target contracts, authorization roles, or execution logic change.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="01--simple-voting"><a class="header" href="#01--simple-voting">01 · Simple Voting</a></h1>
 <p><strong>Source:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/01-simple-voting"><code>examples/governance/01-simple-voting/</code></a></p>
@@ -9124,7 +9225,7 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
 <p>This page provides the outline, references, and accompanying materials for the <strong>Token Development Video Tutorial</strong>.</p>
 <p>🎬 <strong><a href="https://www.youtube.com/watch?v=mock-token-video">Watch the Token Development Tutorial on YouTube</a></strong> (15-20 minutes)</p>
 <hr>
-<h2 id="tutorial-outline"><a class="header" href="#tutorial-outline">Tutorial Outline</a></h2>
+<h2 id="tutorial-outline-1"><a class="header" href="#tutorial-outline-1">Tutorial Outline</a></h2>
 <p>The video covers the lifecycle of token design, testing, and deployment on the Stellar network using Soroban.</p>
 <h3 id="1-introduction--sep-41-standard-000--300"><a class="header" href="#1-introduction--sep-41-standard-000--300">1. Introduction &amp; SEP-41 Standard (0:00 – 3:00)</a></h3>
 <ul>
@@ -9178,7 +9279,7 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
 <p>This page provides the outline, references, and accompanying materials for the <strong>DeFi Development Video Tutorial</strong>.</p>
 <p>🎬 <strong><a href="https://www.youtube.com/watch?v=mock-defi-video">Watch the DeFi Development Tutorial on YouTube</a></strong> (20-25 minutes)</p>
 <hr>
-<h2 id="tutorial-outline-1"><a class="header" href="#tutorial-outline-1">Tutorial Outline</a></h2>
+<h2 id="tutorial-outline-2"><a class="header" href="#tutorial-outline-2">Tutorial Outline</a></h2>
 <p>The video covers building, securing, and testing a Constant Product Automated Market Maker (AMM) on Soroban, including cross-contract interaction with standard SEP-41 tokens.</p>
 <h3 id="1-introduction--defi-on-soroban-000--300"><a class="header" href="#1-introduction--defi-on-soroban-000--300">1. Introduction &amp; DeFi on Soroban (0:00 – 3:00)</a></h3>
 <ul>
