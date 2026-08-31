@@ -39,6 +39,7 @@ members = [
     "examples/advanced/06-gas-optimization",
     "examples/advanced/07-trusted-forwarder",
     "examples/advanced/07-upgrade-patterns",
+    "examples/advanced/08-payment-channels",
     "examples/advanced/09-fuzz-testing",
     "examples/advanced/09-storage-layout-validator",
     "examples/advanced/09-storage-optimization",
