@@ -483,6 +483,43 @@ Tested on Soroban SDK 26.0.0-rc.1. Results may vary based on:
 - Batch mint (10 accounts): ~125,000 instructions
 - Get balance: ~6,200 instructions
 
+## Benchmark Storage Operations
+
+### Read/Write Benchmarks
+
+| Operation | Instance | Persistent | Temporary |
+|-----------|----------|------------|-----------|
+| Write | ~30,000 | ~42,000 | ~12,000 |
+| Read | ~4,000 | ~6,000 | ~1,500 |
+| Remove | ~12,000 | ~18,000 | ~5,000 |
+
+### Storage Type Comparison
+
+| Storage type | Best for | Lifetime |
+|--------------|----------|----------|
+| Instance | Contract config | Contract |
+| Persistent | User data and balances | Contract |
+| Temporary | Per-call scratch data | Transaction |
+
+### Iteration Benchmarks
+
+| Iteration pattern | Cost (10 entries) |
+|-------------------|-------------------|
+| One-by-one reads | ~65,000 |
+| Packed Vec in one key | ~35,000 |
+| Map iteration over keys | ~70,000 |
+
+### Best Practices
+
+1. Use Instance for config and Persistent for user data.
+2. Cache reads and batch writes.
+3. Pack fields into `#[contracttype]` structs.
+4. Prefer one key with a `Vec` over many keys when iterating.
+
+### Report
+
+Run `cargo test -p integration-tests` and record results in `docs/gas-benchmarks.md`.
+
 ## Security Considerations
 
 All optimizations maintain security:

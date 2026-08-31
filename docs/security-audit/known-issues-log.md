@@ -51,6 +51,7 @@ maintainers per the contribution policy.
 - **Type:** Test-coverage gap
 - **Status:** Open
 - **Affects:** `examples/tokens/01-sep41-token`,
+  `examples/tokens/09-optimized-token-ops`,
   `examples/intermediate/02-role-based-access-control`,
   `examples/intermediate/03-priority-queue`
 
@@ -60,7 +61,7 @@ is therefore never compiled or executed, so the example ships with effectively
 zero running tests despite appearing to have a suite.
 
 **Evidence.** `grep -rn "mod test\|cfg(test)" src/` returns nothing for these
-three examples, while their sibling examples (e.g. `mint-burn`,
+four examples, while their sibling examples (e.g. `mint-burn`,
 `storage-migration`) do declare `mod test;`.
 
 **Impact.** Untested behavior in audit-relevant examples; CI's per-example
@@ -111,6 +112,62 @@ versions in the reproducible-build notes. Left for the maintainers.
 
 ---
 
+## KI-5 — Missing example README
+
+- **Type:** Documentation gap
+- **Status:** Open
+- **Affects:** `examples/tokens/03-pausable-token`,
+  `examples/tokens/06-reward-token`, `examples/intermediate/ajo`
+
+**Description.** These three in-scope examples have no `README.md` at all
+(`ls <example>/` shows only `Cargo.toml` and `src/`). Every other example in
+both audit-scope tables has one. Without a README the auditor has no
+maintainer-authored description of intended behavior to check the code
+against, which is one of the two documentation-completeness checks this audit
+prep exists to satisfy (§2 "does the documented behavior match the code?").
+
+**Impact.** For these three examples the "README claims match the code" review
+step in [`audit-scope.md`](./audit-scope.md) §2 cannot be performed; the
+auditor must infer intended behavior from the source and tests alone.
+
+**Suggested remediation.** Add a `README.md` to each, following the structure
+already used by sibling examples (purpose, public API, usage example, security
+considerations, testing instructions). Left for the maintainers.
+
+---
+
+## KI-6 — `examples/tokens/README.md` is stale relative to the current directory tree
+
+- **Type:** Documentation gap
+- **Status:** Open
+- **Affects:** `examples/tokens/README.md`
+
+**Description.** The category README's "What's Inside?" and "Examples"
+sections predate several renames/additions and no longer match
+`examples/tokens/`:
+
+- Broken relative links — the target directory does not exist under the name
+  linked: `./allowance-pattern/` (actual: `05-allowance-pattern`),
+  `./token-wrapper/` (actual: `06-token-wrapper`), `./optimized-token-ops/`
+  (actual: `09-optimized-token-ops`).
+- Listed examples that do not exist anywhere in the tree: `02-vesting-contract`
+  (the closest match, `05-vesting`, is a different, already-listed contract),
+  `04-airdrop-contract`, `05-wrapped-asset`.
+- In-scope examples not mentioned at all: `02-sep41-extensions`,
+  `03-optimized-operations`, `03-pausable-token`, `05-allowance-pattern`,
+  `05-vesting`, `10-custom-token`, `token-lock`.
+
+**Impact.** A reader (including an auditor orienting themselves) following the
+category README lands on broken links or looks for contracts that were never
+merged, and misses seven of the eighteen in-scope contracts entirely.
+
+**Suggested remediation.** Regenerate the "Examples" list from the actual
+`examples/tokens/*` directories, fixing each link target. Left for the
+maintainers so the correction can be reviewed alongside whatever prompted the
+original drift.
+
+---
+
 ## Areas flagged for review (not findings)
 
 The following are *not* known issues; they are pointers for the auditor derived
@@ -123,6 +180,20 @@ from the prep scan, to be confirmed or dismissed during the review:
   authorization logic; verify role/threshold checks cannot be bypassed.
 - `storage-migration` should be reviewed for migration ordering, idempotency,
   and authorization.
+- `ajo` (`src/lib.rs:53,60`, `.expect("Not initialized")`) and `lazy-loading`
+  (`src/lib.rs:272`, `.unwrap()` on the oldest cache key) and
+  `storage-pagination` (`src/lib.rs:150`, `.unwrap_or_else(|| panic!(...))` on
+  an out-of-range page index) contain panics reachable from ordinary call
+  paths — confirm each is unreachable for a well-formed caller or convert to a
+  recoverable `Result`/error code.
+- `token-lock` (`src/lib.rs:58,62,82,114,126,167`) uses `panic!` and
+  `unwrap_or_else(|| panic!(...))` for both input validation (non-positive
+  amount, past unlock time) and arithmetic overflow/underflow guards — confirm
+  input-validation panics are intentional (vs. returning a contract error) and
+  that the overflow/underflow paths cannot be triggered by a caller.
+- `04-snapshot-token` (`src/lib.rs:423,447`) calls `.unwrap()` on
+  `history.get(history.len() - 1)` — confirm the history vector cannot be
+  empty at either call site.
 
 ---
 
@@ -131,3 +202,4 @@ from the prep scan, to be confirmed or dismissed during the review:
 | Date | Entry | Change |
 | --- | --- | --- |
 | 2026-06-02 | KI-1…KI-4 | Initial audit-prep baseline recorded. |
+| 2026-08-31 | KI-2, KI-5, KI-6 | Extended scope to `examples/tokens/`; added `09-optimized-token-ops` to KI-2; recorded missing READMEs (KI-5) and a stale category README (KI-6); added panic-path pointers for the newly in-scope examples. |

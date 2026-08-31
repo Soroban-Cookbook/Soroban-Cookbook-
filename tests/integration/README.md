@@ -57,6 +57,25 @@ Cross-crate flows spanning multiple token examples (Issue #119):
 3. **Edge Cases** (`test_token_edge_cases_across_contracts`)
    - Zero amounts, overdraft, and pause-already-in-state across contracts
 
+## Token Security Tests (`token_security_tests.rs`)
+
+Security-focused tests for token examples (Issue #795) — reentrancy,
+arithmetic issues, and authorization bypass attempts. See
+[`SECURITY_REVIEW_TOKEN_EXAMPLES.md`](./SECURITY_REVIEW_TOKEN_EXAMPLES.md)
+for the findings (including a real reentrancy fix in `06-token-wrapper`)
+these tests guard against regressing.
+
+1. **Authorization bypass** (`sep41_token`) — `transfer`/`approve`/
+   `transfer_from`/`mint`/`burn` each rejected without their required
+   signer's real (non-mocked) authorization, plus a real-but-non-admin
+   signer correctly rejected by `mint`'s own admin check.
+2. **Arithmetic issues** (`sep41_token`) — `mint` at `i128::MAX` overflow,
+   full-balance transfer/burn boundaries, and `total_supply` consistency
+   across a mint/transfer/burn cycle.
+3. **Reentrancy** (`token_wrapper`) — a `MaliciousUnderlyingToken` whose
+   `transfer` reenters `wrap`; asserts the `DataKey::Entered` guard blocks
+   the double-mint attempt.
+
 ## Governance Integration Tests (`governance_tests.rs`)
 
 30 tests across 8 categories covering the complete governance stack. All tests use

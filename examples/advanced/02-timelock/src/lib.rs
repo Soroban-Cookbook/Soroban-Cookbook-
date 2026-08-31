@@ -100,6 +100,36 @@ impl TimelockContract {
         );
     }
 
+    /// Return the current admin address.
+    pub fn admin(env: Env) -> Address {
+        env.storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .expect("Not initialized")
+    }
+
+    /// Set a new admin address.
+    ///
+    /// Emits an audit event on success.
+    pub fn set_admin(env: Env, new_admin: Address) {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .expect("Not initialized");
+        admin.require_auth();
+
+        env.storage().instance().set(&DataKey::Admin, &new_admin);
+
+        env.events().publish(
+            (CONTRACT_NS, ACTION_AUDIT, admin, new_admin),
+            AuditTrailEventData {
+                details: symbol_short!("set_admin"),
+                timestamp: env.ledger().timestamp(),
+            },
+        );
+    }
+
     /// Queue an operation for delayed execution.
     ///
     /// - `operation_id`: unique identifier for this operation (caller-defined bytes)

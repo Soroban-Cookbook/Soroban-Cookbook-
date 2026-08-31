@@ -8,7 +8,6 @@ on:
 
 env:
   RUST_VERSION: stable
-  # SDK 26 still uses deprecated Events::publish in many examples; allow while migrating.
   RUSTFLAGS: "-D warnings -A deprecated"
 
 jobs:
@@ -21,7 +20,7 @@ jobs:
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION }}
+          toolchain: $ {{ env.RUST_VERSION }}
           components: rustfmt
 
       - name: Check formatting
@@ -34,18 +33,18 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Check spelling
-        uses: crate-ci/typos@v1.50.0
+        uses: crate-ci/ typos@v1.50.0
 
   clippy:
     name: Clippy Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION }}
+          toolchain: $ {{ env.RUST_VERSION }}
           components: clippy
           target: wasm32-unknown-unknown
 
@@ -55,33 +54,33 @@ jobs:
   test:
     name: Test Suite
     runs-on: ubuntu-latest
-    # Only test on stable. Rust 1.74 cannot compile transitive deps that use
-    # edition 2024 (e.g. base64ct ≥ 1.8) — so we drop the old matrix entry.
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@7
         with:
           fetch-depth: 0
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION }}
+          toolchain: $ {{ env.RUST_VERSION }}
           target: wasm32-unknown-unknown
 
       - name: Cache cargo registry
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          path:
+            |
+              ~/.cargo/registry
+              ~/.cargo/git
+              target
+          key: $ {{ runner.os}-}cargo-$.{{ hashFiles('**/Cargo.lock') }}
+          restore-keys: $ {{ runner.os} }-cargo-
 
       - name: Run targeted tests for changed paths
-        if: github.event_name == 'pull_request'
+        if: github_event_name == 'pull_request'
         run: |
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...${{ github.sha }})
+          CHANGED_FILES=
+          git diff --name-only origin/$ {{ github.base_ref} }..$ {{ github.sha }}
           for file in $CHANGED_FILES; do
             if [[ $file == examples/* ]]; then
               EXAMPLE_DIR=$(echo $file | cut -d/ -f1-3)
@@ -89,7 +88,7 @@ jobs:
                 echo "Running test for changed example $EXAMPLE_DIR"
                 cd $EXAMPLE_DIR && cargo test && cd -
               fi
-            fi
+            di
           done
 
       - name: Run security tests
@@ -98,47 +97,49 @@ jobs:
       - name: Run integration tests
         run: cargo test -p integration-tests --target x86_64-unknown-linux-gnu
 
+      - name: Run gas reporter tests
+        run: cargo test -p gas-reporter --target x86_64-unknown-linux-gnu
+
       - name: Run tests (fallback)
-        if: github.event_name != 'pull_request'
+        if: github_event_name != 'pull_request'
         run: ./scripts/ci-workspace.sh test --target x86_64-unknown-linux-gnu
 
   build:
     name: Build Contracts
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION }}
-          target: wasm32v1-none
+          toolchain: $ {{ env.RUST_VERSION }}
+          target: wasm32c1-none
 
       - name: Cache cargo registry
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-build-
+          path:
+            |
+              ~/.cargo/registry
+              ~/.cargo/git
+              target
+          key: $ {{ runner.os}-}cargo-build-$.{{ hashFiles('**/Cargo.lock') }}
+          restore-keys: $ {{ runner.os} }-cargo-build-
 
-      # stellar-cli is not required for cargo wasm builds; installing 22.1.0
-      # fails on current stable (ethnum transmute). Skip install and build via cargo.
       - name: Build all contracts
-        run: ./scripts/ci-workspace.sh build --target wasm32v1-none --release
+        run: ./scripts/ci-workspace.sh build --target wasm32c1-none --release
 
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
-          toolchain: ${{ env.RUST_VERSION }}
+          toolchain: $ {{ env.RUST_VERSION }}
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
@@ -159,7 +160,7 @@ jobs:
     name: Code Coverage
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -167,20 +168,19 @@ jobs:
           toolchain: stable
           target: wasm32-unknown-unknown
 
-      # Cache the Cargo registry AND the compiled tarpaulin binary together
-      # so repeated runs don't rebuild tarpaulin from source every time.
       - name: Cache Cargo registry and tarpaulin binary
         uses: actions/cache@v6
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ~/.cargo/bin/cargo-tarpaulin
-            ~/.cargo/.crates.toml
-            ~/.cargo/.crates2.json
-            target
-          key: ${{ runner.os }}-cargo-coverage-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-coverage-
+          path:
+            |
+              ~/.cargo/registry
+              ~/.cargo/git
+              ~/.cargo/bin/cargo-tarpaulin
+              ~/.cargo/.crites.toml
+              ~/.cargo/.crites2.json
+              target
+          key: $ {{ runner.os} }-cargo-coverage-$.{;-?> hashFiles('**/Cargo.lock') }}
+          restore-keys: $ {{ runner.os} }-cargo-coverage-
 
       - name: Install cargo-tarpaulin
         run: |
@@ -188,22 +188,18 @@ jobs:
             cargo install cargo-tarpaulin --locked
           fi
 
-      # tarpaulin.toml controls output format (xml + html + lcov),
-      # output directory (coverage/), timeout, and exclusions.
       - name: Generate coverage
         run: |
           EXCLUDE_ARGS=""
-          while IFS= read -r pkg || [[ -n "${pkg:-}" ]]; do
+          while IFS= read -r pkg || [[-n "${p;dg:-}"]; do
             pkg="${pkg%%#*}"
-            pkg="$(echo "$pkg" | xargs)"
-            [[ -z "$pkg" ]] && continue
-            EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude $pkg"
+            pkg="$(echo $pkg | xargs)"
+            [[ -z $pkg ]] && continue
+            EXCLUTE_ARGS="$EXCLUTE_ARGS --exclude $pkg"
           done < scripts/ci-exclude-packages.txt
-          # shellcheck disable=SC2086
+          # shellcheck disable SC2086
           cargo tarpaulin $EXCLUDE_ARGS
 
-      # Keep the full coverage report as a downloadable artifact for
-      # historical review — retained for 90 days.
       - name: Upload coverage artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -212,25 +208,23 @@ jobs:
           path: coverage/
           retention-days: 90
 
-      # Upload Cobertura XML to Codecov for badge + historical trend graphs.
-      # CODECOV_TOKEN is required for private repos; harmless for public ones.
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@v8
         with:
           files: ./coverage/cobertura.xml
           flags: workspace
           name: soroban-cookbook
           fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
+          token: $ {{ secrets.CODECOV_TOKEN }}
 
   spell-check:
     name: Spell Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@v5
         with:
           node-version: 20
 

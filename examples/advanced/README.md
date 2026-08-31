@@ -15,6 +15,7 @@ This category contains examples of complex systems and advanced architectural pa
 
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
+- [`03-state-channel-disputes`](./03-state-channel-disputes/) — State channel dispute resolution with challenges, responses, timeouts, and fraud proofs
 - [`03-beacon-proxy-factory`](./03-beacon-proxy-factory/) — Factory-managed beacon proxies with shared upgrades
 - [`03-permit-pattern`](./03-permit-pattern/) — EIP-2612-style permit approvals with deadline enforcement
 - [`03-gasless-relayer`](./03-gasless-relayer/) — Meta-transaction relayer with nonce checks and signature verification
@@ -36,6 +37,7 @@ This category contains examples of complex systems and advanced architectural pa
 - [`11-version-registry`](./11-version-registry/) — Contract version tracking with history and rollback (Phase 5)
 - [`12-oracle-consumer`](./12-oracle-consumer/) — Three oracle consumer contracts: validated cache, quorum median, and a settlement circuit breaker (Phase 5)
 - [`12-real-world-case-studies`](./12-real-world-case-studies/) — Problem/solution case studies: checks-effects-interactions, checked-arithmetic fees, and commit-reveal bidding
+- [`13-virtual-channel`](./13-virtual-channel/) — Virtual payment channels routed through an intermediary: ledger channels, off-chain updates, and on-chain settlement
 
 ## Planned Examples
 

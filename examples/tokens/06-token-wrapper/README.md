@@ -39,6 +39,23 @@ pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, WrapperError>
 }
 ```
 
+## Security
+
+`wrap`, `unwrap`, and `transfer` share a reentrancy guard (`DataKey::Entered`,
+following the same pattern as
+[`examples/advanced/05-reentrancy-guard`](../../advanced/05-reentrancy-guard/)).
+Without it, a hook-bearing or malicious `underlying` token's `transfer` (or
+even its read-only `balance`, checked by `unwrap` before the guard used to be
+set) could call back into `wrap` mid-flight and mint wrapped shares against
+the same real deposit more than once — this contract's own bookkeeping
+having already been updated doesn't stop a second, independent `wrap`
+invocation from reading that updated state as its new baseline and minting
+again on top of it. See
+[`SECURITY_REVIEW_TOKEN_EXAMPLES.md`](../../../tests/integration/SECURITY_REVIEW_TOKEN_EXAMPLES.md)
+and
+[`tests/integration/tests/token_security_tests.rs`](../../../tests/integration/tests/token_security_tests.rs)
+(#795) for the attack demonstration and regression tests.
+
 ## Backing Invariant
 
 The primary invariant is:

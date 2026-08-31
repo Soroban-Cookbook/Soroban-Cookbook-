@@ -35,6 +35,8 @@ pub enum DataKey {
     Balance(Address),
     /// Temporary storage: session cache keyed by session id
     SessionCache(u64),
+    /// Benchmark key for storage performance tests
+    Benchmark(u64),
 }
 
 /// Optimization 11: bitflags pack multiple booleans into a single `u32`,
@@ -301,5 +303,60 @@ impl GasOptimizationContract {
             write_balance(&env, &account, current - amount);
         }
         Ok(())
+    }
+
+    /// Benchmark write operations across storage tiers.
+    ///
+    /// `storage` selects the tier:
+    /// 0 = instance, 1 = persistent, 2 = temporary.
+    /// Returns the number of entries written.
+    pub fn benchmark_write(env: Env, storage: u32, count: u64) -> u64 {
+        for i in 0..count {
+            let key = DataKey::Benchmark(i);
+            let value = i as i128;
+            match storage {
+                0 => env.storage().instance().set(&key, &value),
+                1 => env.storage().persistent().set(&key, &value),
+                _ => env.storage().temporary().set(&key, &value),
+            }
+        }
+        count
+    }
+
+    /// Benchmark read operations across storage tiers.
+    ///
+    /// Reads `count` entries and returns a checksum so the compiler cannot
+    /// elide the reads.
+    pub fn benchmark_read(env: Env, storage: u32, count: u64) -> u64 {
+        let mut checksum: u64 = 0;
+        for i in 0..count {
+            let key = DataKey::Benchmark(i);
+            let value: i128 = match storage {
+                0 => env.storage().instance().get(&key).unwrap_or(0),
+                1 => env.storage().persistent().get(&key).unwrap_or(0),
+                _ => env.storage().temporary().get(&key).unwrap_or(0),
+            };
+            checksum = checksum.wrapping_add(value as u64);
+        }
+        checksum
+    }
+
+    /// Benchmark iteration over a stored vector.
+    ///
+    /// Writes `count` i128 values into a single temporary-storage vector,
+    /// reads it back, and returns the sum of all values.
+    pub fn benchmark_iteration(env: Env, count: u64) -> u64 {
+        let mut vec = Vec::new(&env);
+        for i in 0..count {
+            vec.push_back(i as i128);
+        }
+        let key = DataKey::SessionCache(u64::MAX);
+        env.storage().temporary().set(&key, &vec);
+        let loaded: Vec<i128> = env.storage().temporary().get(&key).unwrap();
+        let mut sum: u64 = 0;
+        for item in loaded.iter() {
+            sum = sum.wrapping_add(item as u64);
+        }
+        sum
     }
 }
