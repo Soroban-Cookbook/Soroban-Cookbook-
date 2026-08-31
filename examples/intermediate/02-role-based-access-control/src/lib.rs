@@ -1,7 +1,7 @@
 #![no_std]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
+    contract, contracterror, contractevent, contractimpl, contracttype, Address, Env, Vec,
 };
 
 #[contracterror]
@@ -30,7 +30,7 @@ pub enum DataKey {
     UserRole(Address),
 }
 
-#[contracttype]
+#[contractevent]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RoleChangeEvent {
     pub operator: Address,
@@ -38,9 +38,6 @@ pub struct RoleChangeEvent {
     pub old_role: Role,
     pub new_role: Role,
 }
-
-const CONTRACT_NS: Symbol = symbol_short!("rbac");
-const ACTION_ROLE_CHANGE: Symbol = symbol_short!("role_chg");
 
 #[contract]
 pub struct RoleBasedAccessControl;
@@ -59,15 +56,13 @@ impl RoleBasedAccessControl {
             .set(&DataKey::UserRole(owner.clone()), &Role::Owner);
         env.storage().instance().set(&DataKey::Initialized, &true);
 
-        env.events().publish(
-            (CONTRACT_NS, ACTION_ROLE_CHANGE, owner.clone()),
-            RoleChangeEvent {
-                operator: owner.clone(),
-                account: owner,
-                old_role: Role::User,
-                new_role: Role::Owner,
-            },
-        );
+        RoleChangeEvent {
+            operator: owner.clone(),
+            account: owner,
+            old_role: Role::User,
+            new_role: Role::Owner,
+        }
+        .publish(&env);
 
         Ok(())
     }
@@ -87,15 +82,13 @@ impl RoleBasedAccessControl {
             .persistent()
             .set(&DataKey::UserRole(account.clone()), &role);
 
-        env.events().publish(
-            (CONTRACT_NS, ACTION_ROLE_CHANGE, account.clone()),
-            RoleChangeEvent {
-                operator: caller,
-                account,
-                old_role,
-                new_role: role,
-            },
-        );
+        RoleChangeEvent {
+            operator: caller,
+            account,
+            old_role,
+            new_role: role,
+        }
+        .publish(&env);
 
         Ok(())
     }
@@ -115,15 +108,13 @@ impl RoleBasedAccessControl {
             .persistent()
             .remove(&DataKey::UserRole(account.clone()));
 
-        env.events().publish(
-            (CONTRACT_NS, ACTION_ROLE_CHANGE, account.clone()),
-            RoleChangeEvent {
-                operator: caller,
-                account,
-                old_role: target_role,
-                new_role: Role::User,
-            },
-        );
+        RoleChangeEvent {
+            operator: caller,
+            account,
+            old_role: target_role,
+            new_role: Role::User,
+        }
+        .publish(&env);
 
         Ok(())
     }
@@ -134,10 +125,34 @@ impl RoleBasedAccessControl {
     }
 
     pub fn require_role(env: Env, caller: Address, allowed: Vec<Role>) -> Result<(), RbacError> {
-        caller.require_auth();
-        Self::require_initialized(&env)?;
+        Self::require_any_role(&env, &caller, allowed)
+    }
 
-        let user_role = Self::get_role_internal(&env, &caller);
+    pub fn require_single_role(
+        env: &Env,
+        caller: &Address,
+        required: Role,
+    ) -> Result<(), RbacError> {
+        caller.require_auth();
+        Self::require_initialized(env)?;
+
+        let user_role = Self::get_role_internal(env, caller);
+        if user_role as u32 >= required as u32 {
+            Ok(())
+        } else {
+            Err(RbacError::Unauthorized)
+        }
+    }
+
+    pub fn require_any_role(
+        env: &Env,
+        caller: &Address,
+        allowed: Vec<Role>,
+    ) -> Result<(), RbacError> {
+        caller.require_auth();
+        Self::require_initialized(env)?;
+
+        let user_role = Self::get_role_internal(env, caller);
         for allowed_role in allowed.iter() {
             if user_role as u32 >= allowed_role as u32 {
                 return Ok(());
@@ -147,12 +162,26 @@ impl RoleBasedAccessControl {
     }
 
     pub fn admin_action(env: Env, caller: Address, value: u64) -> Result<u64, RbacError> {
-        Self::require_role(
-            env.clone(),
-            caller.clone(),
-            Vec::from_array(&env, [Role::Admin]),
-        )?;
+        Self::require_single_role(&env, &caller, Role::Admin)?;
         Ok(value * 2)
+    }
+
+    pub fn moderator_action(env: Env, caller: Address, value: u64) -> Result<u64, RbacError> {
+        Self::require_single_role(&env, &caller, Role::Moderator)?;
+        Ok(value + 10)
+    }
+
+    pub fn moderator_or_admin_action(
+        env: Env,
+        caller: Address,
+        value: u64,
+    ) -> Result<u64, RbacError> {
+        Self::require_any_role(
+            &env,
+            &caller,
+            Vec::from_array(&env, [Role::Moderator, Role::Admin]),
+        )?;
+        Ok(value + 100)
     }
 
     fn require_initialized(env: &Env) -> Result<(), RbacError> {
@@ -195,3 +224,6 @@ impl RoleBasedAccessControl {
         }
     }
 }
+
+#[cfg(test)]
+mod test;
