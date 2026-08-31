@@ -1,0 +1,12 @@
+[package]
+name = "payment-channels"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
+ed25519-dalek = "2"
