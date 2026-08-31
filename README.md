@@ -176,6 +176,7 @@ We track community health transparently so everyone can see how the project is g
 | [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
+| [Iterable Mapping](./docs/iterable-mapping.md) | Enumeration pattern for key-value maps using a side list, with `keys(page)` and `values(page)` pagination helpers |
 
 The dashboard is updated automatically every Monday by a GitHub Actions workflow.
 

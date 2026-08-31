@@ -5,7 +5,7 @@ Soroban fungible token contracts from a minimal SEP-41 implementation to advance
 ## Examples
 
 | # | Example | Pattern | Difficulty |
-|---|---------|---------|------------|
+---|--------|--------|-------------|
 | 01 | [SEP-41 Token](./tokens/01-sep41-token.md) | Complete SEP-41 fungible token with metadata, approvals, events | Beginner |
 | 02 | [SEP-41 Extensions](./tokens/02-sep41-extensions.md) | Permit, batch transfer, batch approve | Intermediate |
 | 03 | [Optimized Operations](./tokens/03-optimized-operations.md) | Storage layout and batching with benchmarks | Advanced |
@@ -15,6 +15,10 @@ Soroban fungible token contracts from a minimal SEP-41 implementation to advance
 | 07 | [Token Metadata](./tokens/07-token-metadata.md) | Mutable and immutable on-chain metadata | Beginner |
 | 08 | [Multi-Token Balance Manager](./tokens/08-multi-token-balance-manager.md) | Portfolio contract across multiple tokens | Intermediate |
 | 09 | [Optimized Token Ops](./tokens/09-optimized-token-ops.md) | Micro-optimization patterns for transfers | Intermediate |
+
+## Gas Cost Benchmarks
+
+See [docs/gas-benchmarks.md](../../../docs/gas-benchmarks.md) for gas cost comparisons and CI baselines.
 
 ## Prerequisites
 

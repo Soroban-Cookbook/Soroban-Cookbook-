@@ -73,7 +73,7 @@ impl LazyCacheContract {
         remove_cached_entry(&env, &mut metadata, id);
         save_metadata(&env, &metadata);
         env.events()
-            .publish((symbol_short!("cache"), symbol_short!("invalidat")), id);
+            .publish((symbol_short!("cache"), symbol_short!("invalid")), id);
     }
 
     /// Clear the entire temporary cache.

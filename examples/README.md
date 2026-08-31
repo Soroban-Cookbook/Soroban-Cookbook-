@@ -13,7 +13,7 @@ A comprehensive collection of Soroban smart contract examples, ranging from basi
 ### [Intermediate](./intermediate/)
 **Common patterns and real-world use cases** for developers who have mastered the basics.
 - **Key Topics:** Multi-sig patterns, Token interactions, Access Control, Data Structures.
-- **Status:** Several patterns implemented, more planned.
+- **Status:** RBAC implementation added; several patterns implemented, more planned.
 
 ### [Advanced](./advanced/)
 **Complex architectural designs and optimizations** for production-grade systems.

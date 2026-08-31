@@ -30,8 +30,8 @@ pub struct LiquidityEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap_liq");
-const EVENT_ADD: Symbol = symbol_short!("liq_added");
-const EVENT_REMOVE: Symbol = symbol_short!("liq_rmvd");
+const EVENT_ADD: Symbol = symbol_short!("liq_add");
+const EVENT_REMOVE: Symbol = symbol_short!("liq_rem");
 
 impl SwapLiquidityContract {
     /*

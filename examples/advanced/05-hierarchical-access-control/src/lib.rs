@@ -134,6 +134,7 @@ impl HierarchicalAccessControlContract {
 
         let mut manager_perms: Vec<Symbol> = Vec::new(&env);
         manager_perms.push_back(PERM_MANAGE_RESOURCES);
+        manager_perms.push_back(PERM_MANAGE_ROLES);
         manager_perms.push_back(PERM_USE_RESOURCES);
         env.storage()
             .instance()
@@ -169,6 +170,10 @@ impl HierarchicalAccessControlContract {
         caller.require_auth();
         Self::require_permission(&env, &caller, PERM_MANAGE_ROLES);
 
+        if !Self::can_manage_role(&env, &caller, &role) {
+            panic!("Caller cannot manage target role");
+        }
+
         let key = DataKey::RoleMembers(role.clone());
         let mut members: Vec<Address> = env
             .storage()
@@ -196,6 +201,10 @@ impl HierarchicalAccessControlContract {
     pub fn revoke_role(env: Env, caller: Address, role: Symbol, account: Address) {
         caller.require_auth();
         Self::require_permission(&env, &caller, PERM_MANAGE_ROLES);
+
+        if !Self::can_manage_role(&env, &caller, &role) {
+            panic!("Caller cannot manage target role");
+        }
 
         let key = DataKey::RoleMembers(role.clone());
         let members: Vec<Address> = env
@@ -404,19 +413,39 @@ impl HierarchicalAccessControlContract {
     }
 
     fn check_account_permission(env: &Env, account: &Address, permission: Symbol) -> bool {
-        // Check all roles in order of hierarchy (highest first)
+        // Check the highest role held by the account. Effective permissions
+        // include implicit permissions inherited from lower roles.
         let roles = [ROLE_ADMIN, ROLE_MANAGER, ROLE_OPERATOR];
-        for role in roles.iter() {
+        let mut start_role = roles.len();
+        for (i, role) in roles.iter().enumerate() {
             if Self::check_role(env, account, *role) {
-                let perms: Vec<Symbol> = env
-                    .storage()
-                    .instance()
-                    .get(&DataKey::RolePermissions(*role))
-                    .unwrap_or_else(|| Vec::new(&env));
-                if perms.contains(&permission) {
-                    return true;
-                }
+                start_role = i;
+                break;
             }
+        }
+        for role in roles.iter().skip(start_role) {
+            let perms: Vec<Symbol> = env
+                .storage()
+                .instance()
+                .get(&DataKey::RolePermissions(*role))
+                .unwrap_or_else(|| Vec::new(&env));
+            if perms.contains(&permission) {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn can_manage_role(env: &Env, caller: &Address, role: &Symbol) -> bool {
+        if *role == ROLE_ADMIN {
+            return Self::check_role(env, caller, ROLE_ADMIN);
+        }
+        if *role == ROLE_MANAGER {
+            return Self::check_role(env, caller, ROLE_ADMIN);
+        }
+        if *role == ROLE_OPERATOR {
+            return Self::check_role(env, caller, ROLE_ADMIN)
+                || Self::check_role(env, caller, ROLE_MANAGER);
         }
         false
     }
@@ -429,4 +458,108 @@ impl HierarchicalAccessControlContract {
 }
 
 #[cfg(test)]
-mod test;
+mod test {
+    use super::*;
+    use soroban_sdk::testutils::Address as _;
+
+    fn deploy(
+        env: &Env,
+    ) -> (
+        HierarchicalAccessControlContractClient,
+        Address,
+        Address,
+        Address,
+    ) {
+        let admin = Address::generate(env);
+        let manager = Address::generate(env);
+        let operator = Address::generate(env);
+
+        let contract_id = env.register_contract(None, HierarchicalAccessControlContract);
+        let client = HierarchicalAccessControlContractClient::new(env, &contract_id);
+
+        client.initialize(&admin);
+        client.grant_role(&admin, &ROLE_MANAGER, &manager);
+        client.grant_role(&admin, &ROLE_OPERATOR, &operator);
+
+        (client, admin, manager, operator)
+    }
+
+    #[test]
+    fn test_grant_revoke_and_checks() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let user = Address::generate(&env);
+        let (client, admin, _manager, _operator) = deploy(&env);
+
+        assert!(!client.has_role(&ROLE_OPERATOR, &user));
+        assert!(!client.account_has_permission(&user, &PERM_USE_RESOURCES));
+
+        client.grant_role(&admin, &ROLE_OPERATOR, &user);
+        assert!(client.has_role(&ROLE_OPERATOR, &user));
+        assert!(client.account_has_permission(&user, &PERM_USE_RESOURCES));
+
+        client.revoke_role(&admin, &ROLE_OPERATOR, &user);
+        assert!(!client.has_role(&ROLE_OPERATOR, &user));
+        assert!(!client.account_has_permission(&user, &PERM_USE_RESOURCES));
+    }
+
+    #[test]
+    fn test_hierarchy_inherits_permissions() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, admin, manager, _operator) = deploy(&env);
+
+        let custom = symbol_short!("CUSTOM");
+        client.grant_permission(&admin, &custom, &ROLE_OPERATOR);
+
+        assert!(client.role_has_permission(&ROLE_OPERATOR, &custom));
+        assert!(client.account_has_permission(&admin, &custom));
+        assert!(client.account_has_permission(&manager, &custom));
+    }
+
+    #[test]
+    fn test_manager_can_manage_operator_role() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, _admin, manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&manager, &ROLE_OPERATOR, &user);
+        assert!(client.has_role(&ROLE_OPERATOR, &user));
+
+        client.revoke_role(&manager, &ROLE_OPERATOR, &user);
+        assert!(!client.has_role(&ROLE_OPERATOR, &user));
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller cannot manage target role")]
+    fn test_manager_cannot_manage_admin_role() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, _admin, manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&manager, &ROLE_ADMIN, &user);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller does not have required permission")]
+    fn test_operator_cannot_manage_roles() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, _admin, _manager, operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&operator, &ROLE_OPERATOR, &user);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller does not have required permission")]
+    fn test_operator_cannot_manage_resources() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, _admin, _manager, operator) = deploy(&env);
+
+        client.manage_resource(&operator, &symbol_short!("res"));
+    }
+}

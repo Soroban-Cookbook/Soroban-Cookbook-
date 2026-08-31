@@ -1,0 +1,5 @@
+[package]
+name = "docs-audit-tests"
+version.workspace = true
+edition.workspace = true
+publish = false

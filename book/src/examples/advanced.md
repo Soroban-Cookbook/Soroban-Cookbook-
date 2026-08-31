@@ -19,6 +19,16 @@ Complex protocols & optimizations for production systems.
 
 ---
 
+### [03-state-channel-disputes](../examples/advanced/03-state-channel-disputes/)
+**State channel dispute resolution** with challenge submission, response mechanics, timeout handling, and fraud proofs.
+
+**Key Concepts:**
+- Challenge window & dispute deadlines
+- Sequence-based state updates
+- Fraud proof slashing mechanisms
+
+---
+
 ### [03-permit-pattern](../examples/advanced/03-permit-pattern/)
 **Permit-based approvals** with signature-backed authorization and deadline enforcement.
 

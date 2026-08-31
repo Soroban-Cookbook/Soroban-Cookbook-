@@ -29,6 +29,8 @@ pub struct SwapEventData {
 }
 
 const EVENT_NS: Symbol = symbol_short!("swap");
+const EVENT_SWAP: Symbol = symbol_short!("swap_exec");
+const EVENT_PAIR: Symbol = symbol_short!("pair_upd");
 
 impl SimpleSwapContract {
     fn require_owner(&self, env: &Env) {
@@ -93,7 +95,7 @@ impl SimpleSwapContract {
         env.storage().instance().set(&DataKey::RateDen, &rate_den);
 
         env.events().publish(
-            (EVENT_NS, Symbol::new(&env, "pair_updated")),
+            (EVENT_NS, EVENT_PAIR),
             (token_a, token_b, rate_num, rate_den),
         );
     }
@@ -116,7 +118,7 @@ impl SimpleSwapContract {
         env.storage().instance().set(&DataKey::RateDen, &rate_den);
 
         env.events().publish(
-            (EVENT_NS, Symbol::new(&env, "pair_updated")),
+            (EVENT_NS, EVENT_PAIR),
             (token_a, token_b, rate_num, rate_den),
         );
     }
@@ -196,7 +198,7 @@ impl SimpleSwapContract {
         token::Client::new(&env, &buy_token).transfer(&contract_addr, &recipient, &buy_amount);
 
         env.events().publish(
-            (EVENT_NS, Symbol::new(&env, "swap_executed")),
+            (EVENT_NS, EVENT_SWAP),
             SwapEventData {
                 trader,
                 sell_token,

@@ -85,6 +85,10 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
   earlier); related-examples section completed to cover proxy, registry, and
   consumer examples
 
+**#801 — Add Iterable Mapping Utilities (Phase 3)**
+
+- `examples/intermediate/iterable-mappings/` — added filtering (`filter_by_min_value`, `filter_by_page`), mapping (`map_values_scale`, `map_values_scale_page`), and reducing (`reduce_sum`, `reduce_sum_page`) contract methods and generic functional Rust utilities (`filter_by_predicate`, `transform_values`, `reduce_values`), with 18 unit tests and updated README documentation.
+
 ---
 
 ### Aug 30, 2026 — Issue #979: Create Grants Application Process ✅
@@ -129,6 +133,17 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 - `CONTRIBUTING.md` — added Phase 8 completion notice and links
 - `README.md` — added Phase 8 completion status and documentation link
 - **Status:** All Phase 8 objectives met; community governance, metrics, feedback, grants, and project templates delivered.
+
+---
+
+### Aug 31, 2026 — Issue #803: Security Audit Prep for Intermediate Examples ✅
+
+- `docs/security-audit/audit-scope.md` — extended in-scope tables to cover all 13 `examples/intermediate/` contracts and all 18 `examples/tokens/` contracts (SEP-41), previously limited to 8 intermediate examples with tokens entirely out of scope
+- `docs/security-audit/known-issues-log.md` — extended KI-2 (orphaned tests) to `09-optimized-token-ops`; added KI-5 (three examples with no README) and KI-6 (stale `examples/tokens/README.md` index); added panic-path review pointers for the newly in-scope examples
+- `docs/security-audit/audit-prep-checklist.md` — extended the per-example readiness table to all 13 intermediate and 18 token examples with structural facts (README/test-file/wired/`require_auth` counts)
+- `docs/security-audit/README.md` — updated scope-at-a-glance summary to intermediate + token examples
+- `tests/docs-audit/` (new package `docs-audit-tests`) — regression tests that fail if a future example is added without updating the audit-scope/checklist docs, or if an example loses its README without the gap being logged
+- `CONTRIBUTING.md` — documented the new `docs-audit-tests` package and test category
 
 ---
 

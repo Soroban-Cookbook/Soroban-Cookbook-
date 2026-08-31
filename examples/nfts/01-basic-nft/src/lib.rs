@@ -163,10 +163,7 @@ impl BasicNftContract {
             &approved,
         );
         env.events().publish(
-            (
-                soroban_sdk::Symbol::new(&env, "set_approval_for_all"),
-                symbol_short!("nft"),
-            ),
+            (symbol_short!("set_aprv"), symbol_short!("nft")),
             (owner, operator, approved),
         );
         Ok(())

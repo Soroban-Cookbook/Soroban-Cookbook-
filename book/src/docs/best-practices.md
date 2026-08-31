@@ -15,6 +15,10 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: u64) {
 
     // Proceed with transfer logic
     let balance = read_balance(&env, &from);
+    if balance < amount {
+        panic!("Insufficient balance");
+    }
+
     write_balance(&env, &from, balance - amount);
     write_balance(&env, &to, read_balance(&env, &to) + amount);
 }
@@ -221,7 +225,7 @@ pub fn batch_transfer(env: Env, from: Address, transfers: Vec<(Address, u64)>) {
     // Update recipients
     for (to, amount) in transfers.iter() {
         let balance = read_balance(&env, &to);
-        write_balance(&env, &to, balance + amount);
+        write_balance(&env, &to, balance.checked_add(amount).expect("Balance overflow"));
     }
 }
 ```
@@ -287,7 +291,7 @@ lto = true
 
 ```toml
 [dependencies]
-soroban-sdk = "21.7.0"  # Only what you need
+soroban-sdk = "22.0.0"  # Only what you need
 
 # Avoid heavy crates if possible
 ```

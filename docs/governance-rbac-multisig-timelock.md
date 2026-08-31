@@ -250,6 +250,7 @@ A solid governance system often layers RBAC, multisig, and timelock.
 ## 6. Example references in this repository
 
 - [`examples/basics/03-authentication/`](../examples/basics/03-authentication/) — RBAC and basic authentication patterns
+- [`examples/intermediate/access-control/`](../examples/intermediate/access-control/) — combined RBAC, multisig, and timelock with threat models
 - [`examples/intermediate/multi-sig-patterns/`](../examples/intermediate/multi-sig-patterns/) — proposal-based multisig and authorization vectors
 - [`examples/advanced/01-multi-party-auth/`](../examples/advanced/01-multi-party-auth/) — threshold signatures and multi-party approval workflows
 - [`examples/advanced/02-timelock/`](../examples/advanced/02-timelock/) — time-delayed execution and timelock controls

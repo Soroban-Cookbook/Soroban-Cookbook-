@@ -9,39 +9,38 @@ members = [
     "examples/basics/06-validation-patterns",
     "examples/basics/13-queue-variants",
     "examples/basics/14-fifo-queue",
+    "examples/intermediate/iterable-mappings",
     "examples/intermediate/03-priority-queue",
+    "examples/intermediate/02-role-based-access-control",
+    "examples/intermediate/access-control",
     "examples/intermediate/03-pause-unpause",
     "examples/intermediate/multi-sig-patterns",
     "examples/intermediate/event-subscriptions",
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-beacon-proxy",
     "examples/advanced/02-timelock",
+    "examples/advanced/03-state-channel-disputes",
     "examples/advanced/03-beacon-proxy-factory",
-    "examples/advanced/03-gasless-relayer",
+    "examples/advanced/03-gas-less-relayer",
     "examples/advanced/03-batch-builder",
+    "examples/advanced/03-rbac-modifiers",
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/advanced/07-state-channels",
     "examples/advanced/07-trusted-forwarder",
     "examples/advanced/09-storage-layout-validator",
     "examples/advanced/03-permit-pattern",
-    "examples/advanced/03-gasless-relayer",
     "examples/advanced/03-oracle-pattern",
     "examples/advanced/04-upgradeable-proxy",
+    "examples/advanced/multicall",
     "examples/advanced/05-rate-limiting",
     "examples/advanced/03-merkle-airdrop",
-    "examples/advanced/03-oracle-pattern",
-    "examples/advanced/03-permit-pattern",
-    "examples/advanced/05-diamond-security",
-    "examples/advanced/05-diamond-security/facet-adder",
-    "examples/advanced/05-diamond-security/facet-multiplier",
-    "examples/advanced/05-rate-limiting",
     "examples/advanced/06-gas-optimization",
-    "examples/advanced/07-trusted-forwarder",
     "examples/advanced/07-upgrade-patterns",
     "examples/advanced/08-payment-channels",
+    "examples/advanced/08-gas-reporter",
     "examples/advanced/09-fuzz-testing",
-    "examples/advanced/09-storage-layout-validator",
     "examples/advanced/09-storage-optimization",
     "examples/advanced/10-contract-migrations",
     "examples/advanced/11-version-registry",
@@ -49,7 +48,6 @@ members = [
     "examples/advanced/12-oracle-consumer/guarded",
     "examples/advanced/12-oracle-consumer/aggregating",
     "examples/advanced/12-oracle-consumer/settlement",
-    "examples/advanced/09-storage-optimization",
     "examples/advanced/05-diamond-facets",
     "examples/intermediate/event-history",
     "examples/intermediate/ajo-factory",
@@ -67,12 +65,14 @@ members = [
     "examples/tokens/token-lock",
     "examples/governance/01-vote-delegation",
     "examples/intermediate/lazy-loading",
-    "examples/tokens/10-pausable-permissions",
+    "examples/intermediate/iterable-mapping",
     "examples/tokens/08-multi-token-balance-manager",
     "examples/defi/15-reward-strategies",
     "examples/advanced/12-real-world-case-studies",
+    "examples/advanced/13-virtual-channel",
     "tests/integration",
     "tests/security",
+    "tests/docs-audit",
 ]
 
 [workspace.package]
@@ -84,10 +84,10 @@ rust-version = "1.96"
 deprecated = "allow"
 
 [workspace.dependencies]
-soroban-sdk = "26.0.0-rc.1"
+soroban-sdk = "28.0.0-rc.1"
 base64ct = "=1.8.3"
 
-[profile.release]
+[Profile.release]
 opt-level = "z"
 overflow-checks = true
 debug = 0
@@ -97,7 +97,7 @@ panic = "abort"
 codegen-units = 1
 lto = true
 
-[profile.release-with-logs]
+[Profile.release-with-logs]
 inherits = "release"
 debug-assertions = true
 
@@ -109,3 +109,6 @@ debug = true
 overflow-checks = true
 debug-assertions = true
 strip = "symbols"
+
+[profile.bench]
+inherits = "release"
