@@ -165,6 +165,42 @@ sequenceDiagram
   tolerant; writes should fail fast and leave no ambiguous partial state.
 - Document every external contract address in deployment notes.
 
+## Optimizing Cross-Contract Calls
+
+Cross-contract calls dominate transaction cost in Soroban. Reduce overhead by
+packing arguments, batching related calls, and minimizing round trips.
+
+### Pack Arguments
+
+- Encode multiple fields into one `Bytes` or `String` value instead of passing
+  many small arguments.
+- Use a single `Vec` or map when the callee needs a set of related values.
+- For token transfers, follow SEP-41 and pass `Address` and `i128` values
+  directly; do not wrap them in an extra envelope unless the callee requires
+  it.
+
+### Batch Calls
+
+- Combine independent reads into one contract call that returns all requested
+  values.
+- Use factory or registry contracts to resolve addresses, then batch
+  operations against child contracts in one transaction.
+- If a workflow needs several writes, use one coordinator contract call that
+  performs the writes sequentially; avoid forcing the caller to make multiple
+  top-level transactions.
+
+### Minimize Round Trips
+
+- Prefer returning composite structs or `Vec`s over requiring many `get` calls.
+- Cache registry lookups and implementation addresses locally when a
+  transaction performs repeated calls to the same target.
+- Validate arguments before the first call so a failing batch does not waste
+  earlier work.
+
+Measure gas before and after each optimization. Packing arguments usually
+reduces calldata size, batching reduces ledger access overhead, and fewer round
+trips reduce CPU and storage costs.
+
 ## Benchmarking Cross-Contract Calls
 
 Cross-contract calls add ledger I/O, host function calls, and authentication
@@ -198,6 +234,7 @@ following the cross-contract patterns in `integration_tests.rs`.
   bottleneck, but make sure callers still validate the returned address.
 - Document the expected gas and ledger cost per cross-contract action in the
   deployment notes so regressions are visible in code review.
+
 
 ## Upgrade Safety Checklist
 

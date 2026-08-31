@@ -2,21 +2,21 @@
 
 **Source:** [`examples/tokens/03-optimized-operations/`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/03-optimized-operations)
 
-Storage-layout and batching optimizations for high-throughput token contracts. Includes benchmarks comparing naïve and optimized implementations.
+Optimizations for cross-contract calls, including argument packing, call batching, and minimized round trips. Includes benchmarks comparing naïve and optimized implementations.
 
 ## What You'll Learn
 
-- Key packing to reduce per-entry ledger costs
-- Batched balance reads to minimize storage roundtrips
+- Argument packing to reduce cross-contract calldata overhead
+- Call batching to minimize cross-contract round trips
 - Benchmark harness using `cargo bench`
 
 ## Optimizations
 
 | Technique | Saving |
 |-----------|--------|
-| Packed storage keys | Fewer ledger entries → lower fees |
-| Lazy TTL extension | Extend only on write, not every read |
-| Batch balance check | Single storage scan for multi-recipient transfers |
+| Argument packing | Fewer bytes in calldata → lower fees |
+| Call batching | Single transaction for multiple calls → fewer round trips |
+| Minimized round trips | Reduced overhead per cross-contract interaction |
 
 ## Run the Example
 
