@@ -28,6 +28,7 @@ pub enum RegistryKey {
     Entry(Symbol),
     Category(Symbol),
     Categories,
+    Count,
 }
 
 #[contract]
@@ -57,6 +58,15 @@ impl ContractRegistry {
         };
 
         env.storage().persistent().set(&entry_key, &metadata);
+
+        // Increment the running count for paging off-chain tooling.
+        let mut count: u32 = env
+            .storage()
+            .persistent()
+            .get(&RegistryKey::Count)
+            .unwrap_or(0);
+        count = count.saturating_add(1);
+        env.storage().persistent().set(&RegistryKey::Count, &count);
 
         // Add name to category index
         let cat_key = RegistryKey::Category(category.clone());
@@ -108,6 +118,56 @@ impl ContractRegistry {
             .persistent()
             .get(&RegistryKey::Categories)
             .unwrap_or(Vec::new(&env))
+    }
+
+    /// Total number of registered entries — the page bound for off-chain
+    /// tooling that iterates the index.
+    pub fn count(env: Env) -> u32 {
+        env.storage()
+            .persistent()
+            .get(&RegistryKey::Count)
+            .unwrap_or(0)
+    }
+
+    /// Remove an entry and clean up its category index. Returns an error when
+    /// the name was never registered.
+    pub fn deregister(env: Env, name: Symbol) -> Result<(), RegistryError> {
+        let entry_key = RegistryKey::Entry(name.clone());
+        let metadata = env
+            .storage()
+            .persistent()
+            .get::<_, ContractMetadata>(&entry_key)
+            .ok_or(RegistryError::NotFound)?;
+
+        env.storage().persistent().remove(&entry_key);
+
+        // Drop the name from its category index.
+        let cat_key = RegistryKey::Category(metadata.category);
+        if let Some(names) = env.storage().persistent().get::<_, Vec<Symbol>>(&cat_key) {
+            let mut remaining: Vec<Symbol> = Vec::new(&env);
+            for candidate in names.iter() {
+                if candidate != name {
+                    remaining.push_back(candidate);
+                }
+            }
+            if remaining.is_empty() {
+                env.storage().persistent().remove(&cat_key);
+            } else {
+                env.storage().persistent().set(&cat_key, &remaining);
+            }
+        }
+
+        let count: u32 = env
+            .storage()
+            .persistent()
+            .get(&RegistryKey::Count)
+            .unwrap_or(0);
+        env.storage()
+            .persistent()
+            .set(&RegistryKey::Count, &count.saturating_sub(1));
+
+        env.events().publish((symbol_short!("drop"), name), ());
+        Ok(())
     }
 }
 

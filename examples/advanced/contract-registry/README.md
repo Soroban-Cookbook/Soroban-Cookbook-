@@ -14,3 +14,8 @@ Example usage (client calls):
 - `list_categories()` — list known categories.
 
 See `src/lib.rs` and `src/test.rs` for implementation and tests.
+
+Additional query/cleanup APIs (added as part of the #771 wave):
+
+- `count()` — total registered entries, for paging off-chain tooling.
+- `deregister(name)` — remove an entry and its category-index membership.

@@ -49,3 +49,44 @@ fn test_duplicate_register_fails() {
     let res = client.try_register(&name, &category, &version, &addr);
     assert!(res.is_err());
 }
+
+#[test]
+fn test_count_tracks_registers() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ContractRegistry);
+    let client = ContractRegistryClient::new(&env, &contract_id);
+
+    assert_eq!(client.count(), 0);
+    client.register(&symbol_short!("a"), &symbol_short!("cat"), &symbol_short!("v1"), &contract_id.clone());
+    client.register(&symbol_short!("b"), &symbol_short!("cat"), &symbol_short!("v1"), &contract_id.clone());
+    assert_eq!(client.count(), 2);
+}
+
+#[test]
+fn test_deregister_removes_entry_and_updates_index() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ContractRegistry);
+    let client = ContractRegistryClient::new(&env, &contract_id);
+
+    let name = symbol_short!("gone");
+    let category = symbol_short!("tmp");
+    client.register(&name, &category, &symbol_short!("v1"), &contract_id.clone());
+    assert_eq!(client.count(), 1);
+
+    client.deregister(&name);
+    assert_eq!(client.count(), 0);
+    let candidates = client.list_by_category(&category);
+    assert_eq!(candidates.len(), 0, "category index cleaned");
+    let lookup = client.try_get_by_name(&name);
+    assert!(lookup.is_err() || lookup.unwrap().is_err(), "entry removed");
+}
+
+#[test]
+fn test_deregister_unknown_fails() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, ContractRegistry);
+    let client = ContractRegistryClient::new(&env, &contract_id);
+
+    let res = client.try_deregister(&symbol_short!("missing"));
+    assert_eq!(res, Err(Ok(RegistryError::NotFound)));
+}

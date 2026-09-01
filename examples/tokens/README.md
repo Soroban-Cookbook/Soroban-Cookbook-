@@ -26,3 +26,10 @@ This category contains examples related to fungible tokens, including implementa
 - `07-token-metadata`: A token with full SEP-41 metadata support (name, symbol, decimals, URI) with admin-governed updates.
 - `10-automatic-snapshot-triggers`: Time-based & event-based balance snapshots with pruning.
 - [`10-pausable-permissions`](./10-pausable-permissions/): A permission system for pausing — pauser role, multi-sig pause, and time-limited pause.
+
+## Patterns Guide
+
+Before reaching for a specific token example, prefer the consolidated
+[Token Patterns](../../docs/token-patterns.md) guide — it synthesizes metadata,
+mint/burn, wrapping, storage layout, access control, and event decisions with
+concrete do/don't guidance.
