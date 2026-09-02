@@ -2,6 +2,22 @@
 
 This example demonstrates practical optimization techniques for token operations on the Soroban network. It includes side-by-side implementations of standard and optimized patterns with benchmarks showing cost reductions.
 
+## Issue #786 verification
+
+The implementation requested by issue #786 is provided by `OptimizedTokenOps`
+in [`src/lib.rs`](src/lib.rs). It includes batched transfers, consolidated
+balance storage, validation before state changes, and single-write updates.
+The before/after harness is in
+[`benches/benchmarks.rs`](benches/benchmarks.rs); run it with:
+
+```bash
+cargo test -p optimized-token-operations
+cargo bench -p optimized-token-operations
+```
+
+The benchmark output reports measured CPU-instruction and memory deltas rather
+than relying on a fixed estimate. This is the review checklist for #786.
+
 ## Quick Start
 
 ```bash
