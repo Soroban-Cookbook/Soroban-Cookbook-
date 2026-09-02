@@ -21,7 +21,7 @@ members = [
     "examples/advanced/02-timelock",
     "examples/advanced/03-state-channel-disputes",
     "examples/advanced/03-beacon-proxy-factory",
-    "examples/advanced/03-gas-less-relayer",
+    "examples/advanced/03-gasless-relayer",
     "examples/advanced/03-batch-builder",
     "examples/advanced/03-rbac-modifiers",
     "examples/advanced/05-diamond-security",
@@ -33,7 +33,7 @@ members = [
     "examples/advanced/03-permit-pattern",
     "examples/advanced/03-oracle-pattern",
     "examples/advanced/04-upgradeable-proxy",
-    "examples/advanced/multicall",
+    "examples/advanced/08-multicall",
     "examples/advanced/05-rate-limiting",
     "examples/advanced/03-merkle-airdrop",
     "examples/advanced/06-gas-optimization",
@@ -70,6 +70,7 @@ members = [
     "examples/defi/15-reward-strategies",
     "examples/advanced/12-real-world-case-studies",
     "examples/advanced/13-virtual-channel",
+    "examples/advanced/14-bridge-monitor",
     "tests/integration",
     "tests/security",
     "tests/docs-audit",
@@ -86,6 +87,8 @@ deprecated = "allow"
 [workspace.dependencies]
 soroban-sdk = "28.0.0-rc.1"
 base64ct = "=1.8.3"
+ajo-factory = { path = "examples/intermediate/ajo-factory" }
+multi-sig-patterns = { path = "examples/intermediate/multi-sig-patterns" }
 
 [Profile.release]
 opt-level = "z"
