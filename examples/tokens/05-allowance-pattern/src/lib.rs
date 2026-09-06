@@ -196,6 +196,19 @@ impl AllowancePattern {
         if owner_balance < amount {
             return Err(AllowanceError::InsufficientBalance);
         }
+        // If the owner is also the recipient, the balance must not be written twice.
+        if owner == to {
+            write_allowance(
+                &env,
+                &owner,
+                &spender,
+                spendable - amount,
+                allowance.expiration_ledger,
+            );
+            publish_transfer(&env, owner, to, amount);
+            return Ok(());
+        }
+
         let to_balance = read_balance(&env, &to);
         let new_to_balance = to_balance
             .checked_add(amount)
