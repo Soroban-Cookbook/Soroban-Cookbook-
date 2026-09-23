@@ -1,0 +1,10 @@
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/soroban_spec_rust-0bff0f74b9e5ea62.d: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/syn_ext.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/trait.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/types.rs
+
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/libsoroban_spec_rust-0bff0f74b9e5ea62.rlib: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/syn_ext.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/trait.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/types.rs
+
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/libsoroban_spec_rust-0bff0f74b9e5ea62.rmeta: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/syn_ext.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/trait.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/types.rs
+
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/lib.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/syn_ext.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/trait.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/soroban-spec-rust-26.1.0/src/types.rs:
