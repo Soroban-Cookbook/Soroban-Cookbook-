@@ -2,6 +2,18 @@
 
 A proxy pattern for contract upgrades that separates the proxy and implementation contracts. The proxy owns application state, so replacing the implementation preserves that state.
 
+## Scope In the Upgradeability Sequence
+
+This is step 1 of 6 and the starting point for the
+[upgradeability examples](../README.md). It demonstrates a single proxy whose
+implementation address can be changed; `implementation-v1` supplies the initial
+business logic.
+
+- **In scope:** direct implementation routing and proxy-owned state across upgrades.
+- **Out of scope:** timelocked upgrade proposals, shared beacons, and storage
+    schema migration. Continue to [Proxy Admin Controls](../03-proxy-admin/) for
+    upgrade governance.
+
 ## What It Demonstrates
 
 - **Proxy Contract**: Forwards calls to an implementation contract
@@ -62,3 +74,8 @@ Run with:
 ```bash
 cargo test -p upgradeable-proxy
 ```
+
+## Next
+
+Continue with [Proxy Admin Controls](../03-proxy-admin/) to add proposal delays,
+cancellation, and emergency pause controls around upgrade operations.

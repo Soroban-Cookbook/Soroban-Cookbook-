@@ -2,6 +2,17 @@
 
 A Soroban cookbook example for managing upgradeable beacon contracts with per-beacon version history, rollback support, and multi-beacon registration.
 
+## Scope In the Upgradeability Sequence
+
+This is step 5 of 6, following the
+[beacon proxy factory](../03-beacon-proxy-factory/).
+
+- **In scope:** registering multiple named beacons, tracking each beacon's
+	implementation history, and rolling back its latest upgrade.
+- **Out of scope:** deploying proxy fleets or forwarding application calls.
+	Continue to [Upgrade Patterns](../07-upgrade-patterns/) for direct WASM
+	upgrades and storage migration.
+
 ## What it demonstrates
 
 - Versioned beacon implementations
@@ -23,3 +34,8 @@ A Soroban cookbook example for managing upgradeable beacon contracts with per-be
 ```bash
 cargo test -p beacon-management
 ```
+
+## Next
+
+Continue with [Upgrade Patterns](../07-upgrade-patterns/) for direct WASM
+replacement, versioned storage migration, and post-upgrade initialization.

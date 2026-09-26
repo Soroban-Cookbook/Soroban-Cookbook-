@@ -2,6 +2,24 @@
 
 This category contains examples of complex systems and advanced architectural patterns for experienced Soroban developers. These examples tackle sophisticated problems and often involve multi-contract interactions and intricate state management.
 
+## Upgradeability Sequence
+
+Follow these six examples in order. Each step builds on the previous one while
+covering a distinct upgradeability concern:
+
+1. [Upgradeable Proxy](./04-upgradeable-proxy/) — proxy-owned state and direct
+	implementation routing; no governance workflow or beacon.
+2. [Proxy Admin Controls](./03-proxy-admin/) — timelocked proposals,
+	cancellation, and pause; no proxy call forwarding.
+3. [Beacon Proxy](./02-beacon-proxy/) — shared implementation routing through
+	a beacon; no fleet factory.
+4. [Beacon Proxy Factory](./03-beacon-proxy-factory/) — deploy and track a proxy
+	fleet using one beacon; no named-beacon registry.
+5. [Beacon Management](./06-beacon-management/) — version and roll back named
+	beacons; no proxy deployment or call forwarding.
+6. [Upgrade Patterns](./07-upgrade-patterns/) — direct WASM upgrades, storage
+	migration, and initialization guards; no proxy or beacon system.
+
 ## What's Inside?
 
 - **Complex Authorization**: Patterns like threshold signatures and multi-party authorization for high-security applications.

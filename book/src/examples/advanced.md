@@ -2,7 +2,19 @@
 
 Complex protocols & optimizations for production systems.
 
-## 📋 Examples (5 currently)
+## Upgradeability Sequence
+
+Follow these examples in order, from a single implementation pointer to fleet
+management and lower-level WASM and storage upgrade techniques:
+
+1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
+2. [Proxy Admin Controls](../examples/advanced/03-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
+3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
+4. [Beacon Proxy Factory](../examples/advanced/03-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+5. [Beacon Management](../examples/advanced/06-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
+6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
+
+## 📋 Examples
 
 ### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
 **Advanced multi-party authorization** beyond simple multisig.

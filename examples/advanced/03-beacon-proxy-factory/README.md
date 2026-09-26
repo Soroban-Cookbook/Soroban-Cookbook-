@@ -179,6 +179,10 @@ cargo test -p beacon-proxy-factory
 
 ## Related examples
 
-- [`02-beacon-proxy`](../02-beacon-proxy/) — single beacon + single proxy; start here
-- [`06-beacon-management`](../06-beacon-management/) — multiple named beacons in one contract
+- **Sequence step 4 of 6:** follows [Beacon Proxy](../02-beacon-proxy/) and
+    demonstrates factory deployment of multiple proxies sharing one beacon.
+- **In scope:** deploying and tracking a proxy fleet with one shared beacon.
+- **Out of scope:** managing multiple independent named beacons; continue to
+    [Beacon Management](../06-beacon-management/).
+- [Next: Beacon Management](../06-beacon-management/) — versioned, named beacons with rollback
 - [`intermediate/ajo-factory`](../../intermediate/ajo-factory/) — factory deployer pattern

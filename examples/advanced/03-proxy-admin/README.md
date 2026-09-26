@@ -4,6 +4,15 @@ Governance and safety controls around Soroban contract upgrades. The example
 combines four independent safety layers so that no single mistake can result
 in an irreversible bad upgrade.
 
+## Scope In the Upgradeability Sequence
+
+This is step 2 of 6, following the [single upgradeable proxy](../04-upgradeable-proxy/).
+
+- **In scope:** timelocked upgrade proposals, cancellation, emergency pause,
+      and lifecycle events.
+- **Out of scope:** proxy call forwarding and shared implementation routing.
+      Continue to the [beacon proxy](../02-beacon-proxy/) for shared upgrades.
+
 ## What It Demonstrates
 
 - Admin-only `propose_upgrade` with a configurable timelock delay
@@ -79,6 +88,7 @@ cargo test -p proxy-admin
 
 ## Related Examples
 
+- [Next: Beacon Proxy](../02-beacon-proxy/) — share one implementation across proxies
 - [02-timelock](../02-timelock/) — Core timelock pattern this example builds on
 - [01-multi-party-auth](../01-multi-party-auth/) — Threshold signatures for the admin role
 - [Governance Examples](../../governance/) — DAOs that govern upgrade proposals
