@@ -2,6 +2,17 @@
 
 A collection of idiomatic upgrade patterns for Soroban smart contracts. Each pattern is independent and addresses a specific aspect of safe upgradeability — they can be combined as needed for production contracts.
 
+## Scope In the Upgradeability Sequence
+
+This is step 6 of 6, following [Beacon Management](../06-beacon-management/).
+
+- **In scope:** direct WASM replacement, versioned storage migration, and
+    guarded post-upgrade initialization.
+- **Out of scope:** proxy routing, shared-beacon deployment, and a complete
+    governance system. For the sequence's starting point, see
+    [Upgradeable Proxy](../04-upgradeable-proxy/); for timelocked admin controls,
+    see [Proxy Admin Controls](../03-proxy-admin/).
+
 ## What It Demonstrates
 
 - **Direct WASM upgrade** — minimal admin-gated `update_current_contract_wasm` call
