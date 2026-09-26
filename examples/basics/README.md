@@ -21,6 +21,7 @@ Core Soroban fundamentals, one concept per example. Perfect for beginners.
 | 11 | [primitive-types](./11-primitive-types/) | Integer safety, overflow |
 | 12 | [data-types](./12-data-types/) | Full type system reference |
 | 13 | [collection-types](./13-collection-types/) | Vec and Map patterns |
+| 13 | [compressed-storage](./13-compressed-storage/) | Run-length encoding before persistent storage |
 | 13 | [queue-variants](./13-queue-variants/) | Bounded and circular buffer queues |
 | 14 | [fifo-queue](./14-fifo-queue/) | FIFO queue with enqueue, dequeue, peek |
 | 14 | [event-filtering](./14-event-filtering/) | Indexer-friendly topic design |
