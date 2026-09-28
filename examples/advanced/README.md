@@ -66,10 +66,12 @@ covering a distinct upgradeability concern:
 - [`12-oracle-consumer`](./12-oracle-consumer/) — Three oracle consumer contracts: validated cache, quorum median, and a settlement circuit breaker (Phase 5)
 - [`12-real-world-case-studies`](./12-real-world-case-studies/) — Problem/solution case studies: checks-effects-interactions, checked-arithmetic fees, and commit-reveal bidding
 - [`13-virtual-channel`](./13-virtual-channel/) — Virtual payment channels routed through an intermediary: ledger channels, off-chain updates, and on-chain settlement
+- [`14-bridge-validators`](./14-bridge-validators/) — Bridge validator registry with multi-signature threshold verification for cross-chain bridges
+- [`15-oracle-integration`](./15-oracle-integration/) — Asynchronous oracle request/response pattern with secure callbacks and data validation
+- [`16-cross-contract-integration-testing`](./16-cross-contract-integration-testing/) — Cross-contract integration testing patterns
 
 ## Planned Examples
 
-- [`04-bridge-validators`](./04-bridge-validators/) — Bridge validators and multi-sig threshold
 - `05-atomic-swaps`: A trustless, cross-contract asset swap.
 - `05-payment-channels`: A basic state channel implementation for off-chain transactions.
 

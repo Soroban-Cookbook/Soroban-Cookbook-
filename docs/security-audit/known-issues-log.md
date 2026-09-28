@@ -76,7 +76,7 @@ compilation drift the now-compiled tests reveal). Left for the maintainers.
 
 - **Type:** Tooling warning
 - **Status:** Open
-- **Affects:** `examples/advanced/04-cross-contract-integration-testing/Cargo.toml`
+- **Affects:** `examples/advanced/16-cross-contract-integration-testing/Cargo.toml`
 
 **Description.** A `[profile.*]` table is defined in a non-root package, which
 Cargo ignores in a workspace, emitting:
