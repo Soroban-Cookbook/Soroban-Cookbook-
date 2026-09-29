@@ -7,14 +7,14 @@ Complex protocols & optimizations for production systems.
 Follow these examples in order, from a single implementation pointer to fleet
 management and lower-level WASM and storage upgrade techniques:
 
-1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
-2. [Proxy Admin Controls](../examples/advanced/03-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
-3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
-4. [Beacon Proxy Factory](../examples/advanced/03-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
-5. [Beacon Management](../examples/advanced/06-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
-6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
+1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) â€” one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
+2. [Proxy Admin Controls](../examples/advanced/03-proxy-admin/) â€” timelock, cancellation, and pause controls; no call forwarding or beacon.
+3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) â€” multiple proxies can share one implementation through a beacon; no fleet factory.
+4. [Beacon Proxy Factory](../examples/advanced/03-beacon-proxy-factory/) â€” deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+5. [Beacon Management](../examples/advanced/06-beacon-management/) â€” version and roll back multiple named beacons; no proxy deployment or call forwarding.
+6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) â€” direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
 
-## 📋 Examples
+## ðŸ“‹ Examples
 
 ### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
 **Advanced multi-party authorization** beyond simple multisig.
@@ -82,8 +82,8 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [06-diamond-pattern](../examples/advanced/06-diamond-pattern/) ⭐ Canonical
-**Diamond Pattern (EIP-2535)** — Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
+### [06-diamond-pattern](../examples/advanced/06-diamond-pattern/) â­ Canonical
+**Diamond Pattern (EIP-2535)** â€” Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
 
 **Key Concepts:**
 - Diamond storage pattern with namespaced `DataKey` enum
@@ -102,7 +102,7 @@ let value = client.get_value_strict(); // errors if stale
 - Upgrade safeguards with duplicate detection
 
 ### [05-diamond-facets](../examples/advanced/05-diamond-facets/)
-**Diamond Facets** — Router orchestration patterns demonstrating inter-facet communication.
+**Diamond Facets** â€” Router orchestration patterns demonstrating inter-facet communication.
 
 **Key Concepts:**
 - Atomic cross-facet operations (e.g., mint + register metadata)
@@ -120,7 +120,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [08-batch-operations](../examples/advanced/08-batch-operations/)
+### [39-batch-operations](../examples/advanced/39-batch-operations/)
 **Batch operations** with atomic and partial execution.
 
 **Key Concepts:**
@@ -162,7 +162,7 @@ let value = client.get_value_strict(); // errors if stale
 
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
-## ⚠️ Warning
+## âš ï¸ Warning
 Advanced patterns increase complexity - audit thoroughly!
 
 ## Prerequisites

@@ -160,9 +160,9 @@ Proxy pattern that delegates calls to an implementation contract. Admin can swap
 Splits contract logic across multiple facet contracts, each responsible for a subset of functions. A diamond proxy routes calls to the appropriate facet, enabling granular upgrades and modular architecture.
 
 **Examples:**
-- **[06-diamond-pattern](../examples/advanced/06-diamond-pattern/)** — Canonical EIP-2535 adaptation with full diamond-cut operations (Add/Replace/Remove) and diamond-loupe introspection
-- **[05-diamond-security](../examples/advanced/05-diamond-security/)** — Security-hardened variant demonstrating access control per facet, interface verification, and storage collision prevention
-- **[05-diamond-facets](../examples/advanced/05-diamond-facets/)** — Router orchestration patterns showing atomic cross-facet operations
+- **[06-diamond-pattern](../examples/advanced/06-diamond-pattern/)** â€” Canonical EIP-2535 adaptation with full diamond-cut operations (Add/Replace/Remove) and diamond-loupe introspection
+- **[05-diamond-security](../examples/advanced/05-diamond-security/)** â€” Security-hardened variant demonstrating access control per facet, interface verification, and storage collision prevention
+- **[05-diamond-facets](../examples/advanced/05-diamond-facets/)** â€” Router orchestration patterns showing atomic cross-facet operations
 
 ### Architecture Decisions
 - **Facet-selector mapping** stored in the diamond for O(1) dispatch.
@@ -251,7 +251,7 @@ Extends RBAC with hierarchical organization units. Permissions propagate down th
 
 ## 11. Batch Operations
 
-**Location:** `examples/advanced/08-batch-operations/`
+**Location:** `examples/advanced/39-batch-operations/`
 
 ### What it does
 Executes multiple contract calls in a single transaction with configurable atomicity. Supports all-succeed-or-fail and partial-execution modes.
@@ -312,32 +312,32 @@ Prevents reentrant calls by tracking execution state. Uses a mutex flag that blo
 
 ```
 Need multiple signatures?
-├── All signers must approve → N-of-N Multi-Sig
-├── Threshold of signers needed → M-of-N with Proposals
-└── Store signer list compactly → Auth Vectors
+â”œâ”€â”€ All signers must approve â†’ N-of-N Multi-Sig
+â”œâ”€â”€ Threshold of signers needed â†’ M-of-N with Proposals
+â””â”€â”€ Store signer list compactly â†’ Auth Vectors
 
 Need delayed execution?
-├── Add time delay to actions → Timelock
-├── Emergency stop capability → Add Pause pattern
+â”œâ”€â”€ Add time delay to actions â†’ Timelock
+â”œâ”€â”€ Emergency stop capability â†’ Add Pause pattern
 
 Need external data?
-├── Single trusted source → Basic Oracle
-├── Multiple sources → Aggregation Oracle
+â”œâ”€â”€ Single trusted source â†’ Basic Oracle
+â”œâ”€â”€ Multiple sources â†’ Aggregation Oracle
 
 Need contract upgrades?
-├── Single implementation swap → Upgradeable Proxy
-├── Many instances upgrade together → Beacon Proxy
-├── Per-function upgrade granularity → Diamond
-└── Track all versions → Beacon Management
+â”œâ”€â”€ Single implementation swap â†’ Upgradeable Proxy
+â”œâ”€â”€ Many instances upgrade together â†’ Beacon Proxy
+â”œâ”€â”€ Per-function upgrade granularity â†’ Diamond
+â””â”€â”€ Track all versions â†’ Beacon Management
 
 Need access control?
-├── Simple roles → RBAC
-├── Organizational hierarchy → Hierarchical Access Control
+â”œâ”€â”€ Simple roles â†’ RBAC
+â”œâ”€â”€ Organizational hierarchy â†’ Hierarchical Access Control
 
 Need safety?
-├── Prevent reentrancy → Reentrancy Guard
-├── Cross-chain security → Bridge Security
-├── Batch safety → Batch Operations
-├── Off-chain verification → Merkle Proofs
-└── Cross-chain transfers → Cross-Chain Bridge
+â”œâ”€â”€ Prevent reentrancy â†’ Reentrancy Guard
+â”œâ”€â”€ Cross-chain security â†’ Bridge Security
+â”œâ”€â”€ Batch safety â†’ Batch Operations
+â”œâ”€â”€ Off-chain verification â†’ Merkle Proofs
+â””â”€â”€ Cross-chain transfers â†’ Cross-Chain Bridge
 ```

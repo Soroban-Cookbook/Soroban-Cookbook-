@@ -271,7 +271,7 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 11. Batch Operations
 
-**Contract:** `examples/advanced/08-batch-operations/`
+**Contract:** `examples/advanced/39-batch-operations/`
 
 ### Known Vulnerabilities
 | Vulnerability | Severity | Description |

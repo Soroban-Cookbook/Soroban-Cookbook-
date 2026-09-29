@@ -83,11 +83,11 @@ Soroban offers three storage tiers. Choosing the wrong tier is the most common c
 ```rust
 #[contracttype]
 pub enum DataKey {
-    Admin,           // instance — single entry, always needed
-    PoolCount,       // instance — cheap counter
-    Pool(u32),       // persistent — only loaded on demand
-    Balance(Address),// persistent — per-user, loaded on demand
-    Claimed(Address, u32), // persistent — per-user-per-pool
+    Admin,           // instance â€” single entry, always needed
+    PoolCount,       // instance â€” cheap counter
+    Pool(u32),       // persistent â€” only loaded on demand
+    Balance(Address),// persistent â€” per-user, loaded on demand
+    Claimed(Address, u32), // persistent â€” per-user-per-pool
 }
 ```
 
@@ -168,9 +168,9 @@ A single contract address routes to many facet contracts based on function selec
 - **Cons:** High complexity; careful storage layout management required.
 
 **Examples:** 
-- **Canonical:** [`examples/advanced/06-diamond-pattern`](../examples/advanced/06-diamond-pattern/) — Full EIP-2535 adaptation with diamond-cut and loupe
-- **Security-focused:** [`examples/advanced/05-diamond-security`](../examples/advanced/05-diamond-security/) — Hardened with access controls and interface verification
-- **Router orchestration:** [`examples/advanced/05-diamond-facets`](../examples/advanced/05-diamond-facets/) — Atomic cross-facet operations
+- **Canonical:** [`examples/advanced/06-diamond-pattern`](../examples/advanced/06-diamond-pattern/) â€” Full EIP-2535 adaptation with diamond-cut and loupe
+- **Security-focused:** [`examples/advanced/05-diamond-security`](../examples/advanced/05-diamond-security/) â€” Hardened with access controls and interface verification
+- **Router orchestration:** [`examples/advanced/05-diamond-facets`](../examples/advanced/05-diamond-facets/) â€” Atomic cross-facet operations
 
 ### No-Upgrade (Immutable)
 
@@ -206,7 +206,7 @@ let mem = env.budget().memory_bytes_cost();
 
 Each cross-contract call incurs overhead. Batch calls where possible using `batch-operations` patterns:
 
-**Example:** `examples/advanced/08-batch-operations`
+**Example:** `examples/advanced/39-batch-operations`
 
 ### Event-Driven Off-Chain Processing
 
@@ -295,7 +295,7 @@ A token that supports multiple independent reward pools. Users accumulate reward
 **Key architectural decisions:**
 - Pool metadata (`rate_per_token`, `total_deposited`) in `persistent` storage keyed by pool ID
 - Per-user claim tracking in `persistent` storage keyed by `(user, pool_id)`
-- Reward formula: `balance * rate_per_token / 1_000_000` — fixed-point, no floating point
+- Reward formula: `balance * rate_per_token / 1_000_000` â€” fixed-point, no floating point
 
 ### Multi-Party Auth Treasury
 

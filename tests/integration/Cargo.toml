@@ -62,7 +62,7 @@ farming_pool = { path = "../../examples/defi/12-farming-pool", package = "farmin
 amm_router = { path = "../../examples/defi/13-amm-router", package = "amm-router" }
 staking_pool_legacy = { path = "../../examples/defi/staking-pool", package = "staking-pool-legacy" }
 soroban_flash_loan_use_cases = { path = "../../examples/defi/06-flash-loan-use-cases", package = "soroban-flash-loan-use-cases" }
-batch_operations = { path = "../../examples/advanced/08-batch-operations", package = "batch-operations" }
+batch_operations = { path = "../../examples/advanced/39-batch-operations", package = "batch-operations" }
 proposal_validation = { path = "../../examples/governance/01-proposal-validation", package = "proposal-validation" }
 dao_treasury = { path = "../../examples/governance/03-dao-treasury", package = "dao-treasury" }
 compressed_storage = { path = "../../examples/basics/13-compressed-storage", package = "compressed-storage" }
