@@ -170,12 +170,12 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 7. Diamond Pattern
 
-**Contracts:** `examples/advanced/06-diamond-pattern/` (canonical), `examples/advanced/19-diamond-security/` (security-focused), `examples/advanced/18-diamond-facets/` (router orchestration)
+**Contracts:** `examples/advanced/38-diamond-pattern/` (canonical), `examples/advanced/19-diamond-security/` (security-focused), `examples/advanced/18-diamond-facets/` (router orchestration)
 
 ### Implementation Variants
 | Example | Focus | Key Features |
 | --- | --- | --- |
-| **06-diamond-pattern** | Canonical EIP-2535 | Full diamond-cut (Add/Replace/Remove), diamond-loupe introspection, fallback dispatch |
+| **38-diamond-pattern** | Canonical EIP-2535 | Full diamond-cut (Add/Replace/Remove), diamond-loupe introspection, fallback dispatch |
 | **19-diamond-security** | Security hardening | Direct-call protection, interface verification, namespaced storage API, upgrade safeguards |
 | **18-diamond-facets** | Facet coordination | Router orchestration, atomic cross-facet operations, inter-facet communication |
 
@@ -202,7 +202,7 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 8. Beacon Proxy
 
-**Contracts:** `examples/advanced/02-beacon-proxy/`, `examples/advanced/06-beacon-management/`
+**Contracts:** `examples/advanced/02-beacon-proxy/`, `examples/advanced/37-beacon-management/`
 
 ### Known Vulnerabilities
 | Vulnerability | Severity | Description |

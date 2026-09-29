@@ -15,7 +15,7 @@ Search-optimized index of all examples with formatted code snippets and live dem
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
 
 #[contract]
-pub struct HelloContract;          // (1) plain unit struct — no fields needed
+pub struct HelloContract;          // (1) plain unit struct â€” no fields needed
 
 #[contractimpl]
 impl HelloContract {
@@ -68,7 +68,7 @@ pub fn transfer_from(
         .get(&DataKey::Allowance(from.clone(), spender.clone()))
         .unwrap_or(0);
     if allowance < amount { return Err(AuthError::Unauthorized); }
-    // … update balances and reduce allowance …
+    // â€¦ update balances and reduce allowance â€¦
     Ok(())
 }
 ```
@@ -159,10 +159,10 @@ ValidationError::StringTooLong = 106,
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
-// native → Val
+// native â†’ Val
 let val: Val = 42u32.into_val(&env);
 
-// Val → native (safe, returns Result)
+// Val â†’ native (safe, returns Result)
 let n: u32 = u32::try_from_val(&env, &val).unwrap_or(0);
 ```
 
@@ -172,31 +172,31 @@ let n: u32 = u32::try_from_val(&env, &val).unwrap_or(0);
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
-// ✅ Use Symbol for short identifiers
+// âœ… Use Symbol for short identifiers
 let token_symbol = symbol_short!("USDC");
 let action = Symbol::from_str(&env, "transfer");
 
-// ✅ Use String for longer text
+// âœ… Use String for longer text
 let message = String::from_str(&env, "Transaction completed successfully");
 let username = String::from_str(&env, "alice_blockchain_dev");
 
-// ✅ Use Bytes for variable binary data
+// âœ… Use Bytes for variable binary data
 let signature = Bytes::from_slice(&env, &signature_data);
 let serialized_object = Bytes::from_slice(&env, &encoded_data);
 
-// ✅ Use BytesN for fixed-size data
+// âœ… Use BytesN for fixed-size data
 let hash = BytesN::<32>::from_array(&env, &sha256_result);
 let address_hash = BytesN::<20>::from_array(&env, &address_bytes);
 
-// ✅ Use Address for accounts and contracts
+// âœ… Use Address for accounts and contracts
 let user = Address::generate(&env);
 let contract_address = env.current_contract_address();
 
-// ✅ Use Vec for ordered collections
+// âœ… Use Vec for ordered collections
 let mut numbers = Vec::new(&env);
 numbers.push_back(1);
 
-// ✅ Use Map for key-value associations
+// âœ… Use Map for key-value associations
 let mut settings = Map::new(&env);
 settings.set(symbol_short!("theme"), 1);
 ```
@@ -288,7 +288,7 @@ items.push_back(10);
 items.push_back(20);
 items.push_back(30);
 
-// Random access — O(1)
+// Random access â€” O(1)
 let first = items.get(0); // Some(10)
 let len   = items.len();  // 3
 
@@ -567,7 +567,7 @@ diamond.execute(&function_name, &args)?; // Routes to authorized facet
 ```
 
 ### 06 Diamond Pattern (Canonical EIP-2535)
-[View Source](../examples/advanced/06-diamond-pattern)
+[View Source](../examples/advanced/38-diamond-pattern)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -890,7 +890,7 @@ manager.register_token(
 // Decimals are set once and never exposed through an update path.
 // Changing decimals after tokens are in circulation would mean that
 // a balance of 1_000_0000000 (7 decimals = 1000.0) silently becomes
-// 1_000_0000000 (6 decimals = 10000.0) — a 10× reinterpretation with
+// 1_000_0000000 (6 decimals = 10000.0) â€” a 10Ã— reinterpretation with
 // no on-chain record of the change.
 pub fn decimals(env: Env) -> Result<u32, MetadataError> {
     read_decimals(&env)

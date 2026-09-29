@@ -2,7 +2,7 @@
 resolver = "2"
 
 # The `templates/*` directories intentionally contain their own Cargo
-# workspaces — each is a self-contained learner starter kit with its own
+# workspaces â€” each is a self-contained learner starter kit with its own
 # pinned `soroban-sdk`, meant to be copied out and built standalone. Because a
 # package cannot belong to two workspaces at once, they are excluded from the
 # root workspace rather than listed under `members`. Build them individually:
@@ -53,7 +53,7 @@ members = [
     "examples/advanced/08-multicall",
     "examples/advanced/05-rate-limiting",
     "examples/advanced/03-merkle-airdrop",
-    "examples/advanced/06-gas-optimization",
+    "examples/advanced/35-gas-optimization",
     "examples/advanced/07-upgrade-patterns",
     "examples/advanced/08-payment-channels",
     "examples/advanced/08-gas-reporter",
@@ -66,7 +66,7 @@ members = [
     "examples/advanced/12-oracle-consumer/aggregating",
     "examples/advanced/12-oracle-consumer/settlement",
     "examples/advanced/18-diamond-facets",
-    "examples/advanced/06-diamond-pattern",
+    "examples/advanced/38-diamond-pattern",
     "examples/defi/01-simple-swap",
     "examples/defi/02-constant-product-amm",
     "examples/defi/03-lending-pool",

@@ -154,15 +154,15 @@ Proxy pattern that delegates calls to an implementation contract. Admin can swap
 
 ## 7. Diamond Pattern
 
-**Location:** `examples/advanced/06-diamond-pattern/` (canonical), `examples/advanced/18-diamond-facets/` (router orchestration), `examples/advanced/19-diamond-security/` (security-focused)
+**Location:** `examples/advanced/38-diamond-pattern/` (canonical), `examples/advanced/18-diamond-facets/` (router orchestration), `examples/advanced/19-diamond-security/` (security-focused)
 
 ### What it does
 Splits contract logic across multiple facet contracts, each responsible for a subset of functions. A diamond proxy routes calls to the appropriate facet, enabling granular upgrades and modular architecture.
 
 **Examples:**
-- **[06-diamond-pattern](../examples/advanced/06-diamond-pattern/)** — Canonical EIP-2535 adaptation with full diamond-cut operations (Add/Replace/Remove) and diamond-loupe introspection
-- **[05-diamond-security](../examples/advanced/05-diamond-security/)** — Security-hardened variant demonstrating access control per facet, interface verification, and storage collision prevention
-- **[05-diamond-facets](../examples/advanced/05-diamond-facets/)** — Router orchestration patterns showing atomic cross-facet operations
+- **[38-diamond-pattern](../examples/advanced/38-diamond-pattern/)** â€” Canonical EIP-2535 adaptation with full diamond-cut operations (Add/Replace/Remove) and diamond-loupe introspection
+- **[05-diamond-security](../examples/advanced/05-diamond-security/)** â€” Security-hardened variant demonstrating access control per facet, interface verification, and storage collision prevention
+- **[05-diamond-facets](../examples/advanced/05-diamond-facets/)** â€” Router orchestration patterns showing atomic cross-facet operations
 
 ### Architecture Decisions
 - **Facet-selector mapping** stored in the diamond for O(1) dispatch.
@@ -185,7 +185,7 @@ Splits contract logic across multiple facet contracts, each responsible for a su
 
 ## 8. Beacon Proxy
 
-**Location:** `examples/advanced/02-beacon-proxy/`, `examples/advanced/06-beacon-management/`
+**Location:** `examples/advanced/02-beacon-proxy/`, `examples/advanced/37-beacon-management/`
 
 ### What it does
 Beacon pattern where multiple proxy contracts point to a single beacon contract that stores the implementation address. Updating the beacon upgrades all proxies atomically.
@@ -312,32 +312,32 @@ Prevents reentrant calls by tracking execution state. Uses a mutex flag that blo
 
 ```
 Need multiple signatures?
-├── All signers must approve → N-of-N Multi-Sig
-├── Threshold of signers needed → M-of-N with Proposals
-└── Store signer list compactly → Auth Vectors
+â”œâ”€â”€ All signers must approve â†’ N-of-N Multi-Sig
+â”œâ”€â”€ Threshold of signers needed â†’ M-of-N with Proposals
+â””â”€â”€ Store signer list compactly â†’ Auth Vectors
 
 Need delayed execution?
-├── Add time delay to actions → Timelock
-├── Emergency stop capability → Add Pause pattern
+â”œâ”€â”€ Add time delay to actions â†’ Timelock
+â”œâ”€â”€ Emergency stop capability â†’ Add Pause pattern
 
 Need external data?
-├── Single trusted source → Basic Oracle
-├── Multiple sources → Aggregation Oracle
+â”œâ”€â”€ Single trusted source â†’ Basic Oracle
+â”œâ”€â”€ Multiple sources â†’ Aggregation Oracle
 
 Need contract upgrades?
-├── Single implementation swap → Upgradeable Proxy
-├── Many instances upgrade together → Beacon Proxy
-├── Per-function upgrade granularity → Diamond
-└── Track all versions → Beacon Management
+â”œâ”€â”€ Single implementation swap â†’ Upgradeable Proxy
+â”œâ”€â”€ Many instances upgrade together â†’ Beacon Proxy
+â”œâ”€â”€ Per-function upgrade granularity â†’ Diamond
+â””â”€â”€ Track all versions â†’ Beacon Management
 
 Need access control?
-├── Simple roles → RBAC
-├── Organizational hierarchy → Hierarchical Access Control
+â”œâ”€â”€ Simple roles â†’ RBAC
+â”œâ”€â”€ Organizational hierarchy â†’ Hierarchical Access Control
 
 Need safety?
-├── Prevent reentrancy → Reentrancy Guard
-├── Cross-chain security → Bridge Security
-├── Batch safety → Batch Operations
-├── Off-chain verification → Merkle Proofs
-└── Cross-chain transfers → Cross-Chain Bridge
+â”œâ”€â”€ Prevent reentrancy â†’ Reentrancy Guard
+â”œâ”€â”€ Cross-chain security â†’ Bridge Security
+â”œâ”€â”€ Batch safety â†’ Batch Operations
+â”œâ”€â”€ Off-chain verification â†’ Merkle Proofs
+â””â”€â”€ Cross-chain transfers â†’ Cross-Chain Bridge
 ```

@@ -76,5 +76,5 @@ diamond_security = { path = "../../examples/advanced/19-diamond-security", packa
 facet_adder = { path = "../../examples/advanced/19-diamond-security/facet-adder", package = "facet-adder" }
 facet_multiplier = { path = "../../examples/advanced/19-diamond-security/facet-multiplier", package = "facet-multiplier" }
 bridge_security = { path = "../../examples/advanced/17-bridge-security", package = "bridge-security" }
-price_oracle = { path = "../../examples/advanced/06-price-oracle", package = "price-oracle" }
+price_oracle = { path = "../../examples/advanced/36-price-oracle", package = "price-oracle" }
 diamond_facets = { path = "../../examples/advanced/18-diamond-facets", package = "diamond-facets" }

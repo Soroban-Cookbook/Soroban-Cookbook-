@@ -88,8 +88,8 @@ Benchmark script: `./scripts/benchmark.sh examples/intermediate --output-dir gas
 | `15-reentrancy-guard` | `guarded_call` | ~30,000 | ~1.5 KB | Mutex flag adds ~5K  over bare call |
 | `21-merkle-proofs` | `verify_proof` (depth 10) | ~45,000 | ~2 KB | Each hash adds ~4K instructions |
 | `05-batch-operations` | `execute_batch` (5 ops) | ~120,000 | ~6 KB | Scales linearly; batch overhead ~20K base |
-| `06-diamond-pattern` | `diamond_cut` (add facet) | ~65,000 | ~4 KB | Selector registration + storage write |
-| `06-diamond-pattern` | `diamond_call` | ~35,000 | ~2 KB | Dispatch overhead ~5K  over direct call |
+| `38-diamond-pattern` | `diamond_cut` (add facet) | ~65,000 | ~4 KB | Selector registration + storage write |
+| `38-diamond-pattern` | `diamond_call` | ~35,000 | ~2 KB | Dispatch overhead ~5K  over direct call |
 | `custom-token` | `transfer` | ~45,000 | ~2.5 KB | Same as base SEP-41 token |
 | `custom-token` | `multi_sig_transfer` (2 signers) | ~55,000 | ~3 KB | Signer iteration + auth overhead |
 | `custom-token` | `mint` | ~40,000 | ~2 KB | Auth check + supply update + event |
