@@ -53,5 +53,5 @@ cargo build --target wasm32-unknown-unknown --release
 
 ## Next Steps
 
-- **[02-voting-time-constraints](../02-voting-time-constraints/)** — Adds configurable voting periods, grace periods, quorum thresholds, and early closure
-- **[03-proposal-lifecycle](../03-proposal-lifecycle/)** — Full proposal state machine: Draft → Active → Queued → Executed/Defeated
+- **[03-voting-time-constraints](../03-voting-time-constraints/)** — Adds configurable voting periods, grace periods, quorum thresholds, and early closure
+- **[04-proposal-lifecycle](../04-proposal-lifecycle/)** — Full proposal state machine: Draft → Active → Queued → Executed/Defeated

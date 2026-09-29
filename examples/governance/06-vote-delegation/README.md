@@ -20,7 +20,7 @@ In governance, users often want to delegate their voting power to a representati
 ## Project Structure
 
 ```text
-examples/governance/01-vote-delegation/
+examples/governance/06-vote-delegation/
 ├── Cargo.toml
 ├── README.md
 └── src/

@@ -33,14 +33,14 @@ client.prune(&admin, &user, &20000);
 ## Build
 
 ```bash
-cd examples/governance/07-automatic-snapshot-triggers
+cd examples/governance/11-automatic-snapshot-triggers
 cargo build --target wasm32-unknown-unknown --release
 ```
 
 ## Test
 
 ```bash
-cd examples/governance/07-automatic-snapshot-triggers
+cd examples/governance/11-automatic-snapshot-triggers
 cargo test
 ```
 

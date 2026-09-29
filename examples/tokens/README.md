@@ -25,7 +25,7 @@ This category contains examples related to fungible tokens, including implementa
 - `06-reward-token`: A token with multiple independent reward pools; holders earn proportional rewards and claim them on demand.
 - `07-token-metadata`: A token with full SEP-41 metadata support (name, symbol, decimals, URI) with admin-governed updates.
 - `10-automatic-snapshot-triggers`: Time-based & event-based balance snapshots with pruning.
-  - **Cross-domain pattern:** The same snapshot-trigger pattern is implemented across domains: [`defi/14-automatic-snapshot-triggers`](../defi/14-automatic-snapshot-triggers/), [`governance/07-automatic-snapshot-triggers`](../governance/07-automatic-snapshot-triggers/), [`nfts/05-automatic-snapshot-triggers`](../nfts/05-automatic-snapshot-triggers/). All implement the same time-based and event-based snapshot mechanics; only the domain-specific logic differs.
+  - **Cross-domain pattern:** The same snapshot-trigger pattern is implemented across domains: [`defi/14-automatic-snapshot-triggers`](../defi/14-automatic-snapshot-triggers/), [`governance/11-automatic-snapshot-triggers`](../governance/11-automatic-snapshot-triggers/), [`nfts/05-automatic-snapshot-triggers`](../nfts/05-automatic-snapshot-triggers/). All implement the same time-based and event-based snapshot mechanics; only the domain-specific logic differs.
 - [`10-pausable-permissions`](./10-pausable-permissions/): A permission system for pausing — pauser role, multi-sig pause, and time-limited pause.
 
 ## Patterns Guide

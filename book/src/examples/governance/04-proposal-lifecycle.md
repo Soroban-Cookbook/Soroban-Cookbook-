@@ -1,6 +1,6 @@
 # 03 · Proposal Lifecycle
 
-**Source:** [`examples/governance/03-proposal-lifecycle/`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/03-proposal-lifecycle)
+**Source:** [`examples/governance/04-proposal-lifecycle/`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/04-proposal-lifecycle)
 
 A full proposal state machine modelled after OpenZeppelin Governor: proposals progress through **Draft → Active → Queued → Executed** (or **Defeated / Expired**). Each transition is guarded by time and quorum checks.
 
@@ -35,7 +35,7 @@ client.execute(&admin, &pid);    // moves Queued → Executed
 ## Run the Example
 
 ```bash
-cd examples/governance/03-proposal-lifecycle
+cd examples/governance/04-proposal-lifecycle
 cargo test
 ```
 

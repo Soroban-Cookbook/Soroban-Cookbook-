@@ -34,7 +34,7 @@ data_types = { path = "../../examples/basics/12-data-types", package = "data-typ
 collection_types = { path = "../../examples/basics/13-collection-types", package = "collection-types" }
 basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
 nft_marketplace = { path = "../../examples/nfts/04-nft-marketplace", package = "nft-marketplace" }
-proposal_lifecycle = { path = "../../examples/governance/03-proposal-lifecycle", package = "proposal-lifecycle" }
+proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
 role_based_access_control = { path = "../../examples/intermediate/02-role-based-access-control", package = "role-based-access-control" }
 rbac_modifiers = { path = "../../examples/advanced/03-rbac-modifiers", package = "rbac-modifiers" }
 pause_unpause = { path = "../../examples/intermediate/03-pause-unpause", package = "pause-unpause" }
@@ -45,7 +45,7 @@ constant_product_amm = { path = "../../examples/defi/02-constant-product-amm", p
 lending_pool = { path = "../../examples/defi/03-lending-pool", package = "lending-pool" }
 collateralized_lending = { path = "../../examples/defi/04-collateralized-lending", package = "collateralized-lending" }
 proptest = "1.6"
-voting_time_constraints = { path = "../../examples/governance/02-voting-time-constraints", package = "voting-time-constraints" }
+voting_time_constraints = { path = "../../examples/governance/03-voting-time-constraints", package = "voting-time-constraints" }
 oracle_pattern = { path = "../../examples/advanced/03-oracle-pattern", package = "oracle-pattern" }
 cross_contract_integration_testing = { path = "../../examples/advanced/16-cross-contract-integration-testing", package = "cross_contract_integration_testing" }
 upgradeable_proxy = { path = "../../examples/advanced/04-upgradeable-proxy", package = "upgradeable-proxy" }
@@ -63,8 +63,8 @@ amm_router = { path = "../../examples/defi/13-amm-router", package = "amm-router
 staking_pool_legacy = { path = "../../examples/defi/staking-pool", package = "staking-pool-legacy" }
 soroban_flash_loan_use_cases = { path = "../../examples/defi/06-flash-loan-use-cases", package = "soroban-flash-loan-use-cases" }
 batch_operations = { path = "../../examples/advanced/08-batch-operations", package = "batch-operations" }
-proposal_validation = { path = "../../examples/governance/01-proposal-validation", package = "proposal-validation" }
-dao_treasury = { path = "../../examples/governance/03-dao-treasury", package = "dao-treasury" }
+proposal_validation = { path = "../../examples/governance/05-proposal-validation", package = "proposal-validation" }
+dao_treasury = { path = "../../examples/governance/10-dao-treasury", package = "dao-treasury" }
 compressed_storage = { path = "../../examples/basics/13-compressed-storage", package = "compressed-storage" }
 queue_variants = { path = "../../examples/basics/13-queue-variants", package = "queue-variants" }
 event_filtering = { path = "../../examples/basics/14-event-filtering", package = "event_filtering" }

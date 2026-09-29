@@ -1,6 +1,6 @@
 # 02 · Voting Time Constraints
 
-**Source:** [`examples/governance/02-voting-time-constraints/`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/02-voting-time-constraints)
+**Source:** [`examples/governance/03-voting-time-constraints/`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/03-voting-time-constraints)
 
 Adds configurable voting periods, a post-deadline grace period before execution, quorum thresholds, and early closure when a super-majority is reached.
 
@@ -31,8 +31,8 @@ vote_start ────────── vote_end ──── grace_period ─
 ## Run the Example
 
 ```bash
-cd examples/governance/02-voting-time-constraints
+cd examples/governance/03-voting-time-constraints
 cargo test
 ```
 
-## Next: [03 · Proposal Lifecycle](./03-proposal-lifecycle.md)
+## Next: [03 · Proposal Lifecycle](./04-proposal-lifecycle.md)

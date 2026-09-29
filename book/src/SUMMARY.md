@@ -72,13 +72,28 @@
 - [NFT Patterns Reference](./docs/nft-patterns.md)
 - [NFT Development Video Walkthrough](./docs/nft-development-video.md)
 
-## Governance (3 examples)
+## Governance (11 examples)
 - [Overview](./examples/governance.md)
 - [Governance Patterns Guide](./docs/governance-patterns.md)
 - [Governance Security Checklist](./docs/governance-security-checklist.md)
+
+### Core Learning Path
 - [01 · Simple Voting](./examples/governance/01-simple-voting.md)
-- [02 · Voting Time Constraints](./examples/governance/02-voting-time-constraints.md)
-- [03 · Proposal Lifecycle](./examples/governance/03-proposal-lifecycle.md)
+- [02 · Token Voting](./examples/governance/02-token-voting.md)
+- [03 · Voting Time Constraints](./examples/governance/03-voting-time-constraints.md)
+- [04 · Proposal Lifecycle](./examples/governance/04-proposal-lifecycle.md)
+
+### Delegation & Authority
+- [05 · Proposal Validation](./examples/governance/05-proposal-validation.md)
+- [06 · Vote Delegation](./examples/governance/06-vote-delegation.md)
+- [07 · Enhanced Delegation](./examples/governance/07-delegation.md)
+- [08 · Delegation Marketplace](./examples/governance/08-delegation-marketplace.md)
+
+### Advanced Governance
+- [09 · Timelock Governance](./examples/governance/09-timelock-governance.md)
+- [10 · DAO Treasury](./examples/governance/10-dao-treasury.md)
+- [11 · Automatic Snapshot Triggers](./examples/governance/11-automatic-snapshot-triggers.md)
+
 
 ## Tokens (9 examples)
 - [Overview](./examples/tokens.md)

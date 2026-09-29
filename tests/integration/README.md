@@ -167,7 +167,7 @@ cargo test -p integration-tests governance
 | `proposal_lifecycle` | `proposal-lifecycle` | `examples/governance/04-proposal-lifecycle` |
 | `simple_voting` | `simple-voting` | `examples/governance/01-simple-voting` |
 | `voting_time_constraints` | `voting-time-constraints` | `examples/governance/01-voting-time-constraints` |
-| `dao_treasury` | `dao-treasury` | `examples/governance/03-dao-treasury` |
+| `dao_treasury` | `dao-treasury` | `examples/governance/10-dao-treasury` |
 
 ## Running the Tests
 

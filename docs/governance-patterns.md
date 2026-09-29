@@ -174,7 +174,7 @@ fn detect_delegation_cycle(env: &Env, from: &Address, to: &Address) -> Result<()
 
 ### Example reference
 
-See [`examples/governance/01-vote-delegation/`](../examples/governance/01-vote-delegation/) for full implementation with cycle detection and depth limits.
+See [`examples/governance/06-vote-delegation/`](../examples/governance/06-vote-delegation/) for full implementation with cycle detection and depth limits.
 
 ## 3. Token Voting
 
@@ -332,7 +332,7 @@ fn execute(env: &Env, proposal_id: u32) -> Result<(), Error> {
 
 ### Example reference
 
-See [`examples/governance/02-voting-time-constraints/`](../examples/governance/02-voting-time-constraints/) for configurable voting periods and quorum logic.
+See [`examples/governance/03-voting-time-constraints/`](../examples/governance/03-voting-time-constraints/) for configurable voting periods and quorum logic.
 
 ## 5. Proposal Lifecycle
 
@@ -418,7 +418,7 @@ fn cancel_proposal(env: &Env, proposal_id: u32, guardian: Address) -> Result<(),
 
 ### Example reference
 
-See [`examples/governance/03-proposal-lifecycle/`](../examples/governance/03-proposal-lifecycle/) for full state machine implementation.
+See [`examples/governance/04-proposal-lifecycle/`](../examples/governance/04-proposal-lifecycle/) for full state machine implementation.
 
 ## 6. Timelock Governance
 
@@ -550,7 +550,7 @@ fn emergency_execute(env: &Env, proposal_id: u32, emergecy_admin: Address) -> Re
 
 ### Example reference
 
-See [`examples/governance/06-timelock-governance/`](../examples/governance/06-timelock-governance/) for mandatory delays and veto implementation.
+See [`examples/governance/09-timelock-governance/`](../examples/governance/09-timelock-governance/) for mandatory delays and veto implementation.
 
 ## 7. DAO Treasury
 
@@ -701,7 +701,7 @@ fn execute_withdrawal(env: &Env, request_id: u32, executor: Address) -> Result<(
 
 ### Example reference
 
-See [`examples/governance/03-dao-treasury/`](../examples/governance/03-dao-treasury/) for multisig-gated treasury implementation.
+See [`examples/governance/10-dao-treasury/`](../examples/governance/10-dao-treasury/) for multisig-gated treasury implementation.
 
 ## 8. Voting System Comparison
 
@@ -757,7 +757,7 @@ Demonstrates the minimum viable voting system: proposal creation, ballot casting
 - Quick prototype of governance concept
 - Proof of concept for community polls
 
-### Production DAO Stack: 01-simple-voting → 02-voting-time-constraints → 03-proposal-lifecycle → 06-timelock-governance
+### Production DAO Stack: 01-simple-voting → 03-voting-time-constraints → 04-proposal-lifecycle → 09-timelock-governance
 
 **Progression:**
 1. Start with simple voting for initial governance
@@ -765,7 +765,7 @@ Demonstrates the minimum viable voting system: proposal creation, ballot casting
 3. Implement full proposal lifecycle for complex governance
 4. Layer timelock + veto for production security
 
-### Token-Holder DAO: 02-token-voting + 03-dao-treasury
+### Token-Holder DAO: 02-token-voting + 10-dao-treasury
 
 **When to use as template:**
 - DAO with fungible governance token
@@ -810,13 +810,13 @@ Start: Need to make a governance decision on-chain?
 │  └─ Use: Simple Voting (01-simple-voting)
 │
 ├─ Decisions require input from many token holders?
-│  └─ Use: Token Voting (02-token-voting) + Delegation (01-vote-delegation)
+│  └─ Use: Token Voting (02-token-voting) + Delegation (06-vote-delegation)
 │
 ├─ Need formal phases: voting period → grace → execution?
-│  └─ Use: Time Constraints (02-voting-time-constraints) + Lifecycle (03-proposal-lifecycle)
+│  └─ Use: Time Constraints (03-voting-time-constraints) + Lifecycle (04-proposal-lifecycle)
 │
 ├─ Managing shared treasury or protocol upgrades?
-│  └─ Use: Timelock (06-timelock-governance) + Treasury (03-dao-treasury)
+│  └─ Use: Timelock (09-timelock-governance) + Treasury (10-dao-treasury)
 │
 └─ Production DAO with all requirements?
    └─ Use: Stack all patterns: Voting → Delegation → Timelock → Treasury

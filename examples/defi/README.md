@@ -26,7 +26,7 @@ Complex financial instruments and stablecoin models.
   - [Staking Pool example](./staking-pool/)
 - **Automatic Snapshot Triggers** - Time-based & event-based snapshot triggers with pruning.
   - [Snapshot Triggers example](./14-automatic-snapshot-triggers/)
-  - **Cross-domain pattern:** The same snapshot-trigger pattern is implemented across domains: [`tokens/10-automatic-snapshot-triggers`](../tokens/10-automatic-snapshot-triggers/), [`governance/07-automatic-snapshot-triggers`](../governance/07-automatic-snapshot-triggers/), [`nfts/05-automatic-snapshot-triggers`](../nfts/05-automatic-snapshot-triggers/). All implement the same time-based and event-based snapshot mechanics; only the domain-specific logic differs.
+  - **Cross-domain pattern:** The same snapshot-trigger pattern is implemented across domains: [`tokens/10-automatic-snapshot-triggers`](../tokens/10-automatic-snapshot-triggers/), [`governance/11-automatic-snapshot-triggers`](../governance/11-automatic-snapshot-triggers/), [`nfts/05-automatic-snapshot-triggers`](../nfts/05-automatic-snapshot-triggers/). All implement the same time-based and event-based snapshot mechanics; only the domain-specific logic differs.
 - **Reward Strategies** - Linear, exponential decay, and performance-based reward distribution.
   - [Reward Strategies example](./15-reward-strategies/)
 

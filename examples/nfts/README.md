@@ -14,7 +14,7 @@ All examples are production-quality, fully tested, and emit structured events. T
 | 02 | [nft-metadata](./02-nft-metadata/) | On-chain metadata struct, `token_uri` fallback, IPFS-friendly | Beginner |
 | 03 | [nft-metadata-standards](./03-nft-metadata-standards/) | JSON-schema-compliant metadata, typed attribute system, URI validation | Intermediate |
 | 04 | [nft-marketplace](./04-nft-marketplace/) | Fixed-price listings, English auctions, bundles, royalties, trade history | Advanced |
-| 05 | [automatic-snapshot-triggers](./05-automatic-snapshot-triggers/) | Time-based & event-based ownership snapshots with pruning. **Cross-domain:** [`defi/14`](../defi/14-automatic-snapshot-triggers/), [`tokens/10`](../tokens/10-automatic-snapshot-triggers/), [`governance/07`](../governance/07-automatic-snapshot-triggers/) | Intermediate |
+| 05 | [automatic-snapshot-triggers](./05-automatic-snapshot-triggers/) | Time-based & event-based ownership snapshots with pruning. **Cross-domain:** [`defi/14`](../defi/14-automatic-snapshot-triggers/), [`tokens/10`](../tokens/10-automatic-snapshot-triggers/), [`governance/07`](../governance/11-automatic-snapshot-triggers/) | Intermediate |
 
 ---
 

@@ -8,7 +8,7 @@ Scope: advanced execution patterns and governance validation in this repository.
 - examples/advanced/01-multi-party-auth
 - examples/advanced/02-timelock
 - examples/advanced/08-batch-operations
-- examples/governance/01-proposal-validation
+- examples/governance/05-proposal-validation
 - tests/integration advanced review coverage
 
 ## Security Areas Validated
