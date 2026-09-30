@@ -14,7 +14,7 @@ This is the **fifth step** in the [oracle patterns learning path](../README.md#o
 **Prerequisites:** Understand oracle producer patterns:
 - [`03-oracle-pattern`](../03-oracle-pattern/) — Basic oracle mechanics
 - [`03-data-aggregation-oracle`](../03-data-aggregation-oracle/) — Aggregation strategies
-- [`04-oracle-integration`](../04-oracle-integration/) — Integration patterns
+- [`15-oracle-integration`](../15-oracle-integration/) — Integration patterns
 - [`06-price-oracle`](../06-price-oracle/) — Price oracle specifics
 
 **Next step:**

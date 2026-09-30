@@ -74,7 +74,7 @@ A progression from basic oracle producers through aggregation to consumer patter
 
 1. **[`03-oracle-pattern`](./03-oracle-pattern/)** — Basic oracle with authorized submission and freshness checks. Start here to learn single-source oracle mechanics.
 2. **[`03-data-aggregation-oracle`](./03-data-aggregation-oracle/)** — Data aggregation with manipulation detection and outlier filtering. Combine multiple data sources and sanitize them.
-3. **[`04-oracle-integration`](./04-oracle-integration/)** — Integration patterns for consuming oracle data in other contracts.
+3. **[`15-oracle-integration`](./15-oracle-integration/)** — Integration patterns for consuming oracle data in other contracts.
 4. **[`06-price-oracle`](./06-price-oracle/)** — Price oracle with specific focus on financial data. Specialized producer for asset prices.
 5. **[`12-oracle-consumer`](./12-oracle-consumer/)** — Three consumer contracts: validated cache, quorum median consensus, and settlement circuit breaker. Learn safe consumption patterns.
 6. **[`defi/11-amm-price-oracle`](../defi/11-amm-price-oracle/)** — AMM-coupled oracle using DEX pricing. Tightly integrated price discovery via liquidity pools.
@@ -96,7 +96,7 @@ A progression from basic oracle producers through aggregation to consumer patter
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with authorized submission and freshness checks (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
 - [`03-proxy-admin`](./03-proxy-admin/) — Admin-authenticated upgrade proposals with timelock and emergency pause (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
 - [`04-circuit-breaker`](./04-circuit-breaker/) — Emergency pause and auto-recovery pattern
-- [`04-oracle-integration`](./04-oracle-integration/) — Integration patterns for oracle consumption (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
+- [`15-oracle-integration`](./15-oracle-integration/) — Integration patterns for oracle consumption (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
 - [`04-upgradeable-proxy`](./04-upgradeable-proxy/) — Admin-gated implementation upgrades with proxy-owned storage preservation (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
 - [`17-bridge-security`](./17-bridge-security/) — Rate limiting, pause, challenge window, and fraud-proof patterns for bridge releases
 - [`16-hierarchical-access-control`](./16-hierarchical-access-control/) — Advanced RBAC with role hierarchy and dynamic permission inheritance

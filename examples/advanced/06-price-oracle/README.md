@@ -14,7 +14,7 @@ This is the **fourth step** in the [oracle patterns learning path](../README.md#
 **Prerequisites:** Understand general oracle patterns first:
 - [`03-oracle-pattern`](../03-oracle-pattern/) — Basic oracle mechanics
 - [`03-data-aggregation-oracle`](../03-data-aggregation-oracle/) — Aggregation strategies
-- [`04-oracle-integration`](../04-oracle-integration/) — Integration patterns
+- [`15-oracle-integration`](../15-oracle-integration/) — Integration patterns
 
 **Next steps:**
 - **[`12-oracle-consumer`](../12-oracle-consumer/)** — Advanced consumption patterns

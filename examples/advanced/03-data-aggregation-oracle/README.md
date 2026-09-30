@@ -14,7 +14,7 @@ This is the **second step** in the [oracle patterns learning path](../README.md#
 **Prerequisites:** Start with [`03-oracle-pattern`](../03-oracle-pattern/) to understand basic oracle mechanics.
 
 **Next steps:**
-- **[`04-oracle-integration`](../04-oracle-integration/)** — Integration patterns for consumers
+- **[`15-oracle-integration`](../15-oracle-integration/)** — Integration patterns for consumers
 - **[`06-price-oracle`](../06-price-oracle/)** — Price oracle specifics
 - **[`12-oracle-consumer`](../12-oracle-consumer/)** — Safe consumption patterns
 - **[`../defi/11-amm-price-oracle`](../defi/11-amm-price-oracle/)** — AMM-coupled pricing
