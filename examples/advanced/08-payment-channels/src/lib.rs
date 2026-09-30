@@ -31,30 +31,30 @@ pub struct ChannelInfo {
 pub struct PaymentChannel;
 
 fn get_participant_a(env: &Env) -> Address {
-    env.storage().instance().get(&DataKey::ParticipantA).unwrap()
+    env.storage().instance().get(&PART_A).unwrap()
 }
 fn get_participant_b(env: &Env) -> Address {
-    env.storage().instance().get(&DataKey::ParticipantB).unwrap()
+    env.storage().instance().get(&PART_B).unwrap()
 }
 fn get_token(env: &Env) -> Address {
-    env.storage().instance().get(&DataKey::Token).unwrap()
+    env.storage().instance().get(&TOKEN).unwrap()
 }
 fn get_balance_a(env: &Env) -> i128 {
-    env.storage().instance().get(&DataKey::BalanceA).unwrap()
+    env.storage().instance().get(&BAL_A).unwrap()
 }
 fn get_balance_b(env: &Env) -> i128 {
-    env.storage().instance().get(&DataKey::BalanceB).unwrap()
+    env.storage().instance().get(&BAL_B).unwrap()
 }
 fn get_sequence(env: &Env) -> u32 {
-    env.storage().instance().get(&DataKey::Sequence).unwrap()
+    env.storage().instance().get(&SEQ).unwrap()
 }
 fn get_expiry(env: &Env) -> u64 {
-    env.storage().instance().get(&DataKey::Expiry).unwrap()
+    env.storage().instance().get(&EXPIRY).unwrap()
 }
 fn is_closed(env: &Env) -> bool {
     env.storage()
         .instance()
-        .get(&DataKey::Closed)
+        .get(&CLOSED)
         .unwrap_or(false)
 }
 
@@ -103,12 +103,12 @@ impl PaymentChannel {
             let bal = get_balance_a(&env);
             env.storage()
                 .instance()
-                .set(&DataKey::BalanceA, &(bal + amount));
+                .set(&BAL_A, &(bal + amount));
         } else if from == participant_b {
             let bal = get_balance_b(&env);
             env.storage()
                 .instance()
-                .set(&DataKey::BalanceB, &(bal + amount));
+                .set(&BAL_B, &(bal + amount));
         } else {
             panic!("not a participant");
         }
@@ -172,13 +172,9 @@ impl PaymentChannel {
                 &balance_b,
             );
         }
-        env.storage().instance().set(&DataKey::Closed, &true);
-        env.storage()
-            .instance()
-            .set(&DataKey::BalanceA, &0_i128);
-        env.storage()
-            .instance()
-            .set(&DataKey::BalanceB, &0_i128);
+        env.storage().instance().set(&CLOSED, &true);
+        env.storage().instance().set(&BAL_A, &0_i128);
+        env.storage().instance().set(&BAL_B, &0_i128);
     }
 
     pub fn get_info(env: Env) -> ChannelInfo {

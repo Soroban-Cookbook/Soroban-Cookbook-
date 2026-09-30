@@ -1,8 +1,6 @@
 #![cfg(test)]
 
-use soroban_sdk::{
-    contract, contractimpl, testutils::Address as _, Address, Env, IntoVal, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, Address, Env, IntoVal, Symbol};
 use crate::helpers::{perf::measure_execution, setup_env};
 
 mod helpers;

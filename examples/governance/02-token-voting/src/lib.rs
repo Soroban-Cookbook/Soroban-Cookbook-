@@ -1,7 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol, Val, Vec};
+use soroban_sdk::{contract, contracterror, contractevent, contractimpl, contracttype, Address, Env, String, Symbol, Val, Vec};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]

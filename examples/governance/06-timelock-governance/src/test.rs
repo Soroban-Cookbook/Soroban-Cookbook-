@@ -3,9 +3,32 @@
 
 use super::*;
 use soroban_sdk::{
+    contract, contractimpl,
     testutils::{Address as _, Ledger},
     vec, Env, IntoVal,
 };
+
+// `#[contractimpl]` cannot resolve a contract declared inside a function body,
+// so the dummy targets invoked by the execution tests live at module scope.
+#[contract]
+pub struct Dummy42;
+
+#[contractimpl]
+impl Dummy42 {
+    pub fn run(_env: Env) -> u32 {
+        42
+    }
+}
+
+#[contract]
+pub struct Dummy99;
+
+#[contractimpl]
+impl Dummy99 {
+    pub fn run(_env: Env) -> u32 {
+        99
+    }
+}
 
 #[test]
 fn test_init() {
@@ -80,8 +103,12 @@ fn test_execute_delay_not_met() {
     
     let id = client.queue(&target, &func, &args, &150);
     
-    let res = client.try_execute(&id);
-    assert_eq!(res, Err(Ok(Error::DelayNotMet)));
+// `execute` returns `Val`, which has no `PartialEq`, so match the error instead
+    // of comparing the whole `Result`.
+    assert!(matches!(
+        client.try_execute(&id),
+        Err(Ok(Error::DelayNotMet))
+    ));
 }
 
 #[test]
@@ -96,15 +123,7 @@ fn test_execute_success() {
     client.init(&admin, &100);
     
     // We need a dummy contract to invoke
-    #[contract]
-    pub struct Dummy;
-    #[contractimpl]
-    impl Dummy {
-        pub fn run(_env: Env) -> u32 {
-            42
-        }
-    }
-    let dummy_id = env.register_contract(None, Dummy);
+    let dummy_id = env.register_contract(None, Dummy42);
     
     let target = dummy_id;
     let func = Symbol::new(&env, "run");
@@ -156,8 +175,10 @@ fn test_cancel_nonexistent() {
     
     client.init(&admin, &100);
     
-    let res = client.try_cancel(&1);
-    assert_eq!(res, Err(Ok(Error::ProposalNotFound)));
+assert!(matches!(
+        client.try_cancel(&1),
+        Err(Ok(Error::ProposalNotFound))
+    ));
 }
 
 #[test]
@@ -179,8 +200,10 @@ fn test_execute_canceled() {
     client.cancel(&id);
     
     env.ledger().set_timestamp(1000);
-    let res = client.try_execute(&id);
-    assert_eq!(res, Err(Ok(Error::ProposalNotQueued)));
+    assert!(matches!(
+        client.try_execute(&id),
+        Err(Ok(Error::ProposalNotQueued))
+    ));
 }
 
 #[test]
@@ -194,13 +217,7 @@ fn test_execute_already_executed() {
     
     client.init(&admin, &100);
     
-    #[contract]
-    pub struct Dummy;
-    #[contractimpl]
-    impl Dummy {
-        pub fn run(_env: Env) -> u32 { 42 }
-    }
-    let dummy_id = env.register_contract(None, Dummy);
+    let dummy_id = env.register_contract(None, Dummy42);
     
     let target = dummy_id;
     let func = Symbol::new(&env, "run");
@@ -212,8 +229,10 @@ fn test_execute_already_executed() {
     env.ledger().set_timestamp(1151); // fast forward
     
     client.execute(&id);
-    let res = client.try_execute(&id);
-    assert_eq!(res, Err(Ok(Error::ProposalNotQueued)));
+    assert!(matches!(
+        client.try_execute(&id),
+        Err(Ok(Error::ProposalNotQueued))
+    ));
 }
 
 #[test]
@@ -227,13 +246,7 @@ fn test_emergency_execute() {
     
     client.init(&admin, &100);
     
-    #[contract]
-    pub struct Dummy;
-    #[contractimpl]
-    impl Dummy {
-        pub fn run(_env: Env) -> u32 { 99 }
-    }
-    let dummy_id = env.register_contract(None, Dummy);
+    let dummy_id = env.register_contract(None, Dummy99);
     
     let target = dummy_id;
     let func = Symbol::new(&env, "run");
@@ -258,13 +271,7 @@ fn test_emergency_execute_already_executed() {
     
     client.init(&admin, &100);
     
-    #[contract]
-    pub struct Dummy;
-    #[contractimpl]
-    impl Dummy {
-        pub fn run(_env: Env) -> u32 { 99 }
-    }
-    let dummy_id = env.register_contract(None, Dummy);
+    let dummy_id = env.register_contract(None, Dummy99);
     
     let target = dummy_id;
     let func = Symbol::new(&env, "run");
@@ -276,8 +283,10 @@ fn test_emergency_execute_already_executed() {
     env.ledger().set_timestamp(1151);
     client.execute(&id);
     
-    let res = client.try_emergency_execute(&id);
-    assert_eq!(res, Err(Ok(Error::ProposalNotQueued)));
+    assert!(matches!(
+        client.try_emergency_execute(&id),
+        Err(Ok(Error::ProposalNotQueued))
+    ));
 }
 
 #[test]
@@ -298,6 +307,8 @@ fn test_emergency_execute_canceled() {
     let id = client.queue(&target, &func, &args, &150);
     client.cancel(&id);
     
-    let res = client.try_emergency_execute(&id);
-    assert_eq!(res, Err(Ok(Error::ProposalNotQueued)));
+    assert!(matches!(
+        client.try_emergency_execute(&id),
+        Err(Ok(Error::ProposalNotQueued))
+    ));
 }

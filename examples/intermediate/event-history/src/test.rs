@@ -16,7 +16,7 @@ fn setup() -> (Env, Address, EventHistoryClient<'static>) {
 
 #[test]
 fn test_append_and_paginate_history_entries() {
-    let (mut env, _admin, client) = setup();
+    let (env, _admin, client) = setup();
     env.mock_all_auths();
 
     let actor = Address::generate(&env);
@@ -46,7 +46,7 @@ fn test_append_and_paginate_history_entries() {
 
 #[test]
 fn test_get_events_page_returns_cursor_and_next_page() {
-    let (mut env, _admin, client) = setup();
+    let (env, _admin, client) = setup();
     env.mock_all_auths();
 
     let actor = Address::generate(&env);
@@ -72,7 +72,7 @@ fn test_get_events_page_returns_cursor_and_next_page() {
 
 #[test]
 fn test_get_events_page_rejects_expired_cursor() {
-    let (mut env, _admin, client) = setup();
+    let (env, _admin, client) = setup();
     env.mock_all_auths();
 
     let actor = Address::generate(&env);
@@ -94,7 +94,7 @@ fn test_get_events_page_rejects_expired_cursor() {
 
 #[test]
 fn test_storage_limit_trims_oldest_entries() {
-    let (mut env, _admin, client) = setup();
+    let (env, _admin, client) = setup();
     env.mock_all_auths();
 
     let actor = Address::generate(&env);
@@ -121,7 +121,7 @@ fn test_storage_limit_trims_oldest_entries() {
 
 #[test]
 fn test_query_by_time_returns_matching_entries() {
-    let (mut env, _admin, client) = setup();
+    let (env, _admin, client) = setup();
     env.mock_all_auths();
 
     let actor = Address::generate(&env);

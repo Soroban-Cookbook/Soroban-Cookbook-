@@ -8,10 +8,17 @@ resolver = "2"
 # root workspace rather than listed under `members`. Build them individually:
 #
 #     cd templates/token-dapp && cargo build
+#
+# `tests/fuzz` is likewise a self-contained workspace root of its own: it
+# carries its own `[workspace]`/`[workspace.dependencies]` and pins the same
+# SDK, and is driven by `cargo fuzz run --fuzz-dir tests/fuzz`. Listing it
+# under `members` made Cargo abort the whole workspace with "multiple
+# workspace roots found in the same workspace", so it is excluded here too.
 exclude = [
     "templates/dao-governance-dapp",
     "templates/nft-marketplace-dapp",
     "templates/token-dapp",
+    "tests/fuzz",
 ]
 
 members = [
@@ -43,6 +50,7 @@ members = [
     "examples/advanced/19-diamond-security",
     "examples/advanced/19-diamond-security/facet-adder",
     "examples/advanced/19-diamond-security/facet-multiplier",
+    "examples/advanced/16-cross-contract-integration-testing",
     "examples/advanced/16-hierarchical-access-control",
     "examples/advanced/07-state-channels",
     "examples/advanced/07-trusted-forwarder",
@@ -119,7 +127,6 @@ members = [
     "tests/integration",
     "tests/security",
     "tests/docs-audit",
-    "tests/fuzz",
 ]
 
 [workspace.package]

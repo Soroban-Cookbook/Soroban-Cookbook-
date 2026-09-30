@@ -70,10 +70,11 @@ pub struct ProtectedCallEventData {
 }
 
 const CONTRACT_NS: Symbol = symbol_short!("hac");
-const ACTION_ROLE_GRANT: Symbol = symbol_short!("role_grant");
-const ACTION_ROLE_REVOKE: Symbol = symbol_short!("role_revoke");
-const ACTION_PERM_GRANT: Symbol = symbol_short!("perm_grant");
-const ACTION_PERM_REVOKE: Symbol = symbol_short!("perm_revoke");
+// `symbol_short!` is limited to 9 characters.
+const ACTION_ROLE_GRANT: Symbol = symbol_short!("role_grnt");
+const ACTION_ROLE_REVOKE: Symbol = symbol_short!("role_rvk");
+const ACTION_PERM_GRANT: Symbol = symbol_short!("perm_grnt");
+const ACTION_PERM_REVOKE: Symbol = symbol_short!("perm_rvk");
 const ACTION_CALL: Symbol = symbol_short!("call");
 
 // ---------------------------------------------------------------------------
@@ -84,9 +85,9 @@ pub const ROLE_ADMIN: Symbol = symbol_short!("ADMIN");
 pub const ROLE_MANAGER: Symbol = symbol_short!("MANAGER");
 pub const ROLE_OPERATOR: Symbol = symbol_short!("OPERATOR");
 
-pub const PERM_MANAGE_ROLES: Symbol = symbol_short!("MANAGE_ROLES");
-pub const PERM_MANAGE_PERMISSIONS: Symbol = symbol_short!("MANAGE_PERMS");
-pub const PERM_MANAGE_RESOURCES: Symbol = symbol_short!("MANAGE_RES");
+pub const PERM_MANAGE_ROLES: Symbol = symbol_short!("MNG_ROLES");
+pub const PERM_MANAGE_PERMISSIONS: Symbol = symbol_short!("MNG_PERMS");
+pub const PERM_MANAGE_RESOURCES: Symbol = symbol_short!("MNG_RES");
 pub const PERM_USE_RESOURCES: Symbol = symbol_short!("USE_RES");
 
 // ---------------------------------------------------------------------------
@@ -418,7 +419,7 @@ impl HierarchicalAccessControlContract {
         let roles = [ROLE_ADMIN, ROLE_MANAGER, ROLE_OPERATOR];
         let mut start_role = roles.len();
         for (i, role) in roles.iter().enumerate() {
-            if Self::check_role(env, account, *role) {
+            if Self::check_role(env, account, role.clone()) {
                 start_role = i;
                 break;
             }
@@ -427,7 +428,7 @@ impl HierarchicalAccessControlContract {
             let perms: Vec<Symbol> = env
                 .storage()
                 .instance()
-                .get(&DataKey::RolePermissions(*role))
+                .get(&DataKey::RolePermissions(role.clone()))
                 .unwrap_or_else(|| Vec::new(&env));
             if perms.contains(&permission) {
                 return true;
@@ -465,7 +466,7 @@ mod test {
     fn deploy(
         env: &Env,
     ) -> (
-        HierarchicalAccessControlContractClient,
+        HierarchicalAccessControlContractClient<'_>,
         Address,
         Address,
         Address,

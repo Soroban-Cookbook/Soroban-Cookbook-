@@ -1,5 +1,3 @@
-[workspace]
-
 [package]
 name = "snapshot-triggers-governance"
 version = "0.1.0"

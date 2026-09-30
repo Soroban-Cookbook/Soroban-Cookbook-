@@ -2,7 +2,7 @@
 //! Unit tests for the minting strategies token example.
 
 use super::*;
-use soroban_sdk::{symbol_short, testutils::{Address as _, Events as _}, Address, Env, Symbol, TryFromVal};
+use soroban_sdk::{symbol_short, testutils::{Address as _, Events as _, Ledger}, Address, Env, Symbol, TryFromVal};
 use soroban_validation::test_events::EventList;
 
 #[test]
@@ -123,7 +123,7 @@ fn test_mint_emits_event_with_strategy_topic() {
     let client = MintingStrategiesTokenClient::new(&env, &contract_id);
 
     client
-        .try_initialize(&admin, &0, &0, &10, &100)
+        .try_initialize(&admin, &1000, &0, &10, &100)
         .unwrap()
         .unwrap();
 

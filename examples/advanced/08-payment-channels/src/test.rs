@@ -149,7 +149,6 @@ fn test_invalid_signature() {
     let new_b: i128 = 80;
     let seq: u32 = 1;
     let msg = make_state_message(&env, &pc_id, new_a, new_b, seq);
-    let msg_bytes = msg.to_buffer::<128>();
     // Sign with a wrong key
     let wrong_kp = SigningKey::from_bytes(&[3u8; 32]);
     let sig_bad_bytes = sign_message(&env, &wrong_kp, &msg);

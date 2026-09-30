@@ -23,7 +23,7 @@ fn setup() -> (Env, Address, StateChannelContractClient<'static>) {
 
 /// Open a channel with default parameters (100 + 100 deposit, custom period).
 fn open_channel(
-    env: &Env,
+    _env: &Env,
     client: &StateChannelContractClient,
     party_a: &Address,
     party_b: &Address,

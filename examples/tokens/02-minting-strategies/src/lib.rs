@@ -325,7 +325,7 @@ fn read_scheduled_available(env: &Env) -> Result<i128, MintingError> {
 
 fn publish_mint(env: &Env, strategy: Symbol, to: Address, amount: i128) {
     env.events().publish(
-        (EVENT_NAMESPACE, strategy, to.clone()),
+        (EVENT_NAMESPACE, strategy.clone(), to.clone()),
         MintEventData {
             strategy,
             amount,
