@@ -8,10 +8,13 @@ resolver = "2"
 # root workspace rather than listed under `members`. Build them individually:
 #
 #     cd templates/token-dapp && cargo build
+#
+# The fuzz target has its own cargo-fuzz workspace and is built independently.
 exclude = [
     "templates/dao-governance-dapp",
     "templates/nft-marketplace-dapp",
     "templates/token-dapp",
+    "tests/fuzz",
 ]
 
 members = [
@@ -49,6 +52,7 @@ members = [
     "examples/advanced/09-storage-layout-validator",
     "examples/advanced/03-permit-pattern",
     "examples/advanced/03-oracle-pattern",
+    "examples/advanced/03-data-aggregation-oracle",
     "examples/advanced/04-upgradeable-proxy",
     "examples/advanced/08-multicall",
     "examples/advanced/05-rate-limiting",
@@ -119,7 +123,6 @@ members = [
     "tests/integration",
     "tests/security",
     "tests/docs-audit",
-    "tests/fuzz",
 ]
 
 [workspace.package]
