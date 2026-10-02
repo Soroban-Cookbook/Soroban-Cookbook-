@@ -1,6 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
+use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, token, Address, Bytes, BytesN, Env,
     Symbol, Vec,
@@ -216,7 +217,9 @@ impl MerkleWhitelistContract {
         env.storage().instance().set(&DataKey::Admin, &admin);
 
         // Store initial Merkle root
-        env.storage().instance().set(&DataKey::MerkleRoot, &initial_root);
+        env.storage()
+            .instance()
+            .set(&DataKey::MerkleRoot, &initial_root);
         env.storage().instance().set(&DataKey::RootVersion, &1u64);
 
         // Store fee configuration
@@ -226,7 +229,9 @@ impl MerkleWhitelistContract {
             dispute_fee: registration_fee / 10, // 10% of registration fee
             enabled: true,
         };
-        env.storage().instance().set(&DataKey::FeeConfig, &fee_config);
+        env.storage()
+            .instance()
+            .set(&DataKey::FeeConfig, &fee_config);
 
         // Store governance configuration with sensible defaults
         let gov_config = GovernanceConfig {
@@ -329,7 +334,9 @@ impl MerkleWhitelistContract {
             dispute_count: 0,
         };
         env.storage().persistent().set(&entry_key, &entry);
-        env.storage().persistent().extend_ttl(&entry_key, 17280, 120960);
+        env.storage()
+            .persistent()
+            .extend_ttl(&entry_key, 17280, 120960);
 
         // Update rate limit
         Self::update_rate_limit(&env, &address);
@@ -340,7 +347,11 @@ impl MerkleWhitelistContract {
     /// Check if an address is whitelisted (has verified entry).
     pub fn is_whitelisted(env: Env, address: Address) -> bool {
         let entry_key = DataKey::WhitelistEntry(address);
-        if let Some(entry) = env.storage().persistent().get::<_, WhitelistEntry>(&entry_key) {
+        if let Some(entry) = env
+            .storage()
+            .persistent()
+            .get::<_, WhitelistEntry>(&entry_key)
+        {
             entry.verified
         } else {
             false
@@ -485,11 +496,7 @@ impl MerkleWhitelistContract {
     /// # Arguments
     /// * `executor` - Address executing the proposal
     /// * `proposal_id` - ID of the proposal to execute
-    pub fn execute_proposal(
-        env: Env,
-        executor: Address,
-        proposal_id: u64,
-    ) -> Result<(), Error> {
+    pub fn execute_proposal(env: Env, executor: Address, proposal_id: u64) -> Result<(), Error> {
         Self::ensure_not_paused(&env)?;
         executor.require_auth();
 
@@ -508,9 +515,7 @@ impl MerkleWhitelistContract {
         let now = env.ledger().timestamp();
 
         // Check if proposal passed
-        if proposal.votes_for < gov_config.quorum
-            || proposal.votes_for <= proposal.votes_against
-        {
+        if proposal.votes_for < gov_config.quorum || proposal.votes_for <= proposal.votes_against {
             return Err(Error::ProposalNotPassed);
         }
 
@@ -682,11 +687,7 @@ impl MerkleWhitelistContract {
     /// # Arguments
     /// * `resolver` - Address resolving the dispute
     /// * `dispute_id` - ID of the dispute to resolve
-    pub fn resolve_dispute(
-        env: Env,
-        resolver: Address,
-        dispute_id: u64,
-    ) -> Result<(), Error> {
+    pub fn resolve_dispute(env: Env, resolver: Address, dispute_id: u64) -> Result<(), Error> {
         Self::ensure_not_paused(&env)?;
         resolver.require_auth();
 
@@ -762,7 +763,9 @@ impl MerkleWhitelistContract {
         caller.require_auth();
         Self::ensure_role(&env, &caller, Role::Admin)?;
 
-        env.storage().instance().remove(&DataKey::Role(target, role));
+        env.storage()
+            .instance()
+            .remove(&DataKey::Role(target, role));
 
         Ok(())
     }
@@ -895,11 +898,7 @@ impl MerkleWhitelistContract {
     }
 
     /// Remove address from blacklist (admin only).
-    pub fn remove_from_blacklist(
-        env: Env,
-        caller: Address,
-        target: Address,
-    ) -> Result<(), Error> {
+    pub fn remove_from_blacklist(env: Env, caller: Address, target: Address) -> Result<(), Error> {
         caller.require_auth();
         Self::ensure_role(&env, &caller, Role::Admin)?;
 
@@ -1011,8 +1010,7 @@ impl MerkleWhitelistContract {
         let mut buf = Bytes::new(env);
 
         // Append address bytes
-        let addr_str = address.to_string();
-        buf.append(&addr_str);
+        buf.append(&address.clone().to_xdr(env));
 
         // Append nonce (8 bytes, big-endian)
         let nonce_bytes = nonce.to_be_bytes();
@@ -1071,7 +1069,11 @@ impl MerkleWhitelistContract {
         }
 
         let token_client = token::Client::new(env, &fee_config.token);
-        token_client.transfer(from, &env.current_contract_address(), &fee_config.registration_fee);
+        token_client.transfer(
+            from,
+            &env.current_contract_address(),
+            &fee_config.registration_fee,
+        );
 
         // Accumulate fees
         let current: i128 = env
@@ -1079,9 +1081,10 @@ impl MerkleWhitelistContract {
             .instance()
             .get(&DataKey::AccumulatedFees)
             .unwrap_or(0);
-        env.storage()
-            .instance()
-            .set(&DataKey::AccumulatedFees, &(current + fee_config.registration_fee));
+        env.storage().instance().set(
+            &DataKey::AccumulatedFees,
+            &(current + fee_config.registration_fee),
+        );
 
         Ok(())
     }
@@ -1095,7 +1098,11 @@ impl MerkleWhitelistContract {
         }
 
         let token_client = token::Client::new(env, &fee_config.token);
-        token_client.transfer(from, &env.current_contract_address(), &fee_config.dispute_fee);
+        token_client.transfer(
+            from,
+            &env.current_contract_address(),
+            &fee_config.dispute_fee,
+        );
 
         // Accumulate fees
         let current: i128 = env
@@ -1103,9 +1110,10 @@ impl MerkleWhitelistContract {
             .instance()
             .get(&DataKey::AccumulatedFees)
             .unwrap_or(0);
-        env.storage()
-            .instance()
-            .set(&DataKey::AccumulatedFees, &(current + fee_config.dispute_fee));
+        env.storage().instance().set(
+            &DataKey::AccumulatedFees,
+            &(current + fee_config.dispute_fee),
+        );
 
         Ok(())
     }

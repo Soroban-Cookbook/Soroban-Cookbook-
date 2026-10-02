@@ -65,8 +65,7 @@ fn make_fixture() -> Fixture {
     let impl_v2_addr = env.register(ImplV2, ());
 
     // Initialise beacon: admin controls upgrades (factory addr in production).
-    BeaconContractClient::new(&env, &beacon_addr)
-        .init(&admin, &impl_v1_addr, &symbol_short!("v1"));
+    BeaconContractClient::new(&env, &beacon_addr).init(&admin, &impl_v1_addr, &symbol_short!("v1"));
 
     Fixture {
         env,
@@ -200,13 +199,11 @@ fn test_upgrade_beacon_unauthorized() {
     let impl_v2_addr = env.register(ImplV2, ());
 
     env.mock_all_auths();
-    BeaconContractClient::new(&env, &beacon_addr)
-        .init(&admin, &impl_v1_addr, &symbol_short!("v1"));
+    BeaconContractClient::new(&env, &beacon_addr).init(&admin, &impl_v1_addr, &symbol_short!("v1"));
 
     // Strip all auths — upgrade should fail.
     env.set_auths(&[]);
-    BeaconContractClient::new(&env, &beacon_addr)
-        .upgrade(&impl_v2_addr, &symbol_short!("v2"));
+    BeaconContractClient::new(&env, &beacon_addr).upgrade(&impl_v2_addr, &symbol_short!("v2"));
 }
 
 // ---------------------------------------------------------------------------

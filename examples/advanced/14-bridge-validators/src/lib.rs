@@ -2,8 +2,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Address, BytesN, Env, Map, Symbol, Vec,
-    crypto::Hash,
+    contract, contracterror, contractimpl, contracttype, crypto::Hash, Address, BytesN, Env, Map,
+    Symbol, Vec,
 };
 
 #[contracterror]
@@ -54,9 +54,13 @@ impl BridgeValidators {
         admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::Threshold, &threshold);
-        env.storage().instance().set(&DataKey::ValidatorCount, &0u32);
-        
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold, &threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::ValidatorCount, &0u32);
+
         Ok(())
     }
 
@@ -64,7 +68,11 @@ impl BridgeValidators {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
 
-        if env.storage().persistent().has(&DataKey::Validator(pubkey.clone())) {
+        if env
+            .storage()
+            .persistent()
+            .has(&DataKey::Validator(pubkey.clone()))
+        {
             return Err(Error::ValidatorExists);
         }
 
@@ -74,11 +82,19 @@ impl BridgeValidators {
             active: true,
         };
 
-        env.storage().persistent().set(&DataKey::Validator(pubkey.clone()), &validator);
-        
-        let mut count: u32 = env.storage().instance().get(&DataKey::ValidatorCount).unwrap();
+        env.storage()
+            .persistent()
+            .set(&DataKey::Validator(pubkey.clone()), &validator);
+
+        let mut count: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ValidatorCount)
+            .unwrap();
         count += 1;
-        env.storage().instance().set(&DataKey::ValidatorCount, &count);
+        env.storage()
+            .instance()
+            .set(&DataKey::ValidatorCount, &count);
 
         Ok(())
     }
@@ -87,15 +103,27 @@ impl BridgeValidators {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
 
-        if !env.storage().persistent().has(&DataKey::Validator(pubkey.clone())) {
+        if !env
+            .storage()
+            .persistent()
+            .has(&DataKey::Validator(pubkey.clone()))
+        {
             return Err(Error::ValidatorNotFound);
         }
 
-        env.storage().persistent().remove(&DataKey::Validator(pubkey.clone()));
-        
-        let mut count: u32 = env.storage().instance().get(&DataKey::ValidatorCount).unwrap();
+        env.storage()
+            .persistent()
+            .remove(&DataKey::Validator(pubkey.clone()));
+
+        let mut count: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ValidatorCount)
+            .unwrap();
         count -= 1;
-        env.storage().instance().set(&DataKey::ValidatorCount, &count);
+        env.storage()
+            .instance()
+            .set(&DataKey::ValidatorCount, &count);
 
         Ok(())
     }
@@ -112,7 +140,9 @@ impl BridgeValidators {
 
         validator.active = false;
         validator.power = 0;
-        env.storage().persistent().set(&DataKey::Validator(pubkey), &validator);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Validator(pubkey), &validator);
 
         Ok(())
     }
@@ -125,7 +155,9 @@ impl BridgeValidators {
             return Err(Error::InvalidThreshold);
         }
 
-        env.storage().instance().set(&DataKey::Threshold, &new_threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold, &new_threshold);
         Ok(())
     }
 
@@ -134,7 +166,11 @@ impl BridgeValidators {
         message_hash: BytesN<32>,
         signatures: Map<BytesN<32>, BytesN<64>>, // map of pubkey to signature
     ) -> Result<bool, Error> {
-        if env.storage().persistent().has(&DataKey::Processed(message_hash.clone())) {
+        if env
+            .storage()
+            .persistent()
+            .has(&DataKey::Processed(message_hash.clone()))
+        {
             return Err(Error::MessageAlreadyProcessed);
         }
 
@@ -147,14 +183,15 @@ impl BridgeValidators {
                 .persistent()
                 .get(&DataKey::Validator(pubkey.clone()))
                 .ok_or(Error::ValidatorNotFound)?;
-                
+
             if !validator.active {
                 continue;
             }
 
             // Verify signature. Using env.crypto().ed25519_verify
-            env.crypto().ed25519_verify(&pubkey, &message_hash.clone().into(), &sig);
-            
+            env.crypto()
+                .ed25519_verify(&pubkey, &message_hash.clone().into(), &sig);
+
             total_power += validator.power;
         }
 
@@ -162,10 +199,13 @@ impl BridgeValidators {
             return Err(Error::ThresholdNotMet);
         }
 
-        env.storage().persistent().set(&DataKey::Processed(message_hash.clone()), &true);
-        
+        env.storage()
+            .persistent()
+            .set(&DataKey::Processed(message_hash.clone()), &true);
+
         // Emit event
-        env.events().publish((Symbol::new(&env, "processed"), message_hash), ());
+        env.events()
+            .publish((Symbol::new(&env, "processed"), message_hash), ());
 
         Ok(true)
     }

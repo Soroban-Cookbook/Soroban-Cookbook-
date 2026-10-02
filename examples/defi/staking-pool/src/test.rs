@@ -2,7 +2,10 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::{Address as _, Ledger}, Address, Env};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger},
+    Address, Env,
+};
 
 fn setup() -> (Env, Address, StakingPoolContractClient<'static>) {
     let env = Env::default();
@@ -19,9 +22,9 @@ fn test_get_lockup_options() {
     let options = client.get_lockup_options();
 
     assert_eq!(options.len(), 3);
-    assert_eq!(options[0].duration, LOCKUP_30_DAYS);
-    assert_eq!(options[1].boost_bps, BOOST_90_DAYS_BPS);
-    assert_eq!(options[2].boost_bps, BOOST_180_DAYS_BPS);
+    assert_eq!(options.get(0).unwrap().duration, LOCKUP_30_DAYS);
+    assert_eq!(options.get(1).unwrap().boost_bps, BOOST_90_DAYS_BPS);
+    assert_eq!(options.get(2).unwrap().boost_bps, BOOST_180_DAYS_BPS);
 }
 
 #[test]
@@ -40,7 +43,8 @@ fn test_stake_and_get_stake_info() {
 fn test_withdraw_after_maturity_applies_boost() {
     let (env, staker, client) = setup();
     client.stake(&staker, &1_000, &LOCKUP_180_DAYS);
-    env.ledger().with_mut(|l| l.timestamp += LOCKUP_180_DAYS + 1);
+    env.ledger()
+        .with_mut(|l| l.timestamp += LOCKUP_180_DAYS + 1);
 
     let payout = client.withdraw(&staker);
     assert_eq!(payout, 1_250);

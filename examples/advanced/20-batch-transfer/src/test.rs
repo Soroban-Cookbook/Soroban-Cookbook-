@@ -287,13 +287,7 @@ fn test_batch_transfer_total_overflow_fails() {
     let r1 = Address::generate(&env);
     let r2 = Address::generate(&env);
 
-    let transfers = Vec::from_array(
-        &env,
-        [
-            make_transfer(r1, i128::MAX),
-            make_transfer(r2, 1),
-        ],
-    );
+    let transfers = Vec::from_array(&env, [make_transfer(r1, i128::MAX), make_transfer(r2, 1)]);
     let result = client.try_batch_transfer(&admin, &transfers);
     assert_eq!(result, Err(Ok(BatchError::TotalOverflow)));
 }

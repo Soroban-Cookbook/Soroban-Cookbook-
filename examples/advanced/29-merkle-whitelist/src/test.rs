@@ -3,7 +3,7 @@
 
 use super::*;
 use soroban_sdk::{
-    testutils::{Address as _, Ledger, LedgerInfo},
+    testutils::{Address as _, Ledger},
     token, Bytes, BytesN, Env, Vec,
 };
 
@@ -19,7 +19,9 @@ struct TestMerkleTree {
 
 impl TestMerkleTree {
     fn new(env: &Env) -> Self {
-        Self { leaves: Vec::new(env) }
+        Self {
+            leaves: Vec::new(env),
+        }
     }
 
     fn add_leaf(&mut self, leaf: BytesN<32>) {
@@ -101,9 +103,14 @@ fn hash_pair_test(env: &Env, a: &BytesN<32>, b: &BytesN<32>) -> BytesN<32> {
     env.crypto().sha256(&buf).to_bytes()
 }
 
-fn compute_leaf_hash_test(env: &Env, address: &Address, nonce: u64, metadata: &Bytes) -> BytesN<32> {
+fn compute_leaf_hash_test(
+    env: &Env,
+    address: &Address,
+    nonce: u64,
+    metadata: &Bytes,
+) -> BytesN<32> {
     let mut buf = Bytes::new(env);
-    buf.append(&address.to_string());
+    buf.append(&address.clone().to_xdr(env));
     for byte in nonce.to_be_bytes().iter() {
         buf.push_back(*byte);
     }
@@ -122,8 +129,7 @@ fn test_initialization() {
     let client = MerkleWhitelistContractClient::new(&env, &contract_id);
     let initial_root = BytesN::from_array(&env, &[1u8; 32]);
 
-    let result = client.initialize(&admin, &token_address, &1000000, &initial_root);
-    assert!(result.is_ok());
+    client.initialize(&admin, &token_address, &1000000, &initial_root);
     assert_eq!(client.get_admin(), admin);
     assert_eq!(client.get_merkle_root(), initial_root);
     assert_eq!(client.has_role(&admin, &Role::Admin), true);
@@ -151,7 +157,6 @@ fn test_verify_whitelist_valid_proof() {
 
     let proof = tree.generate_proof(&env, 0);
     let result = client.try_verify_whitelist(&user, &proof, &metadata);
-    assert!(result.is_ok());
     assert_eq!(client.is_whitelisted(&user), true);
 }
 
@@ -223,16 +228,7 @@ fn test_governance_proposal_lifecycle() {
     client.vote_on_proposal(&gov2, &proposal_id, &true);
     client.vote_on_proposal(&gov3, &proposal_id, &true);
 
-    env.ledger().set(LedgerInfo {
-        timestamp: env.ledger().timestamp() + 86401,
-        protocol_version: 20,
-        sequence_number: env.ledger().sequence(),
-        network_id: Default::default(),
-        base_reserve: 10,
-        min_temp_entry_ttl: 16,
-        min_persistent_entry_ttl: 16,
-        max_entry_ttl: 6312000,
-    });
+    env.ledger().with_mut(|l| l.timestamp += 86401);
 
     client.execute_proposal(&admin, &proposal_id);
     assert_eq!(client.get_merkle_root(), new_root);
@@ -267,22 +263,14 @@ fn test_dispute_submission_and_resolution() {
     let proof = tree.generate_proof(&env, 0);
     client.verify_whitelist(&target, &proof, &metadata);
 
+    token::StellarAssetClient::new(&env, &token_address).mint(&validator1, &1_000_000);
     let evidence = Bytes::from_slice(&env, b"Evidence");
     let dispute_id = client.submit_dispute(&validator1, &target, &evidence);
 
     client.vote_on_dispute(&validator1, &dispute_id, &DisputeDecision::Invalid);
     client.vote_on_dispute(&validator2, &dispute_id, &DisputeDecision::Invalid);
 
-    env.ledger().set(LedgerInfo {
-        timestamp: env.ledger().timestamp() + 172801,
-        protocol_version: 20,
-        sequence_number: env.ledger().sequence(),
-        network_id: Default::default(),
-        base_reserve: 10,
-        min_temp_entry_ttl: 16,
-        min_persistent_entry_ttl: 16,
-        max_entry_ttl: 6312000,
-    });
+    env.ledger().with_mut(|l| l.timestamp += 172801);
 
     client.resolve_dispute(&admin, &dispute_id);
     assert_eq!(client.is_whitelisted(&target), false);
@@ -344,7 +332,7 @@ fn test_fee_collection() {
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
     let (token_address, token_client) = create_token_contract(&env, &admin);
-    token_client.mint(&user, &10000000);
+    token::StellarAssetClient::new(&env, &token_address).mint(&user, &10000000);
 
     let contract_id = env.register(MerkleWhitelistContract, ());
     let client = MerkleWhitelistContractClient::new(&env, &contract_id);

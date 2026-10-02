@@ -1,1 +1,339 @@
-IWNmZ19hdHRyKHRhcmdldF9mYW1pbHkgPSAid2FzbSIsIG5vX3N0ZCBdKQojIVthbGxvd1tkZXByZWNhdGVkKV0KCnVzZSBzb3JvYmFuX3Nkazo6ewogICAgY29udHJhY3QsIGNvbnRyYWN0ZXJyb3IsIGNvbnRyYWN0aW1wbCwgY29udHJhY3R0eXBlLCBzeW1ib2xfc2hvcnQsIEFkZHJlc3MsIEVudiwgU3RyaW5nLCBWZWMsCn07CgojW2NvbnRyYWN0dHlwZV0KI1tkZXJpdmUoQ2xvbmUpXQpwdWIgZW51bSBEYXRhS2V5IHsKICAgIEFkbWluLAogICAgTmFtZSwKICAgIFN5bWJvbCwKICAgIFRvdGFsU3VwcGx5LAogICAgT3duZXIodTMyKSwKICAgIEJhbGFuY2UoQWRkcmVzcyksCiAgICBUb2tlbkJ5SW5kZXgodTMyKSwKICAgIFRva2VuSW5kZXgodTMyKSwKICAgIE93bmVyVG9rZW5JbmRleCh1MzIpLAogICAgT3duZWRUb2tlbihBZGRyZXNzLCB1MzIpLAogICAgQXBwcm92ZWQodTMyKSwKICAgIEFwcHJvdmVBbGwoQWRkcmVzcywgQWRkcmVzcyksCn0KCiNbY29udHJhY3RlcnJvcl0KI1tkZXJpdmUoQ29weSwgQ2xvbmUsIERlYnVnLCBFcSwgUGFydGlhbEVxKV0KI1tyZXByKHUzMildCnB1YiBlbnVtIE5mdEVycm9yIHsKICAgIEFscmVhZHlJbml0aWFsaXplZCA9IDEsCiAgICBOb3RJbml0aWFsaXplZCA9IDIsCiAgICBUb2tlbk5vdEZvdW5kID0gMywKICAgIFRva2VuQWxyZWFkeUV4aXN0cyA9IDQsCiAgICBOb3RPd25lciA9IDUsCiAgICBOb3RBcHByb3ZlZCA9IDYsCiAgICBOb3RBZG1pbiA9IDcsCn0KCiNbY29udHJhY3RdCnB1YiBzdHJ1Y3QgQmFzaWNOZnRDb250cmFjdDsKCiNbY29udHJhY3RpbXBsXQppbXBsIEJhc2ljTmZ0Q29udHJhY3QgewogICAgcHViIGZuIGluaXRpYWxpemUoCiAgICAgICAgZW52OiBFbnYsCiAgICAgICAgYWRtaW46IEFkZHJlc3MsCiAgICAgICAgbmFtZTogU3RyaW5nLAogICAgICAgIHN5bWJvbDogU3RyaW5nLAogICAgKSAtPiBSZXN1bHQ8KCksIE5mdEVycm9yPiB7CiAgICAgICAgaWYgZW52LnN0b3JhZ2UoKS5pbnN0YW5jZSgpLmhhcygmRGF0YUtleTo6QWRtaW4pIHsKICAgICAgICAgICAgcmV0dXJuIEVycihOZnRFcnJvcjo6QWxyZWFkeUluaXRpYWxpemVkKTsKICAgICAgICB9CgogICAgICAgIGFkbWluLnJlcXVpcmVfYXV0aCgpOwoKICAgICAgICBlbnYuc3RvcmFnZSgpLmluc3RhbmNlKCkuc2V0KCZEYXRhS2V5OjpBZG1pbiwgJmFkbWluKTsKICAgICAgICBlbnYuc3RvcmFnZSgpLmluc3RhbmNlKCkuc2V0KCZEYXRhS2V5OjpOYW1lLCAmbмFtZSk7CiAgICAgICAgZW52LnN0b3JhZ2UoKS5pbnN0YW5jZSgpLnNldCgmRGF0YUtleTo6U3ltYm9sLCAmc3ltYm9sKTsKICAgICAgICBlbnYuc3RvcmFnZSgpLmluc3RhbmNlKCkuc2V0KCZEYXRhS2V5OjpUb3RhbFN1cHBseSwgJjB1MzIpOwoKICAgICAgICBlbnYuZXZlbnRzKCkucHVibGlzaCgKICAgICAgICAgICAgKHN5bWJvbF9zaG9ydCEoImluaXQiKSwgc3ltYm9sX3Nob3J0ISgibmZ0IikpLAogICAgICAgICAgICAobmFtZSwgc3ltYm9sKSwKICAgICAgICApOwoKICAgICAgICBPaygoKQogICAgfQoKICAgIHB1YiBmbiBuYW1lKGVudjogRW52KSAtPiBSZXN1bHQ8U3RyaW5nLCBOZnRFcnJvcj4gewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6TmFtZSkKICAgICAgICAgICAgLm9rX29yKE5mdEVycm9yOjpOb3RJbml0aWFsaXplZCkKICAgIH0KCiAgICBwdWIgZm4gc3ltYm9sKGVudjogRW52KSAtPiBSZXN1bHQ8U3RyaW5nLCBOZnRFcnJvcj4gewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6U3ltYm9sKQogICAgICAgICAgICAub2tfb3IoTmZ0RXJyb3I6Ok5vdEluaXRpYWxpemVkKQogICAgfQoKICAgIHB1YiBmbiB0b3RhbF9zdXBwbHkoZW52OiBFbnYpIC0+IHUzMiB7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpUb3RhbFN1cHBseSkKICAgICAgICAgICAgLnVud3JhcF9vcigwKQogICAgfQoKICAgIHB1YiBmbiBvd25lcl9vZihlbnY6IEVudiwgdG9rZW5faWQ6IHUzMikgLT4gUmVzdWx0PEFkZHJlc3MsIE5mdEVycm9yPiB7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAucGVyc2lzdGVudCgpCiAgICAgICAgICAgIC5nZXQoJkRhdGFLZXk6Ok93bmVyKHRva2VuX2lkKSkKICAgICAgICAgICAgLm9rX29yKE5mdEVycm9yOjpUb2tlbk5vdEZvdW5kKQogICAgfQoKICAgIHB1YiBmbiBiYWxhbmNlX29mKGVudjogRW52LCBvd25lcjogQWRkcmVzcykgLT4gdTMyIHsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6QmFsYW5jZShvd25lcikpCiAgICAgICAgICAgIC51bndyYXBfb3IoMCkKICAgIH0KCiAgICBwdWIgZm4gdG9rZW5fYnlfaW5kZXgoZW52OiBFbnYsIGluZGV4OiB1MzIpIC0+IFJlc3VsdDx1MzIsIE5mdEVycm9yPiB7CiAgICAgICAgbGV0IHN1cHBseSA9IFNlbGY6OnRvdGFsX3N1cHBseShlbnYuY2xvbmUoKSk7CiAgICAgICAgaWYgaW5kZXggPj0gc3VwcGx5IHsKICAgICAgICAgICAgcmV0dXJuIEVycihOZnRFcnJvcjo6VG9rZW5Ob3RGb3VuZCk7CiAgICAgICAgfQogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpUb2tlbkJ5SW5kZXgoaW5kZXgpKQogICAgICAgICAgICAub2tfb3IoTmZ0RXJyb3I6OlRva2VuTm90Rm91bmQpCiAgICB9CgogICAgcHViIGZuIHRva2Vuc19vZl9vd25lcihlbnY6IEVudiwgb3duZXI6IEFkZHJlc3MpIC0+IFZlYzx1MzI+IHsKICAgICAgICBsZXQgYmFsYW5jZSA9IFNlbGY6OmJhbGFuY2Vfb2YoZW52LmNsb25lKCksIG93bmVyLmNsb25lKCkpOwogICAgICAgIGxldCBtdXQgcmVzdWx0ID0gVmVjOjpuZXcoJmVudik7CiAgICAgICAgbGV0IG11dCBpbmRleCA9IDB1MzI7CiAgICAgICAgd2hpbGUgaW5kZXggPCBiYWxhbmNlIHsKICAgICAgICAgICAgbGV0IHRva2VuX2lkOiB1MzIgPSBlbnYKICAgICAgICAgICAgICAgIC5zdG9yYWdlKCkKICAgICAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgICAgIC5nZXQoJkRhdGFLZXk6Ok93bmVkVG9rZW4ob3duZXIuY2xvbmUoKSwgaW5kZXgpKQogICAgICAgICAgICAgICAgLnVud3JhcCgpOwogICAgICAgICAgICByZXN1bHQucHVzaF9iYWNrKHRva2VuX2lkKTsKICAgICAgICAgICAgaW5kZXggKz0gMTsKICAgICAgICB9CiAgICAgICAgcmVzdWx0CiAgICB9CgogICAgcHViIGZuIGFwcHJvdmUoCiAgICAgICAgZW52OiBFbnYsCiAgICAgICAgb3duZXI6IEFkZHJlc3MsCiAgICAgICAgYXBwcm92ZWQ6IEFkZHJlc3MsCiAgICAgICAgdG9rZW5faWQ6IHUzMiwKICAgICkgLT4gUmVzdWx0PCgpLCBOZnRFcnJvcj4gewogICAgICAgIG93bmVyLnJlcXVpcmVfYXV0aCgpOwoKICAgICAgICBsZXQgY3VycmVudF9vd25lciA9IFNlbGY6Om93bmVyX29mKGVudi5jbG9uZSgpLCB0b2tlbl9pZCk/OwogICAgICAgIGlmIGN1cnJlbnRfb3duZXIgIT0gb3duZXIgewogICAgICAgICAgICByZXR1cm4gRXJyKE5mdEVycm9yOjpOb3RPd25lcik7CiAgICAgICAgfQoKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6QXBwcm92ZWQodG9rZW5faWQpLCAmYXBwcm92ZWQpOwogICAgICAgIGVudi5ldmVudHMoKS5wdWJsaXNoKAogICAgICAgICAgICAoc3ltYm9sX3Nob3J0ISgiYXBwcm92ZSIpLCBzeW1ib2xfc2hvcnQhKCJuZnQiKSksCiAgICAgICAgICAgIChvd25lciwgYXBwcm92ZWQsIHRva2VuX2lkKSwKICAgICAgICApOwoKICAgICAgICBPaygoKQogICAgfQoKICAgIHB1YiBmbiBzZXRfYXBwcm92YWxfZm9yX2FsbCgKICAgICAgICBlbnY6IEVudiwKICAgICAgICBvd25lcjogQWRkcmVzcywKICAgICAgICBvcGVyYXRvcjogQWRkcmVzcywKICAgICAgICBhcHByb3ZlZDogYm9vbCwKICAgICkgLT4gUmVzdWx0PCgpLCBOZnRFcnJvcj4gewogICAgICAgIG93bmVyLnJlcXVpcmVfYXV0aCgpOwogICAgICAgIGVudi5zdG9yYWdlKCkucGVyc2lzdGVudCgpLnNldCgKICAgICAgICAgICAgJkRhdGFLZXk6OkFwcHJvdmVBbGwob3duZXIuY2xvbmUoKSwgb3BlcmF0b3IuY2xvbmUoKSksCiAgICAgICAgICAgICZhcHByb3ZlZCwKICAgICAgICApOwogICAgICAgIGVudi5ldmVudHMoKS5wdWJsaXNoKAogICAgICAgICAgICAoc3ltYm9sX3Nob3J0ISgic2V0X2FwcnYiKSwgc3ltYm9sX3Nob3J0ISgibmZ0IikpLAogICAgICAgICAgICAob3duZXIsIG9wZXJhdG9yLCBhcHByb3ZlZCksCiAgICAgICAgKTsKICAgICAgICBPaygoKQogICAgfQoKICAgIHB1YiBmbiBpc19hcHByb3ZlZF9mb3JfYWxsKGVudjogRW52LCBvd25lcjogQWRkcmVzcywgb3BlcmF0b3I6IEFkZHJlc3MpIC0+IGJvb2wgewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpBcHByb3ZlQWxsKG93bmVyLCBvcGVyYXRvcikpCiAgICAgICAgICAgIC51bndyYXBfb3IoZmFsc2UpCiAgICB9CgogICAgcHViIGZuIGdldF9hcHByb3ZlZChlbnY6IEVudiwgdG9rZW5faWQ6IHUzMikgLT4gT3B0aW9uPEFkZHJlc3M+IHsKICAgICAgICBlbnYuc3RvcmFnZSgpLnBlcnNpc3RlbnQoKS5nZXQoJkRhdGFLZXk6OkFwcHJvdmVkKHRva2VuX2lkKSkKICAgIH0KCiAgICBwdWIgZm4gdHJhbnNmZXIoZW52OiBFbnYsIGZyb206IEFkZHJlc3MsIHRvOiBBZGRyZXNzLCB0b2tlbl9pZDogdTMyKSAtPiBSZXN1bHQ8KCksIE5mdEVycm9yPiB7CiAgICAgICAgZnJvbS5yZXF1aXJlX2F1dGgoKTsKICAgICAgICBTZWxmOjp0cmFuc2Zlcl9mcm9tX2ltcGwoZW52LCBmcm9tLmNsb25lKCksIGZyb20sIHRvLCB0b2tlbl9pZCkKICAgIH0KCiAgICBwdWIgZm4gdHJhbnNmZXJfZnJvbSgKICAgICAgICBlbnY6IEVudiwKICAgICAgICBzcGVuZGVyOiBBZGRyZXNzLAogICAgICAgIGZyb206IEFkZHJlc3MsCiAgICAgICAgdG86IEFkZHJlc3MsCiAgICAgICAgdG9rZW5faWQ6IHUzMiwKICAgICkgLT4gUmVzdWx0PCgpLCBOZnRFcnJvcj4gewogICAgICAgIHNwZW5kZXIucmVxdWlyZV9hdXRoKCk7CiAgICAgICAgU2VsZjo6Y2hlY2tfYXBwcm92ZWQoZW52LmNsb25lKCksIHNwZW5kZXIuY2xvbmUoKSwgZnJvbS5jbG9uZSgpLCB0b2tlbl9pZCk/OwogICAgICAgIFNlbGY6OnRyYW5zZmVyX2Zyb21faW1wbChlbnYsIHNwZW5kZXIsIGZyb20sIHRvLCB0b2tlbl9pZCkKICAgIH0KCiAgICBwdWIgZm4gbWludChlbnY6IEVudiwgYWRtaW46IEFkZHJlc3MsIHRvOiBBZGRyZXNzLCB0b2tlbl9pZDogdTMyKSAtPiBSZXN1bHQ8KCksIE5mdEVycm9yPiB7CiAgICAgICAgYWRtaW4ucmVxdWlyZV9hdXRoKCk7CgogICAgICAgIGxldCBzdG9yZWRfYWRtaW46IEFkZHJlc3MgPSBlbnYKICAgICAgICAgICAgLnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpBZG1pbikKICAgICAgICAgICAgLm9rX29yKE5mdEVycm9yOjpOb3RJbml0aWFsaXplZCk/OwogICAgICAgIGlmIHN0b3JlZF9hZG1pbiAhPSBhZG1pbiB7CiAgICAgICAgICAgIHJldHVybiBFcnIoTmZ0RXJyb3I6Ok5vdEFkbWluKTsKICAgICAgICB9CgogICAgICAgIGlmIGVudi5zdG9yYWdlKCkucGVyc2lzdGVudCgpLmhhcygmRGF0YUtleTo6T3duZXIodG9rZW5faWQpKSB7CiAgICAgICAgICAgIHJldHVybiBFcnIoTmZ0RXJyb3I6OlRva2VuQWxyZWFkeUV4aXN0cyk7CiAgICAgICAgfQoKICAgICAgICBsZXQgc3VwcGx5ID0gU2VsZjo6dG90YWxfc3VwcGx5KGVudi5jbG9uZSgpKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6T3duZXIodG9rZW5faWQpLCAmdG8pOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpUb2tlbkJ5SW5kZXgoc3VwcGx5KSwgJnRva2VuX2lkKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6VG9rZW5JbmRleCh0b2tlbl9pZCksICZzdXBwbHkpOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6VG90YWxTdXBwbHksICZzdXBwbHkgKyAxKTsKICAgICAgICBTZWxmOjphZGRfdG9rZW5fdG9fb3duZXIoJmVudiwgdG8uY2xvbmUoKSwgdG9rZW5faWQpOwogICAgICAgIGVudi5ldmVudHMoKS5wdWJsaXNoKAogICAgICAgICAgICAoc3ltYm9sX3Nob3J0ISgibWludCIpLCBzeW1ib2xfc2hvcnQhKCJuZnQiKSksCiAgICAgICAgICAgICh0bywgdG9rZW5faWQpLAogICAgICAgICk7CgogICAgICAgIE9rKCgpCiAgICB9CgogICAgZm4gdHJhbnNmZXJfZnJvbV9pbXBsKAogICAgICAgIGVudjogRW52LAogICAgICAgIF9zcGVuZGVyOiBBZGRyZXNzLAogICAgICAgIGZyb206IEFkZHJlc3MsCiAgICAgICAgdG86IEFkZHJlc3MsCiAgICAgICAgdG9rZW5faWQ6IHUzMiwKICAgICkgLT4gUmVzdWx0PCgpLCBOZnRFcnJvcj4gewogICAgICAgIGxldCBvd25lciA9IFNlbGY6Om93bmVyX29mKGVudi5jbG9uZSgpLCB0b2tlbl9pZCk/OwogICAgICAgIGlmIG93bmVyICE9IGZyb20gewogICAgICAgICAgICByZXR1cm4gRXJyKE5mdEVycm9yOjpOb3RPd25lcik7CiAgICAgICAgfQoKICAgICAgICBpZiBmcm9tID09IHRvIHsKICAgICAgICAgICAgcmV0dXJuIE9rKCgpOwogICAgICAgIH0KCiAgICAgICAgU2VsZjo6cmVtb3ZlX3Rva2VuX2Zyb21fb3duZXIoJmVudiwgZnJvbS5jbG9uZSgpLCB0b2tlbl9pZCk7CiAgICAgICAgU2VsZjo6YWRkX3Rva2VuX3RvX293bmVyKCZlbnYsIHRvLmNsb25lKCksIHRva2VuX2lkKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6T3duZXIodG9rZW5faWQpLCAmdG8pOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAucmVtb3ZlKCZEYXRhS2V5OjpBcHByb3ZlZCh0b2tlbl9pZCkpOwogICAgICAgIGVudi5ldmVudHMoKS5wdWJsaXNoKAogICAgICAgICAgICAoc3ltYm9sX3Nob3J0ISgidHJhbnNmZXIiKSwgc3ltYm9sX3Nob3J0ISgibmZ0IikpLAogICAgICAgICAgICAoZnJvbSwgdG8sIHRva2VuX2lkKSwKICAgICAgICApOwogICAgICAgIE9rKCgpCiAgICB9CgogICAgZm4gY2hlY2tfYXBwcm92ZWQoCiAgICAgICAgZW52OiBFbnYsCiAgICAgICAgc3BlbmRlcjogQWRkcmVzcywKICAgICAgICBvd25lcjogQWRkcmVzcywKICAgICAgICB0b2tlbl9pZDogdTMyLAogICAgKSAtPiBSZXN1bHQ8KCksIE5mdEVycm9yPiB7CiAgICAgICAgaWYgc3BlbmRlciA9PSBvd25lciB7CiAgICAgICAgICAgIHJldHVybiBPaygoKTsKICAgICAgICB9CgogICAgICAgIGlmIGxldCBTb21lKGFwcHJvdmVkKSA9IFNlbGY6OmdldF9hcHByb3ZlZChlbnYuY2xvbmUoKSwgdG9rZW5faWQpIHsKICAgICAgICAgICAgaWYgYXBwcm92ZWQgPT0gc3BlbmRlciB7CiAgICAgICAgICAgICAgICByZXR1cm4gT2soKCk7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIGlmIFNlbGY6OmlzX2FwcHJvdmVkX2Zvcl9hbGwoZW52LCBvd25lci5jbG9uZSgpLCBzcGVuZGVyLmNsb25lKCkpIHsKICAgICAgICAgICAgcmV0dXJuIE9rKCgpOwogICAgICAgIH0KCiAgICAgICAgRXJyKE5mdEVycm9yOjpOb3RBcHByb3ZlZCkKICAgIH0KCiAgICBmbiBhZGRfdG9rZW5fdG9fb3duZXIoZW52OiAmRW52LCBvd25lcjogQWRkcmVzcywgdG9rZW5faWQ6IHUzMikgewogICAgICAgIGxldCBiYWxhbmNlID0gU2VsZjo6YmFsYW5jZV9vZihlbnYuY2xvbmUoKSwgb3duZXIuY2xvbmUoKSk7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAucGVyc2lzdGVudCgpCiAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6Ok93bmVkVG9rZW4ob3duZXIuY2xvbmUoKSwgYmFsYW5jZSksICZ0b2tlbl9pZCk7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAucGVyc2lzdGVudCgpCiAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6Ok93bmVyVG9rZW5JbmRleCh0b2tlbl9pZCksICZiYWxhbmNlKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6QmFsYW5jZShvd25lciksICZiYWxhbmNlICsgMSk7CiAgICB9CgogICAgZm4gcmVtb3ZlX3Rva2VuX2Zyb21fb3duZXIoZW52OiAmRW52LCBvd25lcjogQWRkcmVzcywgdG9rZW5faWQ6IHUzMikgewogICAgICAgIGxldCBiYWxhbmNlID0gU2VsZjo6YmFsYW5jZV9vZihlbnYuY2xvbmUoKSwgb3duZXIuY2xvbmUoKSk7CiAgICAgICAgbGV0IHRva2VuX2luZGV4OiB1MzIgPSBlbnYKICAgICAgICAgICAgLnN0b3JhZ2UoKQogICAgICAgICAgICAucGVyc2lzdGVudCgpCiAgICAgICAgICAgIC5nZXQoJkRhdGFLZXk6Ok93bmVyVG9rZW5JbmRleCh0b2tlbl9pZCkpCiAgICAgICAgICAgIC51bndyYXAoKTsKICAgICAgICBsZXQgbGFzdF9pbmRleCA9IGJhbGFuY2UgLSAxOwoKICAgICAgICBpZiB0b2tlbl9pbmRleCAhPSBsYXN0X2luZGV4IHsKICAgICAgICAgICAgbGV0IGxhc3RfdG9rZW46IHUzMiA9IGVudgogICAgICAgICAgICAgICAgLnN0b3JhZ2UoKQogICAgICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6T3duZWRUb2tlbihvd25lci5jbG9uZSgpLCBsYXN0X2luZGV4KSkKICAgICAgICAgICAgICAgIC51bndyYXAoKTsKICAgICAgICAgICAgZW52LnN0b3JhZ2UoKS5wZXJzaXN0ZW50KCkuc2V0KAogICAgICAgICAgICAgICAgJkRhdGFLZXk6Ok93bmVkVG9rZW4ob3duZXIuY2xvbmUoKSwgdG9rZW5faW5kZXgpLAogICAgICAgICAgICAgICAgJmxhc3RfdG9rZW4sCiAgICAgICAgICAgICk7CiAgICAgICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6Ok93bmVyVG9rZW5JbmRleChsYXN0X3Rva2VuKSwgJnRva2VuX2luZGV4KTsKICAgICAgICB9CgogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLnBlcnNpc3RlbnQoKQogICAgICAgICAgICAucmVtb3ZlKCZEYXRhS2V5OjpPd25lZFRva2VuKG93bmVyLmNsb25lKCksIGxhc3RfaW5kZXgpKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5wZXJzaXN0ZW50KCkKICAgICAgICAgICAgLnJlbW92ZSgmRGF0YUtleTo6T3duZXJUb2tlbkluZGV4KHRva2VuX2lkKSk7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAucGVyc2lzdGVudCgpCiAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6OkJhbGFuY2Uob3duZXIpLCAmbGFzdF9pbmRleCk7CiAgICB9Cn0KCiNbY2ZnKHRlc3QpXQptb2QgdGVzdDsK
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
+
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Vec,
+};
+
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Admin,
+    Name,
+    Symbol,
+    TotalSupply,
+    Owner(u32),
+    Balance(Address),
+    TokenByIndex(u32),
+    TokenIndex(u32),
+    OwnerTokenIndex(u32),
+    OwnedToken(Address, u32),
+    Approved(u32),
+    ApproveAll(Address, Address),
+}
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum NftError {
+    AlreadyInitialized = 1,
+    NotInitialized = 2,
+    TokenNotFound = 3,
+    TokenAlreadyExists = 4,
+    NotOwner = 5,
+    NotApproved = 6,
+    NotAdmin = 7,
+}
+
+#[contract]
+pub struct BasicNftContract;
+
+#[contractimpl]
+impl BasicNftContract {
+    pub fn initialize(
+        env: Env,
+        admin: Address,
+        name: String,
+        symbol: String,
+    ) -> Result<(), NftError> {
+        if env.storage().instance().has(&DataKey::Admin) {
+            return Err(NftError::AlreadyInitialized);
+        }
+
+        admin.require_auth();
+
+        env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage().instance().set(&DataKey::Name, &name);
+        env.storage().instance().set(&DataKey::Symbol, &symbol);
+        env.storage().instance().set(&DataKey::TotalSupply, &0u32);
+
+        env.events().publish(
+            (symbol_short!("init"), symbol_short!("nft")),
+            (name, symbol),
+        );
+
+        Ok(())
+    }
+
+    pub fn name(env: Env) -> Result<String, NftError> {
+        env.storage()
+            .instance()
+            .get(&DataKey::Name)
+            .ok_or(NftError::NotInitialized)
+    }
+
+    pub fn symbol(env: Env) -> Result<String, NftError> {
+        env.storage()
+            .instance()
+            .get(&DataKey::Symbol)
+            .ok_or(NftError::NotInitialized)
+    }
+
+    pub fn total_supply(env: Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::TotalSupply)
+            .unwrap_or(0)
+    }
+
+    pub fn owner_of(env: Env, token_id: u32) -> Result<Address, NftError> {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Owner(token_id))
+            .ok_or(NftError::TokenNotFound)
+    }
+
+    pub fn balance_of(env: Env, owner: Address) -> u32 {
+        env.storage()
+            .persistent()
+            .get(&DataKey::Balance(owner))
+            .unwrap_or(0)
+    }
+
+    pub fn token_by_index(env: Env, index: u32) -> Result<u32, NftError> {
+        let supply = Self::total_supply(env.clone());
+        if index >= supply {
+            return Err(NftError::TokenNotFound);
+        }
+        env.storage()
+            .persistent()
+            .get(&DataKey::TokenByIndex(index))
+            .ok_or(NftError::TokenNotFound)
+    }
+
+    pub fn tokens_of_owner(env: Env, owner: Address) -> Vec<u32> {
+        let balance = Self::balance_of(env.clone(), owner.clone());
+        let mut result = Vec::new(&env);
+        let mut index = 0u32;
+        while index < balance {
+            let token_id: u32 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::OwnedToken(owner.clone(), index))
+                .unwrap();
+            result.push_back(token_id);
+            index += 1;
+        }
+        result
+    }
+
+    pub fn approve(
+        env: Env,
+        owner: Address,
+        approved: Address,
+        token_id: u32,
+    ) -> Result<(), NftError> {
+        owner.require_auth();
+
+        let current_owner = Self::owner_of(env.clone(), token_id)?;
+        if current_owner != owner {
+            return Err(NftError::NotOwner);
+        }
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Approved(token_id), &approved);
+        env.events().publish(
+            (symbol_short!("approve"), symbol_short!("nft")),
+            (owner, approved, token_id),
+        );
+
+        Ok(())
+    }
+
+    pub fn set_approval_for_all(
+        env: Env,
+        owner: Address,
+        operator: Address,
+        approved: bool,
+    ) -> Result<(), NftError> {
+        owner.require_auth();
+        env.storage().persistent().set(
+            &DataKey::ApproveAll(owner.clone(), operator.clone()),
+            &approved,
+        );
+        env.events().publish(
+            (symbol_short!("set_aprv"), symbol_short!("nft")),
+            (owner, operator, approved),
+        );
+        Ok(())
+    }
+
+    pub fn is_approved_for_all(env: Env, owner: Address, operator: Address) -> bool {
+        env.storage()
+            .persistent()
+            .get(&DataKey::ApproveAll(owner, operator))
+            .unwrap_or(false)
+    }
+
+    pub fn get_approved(env: Env, token_id: u32) -> Option<Address> {
+        env.storage().persistent().get(&DataKey::Approved(token_id))
+    }
+
+    pub fn transfer(env: Env, from: Address, to: Address, token_id: u32) -> Result<(), NftError> {
+        from.require_auth();
+        Self::transfer_from_impl(env, from.clone(), from, to, token_id)
+    }
+
+    pub fn transfer_from(
+        env: Env,
+        spender: Address,
+        from: Address,
+        to: Address,
+        token_id: u32,
+    ) -> Result<(), NftError> {
+        spender.require_auth();
+        Self::check_approved(env.clone(), spender.clone(), from.clone(), token_id)?;
+        Self::transfer_from_impl(env, spender, from, to, token_id)
+    }
+
+    pub fn mint(env: Env, admin: Address, to: Address, token_id: u32) -> Result<(), NftError> {
+        admin.require_auth();
+
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(NftError::NotInitialized)?;
+        if stored_admin != admin {
+            return Err(NftError::NotAdmin);
+        }
+
+        if env.storage().persistent().has(&DataKey::Owner(token_id)) {
+            return Err(NftError::TokenAlreadyExists);
+        }
+
+        let supply = Self::total_supply(env.clone());
+        env.storage()
+            .persistent()
+            .set(&DataKey::Owner(token_id), &to);
+        env.storage()
+            .persistent()
+            .set(&DataKey::TokenByIndex(supply), &token_id);
+        env.storage()
+            .persistent()
+            .set(&DataKey::TokenIndex(token_id), &supply);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSupply, &(supply + 1));
+        Self::add_token_to_owner(&env, to.clone(), token_id);
+        env.events().publish(
+            (symbol_short!("mint"), symbol_short!("nft")),
+            (to, token_id),
+        );
+
+        Ok(())
+    }
+
+    fn transfer_from_impl(
+        env: Env,
+        _spender: Address,
+        from: Address,
+        to: Address,
+        token_id: u32,
+    ) -> Result<(), NftError> {
+        let owner = Self::owner_of(env.clone(), token_id)?;
+        if owner != from {
+            return Err(NftError::NotOwner);
+        }
+
+        if from == to {
+            return Ok(());
+        }
+
+        Self::remove_token_from_owner(&env, from.clone(), token_id);
+        Self::add_token_to_owner(&env, to.clone(), token_id);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Owner(token_id), &to);
+        env.storage()
+            .persistent()
+            .remove(&DataKey::Approved(token_id));
+        env.events().publish(
+            (symbol_short!("transfer"), symbol_short!("nft")),
+            (from, to, token_id),
+        );
+        Ok(())
+    }
+
+    fn check_approved(
+        env: Env,
+        spender: Address,
+        owner: Address,
+        token_id: u32,
+    ) -> Result<(), NftError> {
+        if spender == owner {
+            return Ok(());
+        }
+
+        if let Some(approved) = Self::get_approved(env.clone(), token_id) {
+            if approved == spender {
+                return Ok(());
+            }
+        }
+
+        if Self::is_approved_for_all(env, owner.clone(), spender.clone()) {
+            return Ok(());
+        }
+
+        Err(NftError::NotApproved)
+    }
+
+    fn add_token_to_owner(env: &Env, owner: Address, token_id: u32) {
+        let balance = Self::balance_of(env.clone(), owner.clone());
+        env.storage()
+            .persistent()
+            .set(&DataKey::OwnedToken(owner.clone(), balance), &token_id);
+        env.storage()
+            .persistent()
+            .set(&DataKey::OwnerTokenIndex(token_id), &balance);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(owner), &(balance + 1));
+    }
+
+    fn remove_token_from_owner(env: &Env, owner: Address, token_id: u32) {
+        let balance = Self::balance_of(env.clone(), owner.clone());
+        let token_index: u32 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::OwnerTokenIndex(token_id))
+            .unwrap();
+        let last_index = balance - 1;
+
+        if token_index != last_index {
+            let last_token: u32 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::OwnedToken(owner.clone(), last_index))
+                .unwrap();
+            env.storage().persistent().set(
+                &DataKey::OwnedToken(owner.clone(), token_index),
+                &last_token,
+            );
+            env.storage()
+                .persistent()
+                .set(&DataKey::OwnerTokenIndex(last_token), &token_index);
+        }
+
+        env.storage()
+            .persistent()
+            .remove(&DataKey::OwnedToken(owner.clone(), last_index));
+        env.storage()
+            .persistent()
+            .remove(&DataKey::OwnerTokenIndex(token_id));
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(owner), &last_index);
+    }
+}

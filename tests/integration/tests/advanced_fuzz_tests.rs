@@ -15,8 +15,8 @@ use facet_multiplier::{FacetMultiplierContract, FacetMultiplierContractClient};
 use price_oracle::{AssetConfig, OracleError, PriceOracleContract, PriceOracleContractClient};
 use proptest::prelude::*;
 use soroban_sdk::{
-    symbol_short, testutils::Address as _, testutils::Ledger, Address, Bytes, Env, IntoVal,
-    Symbol, TryIntoVal, Vec,
+    symbol_short, testutils::Address as _, testutils::Ledger, Address, Bytes, Env, IntoVal, Symbol,
+    TryIntoVal, Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -93,9 +93,17 @@ fn fuzz_diamond_multiply_execute_matches_operands() {
 #[test]
 fn fuzz_diamond_duplicate_function_registration_rejected() {
     let (proxy, _adder, admin, adder_id) = setup_diamond_with_adder();
-    proxy.add_facet(&admin, &adder_id, &soroban_sdk::vec![&proxy.env, symbol_short!("add")]);
+    proxy.add_facet(
+        &admin,
+        &adder_id,
+        &soroban_sdk::vec![&proxy.env, symbol_short!("add")],
+    );
 
-    let res = proxy.try_add_facet(&admin, &adder_id, &soroban_sdk::vec![&proxy.env, symbol_short!("add")]);
+    let res = proxy.try_add_facet(
+        &admin,
+        &adder_id,
+        &soroban_sdk::vec![&proxy.env, symbol_short!("add")],
+    );
     assert_eq!(res, Err(Ok(SecurityError::DuplicateFunction)));
 }
 
@@ -105,7 +113,11 @@ fn fuzz_diamond_random_non_admins_cannot_add_facet() {
 
     for _ in 0..10 {
         let intruder = Address::generate(&proxy.env);
-        let res = proxy.try_add_facet(&intruder, &adder_id, &soroban_sdk::vec![&proxy.env, symbol_short!("add")]);
+        let res = proxy.try_add_facet(
+            &intruder,
+            &adder_id,
+            &soroban_sdk::vec![&proxy.env, symbol_short!("add")],
+        );
         assert_eq!(res, Err(Ok(SecurityError::NotAdmin)));
     }
 }
@@ -178,7 +190,12 @@ fn setup_bridge(
     let admin = Address::generate(&env);
     let bridge_id = env.register_contract(None, BridgeSecurityContract);
     let bridge = BridgeSecurityContractClient::new(&env, &bridge_id);
-    bridge.initialize(&admin, &rate_limit_amount, &rate_limit_window, &challenge_period);
+    bridge.initialize(
+        &admin,
+        &rate_limit_amount,
+        &rate_limit_window,
+        &challenge_period,
+    );
 
     (bridge, admin)
 }
@@ -306,7 +323,14 @@ fn setup_oracle(
     oracle.initialize(&admin);
 
     let asset = symbol_short!("XLM");
-    oracle.set_asset_config(&admin, &asset, &AssetConfig { max_age, twap_window });
+    oracle.set_asset_config(
+        &admin,
+        &asset,
+        &AssetConfig {
+            max_age,
+            twap_window,
+        },
+    );
 
     (oracle, admin, asset)
 }
@@ -392,7 +416,10 @@ fn fuzz_oracle_random_unauthorized_updaters_rejected() {
 
     for _ in 0..10 {
         let intruder = Address::generate(&oracle.env);
-        let res = oracle.try_submit_prices(&intruder, &Vec::from_array(&oracle.env, [(asset.clone(), 10i128)]));
+        let res = oracle.try_submit_prices(
+            &intruder,
+            &Vec::from_array(&oracle.env, [(asset.clone(), 10i128)]),
+        );
         assert_eq!(res, Err(Ok(OracleError::Unauthorized)));
     }
 }
@@ -405,13 +432,22 @@ fn fuzz_oracle_removed_updater_excluded_from_median() {
     oracle.add_updater(&admin, &honest);
     oracle.add_updater(&admin, &removed);
 
-    oracle.submit_prices(&honest, &Vec::from_array(&oracle.env, [(asset.clone(), 100i128)]));
-    oracle.submit_prices(&removed, &Vec::from_array(&oracle.env, [(asset.clone(), 9_999_999i128)]));
+    oracle.submit_prices(
+        &honest,
+        &Vec::from_array(&oracle.env, [(asset.clone(), 100i128)]),
+    );
+    oracle.submit_prices(
+        &removed,
+        &Vec::from_array(&oracle.env, [(asset.clone(), 9_999_999i128)]),
+    );
 
     // Removing the manipulative updater must exclude its price from all
     // future aggregations, even though its stale entry is still in storage.
     oracle.remove_updater(&admin, &removed);
-    oracle.submit_prices(&honest, &Vec::from_array(&oracle.env, [(asset.clone(), 100i128)]));
+    oracle.submit_prices(
+        &honest,
+        &Vec::from_array(&oracle.env, [(asset.clone(), 100i128)]),
+    );
 
     let price = oracle.get_price(&asset);
     assert_eq!(price.price, 100);

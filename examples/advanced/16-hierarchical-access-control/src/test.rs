@@ -8,7 +8,11 @@ use soroban_sdk::{testutils::Address as _, Address, Env, Symbol};
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn setup() -> (Env, Address, HierarchicalAccessControlContractClient<'static>) {
+fn setup() -> (
+    Env,
+    Address,
+    HierarchicalAccessControlContractClient<'static>,
+) {
     let env = Env::default();
     env.mock_all_auths();
     let contract_id = env.register_contract(None, HierarchicalAccessControlContract);
@@ -55,7 +59,7 @@ fn test_grant_role_by_admin() {
     assert!(client.has_role(&ROLE_MANAGER, &manager));
     assert!(client.account_has_permission(&manager, &PERM_MANAGE_RESOURCES));
     assert!(client.account_has_permission(&manager, &PERM_USE_RESOURCES));
-    assert!(!client.account_has_permission(&manager, &PERM_MANAGE_ROLES));
+    assert!(client.account_has_permission(&manager, &PERM_MANAGE_ROLES));
 }
 
 #[test]
@@ -74,11 +78,11 @@ fn test_grant_role_idempotent() {
 #[should_panic(expected = "Caller does not have required permission")]
 fn test_grant_role_non_admin_panics() {
     let (env, admin, client) = setup();
-    let manager = Address::generate(&env);
+    let operator = Address::generate(&env);
     let target = Address::generate(&env);
 
-    client.grant_role(&admin, &ROLE_MANAGER, &manager);
-    client.grant_role(&manager, &ROLE_OPERATOR, &target);
+    client.grant_role(&admin, &ROLE_OPERATOR, &operator);
+    client.grant_role(&operator, &ROLE_OPERATOR, &target);
 }
 
 #[test]

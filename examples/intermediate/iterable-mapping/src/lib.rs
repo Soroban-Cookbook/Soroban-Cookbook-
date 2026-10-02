@@ -21,7 +21,9 @@ impl IterableMapping {
     /// Insert or update a key-value pair. If the key is new, it is appended
     /// to the iteration order.
     pub fn set(env: Env, key: Symbol, value: u32) {
-        env.storage().instance().set(&DataKey::Value(key.clone()), &value);
+        env.storage()
+            .instance()
+            .set(&DataKey::Value(key.clone()), &value);
         let mut keys: Vec<Symbol> = read_keys(&env);
         if !keys.iter().any(|existing| existing == key) {
             keys.push_back(key);
@@ -43,7 +45,9 @@ impl IterableMapping {
     pub fn remove(env: Env, key: Symbol) -> bool {
         let mut removed = false;
         if env.storage().instance().has(&DataKey::Value(key.clone())) {
-            env.storage().instance().remove(&DataKey::Value(key.clone()));
+            env.storage()
+                .instance()
+                .remove(&DataKey::Value(key.clone()));
             let keys: Vec<Symbol> = read_keys(&env);
             let mut new_keys = vec![&env];
             for k in keys.iter() {
@@ -156,7 +160,13 @@ mod test {
         let contract_id = env.register_contract(None, IterableMapping);
         let client = IterableMappingClient::new(&env, &contract_id);
 
-        for (key, value) in [("key0", 0), ("key1", 1), ("key2", 2), ("key3", 3), ("key4", 4)] {
+        for (key, value) in [
+            ("key0", 0),
+            ("key1", 1),
+            ("key2", 2),
+            ("key3", 3),
+            ("key4", 4),
+        ] {
             client.set(&Symbol::new(&env, key), &value);
         }
 

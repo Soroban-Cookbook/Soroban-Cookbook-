@@ -55,11 +55,11 @@ impl TimelockGovernance {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(Error::AlreadyInitialized);
         }
-        
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::MinDelay, &min_delay);
         env.storage().instance().set(&DataKey::ProposalCount, &0u64);
-        
+
         Ok(())
     }
 
@@ -79,7 +79,11 @@ impl TimelockGovernance {
         }
 
         let eta = env.ledger().timestamp() + delay;
-        let mut count: u64 = env.storage().instance().get(&DataKey::ProposalCount).unwrap();
+        let mut count: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ProposalCount)
+            .unwrap();
         count += 1;
 
         let proposal = Proposal {
@@ -91,11 +95,16 @@ impl TimelockGovernance {
             status: ProposalStatus::Queued,
         };
 
-        env.storage().persistent().set(&DataKey::Proposal(count), &proposal);
-        env.storage().instance().set(&DataKey::ProposalCount, &count);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(count), &proposal);
+        env.storage()
+            .instance()
+            .set(&DataKey::ProposalCount, &count);
 
         // Emit event
-        env.events().publish((Symbol::new(&env, "queued"), count), eta);
+        env.events()
+            .publish((Symbol::new(&env, "queued"), count), eta);
 
         Ok(count)
     }
@@ -119,12 +128,15 @@ impl TimelockGovernance {
         }
 
         proposal.status = ProposalStatus::Executed;
-        env.storage().persistent().set(&DataKey::Proposal(id), &proposal);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(id), &proposal);
 
         let result = env.invoke_contract(&proposal.target, &proposal.function, proposal.args);
 
         // Emit event
-        env.events().publish((Symbol::new(&env, "executed"), id), ());
+        env.events()
+            .publish((Symbol::new(&env, "executed"), id), ());
 
         Ok(result)
     }
@@ -144,10 +156,13 @@ impl TimelockGovernance {
         }
 
         proposal.status = ProposalStatus::Canceled;
-        env.storage().persistent().set(&DataKey::Proposal(id), &proposal);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(id), &proposal);
 
         // Emit event
-        env.events().publish((Symbol::new(&env, "canceled"), id), ());
+        env.events()
+            .publish((Symbol::new(&env, "canceled"), id), ());
 
         Ok(())
     }
@@ -169,12 +184,15 @@ impl TimelockGovernance {
 
         // Bypass ETA check
         proposal.status = ProposalStatus::Executed;
-        env.storage().persistent().set(&DataKey::Proposal(id), &proposal);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(id), &proposal);
 
         let result = env.invoke_contract(&proposal.target, &proposal.function, proposal.args);
 
         // Emit event
-        env.events().publish((Symbol::new(&env, "emergency_executed"), id), ());
+        env.events()
+            .publish((Symbol::new(&env, "emergency_executed"), id), ());
 
         Ok(result)
     }

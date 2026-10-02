@@ -370,7 +370,9 @@ impl VirtualChannelContract {
         env.storage()
             .instance()
             .set(&DataKey::Ledger(vc.ledger_b), &lb);
-        env.storage().instance().set(&DataKey::Virtual(channel_id), &vc);
+        env.storage()
+            .instance()
+            .set(&DataKey::Virtual(channel_id), &vc);
 
         env.events().publish(
             (NS_UPDATE, symbol_short!("mat"), channel_id),

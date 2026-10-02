@@ -2,7 +2,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol, Vec,
+    contract, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address, Bytes, BytesN, Env,
+    Symbol, Vec,
 };
 
 #[contract]
@@ -39,7 +40,7 @@ pub enum DataKey {
     ValidatorThreshold,
     LockedBalance(Address, Address),
     Nonce,
-    ProcessedTransfer(Bytes),
+    ProcessedTransfer(BytesN<32>),
     TokenMapping(Symbol, Address),
 }
 
@@ -68,10 +69,14 @@ impl CrossChainBridgeContract {
         admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::ValidatorThreshold, &threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::ValidatorThreshold, &threshold);
 
         for validator in validators.iter() {
-            env.storage().instance().set(&DataKey::Validator(validator.clone()), &true);
+            env.storage()
+                .instance()
+                .set(&DataKey::Validator(validator.clone()), &true);
         }
     }
 
@@ -112,7 +117,9 @@ impl CrossChainBridgeContract {
         // Update locked balance
         let balance_key = DataKey::LockedBalance(token.clone(), sender.clone());
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0);
-        env.storage().instance().set(&balance_key, &(current_balance + amount));
+        env.storage()
+            .instance()
+            .set(&balance_key, &(current_balance + amount));
 
         // Emit event
         env.events().publish(
@@ -130,8 +137,15 @@ impl CrossChainBridgeContract {
     /// Mint tokens on destination chain after validator signatures
     pub fn mint_tokens(env: Env, transfer: BridgeTransfer, signatures: Vec<ValidatorSignature>) {
         // Verify transfer is not already processed
-        let transfer_hash = env.crypto().sha256(&env.serialize_value(&transfer)).to_bytes();
-        if env.storage().instance().has(&DataKey::ProcessedTransfer(transfer_hash.clone())) {
+        let transfer_hash = env
+            .crypto()
+            .sha256(&transfer.clone().to_xdr(&env))
+            .to_bytes();
+        if env
+            .storage()
+            .instance()
+            .has(&DataKey::ProcessedTransfer(transfer_hash.clone()))
+        {
             panic!("Transfer already processed");
         }
 
@@ -142,7 +156,10 @@ impl CrossChainBridgeContract {
         let token = env
             .storage()
             .instance()
-            .get(&DataKey::TokenMapping(transfer.source_chain, transfer.token.clone()))
+            .get(&DataKey::TokenMapping(
+                transfer.source_chain.clone(),
+                transfer.token.clone(),
+            ))
             .unwrap_or(transfer.token.clone());
 
         // Mint tokens (or transfer from bridge's balance)
@@ -150,10 +167,16 @@ impl CrossChainBridgeContract {
         // In a real implementation, this would mint wrapped tokens or use bridge's reserve
         // For this example, we'll assume bridge has a reserve to transfer from
         let recipient_address = Address::from_string_bytes(&transfer.recipient);
-        token_client.transfer(&env.current_contract_address(), &recipient_address, &transfer.amount);
+        token_client.transfer(
+            &env.current_contract_address(),
+            &recipient_address,
+            &transfer.amount,
+        );
 
         // Mark transfer as processed
-        env.storage().instance().set(&DataKey::ProcessedTransfer(transfer_hash), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::ProcessedTransfer(transfer_hash), &true);
 
         // Emit event
         env.events().publish(
@@ -216,8 +239,15 @@ impl CrossChainBridgeContract {
     /// Release locked tokens on source chain after validator signatures
     pub fn release_tokens(env: Env, transfer: BridgeTransfer, signatures: Vec<ValidatorSignature>) {
         // Verify transfer is not already processed
-        let transfer_hash = env.crypto().sha256(&env.serialize_value(&transfer)).to_bytes();
-        if env.storage().instance().has(&DataKey::ProcessedTransfer(transfer_hash.clone())) {
+        let transfer_hash = env
+            .crypto()
+            .sha256(&transfer.clone().to_xdr(&env))
+            .to_bytes();
+        if env
+            .storage()
+            .instance()
+            .has(&DataKey::ProcessedTransfer(transfer_hash.clone()))
+        {
             panic!("Transfer already processed");
         }
 
@@ -229,15 +259,23 @@ impl CrossChainBridgeContract {
 
         // Release tokens
         let token_client = TokenClient::new(&env, &transfer.token);
-        token_client.transfer(&env.current_contract_address(), &recipient_address, &transfer.amount);
+        token_client.transfer(
+            &env.current_contract_address(),
+            &recipient_address,
+            &transfer.amount,
+        );
 
         // Update locked balance
         let balance_key = DataKey::LockedBalance(transfer.token.clone(), transfer.sender.clone());
         let current_balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0);
-        env.storage().instance().set(&balance_key, &(current_balance - transfer.amount));
+        env.storage()
+            .instance()
+            .set(&balance_key, &(current_balance - transfer.amount));
 
         // Mark transfer as processed
-        env.storage().instance().set(&DataKey::ProcessedTransfer(transfer_hash), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::ProcessedTransfer(transfer_hash), &true);
 
         // Emit event
         env.events().publish(
@@ -255,11 +293,17 @@ impl CrossChainBridgeContract {
         Self::require_admin(&env, &admin);
         admin.require_auth();
 
-        if env.storage().instance().has(&DataKey::Validator(validator.clone())) {
+        if env
+            .storage()
+            .instance()
+            .has(&DataKey::Validator(validator.clone()))
+        {
             panic!("Validator already exists");
         }
 
-        env.storage().instance().set(&DataKey::Validator(validator), &true);
+        env.storage()
+            .instance()
+            .set(&DataKey::Validator(validator), &true);
     }
 
     /// Remove a validator (admin only)
@@ -267,18 +311,28 @@ impl CrossChainBridgeContract {
         Self::require_admin(&env, &admin);
         admin.require_auth();
 
-        if !env.storage().instance().has(&DataKey::Validator(validator.clone())) {
+        if !env
+            .storage()
+            .instance()
+            .has(&DataKey::Validator(validator.clone()))
+        {
             panic!("Validator not found");
         }
 
         // Check if removing would drop below threshold
-        let threshold: u32 = env.storage().instance().get(&DataKey::ValidatorThreshold).unwrap_or(1);
+        let threshold: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ValidatorThreshold)
+            .unwrap_or(1);
         let current_count = Self::count_validators(&env);
         if current_count - 1 < threshold {
             panic!("Cannot remove: would drop below threshold");
         }
 
-        env.storage().instance().remove(&DataKey::Validator(validator));
+        env.storage()
+            .instance()
+            .remove(&DataKey::Validator(validator));
     }
 
     /// Update validator threshold (admin only)
@@ -295,15 +349,26 @@ impl CrossChainBridgeContract {
             panic!("Threshold exceeds validator count");
         }
 
-        env.storage().instance().set(&DataKey::ValidatorThreshold, &threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::ValidatorThreshold, &threshold);
     }
 
     /// Map a token from another chain to a Soroban token (admin only)
-    pub fn map_token(env: Env, admin: Address, source_chain: Symbol, source_token: Address, soroban_token: Address) {
+    pub fn map_token(
+        env: Env,
+        admin: Address,
+        source_chain: Symbol,
+        source_token: Address,
+        soroban_token: Address,
+    ) {
         Self::require_admin(&env, &admin);
         admin.require_auth();
 
-        env.storage().instance().set(&DataKey::TokenMapping(source_chain, source_token), &soroban_token);
+        env.storage().instance().set(
+            &DataKey::TokenMapping(source_chain, source_token),
+            &soroban_token,
+        );
     }
 
     /// Get admin address
@@ -313,17 +378,26 @@ impl CrossChainBridgeContract {
 
     /// Check if address is a validator
     pub fn is_validator(env: Env, address: Address) -> bool {
-        env.storage().instance().get(&DataKey::Validator(address)).unwrap_or(false)
+        env.storage()
+            .instance()
+            .get(&DataKey::Validator(address))
+            .unwrap_or(false)
     }
 
     /// Get current validator threshold
     pub fn get_threshold(env: Env) -> u32 {
-        env.storage().instance().get(&DataKey::ValidatorThreshold).unwrap_or(1)
+        env.storage()
+            .instance()
+            .get(&DataKey::ValidatorThreshold)
+            .unwrap_or(1)
     }
 
     /// Get locked balance for a token and sender
     pub fn get_locked_balance(env: Env, token: Address, sender: Address) -> i128 {
-        env.storage().instance().get(&DataKey::LockedBalance(token, sender)).unwrap_or(0)
+        env.storage()
+            .instance()
+            .get(&DataKey::LockedBalance(token, sender))
+            .unwrap_or(0)
     }
 
     /// Get nonce
@@ -342,22 +416,34 @@ impl CrossChainBridgeContract {
         }
     }
 
-    fn count_validators(env: &Env) -> u32 {
+    fn count_validators(_env: &Env) -> u32 {
         // In a real implementation, we'd track validators in a list
         // For this example, we'll return a default count
         3
     }
 
-    fn verify_validator_signatures(env: &Env, transfer: &BridgeTransfer, signatures: &Vec<ValidatorSignature>) {
-        let threshold: u32 = env.storage().instance().get(&DataKey::ValidatorThreshold).unwrap_or(1);
-        let transfer_hash = env.crypto().sha256(&env.serialize_value(transfer)).to_bytes();
+    fn verify_validator_signatures(
+        env: &Env,
+        _transfer: &BridgeTransfer,
+        signatures: &Vec<ValidatorSignature>,
+    ) {
+        let threshold: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::ValidatorThreshold)
+            .unwrap_or(1);
 
         let mut valid_signatures = 0;
         let mut seen_validators = Vec::new(env);
 
         for sig in signatures.iter() {
             // Check if validator is valid
-            if !env.storage().instance().get(&DataKey::Validator(sig.validator.clone())).unwrap_or(false) {
+            if !env
+                .storage()
+                .instance()
+                .get(&DataKey::Validator(sig.validator.clone()))
+                .unwrap_or(false)
+            {
                 continue;
             }
 

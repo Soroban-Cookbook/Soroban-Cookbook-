@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 use super::*;
-use soroban_sdk::{symbol_short, testutils::Address as _, vec, Env};
+use soroban_sdk::{testutils::Address as _, Env};
 
 fn setup_initialized(env: &Env) -> (RoleBasedAccessControlClient<'_>, Address) {
     let contract_id = env.register_contract(None, RoleBasedAccessControl);
@@ -26,11 +26,11 @@ fn test_owner_can_grant_admin_and_moderator_roles() {
     let (client, owner) = setup_initialized(&env);
     let user = Address::generate(&env);
 
-    assert_eq!(client.grant_role(&owner, &user, &Role::Admin), Ok(()));
+    client.grant_role(&owner, &user, &Role::Admin);
     assert!(client.has_role(&user, &Role::Admin));
 
     let other_user = Address::generate(&env);
-    assert_eq!(client.grant_role(&owner, &other_user, &Role::Moderator), Ok(()));
+    client.grant_role(&owner, &other_user, &Role::Moderator);
     assert!(client.has_role(&other_user, &Role::Moderator));
 }
 
@@ -57,7 +57,7 @@ fn test_admin_can_grant_and_revoke_moderator_role() {
     client.grant_role(&admin, &user, &Role::Moderator);
     assert!(client.has_role(&user, &Role::Moderator));
 
-    assert_eq!(client.revoke_role(&admin, &user), Ok(()));
+    client.revoke_role(&admin, &user);
     assert!(!client.has_role(&user, &Role::Moderator));
     assert!(client.has_role(&user, &Role::User));
 }
@@ -111,7 +111,7 @@ fn test_moderator_cannot_revoke_admin() {
 #[should_panic(expected = "Error(Contract, #2)")]
 fn test_user_cannot_grant_any_role() {
     let env = Env::default();
-    let (client, owner) = setup_initialized(&env);
+    let (client, _owner) = setup_initialized(&env);
     let user = Address::generate(&env);
     let target = Address::generate(&env);
 

@@ -224,7 +224,11 @@ impl StateChannelContract {
         }
 
         let dispute = dispute_period.unwrap_or(DEFAULT_DISPUTE_PERIOD);
-        let channel_id: u64 = env.storage().instance().get(&DataKey::NextChannelId).unwrap();
+        let channel_id: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::NextChannelId)
+            .unwrap();
 
         let channel = Channel {
             party_a: party_a.clone(),
@@ -310,8 +314,7 @@ impl StateChannelContract {
         channel.balance_a = balance_a;
         channel.balance_b = balance_b;
         channel.status = ChannelStatus::Disputed;
-        channel.challenge_expiry =
-            env.ledger().sequence() + channel.dispute_period;
+        channel.challenge_expiry = env.ledger().sequence() + channel.dispute_period;
 
         env.storage()
             .persistent()

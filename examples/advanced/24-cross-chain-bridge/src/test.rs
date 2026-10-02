@@ -3,8 +3,8 @@ extern crate std;
 
 use super::*;
 use soroban_sdk::{
-    testutils::{Address as _, Ledger},
-    Address, Bytes, Env, IntoVal, Symbol, Vec,
+    testutils::{Address as _, Events},
+    Address, Bytes, Env, Vec,
 };
 
 // Mock token contract for testing
@@ -14,16 +14,24 @@ struct MockTokenContract;
 #[contractimpl]
 impl MockTokenContract {
     pub fn initialize(env: Env, admin: Address) {
-        env.storage().instance().set(&symbol_short!("admin"), &admin);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("admin"), &admin);
     }
 
     pub fn mint(env: Env, to: Address, amount: i128) {
-        let admin: Address = env.storage().instance().get(&symbol_short!("admin")).unwrap();
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&symbol_short!("admin"))
+            .unwrap();
         admin.require_auth();
 
         let balance_key = (symbol_short!("balance"), to.clone());
         let balance: i128 = env.storage().instance().get(&balance_key).unwrap_or(0);
-        env.storage().instance().set(&balance_key, &(balance + amount));
+        env.storage()
+            .instance()
+            .set(&balance_key, &(balance + amount));
     }
 
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
@@ -39,12 +47,19 @@ impl MockTokenContract {
             panic!("Insufficient balance");
         }
 
-        env.storage().instance().set(&from_key, &(from_balance - amount));
-        env.storage().instance().set(&to_key, &(to_balance + amount));
+        env.storage()
+            .instance()
+            .set(&from_key, &(from_balance - amount));
+        env.storage()
+            .instance()
+            .set(&to_key, &(to_balance + amount));
     }
 
     pub fn balance(env: Env, address: Address) -> i128 {
-        env.storage().instance().get(&(symbol_short!("balance"), address)).unwrap_or(0)
+        env.storage()
+            .instance()
+            .get(&(symbol_short!("balance"), address))
+            .unwrap_or(0)
     }
 }
 
@@ -57,6 +72,7 @@ fn get_token_balance(env: &Env, token_id: &Address, address: &Address) -> i128 {
 #[test]
 fn test_initialize() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let validator1 = Address::generate(&env);
     let validator2 = Address::generate(&env);
@@ -77,6 +93,7 @@ fn test_initialize() {
 #[should_panic(expected = "Contract already initialized")]
 fn test_initialize_twice_panics() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let validators = Vec::from_array(&env, [Address::generate(&env)]);
 
@@ -107,7 +124,7 @@ fn test_lock_tokens() {
 
     // Mint tokens to sender
     let sender = Address::generate(&env);
-    token_client.mint(&token_admin, &sender, &1000i128);
+    token_client.mint(&sender, &1000i128);
 
     // Lock tokens
     let recipient = Bytes::from_array(&env, &[0u8; 32]);
@@ -203,11 +220,14 @@ fn test_set_threshold() {
     env.mock_all_auths();
 
     let admin = Address::generate(&env);
-    let validators = Vec::from_array(&env, [
-        Address::generate(&env),
-        Address::generate(&env),
-        Address::generate(&env),
-    ]);
+    let validators = Vec::from_array(
+        &env,
+        [
+            Address::generate(&env),
+            Address::generate(&env),
+            Address::generate(&env),
+        ],
+    );
     let contract_id = env.register_contract(None, CrossChainBridgeContract);
     let client = CrossChainBridgeContractClient::new(&env, &contract_id);
     client.initialize(&admin, &validators, &1u32);
@@ -244,7 +264,12 @@ fn test_map_token() {
 
     let source_token = Address::generate(&env);
     let soroban_token = Address::generate(&env);
-    client.map_token(&admin, &symbol_short!("ethereum"), &source_token, &soroban_token);
+    client.map_token(
+        &admin,
+        &symbol_short!("ethereum"),
+        &source_token,
+        &soroban_token,
+    );
 }
 
 #[test]
@@ -267,11 +292,11 @@ fn test_burn_tokens() {
 
     // Mint tokens to sender
     let sender = Address::generate(&env);
-    token_client.mint(&token_admin, &sender, &1000i128);
+    token_client.mint(&sender, &1000i128);
 
     // Burn tokens
     let recipient = Bytes::from_array(&env, &[0u8; 32]);
-    let transfer = bridge_client.burn_tokens(
+    let _transfer = bridge_client.burn_tokens(
         &sender,
         &symbol_short!("soroban"),
         &recipient,
@@ -332,11 +357,11 @@ fn test_mint_tokens() {
     bridge_client.initialize(&bridge_admin, &validators, &1u32);
 
     // Mint tokens to bridge for reserve
-    token_client.mint(&token_admin, &bridge_id, &1000i128);
+    token_client.mint(&bridge_id, &1000i128);
 
     // Create transfer
-    let recipient_bytes = Bytes::from_array(&env, &[0u8; 32]);
-    let recipient = Address::from_string_bytes(&recipient_bytes);
+    let recipient = Address::generate(&env);
+    let recipient_bytes = recipient.to_string().to_bytes();
     let transfer = BridgeTransfer {
         source_chain: symbol_short!("ethereum"),
         destination_chain: symbol_short!("soroban"),
@@ -381,14 +406,14 @@ fn test_mint_duplicate_transfer_panics() {
     let bridge_client = CrossChainBridgeContractClient::new(&env, &bridge_id);
     bridge_client.initialize(&bridge_admin, &validators, &1u32);
 
-    token_client.mint(&token_admin, &bridge_id, &1000i128);
+    token_client.mint(&bridge_id, &1000i128);
 
     // Create transfer
     let transfer = BridgeTransfer {
         source_chain: symbol_short!("ethereum"),
         destination_chain: symbol_short!("soroban"),
         sender: Address::generate(&env),
-        recipient: Bytes::from_array(&env, &[0u8; 32]),
+        recipient: Address::generate(&env).to_string().to_bytes(),
         token: token_id.clone(),
         amount: 200,
         nonce: 0,
@@ -426,7 +451,7 @@ fn test_release_tokens() {
 
     // First lock some tokens
     let sender = Address::generate(&env);
-    token_client.mint(&token_admin, &sender, &1000i128);
+    token_client.mint(&sender, &1000i128);
     let recipient_lock = Bytes::from_array(&env, &[0u8; 32]);
     bridge_client.lock_tokens(
         &sender,
@@ -437,8 +462,8 @@ fn test_release_tokens() {
     );
 
     // Create release transfer
-    let recipient_bytes = Bytes::from_array(&env, &[1u8; 32]);
-    let recipient = Address::from_string_bytes(&recipient_bytes);
+    let recipient = Address::generate(&env);
+    let recipient_bytes = recipient.to_string().to_bytes();
     let transfer = BridgeTransfer {
         source_chain: symbol_short!("ethereum"),
         destination_chain: symbol_short!("soroban"),
@@ -520,25 +545,37 @@ fn test_multiple_locks_and_releases() {
 
     // Mint tokens
     let sender = Address::generate(&env);
-    token_client.mint(&token_admin, &sender, &2000i128);
+    token_client.mint(&sender, &2000i128);
 
     // Lock 1
     let recipient1 = Bytes::from_array(&env, &[1u8; 32]);
-    bridge_client.lock_tokens(&sender, &symbol_short!("ethereum"), &recipient1, &token_id, &500i128);
+    bridge_client.lock_tokens(
+        &sender,
+        &symbol_short!("ethereum"),
+        &recipient1,
+        &token_id,
+        &500i128,
+    );
     assert_eq!(bridge_client.get_locked_balance(&token_id, &sender), 500);
 
     // Lock 2
     let recipient2 = Bytes::from_array(&env, &[2u8; 32]);
-    bridge_client.lock_tokens(&sender, &symbol_short!("polygon"), &recipient2, &token_id, &300i128);
+    bridge_client.lock_tokens(
+        &sender,
+        &symbol_short!("polygon"),
+        &recipient2,
+        &token_id,
+        &300i128,
+    );
     assert_eq!(bridge_client.get_locked_balance(&token_id, &sender), 800);
 
     // Release 1
-    let release_recipient = Address::from_string_bytes(&Bytes::from_array(&env, &[3u8; 32]));
+    let release_recipient = Address::generate(&env);
     let transfer = BridgeTransfer {
         source_chain: symbol_short!("ethereum"),
         destination_chain: symbol_short!("soroban"),
         sender: sender.clone(),
-        recipient: Bytes::from_array(&env, &[3u8; 32]),
+        recipient: release_recipient.to_string().to_bytes(),
         token: token_id.clone(),
         amount: 400,
         nonce: 2,
@@ -571,7 +608,7 @@ fn test_event_emission() {
     bridge_client.initialize(&bridge_admin, &validators, &1u32);
 
     let sender = Address::generate(&env);
-    token_client.mint(&token_admin, &sender, &1000i128);
+    token_client.mint(&sender, &1000i128);
 
     let recipient = Bytes::from_array(&env, &[0u8; 32]);
     bridge_client.lock_tokens(
@@ -584,5 +621,5 @@ fn test_event_emission() {
 
     // Verify event was emitted
     let events = env.events().all();
-    assert_eq!(events.len(), 1);
+    assert_eq!(events.events().len(), 1);
 }

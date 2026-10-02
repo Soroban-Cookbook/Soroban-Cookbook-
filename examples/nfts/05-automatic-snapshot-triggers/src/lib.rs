@@ -1,7 +1,9 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
+};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -50,37 +52,47 @@ impl SnapshotTrigger {
         }
         admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::Frequency, &frequency);
+        env.storage()
+            .instance()
+            .set(&DataKey::Frequency, &frequency);
         env.storage().instance().set(&DataKey::LastSnapshot, &0u32);
-        env.storage().instance().set(&DataKey::TotalSnapshots, &0u32);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSnapshots, &0u32);
         env.storage().instance().set(&DataKey::Enabled, &true);
-        env.storage().instance().set(&DataKey::PruneThreshold, &0u32);
-        env.events().publish(
-            (EVENT_NS, symbol_short!("init")),
-            (admin, frequency),
-        );
+        env.storage()
+            .instance()
+            .set(&DataKey::PruneThreshold, &0u32);
+        env.events()
+            .publish((EVENT_NS, symbol_short!("init")), (admin, frequency));
         Ok(())
     }
 
     pub fn set_frequency(env: Env, admin: Address, frequency: u32) -> Result<(), SnapshotError> {
         Self::require_admin(&env, &admin)?;
-        let old: u32 = env.storage().instance().get(&DataKey::Frequency).unwrap_or(0);
-        env.storage().instance().set(&DataKey::Frequency, &frequency);
-        env.events().publish(
-            (EVENT_NS, symbol_short!("freq")),
-            (old, frequency),
-        );
+        let old: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Frequency)
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::Frequency, &frequency);
+        env.events()
+            .publish((EVENT_NS, symbol_short!("freq")), (old, frequency));
         Ok(())
     }
 
     pub fn set_enabled(env: Env, admin: Address, enabled: bool) -> Result<(), SnapshotError> {
         Self::require_admin(&env, &admin)?;
-        let old: bool = env.storage().instance().get(&DataKey::Enabled).unwrap_or(true);
+        let old: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Enabled)
+            .unwrap_or(true);
         env.storage().instance().set(&DataKey::Enabled, &enabled);
-        env.events().publish(
-            (EVENT_NS, symbol_short!("enable")),
-            (old, enabled),
-        );
+        env.events()
+            .publish((EVENT_NS, symbol_short!("enable")), (old, enabled));
         Ok(())
     }
 
@@ -90,12 +102,16 @@ impl SnapshotTrigger {
         older_than: u32,
     ) -> Result<(), SnapshotError> {
         Self::require_admin(&env, &admin)?;
-        let old: u32 = env.storage().instance().get(&DataKey::PruneThreshold).unwrap_or(0);
-        env.storage().instance().set(&DataKey::PruneThreshold, &older_than);
-        env.events().publish(
-            (EVENT_NS, symbol_short!("prune_cfg")),
-            (old, older_than),
-        );
+        let old: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::PruneThreshold)
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&DataKey::PruneThreshold, &older_than);
+        env.events()
+            .publish((EVENT_NS, symbol_short!("prune_cfg")), (old, older_than));
         Ok(())
     }
 
@@ -118,27 +134,43 @@ impl SnapshotTrigger {
             .persistent()
             .set(&DataKey::Snapshots(owner.clone()), &snapshots);
 
-        let mut total: u32 = env.storage().instance().get(&DataKey::TotalSnapshots).unwrap_or(0);
+        let mut total: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalSnapshots)
+            .unwrap_or(0);
         total += 1;
-        env.storage().instance().set(&DataKey::TotalSnapshots, &total);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSnapshots, &total);
 
-        env.events().publish(
-            (EVENT_NS, symbol_short!("record")),
-            (owner, value, now),
-        );
+        env.events()
+            .publish((EVENT_NS, symbol_short!("record")), (owner, value, now));
     }
 
     /// Time-based snapshot: only records if enough ledgers have elapsed.
     pub fn auto_snapshot(env: Env, owner: Address) -> Result<(), SnapshotError> {
-        let enabled: bool = env.storage().instance().get(&DataKey::Enabled).unwrap_or(true);
+        let enabled: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Enabled)
+            .unwrap_or(true);
         if !enabled {
             return Err(SnapshotError::NoSnapshotDue);
         }
-        let frequency: u32 = env.storage().instance().get(&DataKey::Frequency).unwrap_or(1);
+        let frequency: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Frequency)
+            .unwrap_or(1);
         if frequency == 0 {
             return Err(SnapshotError::InvalidFrequency);
         }
-        let last: u32 = env.storage().instance().get(&DataKey::LastSnapshot).unwrap_or(0);
+        let last: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::LastSnapshot)
+            .unwrap_or(0);
         let now = env.ledger().sequence();
         if now < last + frequency {
             return Err(SnapshotError::NoSnapshotDue);
@@ -191,14 +223,16 @@ impl SnapshotTrigger {
             .persistent()
             .set(&DataKey::Snapshots(owner.clone()), &kept);
 
-        env.events().publish(
-            (EVENT_NS, symbol_short!("prune")),
-            (admin, owner, pruned),
-        );
+        env.events()
+            .publish((EVENT_NS, symbol_short!("prune")), (admin, owner, pruned));
         Ok(pruned)
     }
 
-    pub fn get_snapshot(env: Env, owner: Address, index: u32) -> Result<SnapshotRecord, SnapshotError> {
+    pub fn get_snapshot(
+        env: Env,
+        owner: Address,
+        index: u32,
+    ) -> Result<SnapshotRecord, SnapshotError> {
         let snapshots: Vec<SnapshotRecord> = env
             .storage()
             .persistent()
@@ -238,10 +272,26 @@ impl SnapshotTrigger {
     }
 
     pub fn get_config(env: Env) -> (u32, bool, u32, u32) {
-        let frequency: u32 = env.storage().instance().get(&DataKey::Frequency).unwrap_or(0);
-        let enabled: bool = env.storage().instance().get(&DataKey::Enabled).unwrap_or(true);
-        let last: u32 = env.storage().instance().get(&DataKey::LastSnapshot).unwrap_or(0);
-        let total: u32 = env.storage().instance().get(&DataKey::TotalSnapshots).unwrap_or(0);
+        let frequency: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::Frequency)
+            .unwrap_or(0);
+        let enabled: bool = env
+            .storage()
+            .instance()
+            .get(&DataKey::Enabled)
+            .unwrap_or(true);
+        let last: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::LastSnapshot)
+            .unwrap_or(0);
+        let total: u32 = env
+            .storage()
+            .instance()
+            .get(&DataKey::TotalSnapshots)
+            .unwrap_or(0);
         (frequency, enabled, last, total)
     }
 

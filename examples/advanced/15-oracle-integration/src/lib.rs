@@ -22,7 +22,8 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
-    contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, Address, Env, Symbol, IntoVal
+    contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, Address, Env,
+    IntoVal, Symbol,
 };
 
 // ---------------------------------------------------------------------------
@@ -148,7 +149,9 @@ impl OracleContract {
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Updater, &updater);
         env.storage().instance().set(&DataKey::MaxAge, &max_age);
-        env.storage().instance().set(&DataKey::RequestTimeout, &request_timeout);
+        env.storage()
+            .instance()
+            .set(&DataKey::RequestTimeout, &request_timeout);
         env.storage().instance().set(&DataKey::NextRequestId, &1u32);
         Ok(())
     }
@@ -173,7 +176,9 @@ impl OracleContract {
             .instance()
             .get(&DataKey::NextRequestId)
             .unwrap_or(1);
-        env.storage().instance().set(&DataKey::NextRequestId, &(request_id + 1));
+        env.storage()
+            .instance()
+            .set(&DataKey::NextRequestId, &(request_id + 1));
 
         let request = OracleRequest {
             id: request_id,
@@ -185,7 +190,9 @@ impl OracleContract {
         };
 
         // Save to persistent storage since requests can bridge multiple ledgers.
-        env.storage().persistent().set(&DataKey::Request(request_id), &request);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Request(request_id), &request);
 
         // Emit requested event via modern event publish syntax
         OracleRequestEvent {
@@ -235,12 +242,18 @@ impl OracleContract {
         }
 
         let now = env.ledger().timestamp();
-        let timeout: u64 = env.storage().instance().get(&DataKey::RequestTimeout).unwrap();
+        let timeout: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::RequestTimeout)
+            .unwrap();
 
         // 3. Expiration Check
         if now.saturating_sub(request.request_timestamp) > timeout {
             request.status = RequestStatus::Expired;
-            env.storage().persistent().set(&DataKey::Request(request_id), &request);
+            env.storage()
+                .persistent()
+                .set(&DataKey::Request(request_id), &request);
             return Err(OracleError::RequestExpired);
         }
 
@@ -265,7 +278,9 @@ impl OracleContract {
 
         // 6. Update request status to avoid reentrancy/replay
         request.status = RequestStatus::Fulfilled;
-        env.storage().persistent().set(&DataKey::Request(request_id), &request);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Request(request_id), &request);
 
         // 7. Invoke consumer callback synchronously
         env.invoke_contract::<()>(
@@ -287,7 +302,9 @@ impl OracleContract {
 
     /// Read request details.
     pub fn get_request(env: Env, request_id: u32) -> Option<OracleRequest> {
-        env.storage().persistent().get(&DataKey::Request(request_id))
+        env.storage()
+            .persistent()
+            .get(&DataKey::Request(request_id))
     }
 
     /// Rotate updater address. Admin only.
@@ -298,7 +315,9 @@ impl OracleContract {
             .get(&DataKey::Admin)
             .ok_or(OracleError::NotInitialized)?;
         admin.require_auth();
-        env.storage().instance().set(&DataKey::Updater, &new_updater);
+        env.storage()
+            .instance()
+            .set(&DataKey::Updater, &new_updater);
         Ok(())
     }
 }
@@ -336,12 +355,18 @@ impl ConsumerContract {
         if env.storage().instance().has(&ConsumerDataKey::Oracle) {
             panic!("already initialized");
         }
-        env.storage().instance().set(&ConsumerDataKey::Oracle, &oracle);
+        env.storage()
+            .instance()
+            .set(&ConsumerDataKey::Oracle, &oracle);
     }
 
     /// Initiate a price request for a given asset (e.g. XLM/USD).
     pub fn request_price(env: Env, query: Symbol) -> u32 {
-        let oracle: Address = env.storage().instance().get(&ConsumerDataKey::Oracle).unwrap();
+        let oracle: Address = env
+            .storage()
+            .instance()
+            .get(&ConsumerDataKey::Oracle)
+            .unwrap();
         let oracle_client = OracleContractClient::new(&env, &oracle);
 
         let self_addr = env.current_contract_address();
@@ -349,7 +374,9 @@ impl ConsumerContract {
         let request_id = oracle_client.request_data(&self_addr, &symbol_short!("callback"), &query);
 
         // Store the request metadata so we can map the incoming request ID back to the requested asset
-        env.storage().persistent().set(&ConsumerDataKey::PendingRequest(request_id), &query);
+        env.storage()
+            .persistent()
+            .set(&ConsumerDataKey::PendingRequest(request_id), &query);
 
         request_id
     }
@@ -360,7 +387,11 @@ impl ConsumerContract {
     /// 1. **Caller Verification**: Employs `oracle.require_auth()` to ensure only the trusted Oracle contract can invoke this.
     /// 2. **Request State**: Ensures the request ID corresponds to a registered active query, preventing arbitrary unsolicited data updates.
     pub fn callback(env: Env, request_id: u32, value: i128, timestamp: u64) {
-        let oracle: Address = env.storage().instance().get(&ConsumerDataKey::Oracle).unwrap();
+        let oracle: Address = env
+            .storage()
+            .instance()
+            .get(&ConsumerDataKey::Oracle)
+            .unwrap();
         // Secure Callback check: require authorization from the oracle contract address
         oracle.require_auth();
 
@@ -372,11 +403,17 @@ impl ConsumerContract {
             .expect("unrecognized or already processed request");
 
         // Clear the pending request to prevent replay attacks on this callback handler
-        env.storage().persistent().remove(&ConsumerDataKey::PendingRequest(request_id));
+        env.storage()
+            .persistent()
+            .remove(&ConsumerDataKey::PendingRequest(request_id));
 
         // Update consumer price feed state
-        env.storage().instance().set(&ConsumerDataKey::LastPrice(query.clone()), &value);
-        env.storage().instance().set(&ConsumerDataKey::LastTimestamp(query.clone()), &timestamp);
+        env.storage()
+            .instance()
+            .set(&ConsumerDataKey::LastPrice(query.clone()), &value);
+        env.storage()
+            .instance()
+            .set(&ConsumerDataKey::LastTimestamp(query.clone()), &timestamp);
 
         // Emit consumer update event via modern event publish syntax
         ConsumerUpdateEvent {
@@ -390,12 +427,16 @@ impl ConsumerContract {
 
     /// Read the latest price for an asset query.
     pub fn get_price(env: Env, query: Symbol) -> Option<i128> {
-        env.storage().instance().get(&ConsumerDataKey::LastPrice(query))
+        env.storage()
+            .instance()
+            .get(&ConsumerDataKey::LastPrice(query))
     }
 
     /// Read the latest timestamp for an asset query.
     pub fn get_timestamp(env: Env, query: Symbol) -> Option<u64> {
-        env.storage().instance().get(&ConsumerDataKey::LastTimestamp(query))
+        env.storage()
+            .instance()
+            .get(&ConsumerDataKey::LastTimestamp(query))
     }
 }
 

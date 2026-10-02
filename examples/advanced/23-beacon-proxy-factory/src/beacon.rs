@@ -129,11 +129,7 @@ impl BeaconContract {
 
         admin.require_auth();
 
-        let prev_version: u32 = env
-            .storage()
-            .persistent()
-            .get(&VERSION_KEY)
-            .unwrap_or(0);
+        let prev_version: u32 = env.storage().persistent().get(&VERSION_KEY).unwrap_or(0);
 
         let new_version = prev_version
             .checked_add(1)
@@ -142,9 +138,7 @@ impl BeaconContract {
         env.storage()
             .persistent()
             .set(&IMPL_KEY, &new_implementation);
-        env.storage()
-            .persistent()
-            .set(&VERSION_KEY, &new_version);
+        env.storage().persistent().set(&VERSION_KEY, &new_version);
 
         env.storage().persistent().set(
             &DataKey::VersionLog(new_version),

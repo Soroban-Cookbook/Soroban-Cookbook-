@@ -4,7 +4,7 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::testutils::{Address as _, Ledger, Events as _};
+use soroban_sdk::testutils::{Address as _, Events as _, Ledger};
 use soroban_sdk::{symbol_short, Address, Env, Event};
 
 fn setup() -> (
@@ -82,7 +82,12 @@ fn test_request_data_success() {
     let binding = env.events().all();
     let all_events = binding.events();
     for (i, event) in all_events.iter().enumerate() {
-        std::println!("DEBUG EVENT {}: contract={:?}, body={:?}", i, event.contract_id, event.body);
+        std::println!(
+            "DEBUG EVENT {}: contract={:?}, body={:?}",
+            i,
+            event.contract_id,
+            event.body
+        );
     }
     std::println!("DEBUG oracle.address = {:?}", oracle.address);
 
@@ -115,7 +120,8 @@ fn test_request_data_not_initialized() {
     let oracle = OracleContractClient::new(&env, &oracle_id);
     let consumer = Address::generate(&env);
 
-    let result = oracle.try_request_data(&consumer, &symbol_short!("callback"), &symbol_short!("BTC"));
+    let result =
+        oracle.try_request_data(&consumer, &symbol_short!("callback"), &symbol_short!("BTC"));
     assert_eq!(result, Err(Ok(OracleError::NotInitialized)));
 }
 

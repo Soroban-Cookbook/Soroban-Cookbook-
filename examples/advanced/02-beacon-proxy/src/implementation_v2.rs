@@ -65,7 +65,9 @@ impl ImplV2 {
     /// New counter value after increment.
     pub fn increment(env: Env) -> u32 {
         let current: u32 = env.storage().persistent().get(&COUNT_KEY).unwrap_or(0);
-        let next = current.checked_add(1).unwrap_or_else(|| panic!("Counter overflow"));
+        let next = current
+            .checked_add(1)
+            .unwrap_or_else(|| panic!("Counter overflow"));
         env.storage().persistent().set(&COUNT_KEY, &next);
         next
     }

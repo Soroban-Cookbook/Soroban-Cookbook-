@@ -17,8 +17,7 @@
 
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env,
-    Symbol,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env, Symbol,
 };
 
 const BPS_DENOMINATOR: i128 = 10_000;
@@ -184,17 +183,18 @@ impl CaseStudies {
             return Err(Error::AlreadyRevealed);
         }
 
-        let expected = env
-            .crypto()
-            .sha256(&(amount, salt).to_xdr(&env))
-            .to_bytes();
+        let expected = env.crypto().sha256(&(amount, salt).to_xdr(&env)).to_bytes();
         if expected != commitment {
             return Err(Error::CommitmentMismatch);
         }
 
         env.storage().persistent().set(&revealed_key, &amount);
 
-        let highest_bid: i128 = env.storage().instance().get(&DataKey::HighestBid).unwrap_or(0);
+        let highest_bid: i128 = env
+            .storage()
+            .instance()
+            .get(&DataKey::HighestBid)
+            .unwrap_or(0);
         if amount > highest_bid {
             env.storage().instance().set(&DataKey::HighestBid, &amount);
             env.storage()
@@ -207,7 +207,10 @@ impl CaseStudies {
     }
 
     pub fn highest_bid(env: Env) -> i128 {
-        env.storage().instance().get(&DataKey::HighestBid).unwrap_or(0)
+        env.storage()
+            .instance()
+            .get(&DataKey::HighestBid)
+            .unwrap_or(0)
     }
 
     pub fn highest_bidder(env: Env) -> Option<Address> {

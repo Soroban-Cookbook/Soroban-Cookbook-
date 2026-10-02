@@ -18,13 +18,12 @@ fn setup() -> (Env, Address, Address) {
 
     let admin = Address::generate(&env);
 
-    client
-        .initialize(
-            &admin,
-            &String::from_str(&env, "My Collection"),
-            &String::from_str(&env, "MNFT"),
-            &String::from_str(&env, ""),
-        );
+    client.initialize(
+        &admin,
+        &String::from_str(&env, "My Collection"),
+        &String::from_str(&env, "MNFT"),
+        &String::from_str(&env, ""),
+    );
 
     (env, contract_id, admin)
 }
@@ -80,10 +79,7 @@ fn test_initialize_success() {
     let (env, contract_id, _admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
-    assert_eq!(
-        client.name(),
-        String::from_str(&env, "My Collection")
-    );
+    assert_eq!(client.name(), String::from_str(&env, "My Collection"));
     assert_eq!(client.symbol(), String::from_str(&env, "MNFT"));
     assert_eq!(client.total_supply(), 0);
 }
@@ -93,12 +89,14 @@ fn test_initialize_twice_fails() {
     let (env, contract_id, admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
-    let err = client.try_initialize(
-        &admin,
-        &String::from_str(&env, "Second"),
-        &String::from_str(&env, "SEC"),
-        &String::from_str(&env, ""),
-    ).unwrap_err();
+    let err = client
+        .try_initialize(
+            &admin,
+            &String::from_str(&env, "Second"),
+            &String::from_str(&env, "SEC"),
+            &String::from_str(&env, ""),
+        )
+        .unwrap_err();
     assert_eq!(err, Ok(NftError::AlreadyInitialized));
 }
 
@@ -161,7 +159,9 @@ fn test_mint_non_admin_fails() {
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
 
-    let err = client.try_mint(&attacker, &owner, &1u32, &meta).unwrap_err();
+    let err = client
+        .try_mint(&attacker, &owner, &1u32, &meta)
+        .unwrap_err();
     assert_eq!(err, Ok(NftError::NotAdmin));
 }
 
@@ -243,13 +243,12 @@ fn test_token_uri_with_base_uri() {
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     let admin = Address::generate(&env);
-    client
-        .initialize(
-            &admin,
-            &String::from_str(&env, "My Collection"),
-            &String::from_str(&env, "MNFT"),
-            &String::from_str(&env, "https://api.example.com/metadata/"),
-        );
+    client.initialize(
+        &admin,
+        &String::from_str(&env, "My Collection"),
+        &String::from_str(&env, "MNFT"),
+        &String::from_str(&env, "https://api.example.com/metadata/"),
+    );
 
     let owner = Address::generate(&env);
     let meta = valid_metadata(&env);
@@ -365,8 +364,7 @@ fn test_set_approval_for_all() {
     client.mint(&admin, &alice, &1u32, &meta.clone());
     client.mint(&admin, &alice, &2u32, &meta);
 
-    client
-        .set_approval_for_all(&alice, &operator, &true);
+    client.set_approval_for_all(&alice, &operator, &true);
     assert!(client.is_approved_for_all(&alice, &operator));
 
     // Operator can transfer any of Alice's tokens
@@ -387,10 +385,8 @@ fn test_revoke_approval_for_all() {
     let meta = valid_metadata(&env);
 
     client.mint(&admin, &alice, &1u32, &meta);
-    client
-        .set_approval_for_all(&alice, &operator, &true);
-    client
-        .set_approval_for_all(&alice, &operator, &false);
+    client.set_approval_for_all(&alice, &operator, &true);
+    client.set_approval_for_all(&alice, &operator, &false);
 
     assert!(!client.is_approved_for_all(&alice, &operator));
 
@@ -573,7 +569,9 @@ fn test_update_metadata_non_admin_fails() {
     client.mint(&admin, &owner, &1u32, &meta.clone());
 
     let attacker = Address::generate(&env);
-    let err = client.try_update_metadata(&attacker, &1u32, &meta).unwrap_err();
+    let err = client
+        .try_update_metadata(&attacker, &1u32, &meta)
+        .unwrap_err();
     assert_eq!(err, Ok(NftError::NotAdmin));
 }
 
@@ -583,7 +581,9 @@ fn test_update_metadata_nonexistent_token_fails() {
     let client = NftMetadataContractClient::new(&env, &contract_id);
 
     let meta = valid_metadata(&env);
-    let err = client.try_update_metadata(&admin, &999u32, &meta).unwrap_err();
+    let err = client
+        .try_update_metadata(&admin, &999u32, &meta)
+        .unwrap_err();
     assert_eq!(err, Ok(NftError::TokenNotFound));
 }
 

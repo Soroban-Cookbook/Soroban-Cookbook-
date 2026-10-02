@@ -158,10 +158,8 @@ impl DelegationMarketplace {
         };
         env.storage().persistent().set(&key, &offer);
 
-        env.events().publish(
-            (NS, EVT_LIST, delegator),
-            (voting_power, price_per_unit),
-        );
+        env.events()
+            .publish((NS, EVT_LIST, delegator), (voting_power, price_per_unit));
 
         Ok(())
     }
@@ -169,10 +167,7 @@ impl DelegationMarketplace {
     /// Cancel an open offer. Any remaining units are reclaimed.
     ///
     /// Only the delegator who created the offer can cancel it.
-    pub fn cancel_offer(
-        env: Env,
-        delegator: Address,
-    ) -> Result<(), MarketplaceError> {
+    pub fn cancel_offer(env: Env, delegator: Address) -> Result<(), MarketplaceError> {
         delegator.require_auth();
 
         let key = DataKey::Offer(delegator.clone());
@@ -189,9 +184,7 @@ impl DelegationMarketplace {
 
     /// Return the open offer for `delegator`, or `None` if not found.
     pub fn get_offer(env: Env, delegator: Address) -> Option<DelegationOffer> {
-        env.storage()
-            .persistent()
-            .get(&DataKey::Offer(delegator))
+        env.storage().persistent().get(&DataKey::Offer(delegator))
     }
 
     // -----------------------------------------------------------------------
@@ -259,9 +252,10 @@ impl DelegationMarketplace {
         env.storage()
             .persistent()
             .set(&DataKey::Balance(renter.clone()), &(renter_balance - fee));
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(delegator.clone()), &(delegator_balance + fee));
+        env.storage().persistent().set(
+            &DataKey::Balance(delegator.clone()),
+            &(delegator_balance + fee),
+        );
 
         // Reduce available voting power in offer
         offer.voting_power -= units;
@@ -281,10 +275,8 @@ impl DelegationMarketplace {
         };
         env.storage().persistent().set(&delegation_key, &delegation);
 
-        env.events().publish(
-            (NS, EVT_RENT, renter, delegator),
-            (units, fee, expires_at),
-        );
+        env.events()
+            .publish((NS, EVT_RENT, renter, delegator), (units, fee, expires_at));
 
         Ok(())
     }
@@ -340,10 +332,8 @@ impl DelegationMarketplace {
             env.storage().persistent().set(&offer_key, &offer);
         }
 
-        env.events().publish(
-            (NS, EVT_EXPIRE, renter, delegator),
-            returned_units,
-        );
+        env.events()
+            .publish((NS, EVT_EXPIRE, renter, delegator), returned_units);
 
         Ok(())
     }

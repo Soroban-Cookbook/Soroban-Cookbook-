@@ -328,7 +328,11 @@ impl AjoFactory {
             .set(&FactoryDataKey::Instances, &instances);
 
         env.events().publish(
-            (symbol_short!("Created"), template_id, deployed_address.clone()),
+            (
+                symbol_short!("Created"),
+                template_id,
+                deployed_address.clone(),
+            ),
             creator,
         );
 

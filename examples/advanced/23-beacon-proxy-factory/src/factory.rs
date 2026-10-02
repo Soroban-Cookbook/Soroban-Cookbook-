@@ -29,11 +29,11 @@
 //! | `DataKey::ProxyWasmHash` | `BytesN<32>` | WASM hash used to deploy new proxies |
 //! | `DataKey::Proxies` | `Vec<Address>` | Ordered list of all deployed proxy addresses |
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, vec, Address, BytesN, Env, IntoVal,
-    Symbol, Vec,
-};
 use soroban_sdk::xdr::ToXdr;
+use soroban_sdk::{
+    contract, contractimpl, contracttype, symbol_short, vec, Address, BytesN, Env, IntoVal, Symbol,
+    Vec,
+};
 
 // ---------------------------------------------------------------------------
 // Storage keys
@@ -352,7 +352,9 @@ impl BeaconProxyFactory {
         // Build a deterministic salt from the current proxy count.
         // Using nonce + 1 to distinguish proxy salts from the beacon salt (nonce 0).
         let salt_seed = DataKey::ProxySaltSeed(
-            nonce.checked_add(1).unwrap_or_else(|| panic!("Nonce overflow")),
+            nonce
+                .checked_add(1)
+                .unwrap_or_else(|| panic!("Nonce overflow")),
         );
         let salt = env.crypto().sha256(&salt_seed.to_xdr(env));
 
@@ -366,11 +368,7 @@ impl BeaconProxyFactory {
         env.invoke_contract::<()>(
             &proxy_addr,
             &Symbol::new(env, "init"),
-            vec![
-                env,
-                admin.into_val(env),
-                beacon.into_val(env),
-            ],
+            vec![env, admin.into_val(env), beacon.into_val(env)],
         );
 
         proxies.push_back(proxy_addr.clone());

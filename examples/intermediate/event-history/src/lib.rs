@@ -199,11 +199,7 @@ impl EventHistory {
             index += 1;
         }
 
-        let next_cursor = if end >= next_index {
-            None
-        } else {
-            Some(end)
-        };
+        let next_cursor = if end >= next_index { None } else { Some(end) };
 
         Ok(HistoryPage {
             entries: result,

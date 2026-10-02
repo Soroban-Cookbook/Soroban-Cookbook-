@@ -2,8 +2,8 @@
 //! Unit tests for the event history contract.
 
 use super::*;
-use soroban_sdk::{symbol_short, Address, Env};
 use soroban_sdk::testutils::{Address as _, Ledger as _};
+use soroban_sdk::{symbol_short, Address, Env};
 
 fn setup() -> (Env, Address, EventHistoryClient<'static>) {
     let env = Env::default();
@@ -52,12 +52,9 @@ fn test_get_events_page_returns_cursor_and_next_page() {
     let actor = Address::generate(&env);
     let action = symbol_short!("create");
 
-    client
-        .append_event(&actor, &action, &symbol_short!("a"));
-    client
-        .append_event(&actor, &action, &symbol_short!("b"));
-    client
-        .append_event(&actor, &action, &symbol_short!("c"));
+    client.append_event(&actor, &action, &symbol_short!("a"));
+    client.append_event(&actor, &action, &symbol_short!("b"));
+    client.append_event(&actor, &action, &symbol_short!("c"));
 
     let page1 = client.get_events_page(&None, &2);
     assert_eq!(page1.entries.len(), 2);
@@ -78,14 +75,10 @@ fn test_get_events_page_rejects_expired_cursor() {
     let actor = Address::generate(&env);
     let action = symbol_short!("write");
 
-    client
-        .append_event(&actor, &action, &symbol_short!("first"));
-    client
-        .append_event(&actor, &action, &symbol_short!("second"));
-    client
-        .append_event(&actor, &action, &symbol_short!("third"));
-    client
-        .append_event(&actor, &action, &symbol_short!("fourth"));
+    client.append_event(&actor, &action, &symbol_short!("first"));
+    client.append_event(&actor, &action, &symbol_short!("second"));
+    client.append_event(&actor, &action, &symbol_short!("third"));
+    client.append_event(&actor, &action, &symbol_short!("fourth"));
 
     let cursor = 0u32;
     let err = client.try_get_events_page(&Some(cursor), &2).unwrap_err();
@@ -100,14 +93,10 @@ fn test_storage_limit_trims_oldest_entries() {
     let actor = Address::generate(&env);
     let action = symbol_short!("write");
 
-    client
-        .append_event(&actor, &action, &symbol_short!("first"));
-    client
-        .append_event(&actor, &action, &symbol_short!("second"));
-    client
-        .append_event(&actor, &action, &symbol_short!("third"));
-    client
-        .append_event(&actor, &action, &symbol_short!("fourth"));
+    client.append_event(&actor, &action, &symbol_short!("first"));
+    client.append_event(&actor, &action, &symbol_short!("second"));
+    client.append_event(&actor, &action, &symbol_short!("third"));
+    client.append_event(&actor, &action, &symbol_short!("fourth"));
 
     let stats = client.history_stats();
     assert_eq!(stats.count, 3);
@@ -128,14 +117,11 @@ fn test_query_by_time_returns_matching_entries() {
     let action = symbol_short!("time");
 
     let first_ts = env.ledger().timestamp();
-    client
-        .append_event(&actor, &action, &symbol_short!("one"));
+    client.append_event(&actor, &action, &symbol_short!("one"));
     env.ledger().set_timestamp(first_ts + 20);
-    client
-        .append_event(&actor, &action, &symbol_short!("two"));
+    client.append_event(&actor, &action, &symbol_short!("two"));
     env.ledger().set_timestamp(first_ts + 40);
-    client
-        .append_event(&actor, &action, &symbol_short!("three"));
+    client.append_event(&actor, &action, &symbol_short!("three"));
 
     let range = client.query_by_time(&(first_ts + 10), &(first_ts + 30), &10);
     assert_eq!(range.len(), 1);

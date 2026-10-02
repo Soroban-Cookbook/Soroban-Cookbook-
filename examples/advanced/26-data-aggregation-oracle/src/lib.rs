@@ -1,9 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 /// Maximum number of data sources allowed per oracle
 const MAX_SOURCES: u32 = 10;
@@ -106,7 +104,9 @@ impl DataAggregationOracleContract {
         }
 
         sources.push_back(source);
-        env.storage().instance().set(&DataKey::TrustedSources, &sources);
+        env.storage()
+            .instance()
+            .set(&DataKey::TrustedSources, &sources);
     }
 
     /// Remove a trusted data source
@@ -128,7 +128,9 @@ impl DataAggregationOracleContract {
             panic!("Not found");
         }
 
-        env.storage().instance().set(&DataKey::TrustedSources, &sources);
+        env.storage()
+            .instance()
+            .set(&DataKey::TrustedSources, &sources);
     }
 
     /// Submit data from a source
@@ -139,9 +141,10 @@ impl DataAggregationOracleContract {
         env.storage()
             .instance()
             .set(&DataKey::SourceValue(source.clone()), &value);
-        env.storage()
-            .instance()
-            .set(&DataKey::SourceTimestamp(source.clone()), &env.ledger().timestamp());
+        env.storage().instance().set(
+            &DataKey::SourceTimestamp(source.clone()),
+            &env.ledger().timestamp(),
+        );
 
         env.events().publish(
             (CONTRACT_NS, ACTION_SUBMIT, source.clone()),
@@ -165,7 +168,8 @@ impl DataAggregationOracleContract {
         // Collect values
         let mut values: Vec<i128> = Vec::new(&env);
         for source in sources.iter() {
-            if env.storage()
+            if env
+                .storage()
                 .instance()
                 .has(&DataKey::SourceValue(source.clone()))
             {

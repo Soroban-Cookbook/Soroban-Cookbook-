@@ -247,18 +247,9 @@ fn uninitialized_calls_return_not_initialized() {
         client.try_execute_upgrade(),
         Err(Ok(AdminError::NotInitialized))
     );
-    assert_eq!(
-        client.try_pause(),
-        Err(Ok(AdminError::NotInitialized))
-    );
-    assert_eq!(
-        client.try_unpause(),
-        Err(Ok(AdminError::NotInitialized))
-    );
-    assert_eq!(
-        client.try_admin(),
-        Err(Ok(AdminError::NotInitialized))
-    );
+    assert_eq!(client.try_pause(), Err(Ok(AdminError::NotInitialized)));
+    assert_eq!(client.try_unpause(), Err(Ok(AdminError::NotInitialized)));
+    assert_eq!(client.try_admin(), Err(Ok(AdminError::NotInitialized)));
 }
 
 // ---------------------------------------------------------------------------

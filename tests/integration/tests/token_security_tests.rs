@@ -35,9 +35,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short,
-    testutils::Address as _,
-    vec, Address, Env, IntoVal, String, Symbol,
+    contract, contractimpl, contracttype, symbol_short, testutils::Address as _, vec, Address, Env,
+    IntoVal, String, Symbol,
 };
 
 use sep41_token::{Sep41Token, Sep41TokenClient, TokenError};
@@ -247,8 +246,12 @@ impl MaliciousUnderlyingToken {
     /// the `attack_type` parameter convention in
     /// `15-reentrancy-guard/src/test.rs`'s `MaliciousContract::init`).
     pub fn init(env: Env, wrapper: Address, attacking: bool) {
-        env.storage().instance().set(&MaliciousKey::Wrapper, &wrapper);
-        env.storage().instance().set(&MaliciousKey::Attacking, &attacking);
+        env.storage()
+            .instance()
+            .set(&MaliciousKey::Wrapper, &wrapper);
+        env.storage()
+            .instance()
+            .set(&MaliciousKey::Attacking, &attacking);
     }
 
     pub fn set_balance(env: Env, id: Address, amount: i128) {
@@ -277,9 +280,10 @@ impl MaliciousUnderlyingToken {
             .persistent()
             .get(&MaliciousKey::RealBalance(to.clone()))
             .unwrap_or(0);
-        env.storage()
-            .persistent()
-            .set(&MaliciousKey::RealBalance(from.clone()), &(from_bal - amount));
+        env.storage().persistent().set(
+            &MaliciousKey::RealBalance(from.clone()),
+            &(from_bal - amount),
+        );
         env.storage()
             .persistent()
             .set(&MaliciousKey::RealBalance(to), &(to_bal + amount));
@@ -292,7 +296,9 @@ impl MaliciousUnderlyingToken {
         if attacking {
             // Disable further attacks first so the reentrant `wrap` call
             // below doesn't recurse forever if it (wrongly) succeeds.
-            env.storage().instance().set(&MaliciousKey::Attacking, &false);
+            env.storage()
+                .instance()
+                .set(&MaliciousKey::Attacking, &false);
             let wrapper: Address = env
                 .storage()
                 .instance()

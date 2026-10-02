@@ -102,7 +102,10 @@ fn test_open_channel_zero_deposit_fails() {
     let (env, _id, client) = setup();
     let a = Address::generate(&env);
     let b = Address::generate(&env);
-    let err = client.try_open(&a, &b, &0, &100, &None).unwrap_err().unwrap();
+    let err = client
+        .try_open(&a, &b, &0, &100, &None)
+        .unwrap_err()
+        .unwrap();
     assert_eq!(err, ChannelError::InvalidDeposit);
 }
 
@@ -329,17 +332,11 @@ fn test_get_sequence_and_balances() {
 
     // Before any challenge the sequence is 0 and balances match deposits.
     assert_eq!(client.get_sequence(&channel_id), 0);
-    assert_eq!(
-        client.get_balances(&channel_id),
-        (300_i128, 700_i128)
-    );
+    assert_eq!(client.get_balances(&channel_id), (300_i128, 700_i128));
 
     client.challenge(&channel_id, &a, &3, &400, &600);
     assert_eq!(client.get_sequence(&channel_id), 3);
-    assert_eq!(
-        client.get_balances(&channel_id),
-        (400_i128, 600_i128)
-    );
+    assert_eq!(client.get_balances(&channel_id), (400_i128, 600_i128));
 }
 
 #[test]
@@ -352,17 +349,11 @@ fn test_get_status_transitions() {
     assert_eq!(client.get_status(&channel_id), ChannelStatus::Open);
 
     client.challenge(&channel_id, &a, &1, &100, &100);
-    assert_eq!(
-        client.get_status(&channel_id),
-        ChannelStatus::Disputed
-    );
+    assert_eq!(client.get_status(&channel_id), ChannelStatus::Disputed);
 
     advance_ledger(&env, 6);
     client.finalize(&channel_id);
-    assert_eq!(
-        client.get_status(&channel_id),
-        ChannelStatus::Closed
-    );
+    assert_eq!(client.get_status(&channel_id), ChannelStatus::Closed);
 }
 
 // ---------------------------------------------------------------------------
@@ -379,7 +370,10 @@ fn test_operations_without_init_fail() {
     // None of the public methods should succeed before initialize().
     let a = Address::generate(&env);
     let b = Address::generate(&env);
-    let err = client.try_open(&a, &b, &100, &100, &None).unwrap_err().unwrap();
+    let err = client
+        .try_open(&a, &b, &100, &100, &None)
+        .unwrap_err()
+        .unwrap();
     assert_eq!(err, ChannelError::NotInitialized);
 }
 

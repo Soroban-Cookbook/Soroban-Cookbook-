@@ -2,7 +2,10 @@
 
 use soroban_sdk::Env;
 
-pub fn measure<F>(env: &Env, f: F) -> u64 where F: FnOnce(&Env) {
+pub fn measure<F>(env: &Env, f: F) -> u64
+where
+    F: FnOnce(&Env),
+{
     let mut b = env.cost_estimate().budget();
     b.reset_default();
     f(env);

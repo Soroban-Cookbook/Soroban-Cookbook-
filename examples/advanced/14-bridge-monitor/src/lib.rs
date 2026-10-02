@@ -91,9 +91,13 @@ impl BridgeMonitor {
         }
         admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
-        env.storage().instance().set(&DataKey::Threshold, &threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold, &threshold);
         env.storage().instance().set(&DataKey::Initialized, &true);
-        env.storage().instance().set(&DataKey::TransactionCount, &0u32);
+        env.storage()
+            .instance()
+            .set(&DataKey::TransactionCount, &0u32);
         env.storage().instance().set(&DataKey::AlertCount, &0u32);
         Ok(())
     }
@@ -103,7 +107,12 @@ impl BridgeMonitor {
     }
 
     fn require_admin(env: &Env, caller: &Address) -> Result<(), BridgeMonitorError> {
-        if !env.storage().instance().get::<_, bool>(&DataKey::Initialized).unwrap_or(false) {
+        if !env
+            .storage()
+            .instance()
+            .get::<_, bool>(&DataKey::Initialized)
+            .unwrap_or(false)
+        {
             return Err(BridgeMonitorError::NotInitialized);
         }
         let admin: Address = env
@@ -135,9 +144,15 @@ impl BridgeMonitor {
     }
 
     /// Change the balance-drift alert threshold.
-    pub fn set_threshold(env: Env, admin: Address, threshold: i128) -> Result<(), BridgeMonitorError> {
+    pub fn set_threshold(
+        env: Env,
+        admin: Address,
+        threshold: i128,
+    ) -> Result<(), BridgeMonitorError> {
         Self::require_admin(&env, &admin)?;
-        env.storage().instance().set(&DataKey::Threshold, &threshold);
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold, &threshold);
         Ok(())
     }
 
@@ -182,7 +197,9 @@ impl BridgeMonitor {
             .unwrap_or_else(|| Vec::new(&env));
         txs.push_back(tx);
         env.storage().persistent().set(&DataKey::Transactions, &txs);
-        env.storage().instance().set(&DataKey::TransactionCount, &next);
+        env.storage()
+            .instance()
+            .set(&DataKey::TransactionCount, &next);
 
         env.events().publish(
             (symbol_short!("TX"), &token),
@@ -191,7 +208,12 @@ impl BridgeMonitor {
 
         // Failed transfers are anomalies worth surfacing immediately.
         if status.eq(&String::from_str(&env, "failed")) {
-            Self::raise_alert_internal(&env, "high", "failed_transfer", String::from_str(&env, &format!("bridge tx {next} failed")));
+            Self::raise_alert_internal(
+                &env,
+                "high",
+                "failed_transfer",
+                String::from_str(&env, &format!("bridge tx {next} failed")),
+            );
         }
 
         Ok(next)
@@ -229,9 +251,16 @@ impl BridgeMonitor {
 
     /// Record the latest observed on-chain balance; raises a drift alert when
     /// it moves by more than the threshold vs. the last snapshot.
-    pub fn snapshot_balance(env: Env, indexer: Address, observed: i128) -> Result<(), BridgeMonitorError> {
+    pub fn snapshot_balance(
+        env: Env,
+        indexer: Address,
+        observed: i128,
+    ) -> Result<(), BridgeMonitorError> {
         Self::require_admin(&env, &indexer)?;
-        let previous = env.storage().instance().get::<_, i128>(&DataKey::LastSnapshot);
+        let previous = env
+            .storage()
+            .instance()
+            .get::<_, i128>(&DataKey::LastSnapshot);
         match previous {
             Some(prev) => {
                 let threshold = env
@@ -245,13 +274,20 @@ impl BridgeMonitor {
                         &env,
                         "high",
                         "balance_drift",
-                        String::from_str(&env, &format!("balance moved by {drift} (threshold {threshold})")),
+                        String::from_str(
+                            &env,
+                            &format!("balance moved by {drift} (threshold {threshold})"),
+                        ),
                     );
                 }
-                env.storage().instance().set(&DataKey::LastSnapshot, &observed);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::LastSnapshot, &observed);
             }
             None => {
-                env.storage().instance().set(&DataKey::LastSnapshot, &observed);
+                env.storage()
+                    .instance()
+                    .set(&DataKey::LastSnapshot, &observed);
             }
         }
         Ok(())
@@ -292,10 +328,7 @@ impl BridgeMonitor {
             }
         }
         env.storage().persistent().set(&DataKey::Alerts, &remaining);
-        env.events().publish(
-            (symbol_short!("RESOLVE"),),
-            id,
-        );
+        env.events().publish((symbol_short!("RESOLVE"),), id);
         Ok(())
     }
 

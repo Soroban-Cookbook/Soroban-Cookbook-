@@ -258,8 +258,14 @@ fn test_router_register_and_query_facets() {
 
     router.register_facets(&admin, &token_id, &access_id, &registry_id);
 
-    assert_eq!(router.get_facet(&symbol_short!("token")), Some(token_id.clone()));
-    assert_eq!(router.get_facet(&symbol_short!("access")), Some(access_id.clone()));
+    assert_eq!(
+        router.get_facet(&symbol_short!("token")),
+        Some(token_id.clone())
+    );
+    assert_eq!(
+        router.get_facet(&symbol_short!("access")),
+        Some(access_id.clone())
+    );
     assert_eq!(
         router.get_facet(&symbol_short!("registry")),
         Some(registry_id.clone())

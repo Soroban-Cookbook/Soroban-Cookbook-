@@ -2,7 +2,11 @@
 #![allow(deprecated)]
 
 use super::*;
-use soroban_sdk::{symbol_short, testutils::{Address as _, Ledger}, Address, Env, IntoVal, String, Symbol, Vec};
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, Ledger},
+    Address, Env, IntoVal, String, Symbol, Vec,
+};
 
 #[contract]
 pub struct DummyTargetContract;
@@ -10,11 +14,20 @@ pub struct DummyTargetContract;
 #[contractimpl]
 impl DummyTargetContract {
     pub fn execute_action(env: Env, value: u32) {
-        env.storage().instance().set(&symbol_short!("executed"), &value);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("executed"), &value);
     }
 }
 
-fn setup(env: &Env) -> (Address, TokenVotingContractClient<'_>, Address, DummyTargetContractClient<'_>) {
+fn setup(
+    env: &Env,
+) -> (
+    Address,
+    TokenVotingContractClient<'_>,
+    Address,
+    DummyTargetContractClient<'_>,
+) {
     env.mock_all_auths();
 
     let admin = Address::generate(env);
@@ -94,7 +107,13 @@ fn test_proposal_snapshot_locks_voting_power() {
 
     let desc = String::from_str(&env, "Snapshot Proposal");
     let args = Vec::from_array(&env, [42u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&alice, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &alice,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 50);
     client.submit_proposal(&alice, &proposal_id, &20u32, &50u32);
@@ -119,7 +138,13 @@ fn test_vote_for_delegated_balance() {
     client.delegate(&delegator, &delegatee);
     let desc = String::from_str(&env, "Delegate Proposal");
     let args = Vec::from_array(&env, [11u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&delegatee, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &delegatee,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 500);
     client.submit_proposal(&delegatee, &proposal_id, &10u32, &20u32);
@@ -139,7 +164,13 @@ fn test_double_vote_fails() {
 
     let desc = String::from_str(&env, "Double Vote");
     let args = Vec::from_array(&env, [99u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 600);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
@@ -159,14 +190,23 @@ fn test_quorum_not_met() {
 
     let desc = String::from_str(&env, "Quorum Fail");
     let args = Vec::from_array(&env, [7u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 700);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
     client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 711);
-    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Failed);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Failed
+    );
 }
 
 #[test]
@@ -179,19 +219,34 @@ fn test_execute_proposal_success() {
 
     let desc = String::from_str(&env, "Execute Proposal");
     let args = Vec::from_array(&env, [123u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 800);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
     client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 811);
-    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Passed);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Passed
+    );
     client.execute_proposal(&voter, &proposal_id);
-    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Executed);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Executed
+    );
 
     let executed: u32 = env.as_contract(&dummy.address, || {
-        env.storage().instance().get(&symbol_short!("executed")).unwrap()
+        env.storage()
+            .instance()
+            .get(&symbol_short!("executed"))
+            .unwrap()
     });
     assert_eq!(executed, 123);
 }
@@ -206,7 +261,13 @@ fn test_execute_expired() {
 
     let desc = String::from_str(&env, "Expire Proposal");
     let args = Vec::from_array(&env, [321u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 900);
     client.submit_proposal(&voter, &proposal_id, &10u32, &15u32);
@@ -226,8 +287,17 @@ fn test_cancel_proposal() {
 
     let desc = String::from_str(&env, "Cancel Proposal");
     let args = Vec::from_array(&env, [111u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&proposer, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &proposer,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     client.cancel_proposal(&proposer, &proposal_id);
-    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Cancelled);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Cancelled
+    );
 }

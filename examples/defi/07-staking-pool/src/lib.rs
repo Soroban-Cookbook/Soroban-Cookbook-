@@ -1,1 +1,247 @@
-IYFjZmdfYXR0cih0YXJnZXRfZmFtaWx5ID0gIndhc20iLCBub19zdGQpXQojIVthbGxvdChkZXByZWNhdGVkKV0KCnVzZSBzb3JvYmFuX3Nkazp7Y29udHJhY3QsIGNvbnRyYWN0aW1wbCwgY29udHJhY3R0eXBlLCB0b2tlbiwgQWRkcmVzcywgRW52fTsKCiNbaWYoY2ZnKHRlc3QpKV0KbW9kIHRlc3Q7Cgpjb25zdCBSRVdBUkRfUFJFQ0lTSU9OOiBpMTI4ID0gMV8wMDBfMDAwXzAwMF8wMDBfMDAwXzAwMF8wMDA7CgojW2NvbnRyYWN0XQpwdWIgc3RydWN0IFN0YWtpbmdQb29sQ29udHJhY3Q7CgojW2NvbnRyYWN0dHlwZV0KcHViIGVudW0gRGF0YUtleSB7CiAgICBPd25lciwKICAgIFN0YWtpbmdUb2tlbiwKICAgIFJld2FyZFRva2VuLAogICAgUmV3YXJkUmF0ZSwKICAgIExhc3RVcGRhdGVUaW1lLAogICAgUmV3YXJkUGVyVG9rZW5TdG9yZWQsCiAgICBUb3RhbFN1cHBseSwKICAgIEJhbGFuY2UoQWRkcmVzcyksCiAgICBVc2VyUmV3YXJkUGVyVG9rZW5QYWlkKEFkZHJlc3MpLAogICAgUmV3YXJkcyhBZGRyZXNzKSwKfQoKaW1wbCBTdGFraW5nUG9vbENvbnRyYWN0IHsKICAgIC8qCiAgICBmbiByZXF1aXJlX293bmVyKCZzZWxmLCBlbnY6ICZFbnYpIHsKICAgICAgICBsZXQgb3duZXI6IEFkZHJlc3MgPSBlbnYKICAgICAgICAgICAgLnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpPd25lcikKICAgICAgICAgICAgLmV4cGVjdCgibm90IGluaXRpYWxpemVkIik7CiAgICAgICAgb3duZXIucmVxdWlyZV9hdXRoKCk7CiAgICB9CiAgICAqLwoKICAgIGZuIHN0YWtpbmdfdG9rZW4oJnNlbGYsIGVudjogJkVudikgLT4gQWRkcmVzcyB7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpTdGFraW5nVG9rZW4pCiAgICAgICAgICAgIC5leHBlY3QoInN0YWtpbmcgdG9rZW4gbWlzc2luZyIpCiAgICB9CgogICAgZm4gcmV3YXJkX3Rva2VuKCZzZWxmLCBlbnY6ICZFbnYpIC0+IEFkZHJlc3MgewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6UmV3YXJkVG9rZW4pCiAgICAgICAgICAgIC5leHBlY3QoInJld2FyZCB0b2tlbiBtaXNzaW5nIikKICAgIH0KCiAgICBmbiByZXdhcmRfcmF0ZSgmc2VsZiwgZW52OiAmRW52KSAtPiBpMTI4IHsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5pbnN0YW5jZSgpCiAgICAgICAgICAgIC5nZXQoJkRhdGFLZXk6OlJld2FyZFJhdGUpCiAgICAgICAgICAgIC51bndyYXBfb3IoMGkxMjgpCiAgICB9CgogICAgZm4gbGFzdF91cGRhdGVfdGltZSgmc2VsZiwgZW52OiAmRW52KSAtPiB1NjQgewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6TGFzdFVwZGF0ZVRpbWUpCiAgICAgICAgICAgIC51bndyYXBfb3IoZW52LmxlZGdlci gpLnRpbWVzdGFtcCgpKQogICAgfQoKICAgIGZuIHJld2FyZF9wZXJfdG9rZW5fc3RvcmVkKCZzZWxmLCBlbnY6ICZFbnYpIC0+IGkxMjggewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6UmV3YXJkUGVyVG9rZW5TdG9yZWQpCiAgICAgICAgICAgIC51bndyYXBfb3IoMGkxMjgpCiAgICB9CgogICAgZm4gdG90YWxfc3VwcGx5KCZzZWxmLCBlbnY6ICZFbnYpIC0+IGkxMjggewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6VG90YWxTdXBwbHkpCiAgICAgICAgICAgIC51bndyYXBfb3IoMGkxMjgpCiAgICB9CgogICAgZm4gYmFsYW5jZV9vZl9pbnRlcm5hbCgmc2VsZiwgZW52OiAmRW52LCBhY2NvdW50OiAmQWRkcmVzcykgLT4gaTEyOCB7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuZ2V0KCZEYXRhS2V5OjpCYWxhbmNlKGFjY291bnQuY2xvbmUoKSkpCiAgICAgICAgICAgIC51bndyYXBfb3IoMGkxMjgpCiAgICB9CgogICAgZm4gdXNlcl9yZXdhcmRfcGVyX3Rva2VuX3BhaWQoJnNlbGYsIGVudjogJkVudiwgYWNjb3VudDogJkFkZHJlc3MpIC0+IGkxMjggewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6VXNlclJld2FyZFBlclRva2VuUGFpZChhY2NvdW50LmNsb25lKCkpKQogICAgICAgICAgICAudW53cmFwX29yKDBpMTI4KQogICAgfQoKICAgIGZuIHJld2FyZHMoJnNlbGYsIGVudjogJkVudiwgYWNjb3VudDogJkFkZHJlc3MpIC0+IGkxMjggewogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLmdldCgmRGF0YUtleTo6UmV3YXJkcyhhY2NvdW50LmNsb25lKCkpKQogICAgICAgICAgICAudW53cmFwX29yKDBpMTI4KQogICAgfQoKICAgIGZuIHVwZGF0ZV9yZXdhcmQoJnNlbGYsIGVudjogJkVudiwgYWNjb3VudDogJkFkZHJlc3MpIHsKICAgICAgICBsZXQgcmV3YXJkX3Blcl90b2tlbiA9IHNlbGYucmV3YXJkX3Blcl90b2tlbl9pbnRlcm5hbChlbnYpOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6UmV3YXJkUGVyVG9rZW5TdG9yZWQsICZyZXdhcmRfcGVyX3Rva2VuKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5pbnN0YW5jZSgpCiAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6Okxhc3RVcGRhdGVUaW1lLCAmZW52LmxlZGdlci gpLnRpbWVzdGFtcCgpKTsKCiAgICAgICAgbGV0IGVhcm5lZCA9IHNlbGYuZWFybmVkX2F0KGVudiwgYWNjb3VudCwgcmV3YXJkX3Blcl90b2tlbik7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpSZXdhcmRzKGFjY291bnQuY2xvbmUoKSksICZlYXJuZWQpOwogICAgICAgIGVudi5zdG9yYWdlKCkuaW5zdGFuY2UoKS5zZXQoCiAgICAgICAgICAgICZEYXRhS2V5OjpVc2VyUmV3YXJkUGVyVG9rZW5QYWlkKGFjY291bnQuY2xvbmUoKSksCiAgICAgICAgICAgICZyZXdhcmRfcGVyX3Rva2VuLAogICAgICAgICk7CiAgICB9CgogICAgZm4gcmV3YXJkX3Blcl90b2tlbl9pbnRlcm5hbCgmc2VsZiwgZW52OiAmRW52KSAtPiBpMTI4IHsKICAgICAgICBsZXQgdG90YWxfc3VwcGx5ID0gc2VsZi50b3RhbF9zdXBwbHkoZW52KTsKICAgICAgICBpZiB0b3RhbF9zdXBwbHkgPT0gMCB7CiAgICAgICAgICAgIHJldHVybiBzZWxmLnJld2FyZF9wZXJfdG9rZW5fc3RvcmVkKGVudik7CiAgICAgICAgfQogICAgICAgIGxldCBsYXN0X3RpbWUgPSBzZWxmLmxhc3RfdXBkYXRlX3RpbWUoZW52KTsKICAgICAgICBsZXQgbm93ID0gZW52LmxlZGdlci gpLnRpbWVzdGFtcCgpOwogICAgICAgIGxldCBlbGFwc2VkID0gbm93LnNhdHVyYXRpbmdfc3ViKGxhc3RfdGltZSkgYXMgaTEyODsKICAgICAgICBsZXQgYWNjdW11bGF0ZWQgPSBlbGFwc2VkCiAgICAgICAgICAgIC5jaGVja2VkX211bChzZWxmLnJld2FyZF9yYXRlKGVudikpCiAgICAgICAgICAgIC51bndyYXAoKQogICAgICAgICAgICAuY2hlY2tlZF9tdWwoUkVXQVJEX1BSRUNJU0lPTikKICAgICAgICAgICAgLnVud3JhcCgpCiAgICAgICAgICAgIC5jaGVja2VkX2Rpdih0b3RhbF9zdXBwbHkpCiAgICAgICAgICAgIC51bndyYXAoKTsKICAgICAgICBzZWxmLnJld2FyZF9wZXJfdG9rZW5fc3RvcmVkKGVudikKICAgICAgICAgICAgLmNoZWNrZWRfYWRkKGFjY3VtdWxhdGVkKQogICAgICAgICAgICAudW53cmFwKCkKICAgIH0KCiAgICBmbiBlYXJuZWRfYXQoJnNlbGYsIGVudjogJkVudiwgYWNjb3VudDogJkFkZHJlc3MsIHJld2FyZF9wZXJfdG9rZW46IGkxMjgpIC0+IGkxMjggewogICAgICAgIGxldCBiYWxhbmNlID0gc2VsZi5iYWxhbmNlX29mX2ludGVybmFsKGVudiwgYWNjb3VudCk7CiAgICAgICAgbGV0IHBhaWQgPSBzZWxmLnVzZXJfcmV3YXJkX3Blcl90b2tlbl9wYWlkKGVudiwgYWNjb3VudCk7CiAgICAgICAgbGV0IHJld2FyZCA9IGJhbGFuY2UKICAgICAgICAgICAgLmNoZWNrZWRfbXVsKHJld2FyZF9wZXJfdG9rZW4uY2hlY2tlZF9zdWIocGFpZCkudW53cmFwKCkpCiAgICAgICAgICAgIC51bndyYXAoKQogICAgICAgICAgICAuY2hlY2tlZF9kaXYoUkVXQVJEX1BSRUNJU0lPTikKICAgICAgICAgICAgLnVud3JhcCgpOwogICAgICAgIHNlbGYucmV3YXJkcyhlbnYsIGFjY291bnQpLmNoZWNrZWRfYWRkKHJld2FyZCkudW53cmFwKCkKICAgIH0KfQoKI1tjb250cmFjdGltcGxdCmltcGwgU3Rha2luZ1Bvb2xDb250cmFjdCB7CiAgICBwdWIgZm4gaW5pdGlhbGl6ZSgKICAgICAgICBlbnY6IEVudiwKICAgICAgICBvd25lcjogQWRkcmVzcywKICAgICAgICBzdGFraW5nX3Rva2VuOiBBZGRyZXNzLAogICAgICAgIHJld2FyZF90b2tlbjogQWRkcmVzcywKICAgICAgICByZXdhcmRfcmF0ZTogaTEyOCwKICAgICkgewogICAgICAgIGlmIGVudi5zdG9yYWdlKCkuaW5zdGFuY2UoKS5oYXMoJkRhdGFLZXk6Ok93bmVyKSB7CiAgICAgICAgICAgIHBhbmljISgiYWxyZWFkeSBpbml0aWFsaXplZCIpOwogICAgICAgIH0KICAgICAgICBhc3NlcnQhKHJld2FyZF9yYXRlID49IDAsICJyZXdhcmQgcmF0ZSBtdXN0IGJlIG5vbi1uZWdhdGl2ZSIpOwogICAgICAgIGVudi5zdG9yYWdlKCkuaW5zdGFuY2UoKS5zZXQoJkRhdGFLZXk6Ok93bmVyLCAmb3duZXIpOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6U3Rha2luZ1Rva2VuLCAmc3Rha2luZ190b2tlbik7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpSZXdhcmRUb2tlbiwgJnJld2FyZF90b2tlbik7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpSZXdhcmRSYXRlLCAmcmV3YXJkX3JhdGUpOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6TGFzdFVwZGF0ZVRpbWUsICZlbnYubGVkZ2VyKCkudGltZXN0YW1wKCkpOwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6UmV3YXJkUGVyVG9rZW5TdG9yZWQsICZgaTEyOCk7CiAgICAgICAgZW52LnN0b3JhZ2UoKS5pbnN0YW5jZSgpLnNldCgmRGF0YUtleTo6VG90YWxTdXBwbHksICZgaTEyOCk7CiAgICB9CgogICAgcHViIGZuIHN0YWtlKGVudjogRW52LCBzdGFrZXI6IEFkZHJlc3MsIGFtb3VudDogaTEyOCkgewogICAgICAgIGFzc2VydCEoYW1vdW50ID4gMCwgInN0YWtlIGFtb3VudCBtdXN0IGJlIHBvc2l0aXZlIik7CiAgICAgICAgbGV0IHRoaXMgPSBTdGFraW5nUG9vbENvbnRyYWN0OwogICAgICAgIHRoaXMudXBkYXRlX3Jld2FyZCgmZW52LCAmc3Rha2VyKTsKCiAgICAgICAgbGV0IGNvbnRyYWN0ID0gZW52LmN1cnJlbnRfY29udHJhY3RfYWRkcmVzcygpOwogICAgICAgIHRva2VuOjpDbGllbnQ6Om5ldygmZW52LCAmdGhpcy5zdGFraW5nX3Rva2VuKCZlbnYpKS50cmFuc2Zlcigmc3Rha2VyLCAmY29udHJhY3QsICZhbW91bnQpOwoKICAgICAgICBsZXQgbmV3X2JhbGFuY2UgPSB0aGlzLmJhbGFuY2Vfb2ZfaW50ZXJuYWwoJmVudiwgJnN0YWtlcikgKyBhbW91bnQ7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpCYWxhbmNlKHN0YWtlci5jbG9uZSgpKSwgJm5ld19iYWxhbmNlKTsKICAgICAgICBlbnYuc3RvcmFnZSgpCiAgICAgICAgICAgIC5pbnN0YW5jZSgpCiAgICAgICAgICAgIC5zZXQoJkRhdGFLZXk6OlRvdGFsU3VwcGx5LCAmKHRoaXMudG90YWxfc3VwcGx5KCZlbnYpICsgYW1vdW50KSk7CiAgICB9CgogICAgcHViIGZuIHVuc3Rha2UoZW52OiBFbnYsIHN0YWtlcjogQWRkcmVzcywgYW1vdW50OiBpMTI4KSB7CiAgICAgICAgYXNzZXJ0IShhbW91bnQgPiAwLCAidW5zdGFrZSBhbW91bnQgbXVzdCBiZSBwb3NpdGl2ZSIpOwogICAgICAgIGxldCB0aGlzID0gU3Rha2luZ1Bvb2xDb250cmFjdDsKICAgICAgICBsZXQgYmFsYW5jZSA9IHRoaXMuYmFsYW5jZV9vZl9pbnRlcm5hbCgmZW52LCAmc3Rha2VyKTsKICAgICAgICBhc3NlcnQhKGJhbGFuY2UgPj0gYW1vdW50LCAiaW5zdWZmaWNpZW50IHN0YWtlZCBiYWxhbmNlIik7CgogICAgICAgIHRoaXMudXBkYXRlX3Jld2FyZCgmZW52LCAmc3Rha2VyKTsKICAgICAgICBsZXQgbmV3X2JhbGFuY2UgPSBiYWxhbmNlIC0gYW1vdW50OwogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6QmFsYW5jZShzdGFrZXIuY2xvbmUoKSksICZuZXdfYmFsYW5jZSk7CiAgICAgICAgZW52LnN0b3JhZ2UoKQogICAgICAgICAgICAuaW5zdGFuY2UoKQogICAgICAgICAgICAuc2V0KCZEYXRhS2V5OjpUb3RhbFN1cHBseSwgJih0aGlzLnRvdGFsX3N1cHBseSgmZW52KSAtIGFtb3VudCkpOwoKICAgICAgICBsZXQgY29udHJhY3QgPSBlbnYuY3VycmVudF9jb250cmFjdF9hZGRyZXNzKCk7CiAgICAgICAgdG9rZW46OkNsaWVudDo6bmV3KCZlbnYsICZ0aGlzLnN0YWtpbmdfdG9rZW4oJmVudikpLnRyYW5zZmVyKCZjb250cmFjdCwgJnN0YWtlciwgJmFtb3VudCk7CiAgICB9CgogICAgcHViIGZuIGNsYWltX3Jld2FyZHMoZW52OiBFbnYsIHN0YWtlcjogQWRkcmVzcykgewogICAgICAgIGxldCB0aGlzID0gU3Rha2luZ1Bvb2xDb250cmFjdDsKICAgICAgICB0aGlzLnVwZGF0ZV9yZXdhcmQoJmVudiwgJnN0YWtlcik7CiAgICAgICAgbGV0IHJld2FyZCA9IHRoaXMucmV3YXJkcygmZW52LCAmc3Rha2VyKTsKICAgICAgICBhc3NlcnQhKHJld2FyZCA+IDAsICJubyByZXdhcmRzIHRvIGNsYWltIik7CgogICAgICAgIGVudi5zdG9yYWdlKCkKICAgICAgICAgICAgLmluc3RhbmNlKCkKICAgICAgICAgICAgLnNldCgmRGF0YUtleTo6UmV3YXJkcyhzdGFrZXIuY2xvbmUoKSksICZgaTEyOCk7CiAgICAgICAgbGV0IGNvbnRyYWN0ID0gZW52LmN1cnJlbnRfY29udHJhY3RfYWRkcmVzcygpOwogICAgICAgIHRva2VuOjpDbGllbnQ6Om5ldygmZW52LCAmdGhpcy5yZXdhcmRfdG9rZW4oJmVudikpLnRyYW5zZmVyKCZjb250cmFjdCwgJnN0YWtlciwgJnJld2FyZCk7CiAgICB9CgogICAgcHViIGZuIGVhcm5lZChlbnY6IEVudiwgc3Rha2VyOiBBZGRyZXNzKSAtPiBpMTI4IHsKICAgICAgICBsZXQgdGhpcyA9IFN0YWtpbmdQb29sQ29udHJhY3Q7CiAgICAgICAgbGV0IHJld2FyZF9wZXJfdG9rZW4gPSB0aGlzLnJld2FyZF9wZXJfdG9rZW5faW50ZXJuYWwoJmVudik7CiAgICAgICAgdGhpcy5lYXJuZWRfYXQoJmVudiwgJnN0YWtlciwgcmV3YXJkX3Blcl90b2tlbikKICAgIH0KCiAgICBwdWIgZm4gYmFsYW5jZV9vZihlbnY6IEVudiwgc3Rha2VyOiBBZGRyZXNzKSAtPiBpMTI4IHsKICAgICAgICBsZXQgdGhpcyA9IFN0YWtpbmdQb29sQ29udHJhY3Q7CiAgICAgICAgdGhpcy5iYWxhbmNlX29mX2ludGVybmFsKCZlbnYsICZzdGFrZXIpCiAgICB9CgogICAgcHViIGZuIHJld2FyZF9wZXJfdG9rZW4oZW52OiBFbnYpIC0+IGkxMjggewogICAgICAgIGxldCB0aGlzID0gU3Rha2luZ1Bvb2xDb250cmFjdDsKICAgICAgICB0aGlzLnJld2FyZF9wZXJfdG9rZW5faW50ZXJuYWwoJmVudikKICAgIH0KfQo=
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
+
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
+
+const REWARD_PRECISION: i128 = 1_000_000_000_000_000_000;
+
+#[contract]
+pub struct StakingPoolContract;
+
+#[contracttype]
+pub enum DataKey {
+    Owner,
+    StakingToken,
+    RewardToken,
+    RewardRate,
+    LastUpdateTime,
+    RewardPerTokenStored,
+    TotalSupply,
+    Balance(Address),
+    UserRewardPerTokenPaid(Address),
+    Rewards(Address),
+}
+
+impl StakingPoolContract {
+    /*
+    fn require_owner(&self, env: &Env) {
+        let owner: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Owner)
+            .expect("not initialized");
+        owner.require_auth();
+    }
+    */
+
+    fn staking_token(&self, env: &Env) -> Address {
+        env.storage()
+            .instance()
+            .get(&DataKey::StakingToken)
+            .expect("staking token missing")
+    }
+
+    fn reward_token(&self, env: &Env) -> Address {
+        env.storage()
+            .instance()
+            .get(&DataKey::RewardToken)
+            .expect("reward token missing")
+    }
+
+    fn reward_rate(&self, env: &Env) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::RewardRate)
+            .unwrap_or(0i128)
+    }
+
+    fn last_update_time(&self, env: &Env) -> u64 {
+        env.storage()
+            .instance()
+            .get(&DataKey::LastUpdateTime)
+            .unwrap_or(env.ledger().timestamp())
+    }
+
+    fn reward_per_token_stored(&self, env: &Env) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::RewardPerTokenStored)
+            .unwrap_or(0i128)
+    }
+
+    fn total_supply(&self, env: &Env) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::TotalSupply)
+            .unwrap_or(0i128)
+    }
+
+    fn balance_of_internal(&self, env: &Env, account: &Address) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::Balance(account.clone()))
+            .unwrap_or(0i128)
+    }
+
+    fn user_reward_per_token_paid(&self, env: &Env, account: &Address) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::UserRewardPerTokenPaid(account.clone()))
+            .unwrap_or(0i128)
+    }
+
+    fn rewards(&self, env: &Env, account: &Address) -> i128 {
+        env.storage()
+            .instance()
+            .get(&DataKey::Rewards(account.clone()))
+            .unwrap_or(0i128)
+    }
+
+    fn update_reward(&self, env: &Env, account: &Address) {
+        let reward_per_token = self.reward_per_token_internal(env);
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardPerTokenStored, &reward_per_token);
+        env.storage()
+            .instance()
+            .set(&DataKey::LastUpdateTime, &env.ledger().timestamp());
+
+        let earned = self.earned_at(env, account, reward_per_token);
+        env.storage()
+            .instance()
+            .set(&DataKey::Rewards(account.clone()), &earned);
+        env.storage().instance().set(
+            &DataKey::UserRewardPerTokenPaid(account.clone()),
+            &reward_per_token,
+        );
+    }
+
+    fn reward_per_token_internal(&self, env: &Env) -> i128 {
+        let total_supply = self.total_supply(env);
+        if total_supply == 0 {
+            return self.reward_per_token_stored(env);
+        }
+        let last_time = self.last_update_time(env);
+        let now = env.ledger().timestamp();
+        let elapsed = now.saturating_sub(last_time) as i128;
+        let accumulated = elapsed
+            .checked_mul(self.reward_rate(env))
+            .unwrap()
+            .checked_mul(REWARD_PRECISION)
+            .unwrap()
+            .checked_div(total_supply)
+            .unwrap();
+        self.reward_per_token_stored(env)
+            .checked_add(accumulated)
+            .unwrap()
+    }
+
+    fn earned_at(&self, env: &Env, account: &Address, reward_per_token: i128) -> i128 {
+        let balance = self.balance_of_internal(env, account);
+        let paid = self.user_reward_per_token_paid(env, account);
+        let reward = balance
+            .checked_mul(reward_per_token.checked_sub(paid).unwrap())
+            .unwrap()
+            .checked_div(REWARD_PRECISION)
+            .unwrap();
+        self.rewards(env, account).checked_add(reward).unwrap()
+    }
+}
+
+#[contractimpl]
+impl StakingPoolContract {
+    pub fn initialize(
+        env: Env,
+        owner: Address,
+        staking_token: Address,
+        reward_token: Address,
+        reward_rate: i128,
+    ) {
+        if env.storage().instance().has(&DataKey::Owner) {
+            panic!("already initialized");
+        }
+        assert!(reward_rate >= 0, "reward rate must be non-negative");
+        env.storage().instance().set(&DataKey::Owner, &owner);
+        env.storage()
+            .instance()
+            .set(&DataKey::StakingToken, &staking_token);
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardToken, &reward_token);
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardRate, &reward_rate);
+        env.storage()
+            .instance()
+            .set(&DataKey::LastUpdateTime, &env.ledger().timestamp());
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardPerTokenStored, &0i128);
+        env.storage().instance().set(&DataKey::TotalSupply, &0i128);
+    }
+
+    pub fn stake(env: Env, staker: Address, amount: i128) {
+        assert!(amount > 0, "stake amount must be positive");
+        let this = StakingPoolContract;
+        this.update_reward(&env, &staker);
+
+        let contract = env.current_contract_address();
+        token::Client::new(&env, &this.staking_token(&env)).transfer(&staker, &contract, &amount);
+
+        let new_balance = this.balance_of_internal(&env, &staker) + amount;
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(staker.clone()), &new_balance);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSupply, &(this.total_supply(&env) + amount));
+    }
+
+    pub fn unstake(env: Env, staker: Address, amount: i128) {
+        assert!(amount > 0, "unstake amount must be positive");
+        let this = StakingPoolContract;
+        let balance = this.balance_of_internal(&env, &staker);
+        assert!(balance >= amount, "insufficient staked balance");
+
+        this.update_reward(&env, &staker);
+        let new_balance = balance - amount;
+        env.storage()
+            .instance()
+            .set(&DataKey::Balance(staker.clone()), &new_balance);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSupply, &(this.total_supply(&env) - amount));
+
+        let contract = env.current_contract_address();
+        token::Client::new(&env, &this.staking_token(&env)).transfer(&contract, &staker, &amount);
+    }
+
+    pub fn claim_rewards(env: Env, staker: Address) {
+        let this = StakingPoolContract;
+        this.update_reward(&env, &staker);
+        let reward = this.rewards(&env, &staker);
+        assert!(reward > 0, "no rewards to claim");
+
+        env.storage()
+            .instance()
+            .set(&DataKey::Rewards(staker.clone()), &0i128);
+        let contract = env.current_contract_address();
+        token::Client::new(&env, &this.reward_token(&env)).transfer(&contract, &staker, &reward);
+    }
+
+    pub fn earned(env: Env, staker: Address) -> i128 {
+        let this = StakingPoolContract;
+        let reward_per_token = this.reward_per_token_internal(&env);
+        this.earned_at(&env, &staker, reward_per_token)
+    }
+
+    pub fn balance_of(env: Env, staker: Address) -> i128 {
+        let this = StakingPoolContract;
+        this.balance_of_internal(&env, &staker)
+    }
+
+    pub fn reward_per_token(env: Env) -> i128 {
+        let this = StakingPoolContract;
+        this.reward_per_token_internal(&env)
+    }
+}

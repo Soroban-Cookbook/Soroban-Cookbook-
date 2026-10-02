@@ -2,8 +2,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol,
-    Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String,
+    Symbol, Vec,
 };
 
 #[contracttype]
@@ -141,10 +141,9 @@ impl CustomToken {
             return Err(TokenError::InvalidAmount);
         }
 
-        env.storage().persistent().set(
-            &DataKey::Allowance(owner.clone(), spender.clone()),
-            &amount,
-        );
+        env.storage()
+            .persistent()
+            .set(&DataKey::Allowance(owner.clone(), spender.clone()), &amount);
 
         publish_approval(&env, owner, spender, amount);
         Ok(())
@@ -413,7 +412,12 @@ fn ensure_initialized(env: &Env) -> Result<(), TokenError> {
 }
 
 fn ensure_not_paused(env: &Env) -> Result<(), TokenError> {
-    if env.storage().instance().get(&DataKey::Paused).unwrap_or(false) {
+    if env
+        .storage()
+        .instance()
+        .get(&DataKey::Paused)
+        .unwrap_or(false)
+    {
         Err(TokenError::Paused)
     } else {
         Ok(())

@@ -281,4 +281,3 @@ impl FarmingPoolContract {
 
 #[cfg(test)]
 mod test;
-

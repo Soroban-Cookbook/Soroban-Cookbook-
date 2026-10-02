@@ -56,10 +56,8 @@ impl ProxyContract {
         env.storage().persistent().set(&BEACON_KEY, &beacon);
 
         #[allow(deprecated)]
-        env.events().publish(
-            (symbol_short!("proxy"), symbol_short!("init")),
-            beacon,
-        );
+        env.events()
+            .publish((symbol_short!("proxy"), symbol_short!("init")), beacon);
     }
 
     // -----------------------------------------------------------------------
@@ -107,7 +105,11 @@ impl ProxyContract {
     /// This is a pure read — it calls the Beacon's `get_implementation` view function.
     pub fn get_implementation(env: Env) -> Address {
         let beacon = Self::resolve_beacon(&env);
-        env.invoke_contract(&beacon, &Symbol::new(&env, "get_implementation"), vec![&env])
+        env.invoke_contract(
+            &beacon,
+            &Symbol::new(&env, "get_implementation"),
+            vec![&env],
+        )
     }
 
     // -----------------------------------------------------------------------

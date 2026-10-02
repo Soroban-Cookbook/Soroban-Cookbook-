@@ -14,7 +14,14 @@ fn setup_test() -> (Env, FarmingPoolContractClient<'static>, Address) {
     (env, client, admin)
 }
 
-fn create_token(env: &Env, admin: &Address) -> (Address, token::Client<'static>, token::StellarAssetClient<'static>) {
+fn create_token(
+    env: &Env,
+    admin: &Address,
+) -> (
+    Address,
+    token::Client<'static>,
+    token::StellarAssetClient<'static>,
+) {
     let id = env.register_stellar_asset_contract(admin.clone());
     let token = token::Client::new(env, &id);
     let admin_client = token::StellarAssetClient::new(env, &id);
@@ -23,7 +30,7 @@ fn create_token(env: &Env, admin: &Address) -> (Address, token::Client<'static>,
 
 #[test]
 fn test_initialize() {
-    let (_env, client, admin) = setup_test();
+    let (_env, _client, _admin) = setup_test();
     // Verification is implicit in setup_test as it calls initialize
 }
 
@@ -65,12 +72,12 @@ fn test_reward_logic() {
     assert_eq!(staking_token.balance(&client.address), 500);
 
     // Advance ledger
-    env.ledger().with_mut(|li| li.sequence += 10);
+    env.ledger().with_mut(|li| li.sequence_number += 10);
 
     // Withdraw and check rewards
     // 10 ledgers * 100 reward_rate = 1000 rewards
     client.withdraw(&user, &pool_id, &500);
-    
+
     assert_eq!(staking_token.balance(&user), 1000);
     assert_eq!(reward_token.balance(&user), 1000);
 }

@@ -4,6 +4,10 @@
 //! Fuzz deposit → claim on the advanced claimable-balance example.
 //! Asserts token/storage invariants after each step.
 
+use fuzz_testing::{
+    ClaimableBalance, ClaimableBalanceContract, ClaimableBalanceContractClient, DataKey, TimeBound,
+    TimeBoundKind,
+};
 use libfuzzer_sys::fuzz_target;
 use soroban_sdk::testutils::{
     arbitrary::{arbitrary, Arbitrary},
@@ -12,10 +16,6 @@ use soroban_sdk::testutils::{
 use soroban_sdk::token::Client as TokenClient;
 use soroban_sdk::token::StellarAssetClient as TokenAdminClient;
 use soroban_sdk::{vec, Address, Env};
-use fuzz_testing::{
-    ClaimableBalance, ClaimableBalanceContract, ClaimableBalanceContractClient, DataKey,
-    TimeBound, TimeBoundKind,
-};
 
 #[derive(Arbitrary, Debug)]
 struct Input {
@@ -62,12 +62,7 @@ fuzz_target!(|input: Input| {
     assert_invariants(&env, &contract_id, &token_client, &input);
 });
 
-fn assert_invariants(
-    env: &Env,
-    contract_id: &Address,
-    token_client: &TokenClient,
-    input: &Input,
-) {
+fn assert_invariants(env: &Env, contract_id: &Address, token_client: &TokenClient, input: &Input) {
     env.as_contract(contract_id, || {
         let storage = env.storage().persistent();
         let is_init = storage.has(&DataKey::Init);
