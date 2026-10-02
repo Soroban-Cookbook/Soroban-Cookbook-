@@ -141,7 +141,6 @@ members = [
     "examples/governance/01-simple-voting",
     "examples/governance/02-token-voting",
     "examples/governance/06-timelock-governance",
-    "examples/governance/07-automatic-snapshot-triggers",
     "examples/governance/01-delegation-marketplace",
     "examples/governance/01-proposal-validation",
     "examples/nfts/01-basic-nft",
