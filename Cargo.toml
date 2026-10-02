@@ -162,6 +162,7 @@ members = [
     "examples/advanced/12-real-world-case-studies",
     "examples/advanced/13-virtual-channel",
     "examples/advanced/14-bridge-monitor",
+    "examples/advanced/15-reentrancy-guard",
     "examples/advanced/14-bridge-validators",
     "examples/defi/07-staking-pool",
     "examples/defi/10-swap-liquidity",
