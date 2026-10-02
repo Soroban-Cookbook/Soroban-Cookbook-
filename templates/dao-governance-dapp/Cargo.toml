@@ -4,6 +4,13 @@ members = [
     "contracts/governance",
 ]
 
+# This template is built as a standalone workspace with the same SDK pin as the
+# root cookbook workspace. It is intentionally not a member of the root workspace
+# because it ships its own release/test profiles and is used as a standalone
+# template by learners. Build it with:
+#   cd templates/dao-governance-dapp && cargo check --workspace
+# To keep the SDK pin in sync with the cookbook, update the version below.
+
 [workspace.package]
 version = "0.1.0"
 edition = "2021"
