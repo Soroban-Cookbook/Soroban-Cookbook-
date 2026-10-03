@@ -9,6 +9,6 @@ This example demonstrates how to optimize multiple cross-contract updates by bat
 ## Run tests
 
 ```bash
-cd examples/advanced/03-cross-contract-optimization
+cd examples/advanced/25-cross-contract-optimization
 cargo test
 ```

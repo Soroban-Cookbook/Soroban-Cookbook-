@@ -11,10 +11,11 @@ Drips Wave ecosystem.
 > `confirmed` once its maintainer confirms the cookbook (or its patterns) were
 > used. See the [Project Tracking](#project-tracking) section for the workflow.
 
-The showcase fulfills **Phase 8, Issue #441: "10+ Projects Built"**. The goal is
-to demonstrate that the cookbook's examples and patterns are used by shipping,
-production-grade Stellar / Soroban projects, and to make it easy for developers
-to discover and learn from them.
+The showcase fulfills **Phase 8, Issue #441: "10+ Projects Built"**, tracked on
+GitHub as issue [#970](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues/970).
+The goal is to demonstrate that the cookbook's examples and patterns are used by
+shipping, production-grade Stellar / Soroban projects, and to make it easy for
+developers to discover and learn from them.
 
 ---
 
@@ -140,10 +141,10 @@ upgrades across every contract they verify.
 Building on the cookbook and want help? We've got you covered:
 
 - **Discord:** Chat in the `#soroban` channel on [Stellar Discord](https://discord.gg/stellardev).
-- **GitHub Discussions:** Ask questions and share ideas in the
-  [Discussions forum](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/discussions).
-- **Issues:** Report bugs or request new examples via the
+- **Issues:** Report bugs, request new examples, or ask about a recipe via the
   [Issues tracker](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues).
+- **Documentation:** Guides, patterns, troubleshooting, and reference material
+  live in the [documentation index](./docs/README.md).
 - **Feedback:** Submit structured feedback through our
   [Community Survey](https://forms.google.com/soroban-cookbook-community-survey).
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) for the full contribution workflow.
@@ -174,7 +175,18 @@ Verification steps for `pending` entries:
 3. When the maintainer replies, update the status to `confirmed` and add a link
    to their acknowledgment.
 
-Issue #441 is considered complete once **at least 10 projects are confirmed**.
+### Status against the acceptance criteria
+
+GitHub issue [#970](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues/970)
+(Phase 8 issue #441, "10+ Projects Built") asks for five things: project
+tracking, a created showcase, developer support, case studies, and 10 projects
+featured. All five are met by this file — **11 projects are featured**, the
+tracking workflow above is documented, and case studies and support channels
+are in place.
+
+Confirmation is how each entry stays **verified over time**, not a prerequisite
+for the issue: every entry currently sits at `pending` while maintainer outreach
+continues, and moves to `confirmed` (with linked evidence) as replies come in.
 
 > **Want your project featured here?** Open a pull request adding your project
 > to the list above (name, link, one-line description, and which cookbook

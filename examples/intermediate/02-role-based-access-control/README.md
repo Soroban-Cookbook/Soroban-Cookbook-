@@ -1,6 +1,6 @@
 # Role-Based Access Control
 
-> **Note:** For learning RBAC patterns, start with [**03-rbac-modifiers**](../../advanced/03-rbac-modifiers/) — the canonical RBAC example with composable guards and flexible symbol-based roles. This example demonstrates a **simpler numeric hierarchy** approach.
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../../advanced/32-rbac-modifiers/) — the canonical RBAC example with composable guards and flexible symbol-based roles. This example demonstrates a **simpler numeric hierarchy** approach.
 
 This intermediate example demonstrates RBAC with a **strict numeric role hierarchy** for Soroban smart contracts.
 
@@ -34,7 +34,7 @@ This example differs from the canonical RBAC pattern by using a **numeric role h
 
 ## Related Examples
 
-- **[03-rbac-modifiers](../../advanced/03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible symbol-based roles
+- **[32-rbac-modifiers](../../advanced/32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible symbol-based roles
 - [access-control](../access-control/) — Combined RBAC + Multisig + Timelock pattern
-- [05-hierarchical-access-control](../../advanced/05-hierarchical-access-control/) — RBAC with dynamic permission inheritance
+- [16-hierarchical-access-control](../../advanced/16-hierarchical-access-control/) — RBAC with dynamic permission inheritance
 - [03-authentication](../../basics/03-authentication/) — Single-party auth basics

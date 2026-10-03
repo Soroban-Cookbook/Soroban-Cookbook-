@@ -1,6 +1,6 @@
 # Access Control Guide
 
-> **Note:** For learning RBAC patterns, start with [**03-rbac-modifiers**](../../advanced/03-rbac-modifiers/) — the canonical RBAC example. This example demonstrates how to **combine RBAC + Multisig + Timelock** in a single contract for comprehensive governance.
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../../advanced/32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates how to **combine RBAC + Multisig + Timelock** in a single contract for comprehensive governance.
 
 This intermediate example demonstrates a complete access control system combining **Role-Based Access Control (RBAC)**, **Multi-Signature (Multisig)** approval workflows, and **Timelock** delays in a single Soroban smart contract.
 
@@ -138,8 +138,8 @@ cargo build --target wasm32v1-none --release -p access-control
 
 ## Related Examples
 
-- **[03-rbac-modifiers](../../advanced/03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards (use this as foundation before adding multisig/timelock)
+- **[32-rbac-modifiers](../../advanced/32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards (use this as foundation before adding multisig/timelock)
 - [`02-role-based-access-control`](../02-role-based-access-control/) — Basic RBAC with numeric hierarchy
 - [`multi-sig-patterns`](../multi-sig-patterns/) — Multi-party authorization patterns
 - [`02-timelock`](../../advanced/02-timelock/) — Time-delayed execution patterns
-- [05-hierarchical-access-control](../../advanced/05-hierarchical-access-control/) — RBAC with dynamic permissions
+- [16-hierarchical-access-control](../../advanced/16-hierarchical-access-control/) — RBAC with dynamic permissions

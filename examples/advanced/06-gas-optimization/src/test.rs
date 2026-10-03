@@ -2,10 +2,14 @@
 #[cfg(test)]
 mod tests {
     use crate::*;
-    use soroban_sdk::{Address, Env, Vec};
+    use soroban_sdk::{
+        testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation},
+        Address, Env, IntoVal, Symbol, Vec,
+    };
 
     fn setup() -> (Env, GasOptimizationContractClient<'static>, Address) {
         let env = Env::default();
+        env.mock_all_auths();
         let contract_id = env.register(GasOptimizationContract, ());
         let client = GasOptimizationContractClient::new(&env, &contract_id);
         let admin = Address::generate(&env);
@@ -16,7 +20,7 @@ mod tests {
 
     #[test]
     fn test_optimization_1_instance_storage_initialization() {
-        let (env, client, admin) = setup();
+        let (_env, client, admin) = setup();
 
         // Optimization 1: instance storage used for config
         let result = client.try_initialize(&admin, &100u32);
@@ -41,7 +45,6 @@ mod tests {
         client.batch_mint(&recipients);
 
         // Optimization 2: transfer uses a single cached config read
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_ok());
     }
@@ -113,7 +116,6 @@ mod tests {
         assert_eq!(balance, 5000);
 
         // Transfer with minimal storage reads
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_ok());
 
@@ -140,7 +142,6 @@ mod tests {
         client.batch_mint(&recipients);
 
         // Transfer should succeed (contract not paused by default)
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_ok());
     }
@@ -158,7 +159,6 @@ mod tests {
         client.batch_mint(&recipients);
 
         // Optimization 8: checked arithmetic prevents overflow / underflow
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &2000i128);
         assert!(result.is_err());
     }
@@ -173,7 +173,6 @@ mod tests {
         client.pause();
 
         // Optimization 9: paused check short-circuits before any balance I/O
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_err());
     }
@@ -187,7 +186,6 @@ mod tests {
         client.initialize(&admin, &100u32);
 
         // Optimization 10: typed errors give callers precise failure information
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &0i128);
         assert!(result.is_err());
     }
@@ -228,7 +226,6 @@ mod tests {
         recipients.push_back((user1.clone(), 5000i128));
         client.batch_mint(&recipients);
 
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_ok());
 
@@ -249,7 +246,6 @@ mod tests {
         recipients.push_back((user1.clone(), 10000i128));
         client.batch_mint(&recipients);
 
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_ok());
 
@@ -269,8 +265,6 @@ mod tests {
         let mut recipients = Vec::new(&env);
         recipients.push_back((user1.clone(), 1000i128));
         client.batch_mint(&recipients);
-
-        env.mock_all_auths();
 
         // Works before pause
         assert!(client.try_transfer(&user1, &user2, &100i128).is_ok());
@@ -300,7 +294,6 @@ mod tests {
 
         client.set_emergency(&true);
 
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &100i128);
         assert!(result.is_err());
     }
@@ -360,7 +353,6 @@ mod tests {
 
         client.initialize(&admin, &0u32);
 
-        env.mock_all_auths();
         let result = client.try_transfer(&user1, &user2, &1000i128);
         assert!(result.is_err());
     }
@@ -373,7 +365,6 @@ mod tests {
 
         client.initialize(&admin, &0u32);
 
-        env.mock_all_auths();
         // Zero amount is invalid
         let result = client.try_transfer(&user1, &user2, &0i128);
         assert!(result.is_err());
@@ -416,5 +407,111 @@ mod tests {
         assert!(client.try_pause().is_ok());
         assert!(client.try_unpause().is_ok());
         assert!(client.try_set_emergency(&false).is_ok());
+    }
+
+    // ============== Authorization Tests ==============
+
+    /// Asserts that the last invocation required exactly `signer`'s auth for
+    /// `function` on the contract, so a dropped `require_auth` fails loudly.
+    fn assert_auth(
+        env: &Env,
+        client: &GasOptimizationContractClient,
+        signer: &Address,
+        function: &str,
+        args: soroban_sdk::Vec<soroban_sdk::Val>,
+    ) {
+        assert_eq!(
+            env.auths(),
+            std::vec![(
+                signer.clone(),
+                AuthorizedInvocation {
+                    function: AuthorizedFunction::Contract((
+                        client.address.clone(),
+                        Symbol::new(env, function),
+                        args,
+                    )),
+                    sub_invocations: std::vec![],
+                }
+            )]
+        );
+    }
+
+    #[test]
+    fn test_transfer_requires_sender_auth() {
+        let (env, client, admin) = setup();
+        let user1 = Address::generate(&env);
+        let user2 = Address::generate(&env);
+
+        client.initialize(&admin, &0u32);
+        let mut recipients = Vec::new(&env);
+        recipients.push_back((user1.clone(), 1000i128));
+        client.batch_mint(&recipients);
+
+        client.transfer(&user1, &user2, &100i128);
+        assert_auth(
+            &env,
+            &client,
+            &user1,
+            "transfer",
+            (user1.clone(), user2.clone(), 100i128).into_val(&env),
+        );
+    }
+
+    #[test]
+    fn test_admin_functions_require_admin_auth() {
+        let (env, client, admin) = setup();
+        client.initialize(&admin, &0u32);
+
+        let mut recipients = Vec::new(&env);
+        recipients.push_back((Address::generate(&env), 1000i128));
+        client.batch_mint(&recipients);
+        assert_auth(
+            &env,
+            &client,
+            &admin,
+            "batch_mint",
+            (recipients.clone(),).into_val(&env),
+        );
+
+        client.batch_burn(&recipients);
+        assert_auth(
+            &env,
+            &client,
+            &admin,
+            "batch_burn",
+            (recipients.clone(),).into_val(&env),
+        );
+
+        client.pause();
+        assert_auth(&env, &client, &admin, "pause", ().into_val(&env));
+
+        client.unpause();
+        assert_auth(&env, &client, &admin, "unpause", ().into_val(&env));
+
+        client.set_emergency(&true);
+        assert_auth(
+            &env,
+            &client,
+            &admin,
+            "set_emergency",
+            (true,).into_val(&env),
+        );
+    }
+
+    #[test]
+    fn test_admin_functions_reject_without_auth() {
+        let env = Env::default();
+        let client =
+            GasOptimizationContractClient::new(&env, &env.register(GasOptimizationContract, ()));
+        let admin = Address::generate(&env);
+        client.initialize(&admin, &0u32);
+
+        let mut recipients = Vec::new(&env);
+        recipients.push_back((Address::generate(&env), 1000i128));
+
+        assert!(client.try_batch_mint(&recipients).is_err());
+        assert!(client.try_pause().is_err());
+        assert!(client.try_set_emergency(&true).is_err());
+        assert_eq!(client.get_balance(&recipients.get(0).unwrap().0), 0);
     }
 }

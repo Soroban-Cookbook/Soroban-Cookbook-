@@ -325,10 +325,10 @@ if is_governor {
 6. **Validator Stakes**: Require validators to stake tokens for accountability
 
 ## Related Examples
-- `03-merkle-airdrop`: Basic Merkle proof verification
+- `28-merkle-airdrop`: Basic Merkle proof verification
 - `21-merkle-proofs`: Advanced proof techniques
 - `01-multi-party-auth`: Multi-signature patterns
-- `03-registry-access-controls`: Registry management
+- `33-registry-access-controls`: Registry management
 - `16-hierarchical-access-control`: Role-based permissions
 
 ## References

@@ -326,7 +326,13 @@ pub enum ConsumerDataKey {
 #[contractimpl]
 impl ConsumerContract {
     /// Initialize the consumer with the target Oracle contract.
-    pub fn initialize(env: Env, oracle: Address) {
+    ///
+    /// Authenticated: the `admin` must authorize. Without this gate an attacker
+    /// could front-run deployment by calling `initialize` first and pointing the
+    /// consumer at a malicious oracle, after which downstream settlement would
+    /// follow attacker-controlled prices (issue #1087).
+    pub fn initialize(env: Env, admin: Address, oracle: Address) {
+        admin.require_auth();
         if env.storage().instance().has(&ConsumerDataKey::Oracle) {
             panic!("already initialized");
         }

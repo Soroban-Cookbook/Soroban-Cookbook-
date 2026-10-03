@@ -13,7 +13,7 @@ This is the **third step** in the [oracle patterns learning path](../README.md#o
 
 **Prerequisites:**
 - Start with [`03-oracle-pattern`](../03-oracle-pattern/) for basic oracle mechanics
-- Then [`03-data-aggregation-oracle`](../03-data-aggregation-oracle/) for aggregation strategies
+- Then [`26-data-aggregation-oracle`](../26-data-aggregation-oracle/) for aggregation strategies
 
 **Next steps:**
 - **[`06-price-oracle`](../06-price-oracle/)** — Price oracle specifics

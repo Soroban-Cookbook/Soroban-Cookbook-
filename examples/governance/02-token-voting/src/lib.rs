@@ -511,11 +511,11 @@ impl TokenVotingContract {
             .ok_or(VotingError::ProposalNotFound)?;
 
         let current_state = Self::resolve_proposal_state(&env, &proposal);
+        if current_state == ProposalState::Expired {
+            return Err(VotingError::ExecutionEnded);
+        }
         if current_state != ProposalState::Passed {
             return Err(VotingError::InvalidState);
-        }
-        if env.ledger().sequence() > proposal.execution_end_ledger {
-            return Err(VotingError::ExecutionEnded);
         }
 
         env.invoke_contract::<()>(&proposal.target_contract, &proposal.action, proposal.action_args.clone());
@@ -713,3 +713,6 @@ impl TokenVotingContract {
         proposal.votes_yes + proposal.votes_no >= min_quorum
     }
 }
+
+#[cfg(test)]
+mod test;

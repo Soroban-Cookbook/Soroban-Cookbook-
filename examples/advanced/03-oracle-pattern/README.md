@@ -12,7 +12,7 @@ This is the **foundation example** in the [oracle patterns learning path](../REA
 - Basic consumer interactions
 
 After learning this foundation, proceed to:
-- **[`03-data-aggregation-oracle`](../03-data-aggregation-oracle/)** — Aggregate multiple data sources
+- **[`26-data-aggregation-oracle`](../26-data-aggregation-oracle/)** — Aggregate multiple data sources
 - **[`04-oracle-integration`](../04-oracle-integration/)** — Integration patterns for consumers
 - **[`06-price-oracle`](../06-price-oracle/)** — Price oracle specifics
 - **[`12-oracle-consumer`](../12-oracle-consumer/)** — Safe consumption patterns

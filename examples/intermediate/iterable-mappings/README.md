@@ -1,10 +1,27 @@
 # Iterable Mapping Utilities
 
+**An advanced companion to the canonical iterable map example** — the same enumerable key-value pattern extended with collection utilities for **filtering**, **mapping**, and **reducing**.
+
+> **Not the learning entry point.** Start with [`iterable-mapping`](../iterable-mapping/), the canonical iterable map example used by the Soroban Cookbook. Come back here once you understand the side-list key index and page-bounded iteration.
+
 This example demonstrates how to maintain an enumerable key-value collection on Soroban and manipulate it safely using collection utilities for **filtering**, **mapping**, and **reducing**.
 
 The contract maintains:
 - a `Map<Symbol, u32>` for $O(1)$ key lookups, and
 - a separate `Vec<Symbol>` index for ordered, page-bounded key iteration.
+
+## How It Differs from the Canonical Example
+
+| | [`iterable-mapping`](../iterable-mapping/) (canonical) | This example |
+|---|---|---|
+| Page indexing | Zero-indexed (`page * page_size`) | One-indexed (`(page - 1) * page_size`) |
+| Page-size cap | `MAX_PAGE_SIZE = 100` | None |
+| Storage layout | One instance-storage entry per key, plus a `Vec<Symbol>` index | A single `Map<Symbol, u32>`, plus a `Vec<Symbol>` index |
+| Extra reads | `contains(key)`, `entries(page, page_size)` | `is_empty()` |
+| `remove(key)` | Returns `bool` (whether the key existed) | Returns `()` |
+| Collection utilities | — | `filter_by_*`, `map_values_*`, `reduce_sum*`, and the generic helpers below |
+
+`set`, `get`, `len`, `keys(page, page_size)`, and `values(page, page_size)` share the same names and semantics in both. Page indices are **not** interchangeable between the two.
 
 ## Key Features & Helpers
 

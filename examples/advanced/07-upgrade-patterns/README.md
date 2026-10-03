@@ -11,7 +11,7 @@ This is step 6 of 6, following [Beacon Management](../06-beacon-management/).
 - **Out of scope:** proxy routing, shared-beacon deployment, and a complete
     governance system. For the sequence's starting point, see
     [Upgradeable Proxy](../04-upgradeable-proxy/); for timelocked admin controls,
-    see [Proxy Admin Controls](../03-proxy-admin/).
+    see [Proxy Admin Controls](../31-proxy-admin/).
 
 ## Role in Learning Path
 
@@ -26,8 +26,8 @@ This is the **final step** in the [upgrade patterns learning path](../README.md#
 
 **Prerequisites:** Understand all proxy and versioning patterns:
 - [`02-beacon-proxy`](../02-beacon-proxy/) — Basic beacon concept
-- [`03-beacon-proxy-factory`](../03-beacon-proxy-factory/) — Factory patterns
-- [`03-proxy-admin`](../03-proxy-admin/) — Governance patterns
+- [`23-beacon-proxy-factory`](../23-beacon-proxy-factory/) — Factory patterns
+- [`31-proxy-admin`](../31-proxy-admin/) — Governance patterns
 - [`04-upgradeable-proxy`](../04-upgradeable-proxy/) — Direct upgrade alternative
 - [`06-beacon-management`](../06-beacon-management/) — Versioned implementations
 

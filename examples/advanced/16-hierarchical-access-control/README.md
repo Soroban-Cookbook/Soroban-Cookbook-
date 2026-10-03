@@ -1,6 +1,6 @@
 # Hierarchical Access Control
 
-> **Note:** For learning RBAC patterns, start with [**03-rbac-modifiers**](../03-rbac-modifiers/) — the canonical RBAC example. This example demonstrates an **advanced hierarchical pattern** with role inheritance and dynamic permission management.
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates an **advanced hierarchical pattern** with role inheritance and dynamic permission management.
 
 This example demonstrates a hierarchical role-based access control (RBAC) system with dynamic permissions for Soroban smart contracts. It implements a multi-tier role architecture, fine-grained permission checks, and secure runtime updates.
 
@@ -155,8 +155,8 @@ soroban contract deploy \
 
 ## Related Examples
 
-- **[03-rbac-modifiers](../03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible roles (start here before adding hierarchy)
+- **[32-rbac-modifiers](../32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible roles (start here before adding hierarchy)
 - [02-role-based-access-control](../../intermediate/02-role-based-access-control/) — Simple RBAC with numeric hierarchy
 - [access-control](../../intermediate/access-control/) — Combined RBAC + Multisig + Timelock
-- [03-registry-access-controls](../03-registry-access-controls/) — Registry-specific access controls
+- [33-registry-access-controls](../33-registry-access-controls/) — Registry-specific access controls
 - [01-multi-party-auth](../01-multi-party-auth/) — N-of-N and M-of-N authorization patterns

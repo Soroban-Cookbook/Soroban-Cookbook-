@@ -21,7 +21,7 @@
 //!
 //! ## Relationship to other advanced examples
 //!
-//! - [`03-proxy-admin`]: adds a timelock + proposal workflow on top of the
+//! - [`31-proxy-admin`]: adds a timelock + proposal workflow on top of the
 //!   direct upgrade call shown here — use that when stakeholders need a review
 //!   window before a WASM swap lands.
 //! - [`04-upgradeable-proxy`]: shows the *delegation proxy* pattern (swapping

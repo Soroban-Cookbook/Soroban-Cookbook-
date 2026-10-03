@@ -52,7 +52,10 @@ maintainers per the contribution policy.
 - **Status:** Open
 - **Affects:** `examples/tokens/01-sep41-token`,
   `examples/tokens/09-optimized-token-ops`,
-  `examples/intermediate/03-priority-queue`
+  `examples/intermediate/03-priority-queue`,
+  `examples/defi/11-amm-price-oracle`
+  `examples/intermediate/03-priority-queue`  
+  ~~`examples/nfts/02-nft-metadata`~~ (fixed 2026-09-29)
 
 **Description.** Each listed example contains a `src/test.rs`, but its `lib.rs`
 declares neither `mod test;` nor an inline `#[cfg(test)]` module. The test file
@@ -68,6 +71,23 @@ four examples, while their sibling examples (e.g. `mint-burn`,
 
 **Suggested remediation.** Add `mod test;` to each `lib.rs` (and fix any
 compilation drift the now-compiled tests reveal). Left for the maintainers.
+
+**Resolved instances.** `examples/advanced/08-multicall` had the same gap
+(placeholder `lib.rs`/`test.rs`). It now ships a real contract whose `lib.rs`
+declares `#[cfg(test)] mod test;`, and `cargo test -p multicall` runs its suite.
+`examples/advanced/06-gas-optimization` had a complete `src/test.rs` that
+`lib.rs` never declared. Once wired, 16 of its 22 tests failed because admin
+calls ran before `mock_all_auths()`. The setup is fixed, and new tests now fail
+if any `require_auth` call is removed.
+`examples/advanced/08-payment-channels` had an unwired `src/test.rs`, and its
+`lib.rs` did not compile (it used soroban-sdk APIs that do not exist). The
+contract was restored with the same design, `#[cfg(test)] mod test;` was added,
+and `cargo test -p payment-channels` now runs 17 tests, including
+`require_auth` regression tests.
+`examples/advanced/08-computation-optimization` had no `lib.rs`, a garbled
+`src/test.rs`, and was not a workspace member. It now has a real contract
+wired with `#[cfg(test)] mod test;`, is listed in the workspace `members`, and
+`cargo test -p computation-optimization` runs its suite.
 
 ---
 
@@ -202,4 +222,10 @@ from the prep scan, to be confirmed or dismissed during the review:
 | --- | --- | --- |
 | 2026-06-02 | KI-1…KI-4 | Initial audit-prep baseline recorded. |
 | 2026-08-31 | KI-2, KI-5, KI-6 | Extended scope to `examples/tokens/`; added `09-optimized-token-ops` to KI-2; recorded missing READMEs (KI-5) and a stale category README (KI-6); added panic-path pointers for the newly in-scope examples. |
+| 2026-09-30 | KI-2 | Resolved the same wiring gap in `examples/advanced/08-multicall` (#1191): real contract, `#[cfg(test)] mod test;`, suite runs under `cargo test -p multicall`. |
+| 2026-09-30 | KI-2 | Resolved the wiring gap in `examples/advanced/06-gas-optimization` (#1190): `#[cfg(test)] mod test;`, fixed stale auth setup, added `require_auth` regression tests. |
+| 2026-09-30 | KI-2 | Resolved the wiring gap in `examples/advanced/08-payment-channels`: restored a compiling `lib.rs`, `#[cfg(test)] mod test;`, 17 tests including auth regressions. |
+| 2026-09-30 | KI-2 | Resolved the wiring gap in `examples/advanced/08-computation-optimization` (#1193): added `lib.rs`, rewrote `src/test.rs`, added the crate to workspace members. |
 | 2026-09-29 | KI-2 | Wired `mod test;` in `02-role-based-access-control` and `examples/basics/lazy-cache`; added `lazy-cache` to the workspace `members` (its README already documented `cargo test -p lazy_cache`). |
+| 2026-09-29 | KI-2 | Wired `mod test;` in `examples/defi/11-amm-price-oracle` and fixed missing imports in test.rs. |
+| 2026-09-29 | KI-2 | Wired `mod test;` in `examples/nfts/02-nft-metadata` to enable unit test execution. |

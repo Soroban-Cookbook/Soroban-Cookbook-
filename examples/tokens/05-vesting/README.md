@@ -37,6 +37,14 @@ If `current_time` is after `start_time + vesting_duration`, the vested amount is
 
 ## Usage
 
+> ⚠️ **UNAUdITED EXAMPLE — NOT FOR PRODUCTION USE**
+>
+> This example code is educational and has **not** been audited. Do **not** deploy it verbatim with real funds. Before any production deployment, obtain a formal security audit, review edge cases for your token and vesting logic, and perform your own validation.
+>
+> **Reentrancy:** `claim` performs a cross-contract `transfer` to the vested token after updating the `claimed_amount`. If the token is malicious or hook-bearing, it could call back into `claim` again. This example does **not** include an explicit reentrancy guard. In Soroban, reentrancy is limited to the same invocation stack (a callee cannot outlive the caller's frame), but shared-state re-entry within that frame must be protected against for production — for example, add a guard flag in storage set before the token call and cleared after, erroring on re-entry.
+>
+> **Storage TTL / Data Expiry:** Per-beneficiary `Schedule` entries are stored in **persistent** storage, which has a per-key TTL. Either explicitly extend TTL on every schedule write or run a periodic maintenance call to extend all active schedule keys. Instance entries (`Admin`, `Token`) are tied to the contract instance TTL and will reset if the instance expires and is restored.
+
 ### 1. Initialize the Contract
 ```rust
 client.initialize(&admin, &token_address);

@@ -348,3 +348,6 @@ impl AmmOracleContract {
         AmmOracleContract::get_twap(&env)
     }
 }
+
+#[cfg(test)]
+mod test;

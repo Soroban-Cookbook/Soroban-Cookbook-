@@ -50,7 +50,9 @@ impl BridgeValidators {
         if threshold == 0 {
             return Err(Error::InvalidThreshold);
         }
-        
+
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Threshold, &threshold);
         env.storage().instance().set(&DataKey::ValidatorCount, &0u32);

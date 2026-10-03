@@ -1,10 +1,10 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 6% (3/50)
-**Last Audit Date:** July 29, 2026
+**Completion:** 8% (4/50)
+**Last Audit Date:** September 30, 2026
 
-Community and ecosystem initiatives — no in-repo deliverables yet.
+Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
 
 ## Partnership with Stellar Foundation
 
@@ -64,14 +64,33 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
   - [x] Links and documentation updated in `CONTRIBUTING.md`
   - [x] Phase issue status updated for manual verification
 
+## Project Showcase
+
+### Issue #441: 10+ Projects Built
+
+- **Priority:** Medium
+- **Status:** ✅ Complete
+
+- **Current state:** Showcase delivered in [`SHOWCASE.md`](./SHOWCASE.md) with 11 featured production projects, case studies, a developer support section, and a project tracking / confirmation workflow; outcomes also documented in [`README.md`](./README.md) and [`CONTRIBUTING.md`](./CONTRIBUTING.md). Tracked on GitHub as issue [#970](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues/970).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria — all five met (see below); phase file updated with this entry.
+- **Scope:** M
+- **Description:** 10+ projects using cookbook
+- **Acceptance Criteria:**
+  - ✅ Project tracking — [`SHOWCASE.md` § Project Tracking](./SHOWCASE.md#project-tracking) records where projects are tracked plus the `pending` / `confirmed` verification workflow.
+  - ✅ Showcase created — [`SHOWCASE.md`](./SHOWCASE.md) created and linked from [`CONTRIBUTING.md`](./CONTRIBUTING.md) ("Built With the Cookbook") and the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics).
+  - ✅ Developer support — [`SHOWCASE.md` § Developer Support](./SHOWCASE.md#developer-support) lists Discord, the GitHub issue tracker, the documentation index, the community survey, and `CONTRIBUTING.md`.
+  - ✅ Case studies — [`SHOWCASE.md` § Case Studies](./SHOWCASE.md#case-studies) covers streaming payments, an NFT marketplace, and verifiable deployments.
+  - ✅ 10 projects featured — 11 projects listed under [`SHOWCASE.md` § Featured Projects](./SHOWCASE.md#featured-projects) (target: 10).
+
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629)
-**Completed:** 3
+**Completed:** 4
 **In Progress:** 0  
-**Planned:** 63
+**Planned:** 62
 
-**Phase 8 Status:** 📋 **6% COMPLETE (Ongoing)**
+**Phase 8 Status:** 📋 **8% COMPLETE (Ongoing)**
 
 Community categories:
 

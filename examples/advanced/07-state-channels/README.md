@@ -12,7 +12,7 @@ This is the **foundation example** in the [state channels learning path](../READ
 
 After learning this foundation, proceed to:
 - **[`08-payment-channels`](../08-payment-channels/)** — Specialize for payment transactions
-- **[`03-state-channel-disputes`](../03-state-channel-disputes/)** — Add formal dispute resolution with challenges and proofs
+- **[`34-state-channel-disputes`](../34-state-channel-disputes/)** — Add formal dispute resolution with challenges and proofs
 - **[`13-virtual-channel`](../13-virtual-channel/)** — Route through intermediaries for hub-based networks
 
 ## Key Concepts

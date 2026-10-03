@@ -171,3 +171,6 @@ impl StakingPoolContract {
         }
     }
 }
+
+#[cfg(test)]
+mod test;

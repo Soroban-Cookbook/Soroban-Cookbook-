@@ -1,7 +1,7 @@
 Registry Access Controls
 ========================
 
-> **Note:** For learning RBAC patterns, start with [**03-rbac-modifiers**](../03-rbac-modifiers/) — the canonical RBAC example. This example demonstrates a **domain-specific access control pattern** for registries with whitelist and fee enforcement.
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates a **domain-specific access control pattern** for registries with whitelist and fee enforcement.
 
 Example demonstrating a registry with:
 
@@ -34,7 +34,7 @@ See `src/lib.rs` for the contract and `src/test.rs` for tests.
 
 ## Related Examples
 
-- **[03-rbac-modifiers](../03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards (use for general access control)
+- **[32-rbac-modifiers](../32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards (use for general access control)
 - [05-hierarchical-access-control](../05-hierarchical-access-control/) — Advanced RBAC with permission inheritance
 - [02-role-based-access-control](../../intermediate/02-role-based-access-control/) — Simple RBAC with numeric hierarchy
-- [03-merkle-whitelist](../03-merkle-whitelist/) — Alternative whitelist approach using Merkle proofs
+- [29-merkle-whitelist](../29-merkle-whitelist/) — Alternative whitelist approach using Merkle proofs

@@ -385,7 +385,7 @@ cargo tarpaulin --out Html
 ## 🔗 Quick Links
 
 ```
-Contract: examples/advanced/03-merkle-whitelist/
+Contract: examples/advanced/29-merkle-whitelist/
 Tests: src/test.rs
 Benchmarks: benches/merkle_benchmarks.rs
 Examples: examples/generate_merkle_tree.rs

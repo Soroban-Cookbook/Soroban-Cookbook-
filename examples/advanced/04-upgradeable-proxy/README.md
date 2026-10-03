@@ -11,7 +11,7 @@ business logic.
 
 - **In scope:** direct implementation routing and proxy-owned state across upgrades.
 - **Out of scope:** timelocked upgrade proposals, shared beacons, and storage
-    schema migration. Continue to [Proxy Admin Controls](../03-proxy-admin/) for
+    schema migration. Continue to [Proxy Admin Controls](../31-proxy-admin/) for
     upgrade governance.
 
 ## Role in Learning Path
@@ -25,8 +25,8 @@ This is the **fourth step** in the [upgrade patterns learning path](../README.md
 
 **Prerequisites:** Understand beacon-based patterns first:
 - [`02-beacon-proxy`](../02-beacon-proxy/) — Basic beacon concept
-- [`03-beacon-proxy-factory`](../03-beacon-proxy-factory/) — Factory patterns
-- [`03-proxy-admin`](../03-proxy-admin/) — Governance patterns
+- [`23-beacon-proxy-factory`](../23-beacon-proxy-factory/) — Factory patterns
+- [`31-proxy-admin`](../31-proxy-admin/) — Governance patterns
 
 **Next steps:**
 - **[`06-beacon-management`](../06-beacon-management/)** — Versioned implementations with rollback
@@ -57,7 +57,7 @@ cargo test -p upgradeable-proxy
 
 ## Next
 
-Continue with [Proxy Admin Controls](../03-proxy-admin/) to add proposal delays,
+Continue with [Proxy Admin Controls](../31-proxy-admin/) to add proposal delays,
 cancellation, and emergency pause controls around upgrade operations.
 
 See the [advanced examples README](../README.md) for the full upgrade patterns learning path.
