@@ -82,8 +82,8 @@ Benchmark script: `./scripts/benchmark.sh examples/intermediate --output-dir gas
 | `01-multi-party-aut` | `encode_auth_vec` (10 signers) | ~40,000 | ~2 KB | Sorting dominates; O(N log N) encoding cost |
 | `02-timelock` | `queue` | ~35,000 | ~1.5 KB | State write with timestamp check |
 | `02-timelock` | `execute` | ~40,000 | ~2 KB | Delay validation + state transition |
-| `03-cross-chain-bridge` | `lock` | ~55,000 | ~3 KB | Mint + storage update + event |
-| `03-cross-chain-bridge` | `release` | ~60,000 | ~3.5 KB | Validator set verification + burn |
+| `24-cross-chain-bridge` | `lock` | ~55,000 | ~3 KB | Mint + storage update + event |
+| `24-cross-chain-bridge` | `release` | ~60,000 | ~3.5 KB | Validator set verification + burn |
 | `17-bridge-security` | `rate_limited_release` | ~50.000 | ~2.5 KB | Epoch check + volume accounting |
 | `15-reentrancy-guard` | `guarded_call` | ~30,000 | ~1.5 KB | Mutex flag adds ~5K  over bare call |
 | `21-merkle-proofs` | `verify_proof` (depth 10) | ~45,000 | ~2 KB | Each hash adds ~4K instructions |

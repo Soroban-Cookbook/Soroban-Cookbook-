@@ -13,7 +13,7 @@ This is the **fourth step** in the [oracle patterns learning path](../README.md#
 
 **Prerequisites:** Understand general oracle patterns first:
 - [`03-oracle-pattern`](../03-oracle-pattern/) — Basic oracle mechanics
-- [`03-data-aggregation-oracle`](../03-data-aggregation-oracle/) — Aggregation strategies
+- [`26-data-aggregation-oracle`](../26-data-aggregation-oracle/) — Aggregation strategies
 - [`04-oracle-integration`](../04-oracle-integration/) — Integration patterns
 
 **Next steps:**

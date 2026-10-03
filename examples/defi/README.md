@@ -14,7 +14,7 @@ This category contains examples related to Decentralized Finance (DeFi) protocol
 
 ### Vaults & Yield
 Automated yield aggregation and reward systems.
-- **Planned:** Yield Vaults, Staking Pools, Liquidity Mining incentives.
+- **Planned:** Yield Vaults, Liquidity Mining incentives.
 
 ### Derivatives & Advanced Financials
 Complex financial instruments and stablecoin models.
@@ -22,8 +22,9 @@ Complex financial instruments and stablecoin models.
 
 ## ≡ƒôï Available Examples
 
-- **Staking Pool** - Rewards for locking up balances with lockup duration options, early withdrawal penalties, and boost incentives for longer locks.
-  - [Staking Pool example](./staking-pool/)
+- **Staking Pool** - Time-based reward distribution through a `reward_per_share` accumulator; stakes, unstakes, and claims all move real tokens.
+  - [Staking Pool example](./07-staking-pool/)
+  - A second, lockup-based design lives at [`staking-pool`](./staking-pool/) (package `staking-pool-legacy`). It is **not** canonical — see [how the two differ](./staking-pool/#how-this-differs-from-the-canonical-example).
 - **Automatic Snapshot Triggers** - Time-based & event-based snapshot triggers with pruning.
   - [Snapshot Triggers example](./14-automatic-snapshot-triggers/)
   - **Cross-domain pattern:** The same snapshot-trigger pattern is implemented across domains: [`tokens/10-automatic-snapshot-triggers`](../tokens/10-automatic-snapshot-triggers/), [`governance/07-automatic-snapshot-triggers`](../governance/07-automatic-snapshot-triggers/), [`nfts/05-automatic-snapshot-triggers`](../nfts/05-automatic-snapshot-triggers/). All implement the same time-based and event-based snapshot mechanics; only the domain-specific logic differs.

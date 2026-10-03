@@ -7,7 +7,7 @@
 //! host-level error. All guard logic (auth checks, version checks, init
 //! guards) runs *before* that call and is therefore fully testable.
 //!
-//! The pattern used in the `upgrade_*` tests is borrowed from `03-proxy-admin`:
+//! The pattern used in the `upgrade_*` tests is borrowed from `31-proxy-admin`:
 //! assert that the result is NOT one of our own error variants, then accept
 //! any host-level error as proof that the deployer stub fired.
 

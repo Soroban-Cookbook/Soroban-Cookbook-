@@ -22,7 +22,7 @@ This is the **third step** in the [upgrade patterns learning path](../README.md#
 
 **Prerequisites:** 
 - Start with [`02-beacon-proxy`](../02-beacon-proxy/) for beacon basics
-- Then [`03-beacon-proxy-factory`](../03-beacon-proxy-factory/) for factory patterns
+- Then [`23-beacon-proxy-factory`](../23-beacon-proxy-factory/) for factory patterns
 
 **Next steps:**
 - **[`04-upgradeable-proxy`](../04-upgradeable-proxy/)** — Alternative pattern: storage in proxy

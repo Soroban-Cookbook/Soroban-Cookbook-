@@ -172,11 +172,12 @@ We track community health transparently so everyone can see how the project is g
 
 | Resource | Description |
 |---|---|
+| [Project Showcase](./SHOWCASE.md) | 10+ real production Stellar/Soroban projects built with the cookbook, with case studies and tracking |
 | [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
 | [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
-| [Iterable Mapping](./docs/iterable-mapping.md) | Enumeration pattern for key-value maps using a side list, with `keys(page)` and `values(page)` pagination helpers |
+| [Iterable Mapping](./examples/intermediate/iterable-mapping/README.md) | Canonical enumeration pattern for key-value maps using a side list, with `keys(page)` and `values(page)` pagination helpers |
 
 The dashboard is updated automatically every Monday by a GitHub Actions workflow.
 

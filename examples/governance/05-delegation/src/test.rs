@@ -2,11 +2,7 @@
 #![allow(deprecated)]
 
 use super::*;
-use soroban_sdk::{
-    symbol_short,
-    testutils::Address as _,
-    Address, Env, Symbol,
-};
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, Symbol};
 
 // ---------------------------------------------------------------------------
 // Test helpers
@@ -328,11 +324,12 @@ fn test_delegation_chain_prevented() {
     client.set_voting_power(&admin, &alice, &1_000);
     client.set_voting_power(&admin, &bob, &500);
 
-    // Alice delegates to Bob
-    client.delegate(&alice, &bob, &5_000, &global());
+    // Bob delegates his own power to Carol — allowed
+    client.delegate(&bob, &carol, &5_000, &global());
 
-    // Bob tries to delegate Alice's received power to Carol — not allowed
-    let res = client.try_delegate(&bob, &carol, &5_000, &global());
+    // Alice now tries to delegate to Bob, who already has an outgoing
+    // delegation — accepting it would form a chain, so it is rejected
+    let res = client.try_delegate(&alice, &bob, &5_000, &global());
     assert_eq!(res, Err(Ok(DelegationError::DelegateeHasOutgoing)));
 }
 

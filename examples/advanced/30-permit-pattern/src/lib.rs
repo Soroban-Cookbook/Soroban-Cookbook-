@@ -49,6 +49,8 @@ pub enum PermitError {
 #[contractimpl]
 impl PermitPattern {
     pub fn initialize(env: Env, admin: Address, initial_supply: i128) -> Result<(), PermitError> {
+        admin.require_auth();
+
         if env.storage().instance().has(&DataKey::Initialized) {
             return Err(PermitError::AlreadyInitialized);
         }

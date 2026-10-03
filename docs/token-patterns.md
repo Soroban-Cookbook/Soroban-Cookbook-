@@ -482,6 +482,6 @@ Use this table to choose the right pattern for your token.
 
 - [`examples/tokens/token-metadata`](../examples/tokens/token-metadata/) — full metadata + mint/burn example
 - [`examples/tokens/token-wrapper`](../examples/tokens/token-wrapper/) — wrapping pattern with backing invariant
-- [`examples/advanced/03-proxy-admin`](../examples/advanced/03-proxy-admin/) — pause + upgrade governance
+- [`examples/advanced/31-proxy-admin`](../examples/advanced/31-proxy-admin/) — pause + upgrade governance
 - [`docs/common-patterns.md`](./common-patterns.md) — general Soroban patterns
 - [`docs/best-practices.md`](./best-practices.md) — security and efficiency rules

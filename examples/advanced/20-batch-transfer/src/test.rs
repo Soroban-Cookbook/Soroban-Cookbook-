@@ -280,3 +280,36 @@ fn test_large_valid_batch_correctness() {
         assert_eq!(client.balance(r), amount_each);
     }
 }
+
+#[test]
+fn test_batch_transfer_total_overflow_fails() {
+    let (env, client, admin) = setup(1_000);
+    let r1 = Address::generate(&env);
+    let r2 = Address::generate(&env);
+
+    let transfers = Vec::from_array(
+        &env,
+        [
+            make_transfer(r1, i128::MAX),
+            make_transfer(r2, 1),
+        ],
+    );
+    let result = client.try_batch_transfer(&admin, &transfers);
+    assert_eq!(result, Err(Ok(BatchError::TotalOverflow)));
+}
+
+#[test]
+fn test_batch_transfer_recipient_overflow_fails() {
+    let (env, client, admin) = setup(1_000);
+    let recipient = Address::generate(&env);
+
+    env.as_contract(&client.address, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(recipient.clone()), &(i128::MAX - 5));
+    });
+
+    let transfers = Vec::from_array(&env, [make_transfer(recipient, 10)]);
+    let result = client.try_batch_transfer(&admin, &transfers);
+    assert_eq!(result, Err(Ok(BatchError::RecipientOverflow)));
+}

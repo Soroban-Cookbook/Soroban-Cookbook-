@@ -58,7 +58,7 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 **#767 — Add Proxy Admin Controls (Phase 3)**
 
-- `examples/advanced/03-proxy-admin/` — admin-authenticated `propose_upgrade` /
+- `examples/advanced/31-proxy-admin/` — admin-authenticated `propose_upgrade` /
   `cancel_upgrade` / `execute_upgrade` with a bounded timelock, emergency
   pause, and a security checklist in the README (delivered earlier; indexed now)
 - `examples/advanced/README.md` — example added to the implemented list

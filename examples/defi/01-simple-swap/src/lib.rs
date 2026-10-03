@@ -1,14 +1,14 @@
-#![cfg_attr(target_family = "wasm", no_std)]
-#![allow(deprecated)]
+!cfg_attr(target_family = "wasm", no_std)]
+#allow_deprecated)
 
 use soroban_sdk::{
     contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
 };
 
-#[contract]
+#contract]
 pub struct SimpleSwapContract;
 
-#[contracttype]
+#contracttype]
 pub enum DataKey {
     Owner,
     TokenA,
@@ -17,7 +17,7 @@ pub enum DataKey {
     RateDen,
 }
 
-#[contracttype]
+#contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SwapEventData {
     pub trader: Address,
@@ -28,9 +28,9 @@ pub struct SwapEventData {
     pub min_buy_amount: i128,
 }
 
-const EVENT_NS: Symbol = symbol_short!("swap");
-const EVENT_SWAP: Symbol = symbol_short!("swap_exec");
-const EVENT_PAIR: Symbol = symbol_short!("pair_upd");
+const EVENT_NS: Symbol = symbol_short("swap");
+const EVENT_SWAP: Symbol = symbol_short("swap_exec");
+const EVENT_PAIR: Symbol = symbol_short("pair_upd");
 
 impl SimpleSwapContract {
     fn require_owner(&self, env: &Env) {
@@ -75,7 +75,7 @@ impl SimpleSwapContract {
     }
 }
 
-#[contractimpl]
+#contractimpl]
 impl SimpleSwapContract {
     pub fn initialize(
         env: Env,
@@ -220,3 +220,6 @@ impl SimpleSwapContract {
         this.rate(&env)
     }
 }
+
+#config(test)]
+mod test;

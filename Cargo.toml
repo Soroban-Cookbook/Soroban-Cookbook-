@@ -1,17 +1,30 @@
 [workspace]
 resolver = "2"
 
-# The `templates/*` directories intentionally contain their own Cargo
-# workspaces — each is a self-contained learner starter kit with its own
-# pinned `soroban-sdk`, meant to be copied out and built standalone. Because a
-# package cannot belong to two workspaces at once, they are excluded from the
-# root workspace rather than listed under `members`. Build them individually:
+# The `templates/dao-governance-dapp` and `templates/token-dapp` directories
+# intentionally contain their own Cargo workspaces — each is a self-contained
+# learner starter kit with its own `soroban-sdk` (kept in sync with the root
+# workspace), meant to be copied out and built standalone. Because a package
+# cannot belong to two workspaces at once, they are excluded from the root
+# workspace rather than listed under `members`.
 #
+# Each defines its own workspace members in its Cargo.toml:
+#   - templates/dao-governance-dapp/contracts/governance
+#   - templates/token-dapp/contracts/token
+#
+# Build them individually:
+#     cd templates/dao-governance-dapp && cargo build
 #     cd templates/token-dapp && cargo build
+#
+# `templates/nft-marketplace-dapp` is a single package (not a workspace) whose
+# contract library lives at `contracts/marketplace/src/lib.rs`. It is listed
+# under `members` below so `cargo build --workspace` and `cargo test --workspace`
+# build it with the workspace `soroban-sdk` (28.0.0-rc.1), keeping it from
+# rotting unnoticed.
 exclude = [
     "templates/dao-governance-dapp",
-    "templates/nft-marketplace-dapp",
     "templates/token-dapp",
+    "tests/fuzz",
 ]
 
 members = [
@@ -19,13 +32,19 @@ members = [
     "examples/hello-world",
     "examples/intermediate/event-aggregation",
     "examples/basics/01-hello-world",
+    "examples/basics/05-error-handling",
+    "examples/basics/03-custom-errors",
     "examples/basics/06-validation-patterns",
+    "examples/basics/07-type-conversions",
+    "examples/basics/09-enum-types",
     "examples/basics/13-collection-types",
     "examples/basics/13-compressed-storage",
     "examples/basics/13-queue-variants",
     "examples/basics/14-event-filtering",
     "examples/basics/14-fifo-queue",
     "examples/basics/lazy-cache",
+    # Companion to the canonical iterable map example below; kept as a member so
+    # its filter/map/reduce utilities stay built and tested.
     "examples/intermediate/iterable-mappings",
     "examples/intermediate/03-priority-queue",
     "examples/intermediate/03-pause-unpause",
@@ -34,12 +53,13 @@ members = [
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-beacon-proxy",
     "examples/advanced/02-timelock",
-    "examples/advanced/03-state-channel-disputes",
-    "examples/advanced/03-beacon-proxy-factory",
-    "examples/advanced/03-gasless-relayer",
-    "examples/advanced/03-batch-builder",
-    "examples/advanced/03-rbac-modifiers",
-    "examples/advanced/03-registry-access-controls",
+    "examples/advanced/34-state-channel-disputes",
+    "examples/advanced/23-beacon-proxy-factory",
+    "examples/advanced/27-gasless-relayer",
+    "examples/advanced/22-batch-builder",
+    "examples/advanced/32-rbac-modifiers",
+    "examples/advanced/33-registry-access-controls",
+    "examples/advanced/31-proxy-admin",
     "examples/advanced/19-diamond-security",
     "examples/advanced/19-diamond-security/facet-adder",
     "examples/advanced/19-diamond-security/facet-multiplier",
@@ -47,17 +67,34 @@ members = [
     "examples/advanced/07-state-channels",
     "examples/advanced/07-trusted-forwarder",
     "examples/advanced/09-storage-layout-validator",
-    "examples/advanced/03-permit-pattern",
+    "examples/advanced/30-permit-pattern",
     "examples/advanced/03-oracle-pattern",
+    "examples/advanced/04-circuit-breaker",
     "examples/advanced/04-upgradeable-proxy",
     "examples/advanced/04-upgradeable-proxy/implementation-v1",
+    "examples/advanced/contract-registry",
     "examples/advanced/08-multicall",
+    "examples/advanced/08-batch-operations",
     "examples/advanced/05-rate-limiting",
-    "examples/advanced/03-merkle-airdrop",
+    "examples/advanced/21-merkle-proofs",
+    "examples/advanced/28-merkle-airdrop",
+    "examples/advanced/29-merkle-whitelist",
+    "examples/advanced/06-beacon-management",
+    "examples/advanced/15-oracle-integration",
+    "examples/advanced/15-reentrancy-guard",
+    "examples/advanced/16-cross-contract-integration-testing",
+    "examples/advanced/17-bridge-security",
+    "examples/advanced/24-cross-chain-bridge",
+    "examples/advanced/25-cross-contract-optimization",
+    "examples/advanced/26-data-aggregation-oracle",
+    "examples/advanced/31-proxy-admin",
     "examples/advanced/06-gas-optimization",
+    "examples/advanced/06-price-oracle",
     "examples/advanced/07-upgrade-patterns",
     "examples/advanced/08-payment-channels",
+    "examples/advanced/08-computation-optimization",
     "examples/advanced/08-gas-reporter",
+    "examples/advanced/08-computation-optimization",
     "examples/advanced/09-fuzz-testing",
     "examples/advanced/09-storage-optimization",
     "examples/advanced/10-contract-migrations",
@@ -68,14 +105,20 @@ members = [
     "examples/advanced/12-oracle-consumer/settlement",
     "examples/advanced/18-diamond-facets",
     "examples/advanced/06-diamond-pattern",
+    "examples/advanced/20-batch-transfer",
     "examples/defi/01-simple-swap",
     "examples/defi/02-constant-product-amm",
     "examples/defi/03-lending-pool",
+    "examples/defi/04-collateralized-lending",
     "examples/defi/08-liquidity-mining",
+    "examples/defi/09-vault-strategies",
+    "examples/nfts/02-nft-metadata",
+    "examples/intermediate/storage-migration",
     "examples/intermediate/event-history",
     "examples/intermediate/ajo-factory",
     "examples/intermediate/ajo",
     "examples/tokens/01-sep41-token",
+    "examples/tokens/01-vesting-management",
     "examples/tokens/02-minting-strategies",
     "examples/tokens/02-sep41-extensions",
     "examples/tokens/03-optimized-operations",
@@ -95,13 +138,21 @@ members = [
     "examples/governance/02-voting-time-constraints",
     "examples/governance/03-dao-treasury",
     "examples/governance/03-proposal-lifecycle",
+    "examples/governance/05-delegation",
     "examples/governance/01-simple-voting",
     "examples/governance/02-token-voting",
     "examples/governance/06-timelock-governance",
     "examples/governance/07-automatic-snapshot-triggers",
     "examples/governance/01-delegation-marketplace",
     "examples/governance/01-proposal-validation",
+    "examples/nfts/01-basic-nft",
+    "examples/nfts/02-nft-metadata",
+    "examples/nfts/03-nft-metadata-standards",
+    "examples/nfts/04-nft-marketplace",
+    "examples/nfts/05-automatic-snapshot-triggers",
     "examples/intermediate/lazy-loading",
+    # Canonical iterable map example referenced by the book and by
+    # examples/intermediate/README.md.
     "examples/intermediate/iterable-mapping",
     "examples/intermediate/storage-pagination",
     "examples/tokens/08-multi-token-balance-manager",
@@ -112,6 +163,7 @@ members = [
     "examples/advanced/12-real-world-case-studies",
     "examples/advanced/13-virtual-channel",
     "examples/advanced/14-bridge-monitor",
+    "examples/advanced/14-bridge-validators",
     "examples/defi/07-staking-pool",
     "examples/defi/10-swap-liquidity",
     "examples/defi/11-amm-price-oracle",
@@ -120,7 +172,6 @@ members = [
     "tests/integration",
     "tests/security",
     "tests/docs-audit",
-    "tests/fuzz",
 ]
 
 [workspace.package]
@@ -137,7 +188,7 @@ base64ct = "=1.8.3"
 ajo-factory = { path = "examples/intermediate/ajo-factory" }
 multi-sig-patterns = { path = "examples/intermediate/multi-sig-patterns" }
 
-[Profile.release]
+[profile.release]
 opt-level = "z"
 overflow-checks = true
 debug = 0
@@ -147,7 +198,7 @@ panic = "abort"
 codegen-units = 1
 lto = true
 
-[Profile.release-with-logs]
+[profile.release-with-logs]
 inherits = "release"
 debug-assertions = true
 

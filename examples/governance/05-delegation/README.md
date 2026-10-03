@@ -92,7 +92,7 @@ All events use the namespace `"deleg"` as the first topic:
 |-----|------|-------|
 | `Admin` | Instance | `Address` |
 | `VotingPower(addr)` | Persistent | `i128` |
-| `Delegation(DelegationId)` | Persistent | `DelegationRecord` |
+| `Delegation(sha256(DelegationId))` | Persistent | `DelegationRecord` |
 | `DelegatorOutgoing(addr)` | Persistent | `Vec<DelegationId>` |
 | `DelegateIncoming(addr)` | Persistent | `Vec<DelegationId>` |
 

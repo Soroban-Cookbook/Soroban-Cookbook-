@@ -8,9 +8,9 @@ Follow these examples in order, from a single implementation pointer to fleet
 management and lower-level WASM and storage upgrade techniques:
 
 1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
-2. [Proxy Admin Controls](../examples/advanced/03-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
+2. [Proxy Admin Controls](../examples/advanced/31-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
 3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
-4. [Beacon Proxy Factory](../examples/advanced/03-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+4. [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
 5. [Beacon Management](../examples/advanced/06-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
 6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
 
@@ -31,7 +31,7 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [03-state-channel-disputes](../examples/advanced/03-state-channel-disputes/)
+### [34-state-channel-disputes](../examples/advanced/34-state-channel-disputes/)
 **State channel dispute resolution** with challenge submission, response mechanics, timeout handling, and fraud proofs.
 
 **Key Concepts:**
@@ -41,7 +41,7 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [03-permit-pattern](../examples/advanced/03-permit-pattern/)
+### [30-permit-pattern](../examples/advanced/30-permit-pattern/)
 **Permit-based approvals** with signature-backed authorization and deadline enforcement.
 
 **Key Concepts:**

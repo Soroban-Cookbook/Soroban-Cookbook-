@@ -29,7 +29,7 @@ fn setup() -> (
     let timeout = 3600u64; // 1 hour
 
     oracle_client.initialize(&admin, &updater, &max_age, &timeout);
-    consumer_client.initialize(&oracle_id);
+    consumer_client.initialize(&admin, &oracle_id);
 
     (env, admin, updater, oracle_client, consumer_client)
 }
@@ -47,6 +47,20 @@ fn test_initialize_twice_fails() {
     let result = oracle.try_initialize(&admin, &updater, &300, &3600);
     assert_eq!(result, Err(Ok(OracleError::AlreadyInitialized)));
     let _ = env;
+}
+
+#[test]
+#[should_panic]
+fn test_initialize_rejects_unauthorized_caller() {
+    let env = Env::default();
+    // No auths mocked: the admin's `require_auth` must fail, so an attacker
+    // cannot front-run deployment and point the consumer at their own oracle
+    // (issue #1087).
+    let admin = Address::generate(&env);
+    let oracle = Address::generate(&env);
+    let consumer_id = env.register(ConsumerContract, ());
+    let consumer_client = ConsumerContractClient::new(&env, &consumer_id);
+    consumer_client.initialize(&admin, &oracle);
 }
 
 // ── 2. Request Data ──────────────────────────────────────────────────────────
@@ -285,11 +299,15 @@ fn test_double_fulfillment_fails() {
 #[should_panic]
 fn test_consumer_rejects_unauthorized_callback() {
     let env = Env::default();
-    // Do NOT mock_all_auths or configure auth, so that require_auth fails.
+    // `initialize` now requires the admin's auth, so mock it for setup only...
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
     let oracle = Address::generate(&env);
     let consumer_id = env.register(ConsumerContract, ());
     let consumer_client = ConsumerContractClient::new(&env, &consumer_id);
-    consumer_client.initialize(&oracle);
+    consumer_client.initialize(&admin, &oracle);
+    // ...then clear all auths so the callback's oracle.require_auth() fails.
+    env.mock_auths(&[]);
 
     // Call callback directly - this should panic due to lack of authorization from the oracle address
     consumer_client.callback(&1, &100, &100);

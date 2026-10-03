@@ -448,11 +448,11 @@ pub struct Config {
 ## How to Run
 
 ```bash
-# Run all tests
-cargo test
+# Run all tests (src/test.rs is wired from lib.rs via `#[cfg(test)] mod test;`)
+cargo test -p gas-optimization
 
 # Run specific test
-cargo test test_optimization_1_instance_storage_initialization
+cargo test -p gas-optimization test_optimization_1_instance_storage_initialization
 
 # Build WASM contract
 cargo build --target wasm32-unknown-unknown --release
@@ -466,7 +466,7 @@ cargo clippy --all-targets -- -D warnings
 | File | Purpose |
 |------|---------|
 | `src/lib.rs` | Contract with 12 optimization patterns and extensive inline documentation |
-| `src/test.rs` | 15+ comprehensive tests covering all optimizations and functional scenarios |
+| `src/test.rs` | 25 tests covering all optimizations, functional scenarios and `require_auth` enforcement |
 | `Cargo.toml` | Crate configuration with workspace dependencies |
 | `README.md` | This guide with before/after comparisons |
 

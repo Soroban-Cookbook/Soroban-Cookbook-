@@ -9,11 +9,11 @@ covering a distinct upgradeability concern:
 
 1. [Upgradeable Proxy](./04-upgradeable-proxy/) — proxy-owned state and direct
 	implementation routing; no governance workflow or beacon.
-2. [Proxy Admin Controls](./03-proxy-admin/) — timelocked proposals,
+2. [Proxy Admin Controls](./31-proxy-admin/) — timelocked proposals,
 	cancellation, and pause; no proxy call forwarding.
 3. [Beacon Proxy](./02-beacon-proxy/) — shared implementation routing through
 	a beacon; no fleet factory.
-4. [Beacon Proxy Factory](./03-beacon-proxy-factory/) — deploy and track a proxy
+4. [Beacon Proxy Factory](./23-beacon-proxy-factory/) — deploy and track a proxy
 	fleet using one beacon; no named-beacon registry.
 5. [Beacon Management](./06-beacon-management/) — version and roll back named
 	beacons; no proxy deployment or call forwarding.
@@ -22,7 +22,21 @@ covering a distinct upgradeability concern:
 
 ## Directory Organization
 
-⚠️ **Note on Numbering:** Directory prefixes provide a suggested learning progression, with each example having a unique identifier. Recent reorganization (resolving issue #1099) established unique prefixes for all examples:
+⚠️ **Note on Numbering:** Directory prefixes provide a suggested learning progression, with each example having a unique identifier:
+- Oracle pattern: `03-oracle-pattern`
+- Batch & transaction builders: `22-batch-builder`
+- Proxy & fleet factories: `23-beacon-proxy-factory`
+- Cross-chain bridging: `24-cross-chain-bridge`
+- Optimization & calls: `25-cross-contract-optimization`
+- Oracle aggregation: `26-data-aggregation-oracle`
+- Meta-transactions & relayers: `27-gasless-relayer`
+- Airdrop & distributions: `28-merkle-airdrop`
+- Whitelist verification: `29-merkle-whitelist`
+- Permit approvals: `30-permit-pattern`
+- Proxy governance: `31-proxy-admin`
+- Composable RBAC: `32-rbac-modifiers`
+- Registry access controls: `33-registry-access-controls`
+- State channel disputes: `34-state-channel-disputes`
 - Security primitives: `05-rate-limiting`, `15-reentrancy-guard`, `16-hierarchical-access-control`
 - Bridge security: `17-bridge-security`
 - Diamond pattern: `18-diamond-facets`, `19-diamond-security`
@@ -50,7 +64,7 @@ A progression from generic state channels to specialized payment and virtual cha
 
 1. **[`07-state-channels`](./07-state-channels/)** — Generic state channel framework with on-chain settlement and dispute resolution. Start here to learn the core mechanics of off-chain state updates with on-chain finality.
 2. **[`08-payment-channels`](./08-payment-channels/)** — Specialized payment channels for transacting between two parties with immediate settlement. Builds on state channel fundamentals.
-3. **[`03-state-channel-disputes`](./03-state-channel-disputes/)** — Dispute resolution with challenges, responses, timeouts, and fraud proofs. Learn how to resolve state conflicts when participants disagree.
+3. **[`34-state-channel-disputes`](./34-state-channel-disputes/)** — Dispute resolution with challenges, responses, timeouts, and fraud proofs. Learn how to resolve state conflicts when participants disagree.
 4. **[`13-virtual-channel`](./13-virtual-channel/)** — Virtual payment channels routed through an intermediary. Routes ledger channels through a hub; enables faster, lower-cost payments via off-chain routing.
 
 **Summary:** Generic → Payment-specific → Dispute resolution → Virtual routing
@@ -60,8 +74,8 @@ A progression from generic state channels to specialized payment and virtual cha
 A progression from basic proxies through beacon patterns to full upgrade governance:
 
 1. **[`02-beacon-proxy`](./02-beacon-proxy/)** — Basic beacon proxy pattern with separate implementation contract. Start here to understand delegated calls and beacon-based upgrades.
-2. **[`03-beacon-proxy-factory`](./03-beacon-proxy-factory/)** — Factory-managed beacon proxies with shared upgrades. One beacon controls many proxies; upgrade all at once.
-3. **[`03-proxy-admin`](./03-proxy-admin/)** — Admin-authenticated upgrade proposals with timelock and emergency pause. Add governance and safety checks to upgrades.
+2. **[`23-beacon-proxy-factory`](./23-beacon-proxy-factory/)** — Factory-managed beacon proxies with shared upgrades. One beacon controls many proxies; upgrade all at once.
+3. **[`31-proxy-admin`](./31-proxy-admin/)** — Admin-authenticated upgrade proposals with timelock and emergency pause. Add governance and safety checks to upgrades.
 4. **[`04-upgradeable-proxy`](./04-upgradeable-proxy/)** — Direct implementation upgrades with proxy-owned storage preservation. Alternative to beacon pattern; storage lives in the proxy.
 5. **[`06-beacon-management`](./06-beacon-management/)** — Versioned beacon management with rollback support. Manage multiple implementation versions and roll back if needed.
 6. **[`07-upgrade-patterns`](./07-upgrade-patterns/)** — Direct WASM upgrade, versioned storage migration, and init guards. Highest-level patterns for safe contract evolution.
@@ -73,7 +87,7 @@ A progression from basic proxies through beacon patterns to full upgrade governa
 A progression from basic oracle producers through aggregation to consumer patterns:
 
 1. **[`03-oracle-pattern`](./03-oracle-pattern/)** — Basic oracle with authorized submission and freshness checks. Start here to learn single-source oracle mechanics.
-2. **[`03-data-aggregation-oracle`](./03-data-aggregation-oracle/)** — Data aggregation with manipulation detection and outlier filtering. Combine multiple data sources and sanitize them.
+2. **[`26-data-aggregation-oracle`](./26-data-aggregation-oracle/)** — Data aggregation with manipulation detection and outlier filtering. Combine multiple data sources and sanitize them.
 3. **[`04-oracle-integration`](./04-oracle-integration/)** — Integration patterns for consuming oracle data in other contracts.
 4. **[`06-price-oracle`](./06-price-oracle/)** — Price oracle with specific focus on financial data. Specialized producer for asset prices.
 5. **[`12-oracle-consumer`](./12-oracle-consumer/)** — Three consumer contracts: validated cache, quorum median consensus, and settlement circuit breaker. Learn safe consumption patterns.
@@ -85,16 +99,16 @@ A progression from basic oracle producers through aggregation to consumer patter
 
 - [`01-multi-party-auth`](./01-multi-party-auth/) — Multi-party authorization patterns
 - [`02-timelock`](./02-timelock/) — Time-delayed execution
-- [`03-state-channel-disputes`](./03-state-channel-disputes/) — State channel dispute resolution with challenges, responses, timeouts, and fraud proofs (See [State Channels learning path](#state-channels--payment-channels))
-- [`03-beacon-proxy-factory`](./03-beacon-proxy-factory/) — Factory-managed beacon proxies with shared upgrades (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
-- [`03-permit-pattern`](./03-permit-pattern/) — EIP-2612-style permit approvals with deadline enforcement
-- [`03-gasless-relayer`](./03-gasless-relayer/) — Meta-transaction relayer with nonce checks and signature verification
-- [`03-batch-builder`](./03-batch-builder/) — Staged batch builder with validation and gas estimation
-- [`03-rbac-modifiers`](./03-rbac-modifiers/) — **Canonical RBAC pattern**: composable role guards with flexible symbol-based roles
-- [`03-registry-access-controls`](./03-registry-access-controls/) — Registry-specific access controls with whitelist and fees
-- [`03-data-aggregation-oracle`](./03-data-aggregation-oracle/) — Data aggregation with manipulation detection and outlier filtering (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
+- [`34-state-channel-disputes`](./34-state-channel-disputes/) — State channel dispute resolution with challenges, responses, timeouts, and fraud proofs (See [State Channels learning path](#state-channels--payment-channels))
+- [`23-beacon-proxy-factory`](./23-beacon-proxy-factory/) — Factory-managed beacon proxies with shared upgrades (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
+- [`30-permit-pattern`](./30-permit-pattern/) — EIP-2612-style permit approvals with deadline enforcement
+- [`27-gasless-relayer`](./27-gasless-relayer/) — Meta-transaction relayer with nonce checks and signature verification
+- [`22-batch-builder`](./22-batch-builder/) — Staged batch builder with validation and gas estimation
+- [`32-rbac-modifiers`](./32-rbac-modifiers/) — **Canonical RBAC pattern**: composable role guards with flexible symbol-based roles
+- [`33-registry-access-controls`](./33-registry-access-controls/) — Registry-specific access controls with whitelist and fees
+- [`26-data-aggregation-oracle`](./26-data-aggregation-oracle/) — Data aggregation with manipulation detection and outlier filtering (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
 - [`03-oracle-pattern`](./03-oracle-pattern/) — Basic oracle with authorized submission and freshness checks (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
-- [`03-proxy-admin`](./03-proxy-admin/) — Admin-authenticated upgrade proposals with timelock and emergency pause (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
+- [`31-proxy-admin`](./31-proxy-admin/) — Admin-authenticated upgrade proposals with timelock and emergency pause (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
 - [`04-circuit-breaker`](./04-circuit-breaker/) — Emergency pause and auto-recovery pattern
 - [`04-oracle-integration`](./04-oracle-integration/) — Integration patterns for oracle consumption (See [Oracle Patterns learning path](#oracle-patterns--price-feeds))
 - [`04-upgradeable-proxy`](./04-upgradeable-proxy/) — Admin-gated implementation upgrades with proxy-owned storage preservation (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
@@ -122,6 +136,10 @@ A progression from basic oracle producers through aggregation to consumer patter
 - [`15-oracle-integration`](./15-oracle-integration/) — Asynchronous oracle request/response pattern with secure callbacks and data validation
 - [`16-cross-contract-integration-testing`](./16-cross-contract-integration-testing/) — Cross-contract integration testing patterns
 - [`02-beacon-proxy`](./02-beacon-proxy/) — Basic beacon proxy pattern (See [Upgrade Patterns learning path](#upgrade-patterns--proxy-patterns))
+- [`24-cross-chain-bridge`](./24-cross-chain-bridge/) — Cross-chain bridge architecture and token locking
+- [`25-cross-contract-optimization`](./25-cross-contract-optimization/) — Cross-contract call optimization patterns
+- [`28-merkle-airdrop`](./28-merkle-airdrop/) — Merkle-tree-verified token distributions and airdrops
+- [`29-merkle-whitelist`](./29-merkle-whitelist/) — Cryptographic Merkle whitelist verification
 
 ## Planned Examples
 
@@ -139,7 +157,7 @@ produced. Planned topics:
   - **[`18-diamond-facets`](./18-diamond-facets/)** — Router orchestration and inter-facet communication
 - Bridge security: rate limiting, challenge windows, fraud proofs (`17-bridge-security`)
 - Price oracle: median aggregation, TWAP, staleness handling (`06-price-oracle`)
-- Meta-transactions: trusted forwarder and gasless relayer (`03-gasless-relayer`, `07-trusted-forwarder`)
+- Meta-transactions: trusted forwarder and gasless relayer (`27-gasless-relayer`, `07-trusted-forwarder`)
 - Upgrade governance: timelocks and versioned migrations (`07-upgrade-patterns`, `10-contract-migrations`)
 
 Tracked in #758.

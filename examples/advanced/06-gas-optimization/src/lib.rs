@@ -360,3 +360,6 @@ impl GasOptimizationContract {
         sum
     }
 }
+
+#[cfg(test)]
+mod test;

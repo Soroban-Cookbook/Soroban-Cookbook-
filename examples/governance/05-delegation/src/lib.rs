@@ -20,7 +20,8 @@
 //!   (04-events pattern).
 //! - Instance storage for global config; persistent storage for per-delegation records.
 //! - `extend_ttl` on all persistent keys after writes.
-//! - `DelegationId` uniquely identifies a delegation as `(delegator, delegate, scope)`.
+//! - `DelegationId` uniquely identifies a delegation as `(delegator, delegate, scope)`;
+//!   its SHA-256 is the storage key, keeping it under the ledger key-size limit.
 //!
 //! ## Storage Layout
 //!
@@ -28,7 +29,7 @@
 //! |-----|------|---------|
 //! | `Admin` | Instance | admin `Address` |
 //! | `VotingPower(addr)` | Persistent | base voting power `i128` |
-//! | `Delegation(DelegationId)` | Persistent | `DelegationRecord` |
+//! | `Delegation(sha256(DelegationId))` | Persistent | `DelegationRecord` |
 //! | `DelegateIncoming(addr)` | Persistent | `Vec<DelegationId>` – delegations *to* addr |
 //! | `DelegatorOutgoing(addr)` | Persistent | `Vec<DelegationId>` – delegations *from* addr |
 //!
@@ -43,7 +44,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, xdr::ToXdr, Address, BytesN,
+    Env, Symbol, Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -112,8 +114,10 @@ pub enum DelegationScope {
 
 /// Unique composite identifier for a delegation.
 ///
-/// The triple `(delegator, delegate, scope)` is the natural key; storing it
-/// as a single struct lets us use it directly as a `DataKey` variant.
+/// The triple `(delegator, delegate, scope)` is the natural key. It is hashed
+/// before use as a storage key (see `delegation_key`) because the raw
+/// encoding of two addresses plus a topic symbol exceeds the ledger's
+/// contract-data key-size limit.
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DelegationId {
@@ -148,8 +152,8 @@ pub enum DataKey {
     Admin,
     /// Persistent: base voting power for an address.
     VotingPower(Address),
-    /// Persistent: delegation record keyed by its composite id.
-    Delegation(DelegationId),
+    /// Persistent: delegation record keyed by the SHA-256 of its composite id.
+    Delegation(BytesN<32>),
     /// Persistent: list of delegation ids pointing *to* an address.
     DelegateIncoming(Address),
     /// Persistent: list of delegation ids pointing *from* an address.
@@ -256,7 +260,7 @@ impl DelegationContract {
         if delegator == delegate {
             return Err(DelegationError::SelfDelegation);
         }
-        if basis_points < 1 || basis_points > BP_DENOM {
+        if !(1..=BP_DENOM).contains(&basis_points) {
             return Err(DelegationError::InvalidBasisPoints);
         }
 
@@ -277,13 +281,10 @@ impl DelegationContract {
             delegate: delegate.clone(),
             scope: scope.clone(),
         };
+        let key = delegation_key(&env, &id);
 
         // Reject duplicate (same triple already active).
-        if env
-            .storage()
-            .persistent()
-            .has(&DataKey::Delegation(id.clone()))
-        {
+        if env.storage().persistent().has(&key) {
             return Err(DelegationError::AlreadyDelegated);
         }
 
@@ -300,14 +301,10 @@ impl DelegationContract {
             created_at: env.ledger().timestamp(),
             active: true,
         };
+        env.storage().persistent().set(&key, &record);
         env.storage()
             .persistent()
-            .set(&DataKey::Delegation(id.clone()), &record);
-        env.storage().persistent().extend_ttl(
-            &DataKey::Delegation(id.clone()),
-            TTL_THRESHOLD,
-            TTL_EXTEND,
-        );
+            .extend_ttl(&key, TTL_THRESHOLD, TTL_EXTEND);
 
         // Update outgoing index for delegator.
         let mut outgoing: Vec<DelegationId> = env
@@ -341,8 +338,10 @@ impl DelegationContract {
             TTL_EXTEND,
         );
 
-        env.events()
-            .publish((NS, EV_DELEGATE, delegator, delegate), (basis_points, scope));
+        env.events().publish(
+            (NS, EV_DELEGATE, delegator, delegate),
+            (basis_points, scope),
+        );
         Ok(())
     }
 
@@ -364,11 +363,12 @@ impl DelegationContract {
             delegate: delegate.clone(),
             scope: scope.clone(),
         };
+        let key = delegation_key(&env, &id);
 
         let mut record: DelegationRecord = env
             .storage()
             .persistent()
-            .get(&DataKey::Delegation(id.clone()))
+            .get(&key)
             .ok_or(DelegationError::DelegationNotFound)?;
 
         if record.id.delegator != delegator {
@@ -377,14 +377,10 @@ impl DelegationContract {
 
         // Soft-delete: mark inactive for audit trail.
         record.active = false;
+        env.storage().persistent().set(&key, &record);
         env.storage()
             .persistent()
-            .set(&DataKey::Delegation(id.clone()), &record);
-        env.storage().persistent().extend_ttl(
-            &DataKey::Delegation(id.clone()),
-            TTL_THRESHOLD,
-            TTL_EXTEND,
-        );
+            .extend_ttl(&key, TTL_THRESHOLD, TTL_EXTEND);
 
         // Remove from outgoing index.
         Self::remove_from_index(&env, &DataKey::DelegatorOutgoing(delegator.clone()), &id);
@@ -415,7 +411,7 @@ impl DelegationContract {
         };
         env.storage()
             .persistent()
-            .get(&DataKey::Delegation(id))
+            .get(&delegation_key(&env, &id))
             .ok_or(DelegationError::DelegationNotFound)
     }
 
@@ -590,13 +586,18 @@ fn scope_covers(scope: &DelegationScope, topic: &Symbol) -> bool {
     }
 }
 
+/// Storage key for a delegation record.
+///
+/// Hashing the composite id yields a fixed 32-byte key regardless of topic
+/// length, keeping it within the ledger's contract-data key-size limit.
+fn delegation_key(env: &Env, id: &DelegationId) -> DataKey {
+    DataKey::Delegation(env.crypto().sha256(&id.clone().to_xdr(env)).into())
+}
+
 /// Look up the basis-points value for a delegation id.
 /// Returns 0 if the record is missing or marked inactive.
 fn active_bp(env: &Env, id: &DelegationId) -> i128 {
-    let record: Option<DelegationRecord> = env
-        .storage()
-        .persistent()
-        .get(&DataKey::Delegation(id.clone()));
+    let record: Option<DelegationRecord> = env.storage().persistent().get(&delegation_key(env, id));
     match record {
         Some(r) if r.active => r.basis_points,
         _ => 0,

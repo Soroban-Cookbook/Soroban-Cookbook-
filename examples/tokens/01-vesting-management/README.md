@@ -67,6 +67,14 @@ When an admin revokes a vesting schedule:
 
 ## Contract Interface
 
+> ⚠️ **UNAUdITED EXAMPLE — NOT FOR PRODUCTION USE**
+>
+> This example code is educational and has **not** been audited. Do **not** deploy it verbatim with real funds. Before any production deployment, obtain a formal security audit, review edge cases for your token, revocation logic, and multi-beneficiary schedule interactions, and perform your own validation.
+>
+> **Reentrancy:** Both `claim` and `revoke` perform cross-contract `transfer` calls to the vested token after updating schedule state (`released_amount`, `revoked`, `total_amount`). If the token is malicious or hook-bearing, it could call back into `claim`, `revoke`, or another entry point. This example does **not** include an explicit reentrancy guard. In Soroban, reentrancy is limited to the same invocation stack (a callee cannot outlive the caller's frame), but shared-state re-entry within that frame must be protected against for production — add a guard flag in storage set before any token call and cleared after, erroring on re-entry.
+>
+> **Storage TTL / Data Expiry:** Per-beneficiary `Schedule` entries are stored in **persistent** storage with per-key TTLs. Either explicitly `extend_ttl` on every schedule write (`create_schedule`, `claim`, `revoke`) or run a periodic maintenance call to extend all active schedule keys. Instance entries (`Admin`, `DefaultToken`) are tied to the contract instance TTL and will reset if the instance expires and is restored.
+
 ### `initialize`
 Initializes the contract with an admin and an optional default token.
 ```rust

@@ -72,7 +72,7 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 3. Oracle Patterns
 
-**Contracts:** `examples/advanced/03-oracle-pattern/`, `examples/advanced/03-data-aggregation-oracle/`
+**Contracts:** `examples/advanced/03-oracle-pattern/`, `examples/advanced/26-data-aggregation-oracle/`
 
 ### Known Vulnerabilities
 | Vulnerability | Severity | Description |
@@ -97,7 +97,7 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 4. Cross-Chain Bridge
 
-**Contract:** `examples/advanced/03-cross-chain-bridge/`
+**Contract:** `examples/advanced/24-cross-chain-bridge/`
 
 ### Known Vulnerabilities
 | Vulnerability | Severity | Description |
@@ -225,7 +225,7 @@ This document provides a security analysis for each advanced pattern in the cook
 
 ## 9. Role-Based Access Control
 
-**Contracts:** `examples/advanced/03-rbac-modifiers/`, `examples/advanced/03-registry-access-controls/`, `examples/advanced/03-proxy-admin/`
+**Contracts:** `examples/advanced/32-rbac-modifiers/`, `examples/advanced/33-registry-access-controls/`, `examples/advanced/31-proxy-admin/`
 
 ### Known Vulnerabilities
 | Vulnerability | Severity | Description |

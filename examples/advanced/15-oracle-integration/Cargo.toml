@@ -1,7 +1,7 @@
 [package]
 name = "oracle-integration"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 publish = false
 
 [lib]
@@ -13,7 +13,3 @@ soroban-sdk = { workspace = true }
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
 soroban-validation = { path = "../../../shared", features = ["testutils"] }
-
-[profile.release]
-opt-level = "z"
-debug = 0

@@ -4,7 +4,7 @@ use soroban_validation::test_events::EventList;
 
 use soroban_sdk::testutils::Address as _;
 use soroban_sdk::{token, Address, Env, Ledger, Symbol};
-use crate::{AmmOracleContractClient, AmmPoolContractClient};
+use crate::{AmmOracleContract, AmmOracleContractClient, AmmPoolContract, AmmPoolContractClient};
 
 fn register_token(env: &Env, admin: &Address, name: &Symbol, symbol: &Symbol) -> Address {
     let token_id = env.register_contract(None, token::Contract);

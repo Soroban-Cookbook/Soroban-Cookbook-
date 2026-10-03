@@ -30,7 +30,7 @@
 //!
 //! A direct upgrade is irreversible once executed and takes effect immediately.
 //! For production contracts consider adding:
-//! - A **timelock** (see `03-proxy-admin`) so stakeholders can review the new
+//! - A **timelock** (see `31-proxy-admin`) so stakeholders can review the new
 //!   WASM hash before it becomes live.
 //! - A **multi-sig** admin (see `01-multi-party-auth`) so no single key can
 //!   push a rogue upgrade.

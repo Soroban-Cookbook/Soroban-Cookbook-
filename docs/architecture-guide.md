@@ -26,9 +26,9 @@ Use this decision tree to select the right architectural pattern before you writ
 |-------------|---------|---------|
 | Single admin | `admin.require_auth()` | `examples/tokens/04-mint-burn` |
 | M-of-N signers | Multi-party auth with threshold | `examples/advanced/01-multi-party-auth` |
-| Role-based (owner/minter/pauser) | RBAC with role bitmap | `examples/advanced/03-rbac-modifiers` |
+| Role-based (owner/minter/pauser) | RBAC with role bitmap | `examples/advanced/32-rbac-modifiers` |
 | Delegated spending | Allowance pattern | `examples/tokens/01-sep41-token` |
-| Gasless UX | Permit / trusted forwarder | `examples/advanced/03-permit-pattern` |
+| Gasless UX | Permit / trusted forwarder | `examples/advanced/30-permit-pattern` |
 
 ### Execution Timing
 
@@ -43,7 +43,7 @@ Use this decision tree to select the right architectural pattern before you writ
 | Requirement | Pattern | Example |
 |-------------|---------|---------|
 | On-chain price feeds | Oracle pattern | `examples/advanced/03-oracle-pattern` |
-| Off-chain data relay | Gasless relayer | `examples/advanced/03-gasless-relayer` |
+| Off-chain data relay | Gasless relayer | `examples/advanced/27-gasless-relayer` |
 | Historical balances | Snapshot token | `examples/tokens/04-snapshot-token` |
 
 ### Upgradability
@@ -118,7 +118,7 @@ Assign roles (minter, pauser, upgrader) to separate addresses. Each role is stor
 
 **When to use:** DeFi protocols, tokens with separate operator roles, DAOs with specialized committees.
 
-**Example:** `examples/advanced/03-rbac-modifiers`
+**Example:** `examples/advanced/32-rbac-modifiers`
 
 ### Multi-Party Authorization (M-of-N)
 

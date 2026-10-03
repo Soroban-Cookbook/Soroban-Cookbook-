@@ -77,7 +77,7 @@ fn test_delegate_and_delegate_at() {
     client.mint(&admin, &delegator, &80i128);
 
     env.ledger().with_mut(|l| l.sequence_number = 200);
-    client.delegate(&delegator, &delegatee).unwrap();
+    client.delegate(&delegator, &delegatee);
 
     assert_eq!(client.get_delegate(&delegator), Some(delegatee.clone()));
     assert_eq!(client.get_delegate_at(&delegator, &200u32), Some(delegatee));
@@ -100,10 +100,10 @@ fn test_proposal_snapshot_locks_voting_power() {
     client.submit_proposal(&alice, &proposal_id, &20u32, &50u32);
 
     env.ledger().with_mut(|l| l.sequence_number = 51);
-    client.transfer(&alice, &bob, &30i128).unwrap();
+    client.transfer(&alice, &bob, &30i128);
 
     client.vote(&alice, &proposal_id, &true);
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert_eq!(proposal.votes_yes, 100);
 }
 
@@ -116,16 +116,16 @@ fn test_vote_for_delegated_balance() {
     client.initialize(&admin, &100i128);
     client.mint(&admin, &delegator, &120i128);
 
-    client.delegate(&delegator, &delegatee).unwrap();
+    client.delegate(&delegator, &delegatee);
     let desc = String::from_str(&env, "Delegate Proposal");
     let args = Vec::from_array(&env, [11u32.into_val(&env)]);
     let proposal_id = client.create_proposal(&delegatee, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
 
     env.ledger().with_mut(|l| l.sequence_number = 500);
     client.submit_proposal(&delegatee, &proposal_id, &10u32, &20u32);
-    client.vote_for(&delegatee, &proposal_id, &delegator, &true).unwrap();
+    client.vote_for(&delegatee, &proposal_id, &delegator, &true);
 
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert_eq!(proposal.votes_yes, 120);
 }
 
@@ -144,7 +144,7 @@ fn test_double_vote_fails() {
     env.ledger().with_mut(|l| l.sequence_number = 600);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
 
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
     let result = client.try_vote(&voter, &proposal_id, &true);
     assert_eq!(result, Err(Ok(VotingError::AlreadyVoted)));
 }
@@ -163,10 +163,10 @@ fn test_quorum_not_met() {
 
     env.ledger().with_mut(|l| l.sequence_number = 700);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 711);
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Failed);
+    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Failed);
 }
 
 #[test]
@@ -183,12 +183,12 @@ fn test_execute_proposal_success() {
 
     env.ledger().with_mut(|l| l.sequence_number = 800);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 811);
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Passed);
-    client.execute_proposal(&voter, &proposal_id).unwrap();
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Executed);
+    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Passed);
+    client.execute_proposal(&voter, &proposal_id);
+    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Executed);
 
     let executed: u32 = env.as_contract(&dummy.address, || {
         env.storage().instance().get(&symbol_short!("executed")).unwrap()
@@ -210,7 +210,7 @@ fn test_execute_expired() {
 
     env.ledger().with_mut(|l| l.sequence_number = 900);
     client.submit_proposal(&voter, &proposal_id, &10u32, &15u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 926);
     let result = client.try_execute_proposal(&voter, &proposal_id);
@@ -228,6 +228,6 @@ fn test_cancel_proposal() {
     let args = Vec::from_array(&env, [111u32.into_val(&env)]);
     let proposal_id = client.create_proposal(&proposer, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
 
-    client.cancel_proposal(&proposer, &proposal_id).unwrap();
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Cancelled);
+    client.cancel_proposal(&proposer, &proposal_id);
+    assert_eq!(client.get_proposal_state(&proposal_id), ProposalState::Cancelled);
 }

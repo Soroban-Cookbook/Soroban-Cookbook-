@@ -84,7 +84,7 @@ On-chain audit history. Record event entries persistently and query them with cu
 - Time-based filtering
 - Storage cap trimming
 
-### Iterable Mapping [./iterable-mapping/](../examples/intermediate/iterable-mapping/)
+### Iterable Mapping (canonical) [./iterable-mapping/](../examples/intermediate/iterable-mapping/)
 
 Enumerating key-value state. A map that stores keys in a side list to support paginated iteration.
 
@@ -101,6 +101,8 @@ client.set(&key, &value);
 // Paginate over keys
 let page = client.keys(&0, &10);
 ```
+
+> **Advanced companion**: [`iterable-mappings`](../examples/intermediate/iterable-mappings/) reuses this pattern to demonstrate filtering, mapping, and reducing over an iterable map.
 
 ## Prerequisites
 

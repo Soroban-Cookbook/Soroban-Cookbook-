@@ -109,7 +109,7 @@
 #### Advanced Examples (3 examples)
 - [x] 01-multi-party-auth - Auth vectors + threshold ✅
 - [x] 02-timelock - Delayed execution ✅
-- [x] 03-data-aggregation-oracle - Multi-source oracle ✅
+- [x] 26-data-aggregation-oracle - Multi-source oracle ✅
 
 #### Finance Examples (1+ examples)
 - [x] token-wrapper - Token wrapping ✅

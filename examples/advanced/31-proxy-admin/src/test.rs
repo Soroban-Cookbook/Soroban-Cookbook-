@@ -224,6 +224,160 @@ fn pause_without_auth_panics() {
 }
 
 // ---------------------------------------------------------------------------
+// Uninitialized operations
+// ---------------------------------------------------------------------------
+
+#[test]
+fn uninitialized_calls_return_not_initialized() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+
+    let hash = dummy_hash(&env, 42);
+    assert_eq!(
+        client.try_propose_upgrade(&hash, &MIN_DELAY),
+        Err(Ok(AdminError::NotInitialized))
+    );
+    assert_eq!(
+        client.try_cancel_upgrade(),
+        Err(Ok(AdminError::NotInitialized))
+    );
+    assert_eq!(
+        client.try_execute_upgrade(),
+        Err(Ok(AdminError::NotInitialized))
+    );
+    assert_eq!(
+        client.try_pause(),
+        Err(Ok(AdminError::NotInitialized))
+    );
+    assert_eq!(
+        client.try_unpause(),
+        Err(Ok(AdminError::NotInitialized))
+    );
+    assert_eq!(
+        client.try_admin(),
+        Err(Ok(AdminError::NotInitialized))
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Boundary delays & Re-proposal
+// ---------------------------------------------------------------------------
+
+#[test]
+fn propose_accepts_exact_boundary_delays() {
+    let (env, _admin, client) = setup();
+    let hash_min = dummy_hash(&env, 101);
+    client.propose_upgrade(&hash_min, &MIN_DELAY);
+    assert_eq!(client.proposal_state(), ProposalState::Pending);
+    client.cancel_upgrade();
+
+    let hash_max = dummy_hash(&env, 102);
+    client.propose_upgrade(&hash_max, &MAX_DELAY);
+    assert_eq!(client.proposal_state(), ProposalState::Pending);
+}
+
+#[test]
+fn re_propose_after_cancel_succeeds() {
+    let (env, _admin, client) = setup();
+    let hash1 = dummy_hash(&env, 11);
+    let hash2 = dummy_hash(&env, 12);
+
+    client.propose_upgrade(&hash1, &MIN_DELAY);
+    assert_eq!(client.proposal_state(), ProposalState::Pending);
+    assert_eq!(client.get_proposal().unwrap().new_wasm_hash, hash1);
+
+    client.cancel_upgrade();
+    assert_eq!(client.proposal_state(), ProposalState::None);
+    assert!(client.get_proposal().is_none());
+
+    client.propose_upgrade(&hash2, &(MIN_DELAY + 10));
+    assert_eq!(client.proposal_state(), ProposalState::Pending);
+    assert_eq!(client.get_proposal().unwrap().new_wasm_hash, hash2);
+}
+
+#[test]
+fn proposal_becomes_ready_at_exact_execute_after_timestamp() {
+    let (env, _admin, client) = setup();
+    client.propose_upgrade(&dummy_hash(&env, 13), &MIN_DELAY);
+    env.ledger().with_mut(|l| l.timestamp += MIN_DELAY);
+    assert_eq!(client.proposal_state(), ProposalState::Ready);
+}
+
+#[test]
+fn get_proposal_fields_match_expected() {
+    let (env, _admin, client) = setup();
+    let hash = dummy_hash(&env, 14);
+    let start_ts = env.ledger().timestamp();
+    client.propose_upgrade(&hash, &MIN_DELAY);
+
+    let proposal = client.get_proposal().expect("proposal should exist");
+    assert_eq!(proposal.new_wasm_hash, hash);
+    assert_eq!(proposal.execute_after, start_ts + MIN_DELAY);
+}
+
+#[test]
+fn require_unpaused_helper_behaves_correctly() {
+    let (env, _admin, client) = setup();
+    env.as_contract(&client.address, || {
+        assert_eq!(require_unpaused(&env), Ok(()));
+    });
+
+    client.pause();
+    env.as_contract(&client.address, || {
+        assert_eq!(require_unpaused(&env), Err(AdminError::ContractPaused));
+    });
+
+    client.unpause();
+    env.as_contract(&client.address, || {
+        assert_eq!(require_unpaused(&env), Ok(()));
+    });
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn unpause_without_auth_panics() {
+    let env = Env::default();
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    env.mock_all_auths();
+    client.initialize(&admin);
+    client.pause();
+    env.set_auths(&[]);
+    client.unpause();
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn cancel_without_auth_panics() {
+    let env = Env::default();
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    env.mock_all_auths();
+    client.initialize(&admin);
+    client.propose_upgrade(&dummy_hash(&env, 15), &MIN_DELAY);
+    env.set_auths(&[]);
+    client.cancel_upgrade();
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn execute_without_auth_panics() {
+    let env = Env::default();
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    env.mock_all_auths();
+    client.initialize(&admin);
+    client.propose_upgrade(&dummy_hash(&env, 16), &MIN_DELAY);
+    env.ledger().with_mut(|l| l.timestamp += MIN_DELAY + 1);
+    env.set_auths(&[]);
+    client.execute_upgrade();
+}
+// ---------------------------------------------------------------------------
 // Benchmarks
 // ---------------------------------------------------------------------------
 // Run with: cargo test -p proxy-admin -- --nocapture bench

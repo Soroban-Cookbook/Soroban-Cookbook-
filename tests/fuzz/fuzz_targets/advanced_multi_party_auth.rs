@@ -28,9 +28,11 @@ fuzz_target!(|input: Input| {
     for _ in 0..(input.count as u32).min(25) {
         signers.push_back(Address::generate(&env));
     }
+    // The arbitrary prototype can yield vectors holding non-`Address` values;
+    // `try_get` skips those instead of panicking in the harness itself.
     let extras: Vec<Address> = input.extra.into_val(&env);
     for i in 0..extras.len().min(5) {
-        if let Some(a) = extras.get(i) {
+        if let Ok(Some(a)) = extras.try_get(i) {
             signers.push_back(a);
         }
     }

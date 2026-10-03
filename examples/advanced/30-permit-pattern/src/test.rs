@@ -22,6 +22,20 @@ fn test_initialize_sets_balance() {
 }
 
 #[test]
+fn test_initialize_requires_admin_auth() {
+    let env = Env::default();
+    let contract_id = env.register(PermitPattern, ());
+    let client = PermitPatternClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    assert!(client.try_initialize(&admin, &1_000).is_err());
+
+    env.mock_all_auths();
+    client.initialize(&admin, &1_000);
+    assert_eq!(client.balance(&admin), 1_000);
+}
+
+#[test]
 fn test_permit_sets_allowance() {
     let (env, client, owner) = setup(1_000);
     let spender = Address::generate(&env);

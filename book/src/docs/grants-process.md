@@ -81,7 +81,7 @@ Active grants report progress bi-weekly and submit milestone reports with code P
 ## Related Resources
 
 - [Contributing Guide](../CONTRIBUTING.md)
-- [Project Showcase](../SHOWCASE.md)
+- [Project Showcase](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/SHOWCASE.md)
 - [Community Guidelines](../community-guidelines.md)
 - [Code of Conduct](../CODE_OF_CONDUCT.md)
 - [Security Best Practices](./security-best-practices.md)

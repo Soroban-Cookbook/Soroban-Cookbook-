@@ -159,9 +159,9 @@ This example is the **canonical RBAC pattern**. The following examples extend or
 
 - **[access-control](../../intermediate/access-control/)** — Combines RBAC + Multisig + Timelock in one contract. Use when you need layered governance with time-delayed execution and multi-party approval.
 
-- **[05-hierarchical-access-control](../05-hierarchical-access-control/)** — Advanced: RBAC with permission inheritance and fine-grained permission checks. Use when you need dynamic permissions that roles can gain/lose at runtime.
+- **[16-hierarchical-access-control](../16-hierarchical-access-control/)** — Advanced: RBAC with permission inheritance and fine-grained permission checks. Use when you need dynamic permissions that roles can gain/lose at runtime.
 
-- **[03-registry-access-controls](../03-registry-access-controls/)** — Registry-specific access controls with whitelist and registration fees. Use for domain registries or similar use cases.
+- **[33-registry-access-controls](../33-registry-access-controls/)** — Registry-specific access controls with whitelist and registration fees. Use for domain registries or similar use cases.
 
 ### Complementary Patterns
 
@@ -171,7 +171,7 @@ This example is the **canonical RBAC pattern**. The following examples extend or
 
 ## When to Use This Pattern
 
-Choose **this example** (03-rbac-modifiers) when you need:
+Choose **this example** (32-rbac-modifiers) when you need:
 - ✅ Flexible, symbol-based roles (not locked to a fixed hierarchy)
 - ✅ Composable guards (`only_role`, `any_role`) for protecting functions
 - ✅ The ability to add custom roles without modifying the contract
@@ -182,6 +182,6 @@ Choose a **different pattern** when:
 - 🔄 You need strict numeric role hierarchy → use `02-role-based-access-control`
 - 🔄 You need multisig + timelock + RBAC in one contract → use `access-control`
 - 🔄 You need roles to inherit permissions dynamically → use `05-hierarchical-access-control`
-- 🔄 You're building a registry with fees/whitelist → use `03-registry-access-controls`
+- 🔄 You're building a registry with fees/whitelist → use `33-registry-access-controls`
 
 **📖 For a comprehensive comparison of all RBAC patterns, see [RBAC Pattern Comparison Guide](../../docs/rbac-pattern-comparison.md).**

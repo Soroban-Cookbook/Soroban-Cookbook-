@@ -399,14 +399,16 @@ factory_client.register_template(
 // Code snippet coming soon
 ```
 
-### Iterable Mappings
-[View Source](../examples/intermediate/iterable-mappings)
+### Iterable Mapping (canonical)
+[View Source](../examples/intermediate/iterable-mapping)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
 // Code snippet coming soon
 ```
+
+Companion example adding filtering, mapping, and reducing over the same pattern: [View Source](../examples/intermediate/iterable-mappings)
 
 ### Multi Sig Patterns
 [View Source](../examples/intermediate/multi-sig-patterns)
@@ -461,7 +463,7 @@ client.initialize(&admin_address);
 ```
 
 ### 03 Cross Contract Optimization
-[View Source](../examples/advanced/03-cross-contract-optimization)
+[View Source](../examples/advanced/25-cross-contract-optimization)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -484,7 +486,7 @@ pub fn submit(env: Env, updater: Address, value: i128) -> Result<(), OracleError
 ```
 
 ### 03 Proxy Admin
-[View Source](../examples/advanced/03-proxy-admin)
+[View Source](../examples/advanced/31-proxy-admin)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -497,7 +499,7 @@ pub fn deposit(env: Env, user: Address, amount: i128) -> Result<(), Error> {
 ```
 
 ### 03 Rbac Modifiers
-[View Source](../examples/advanced/03-rbac-modifiers)
+[View Source](../examples/advanced/32-rbac-modifiers)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -506,7 +508,7 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 ```
 
 ### 03 Registry Access Controls
-[View Source](../examples/advanced/03-registry-access-controls)
+[View Source](../examples/advanced/33-registry-access-controls)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -914,8 +916,4 @@ pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, WrapperError>
     Ok(new_balance)
 }
 ```
-
-## Storage
-
-## Hello-world
 

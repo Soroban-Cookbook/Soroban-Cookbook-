@@ -26,7 +26,8 @@
 
 - [All Examples Index](./examples-index.md)
 
-## Basics (5 examples)
+## Basics
+- [01 · Hello World (canonical intro)](../examples/basics/01-hello-world/README.md)
 - [Overview & listing](./examples/basics.md)
 - [Interactive Playground](./examples/playground.md)
 - [Storage Patterns](./examples/storage-patterns.md)
