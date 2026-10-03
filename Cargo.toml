@@ -71,6 +71,7 @@ members = [
     "examples/advanced/03-oracle-pattern",
     "examples/advanced/04-circuit-breaker",
     "examples/advanced/04-upgradeable-proxy",
+    "examples/advanced/04-upgradeable-proxy/implementation-v1",
     "examples/advanced/contract-registry",
     "examples/advanced/08-multicall",
     "examples/advanced/08-batch-operations",
