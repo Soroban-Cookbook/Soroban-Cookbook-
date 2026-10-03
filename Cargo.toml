@@ -59,6 +59,7 @@ members = [
     "examples/advanced/22-batch-builder",
     "examples/advanced/32-rbac-modifiers",
     "examples/advanced/33-registry-access-controls",
+    "examples/advanced/29-merkle-whitelist",
     "examples/advanced/31-proxy-admin",
     "examples/advanced/19-diamond-security",
     "examples/advanced/19-diamond-security/facet-adder",
