@@ -74,6 +74,11 @@ impl GaslessRelayerContract {
             return Err(RelayerError::AlreadyInitialized);
         }
 
+        // The admin must authorize its own appointment, otherwise anyone could
+        // deploy-and-initialize the contract with themselves as admin and take
+        // over relayer policy.
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Initialized, &true);
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()

@@ -21,6 +21,29 @@ fn sign_tx(env: &Env, signer: &SigningKey, tx: &MetaTx) -> BytesN<64> {
 }
 
 #[test]
+fn test_initialize_requires_admin_auth() {
+    let env = Env::default();
+
+    let contract_id = env.register(GaslessRelayerContract, ());
+    let client = GaslessRelayerContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // No auth is mocked: an unauthenticated caller cannot initialize the
+    // contract or appoint an admin of their choosing.
+    assert!(client.try_initialize(&admin).is_err());
+
+    // The intended admin can initialize once its authorization is provided.
+    env.mock_all_auths();
+    assert_eq!(client.try_initialize(&admin), Ok(Ok(())));
+
+    // Initialization stays one-shot.
+    assert_eq!(
+        client.try_initialize(&admin),
+        Err(Ok(RelayerError::AlreadyInitialized))
+    );
+}
+
+#[test]
 fn test_initialize_and_fund() {
     let env = Env::default();
     env.mock_all_auths();
