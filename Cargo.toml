@@ -80,6 +80,7 @@ members = [
     "examples/advanced/16-cross-contract-integration-testing",
     "examples/advanced/17-bridge-security",
     "examples/advanced/24-cross-chain-bridge",
+    "examples/advanced/03-cross-contract-optimization",
     "examples/advanced/25-cross-contract-optimization",
     "examples/advanced/26-data-aggregation-oracle",
     "examples/advanced/35-gas-optimization",
