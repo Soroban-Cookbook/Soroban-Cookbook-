@@ -12,6 +12,7 @@ operations for the Soroban Cookbook.
 | Deploy Docs | `deploy-docs.yml` | Push to `main` | mdBook → GitHub Pages |
 | Dependabot Auto-merge | `dependabot-auto-merge.yml` | Dependabot PRs | Auto-merge patch updates |
 | Fuzz | `fuzz.yml` | Schedule | Fuzz testing of contract inputs |
+| Coverage Dashboard | `coverage.yml` | Schedule (weekly, Mon 11:00 UTC), manual | `cargo tarpaulin` coverage, regenerates `docs/coverage-dashboard.md` |
 | **Community Metrics** | `community-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect engagement/health data |
 | **Documentation Metrics** | `documentation-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect page views, search queries, user paths |
 

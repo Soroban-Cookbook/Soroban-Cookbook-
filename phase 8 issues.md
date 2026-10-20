@@ -1,7 +1,7 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 14% (7/50)
+**Completion:** 16% (8/50)
 **Last Audit Date:** October 19, 2026
 
 Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
@@ -157,14 +157,33 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - ✅ Dashboard — [`docs/documentation-metrics.md`](./docs/documentation-metrics.md) provides page view tables, search query analysis, popular content rankings, user path analysis, rolling weekly data, monthly trends, zero-result search terms, and mdBook vs webapp comparison.
   - ✅ Verification — Metric definitions added to [`docs/community-metrics.md`](./docs/community-metrics.md) § 3.6 (14 documentation usage metrics). Links added to [`README.md`](./README.md) and [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
+## Events & Workshops
+
+### Issue #422: Organize first workshop
+
+- **Priority:** Medium
+- **Status:** ✅ Complete (plan); date and platform to be set when scheduled
+
+- **Current state:** Deliverable created in-repo — [`docs/workshop-plan.md`](./docs/workshop-plan.md) holds the agenda, registration process, delivery plan, and follow-up checklist. Summarized in [`CONTRIBUTING.md`](./CONTRIBUTING.md#first-workshop) and linked from the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics). Tracked on GitHub as issue [#907](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/issues/907).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria (see below); phase file updated with this entry.
+- **Scope:** M
+- **Description:** Workshop on Soroban development
+- **Acceptance Criteria:**
+  - ✅ Workshop content created — [`docs/workshop-plan.md` § 3](./docs/workshop-plan.md#3-workshop-content) gives the 3-hour agenda, the module format, and prerequisites, built on existing cookbook examples.
+  - 🟡 Date and platform — [`docs/workshop-plan.md` § 2](./docs/workshop-plan.md#2-date-and-platform) fixes the requirements and leaves the date, time, platform, and join link as placeholders for the maintainers to fill in when scheduling.
+  - ✅ Registration — [`docs/workshop-plan.md` § 4](./docs/workshop-plan.md#4-registration) defines the form fields, timeline, waitlist, reminders, and data handling (form URL to be added).
+  - ✅ Delivery — [`docs/workshop-plan.md` § 5](./docs/workshop-plan.md#5-delivery) defines roles, promotion, session preparation, and accessibility.
+  - ✅ Follow-up materials — [`docs/workshop-plan.md` § 6](./docs/workshop-plan.md#6-follow-up-materials) is a checklist with owners and deadlines.
+
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629, #927)
-**Completed:** 7
+**Completed:** 8
 **In Progress:** 0  
-**Planned:** 59
+**Planned:** 58
 
-**Phase 8 Status:** 📋 **14% COMPLETE (Ongoing)**
+**Phase 8 Status:** 📋 **16% COMPLETE (Ongoing)**
 
 Community categories:
 

@@ -1,0 +1,734 @@
+{
+  "date": "2026-10-20",
+  "commit": "e8a5a4b",
+  "lines_covered": 7902,
+  "lines_valid": 9435,
+  "line_rate": 83.75,
+  "crates": {
+    "examples/advanced/01-multi-party-auth": {
+      "lines_covered": 108,
+      "lines_valid": 167,
+      "line_rate": 64.67
+    },
+    "examples/advanced/02-timelock": {
+      "lines_covered": 72,
+      "lines_valid": 78,
+      "line_rate": 92.31
+    },
+    "examples/advanced/03-cross-contract-optimization": {
+      "lines_covered": 12,
+      "lines_valid": 12,
+      "line_rate": 100.0
+    },
+    "examples/advanced/03-oracle-pattern": {
+      "lines_covered": 27,
+      "lines_valid": 34,
+      "line_rate": 79.41
+    },
+    "examples/advanced/04-circuit-breaker": {
+      "lines_covered": 43,
+      "lines_valid": 70,
+      "line_rate": 61.43
+    },
+    "examples/advanced/04-upgradeable-proxy": {
+      "lines_covered": 31,
+      "lines_valid": 34,
+      "line_rate": 91.18
+    },
+    "examples/advanced/04-upgradeable-proxy/implementation-v1": {
+      "lines_covered": 0,
+      "lines_valid": 2,
+      "line_rate": 0.0
+    },
+    "examples/advanced/05-rate-limiting": {
+      "lines_covered": 58,
+      "lines_valid": 63,
+      "line_rate": 92.06
+    },
+    "examples/advanced/07-state-channels": {
+      "lines_covered": 82,
+      "lines_valid": 82,
+      "line_rate": 100.0
+    },
+    "examples/advanced/07-trusted-forwarder": {
+      "lines_covered": 73,
+      "lines_valid": 79,
+      "line_rate": 92.41
+    },
+    "examples/advanced/07-upgrade-patterns": {
+      "lines_covered": 73,
+      "lines_valid": 86,
+      "line_rate": 84.88
+    },
+    "examples/advanced/09-storage-layout-validator": {
+      "lines_covered": 30,
+      "lines_valid": 31,
+      "line_rate": 96.77
+    },
+    "examples/advanced/09-storage-optimization": {
+      "lines_covered": 48,
+      "lines_valid": 48,
+      "line_rate": 100.0
+    },
+    "examples/advanced/10-contract-migrations": {
+      "lines_covered": 77,
+      "lines_valid": 89,
+      "line_rate": 86.52
+    },
+    "examples/advanced/11-version-registry": {
+      "lines_covered": 32,
+      "lines_valid": 42,
+      "line_rate": 76.19
+    },
+    "examples/advanced/12-oracle-consumer/aggregating": {
+      "lines_covered": 54,
+      "lines_valid": 59,
+      "line_rate": 91.53
+    },
+    "examples/advanced/12-oracle-consumer/common": {
+      "lines_covered": 6,
+      "lines_valid": 7,
+      "line_rate": 85.71
+    },
+    "examples/advanced/12-oracle-consumer/guarded": {
+      "lines_covered": 41,
+      "lines_valid": 43,
+      "line_rate": 95.35
+    },
+    "examples/advanced/12-oracle-consumer/settlement": {
+      "lines_covered": 53,
+      "lines_valid": 58,
+      "line_rate": 91.38
+    },
+    "examples/advanced/12-real-world-case-studies": {
+      "lines_covered": 47,
+      "lines_valid": 51,
+      "line_rate": 92.16
+    },
+    "examples/advanced/13-virtual-channel": {
+      "lines_covered": 73,
+      "lines_valid": 81,
+      "line_rate": 90.12
+    },
+    "examples/advanced/14-bridge-monitor": {
+      "lines_covered": 53,
+      "lines_valid": 71,
+      "line_rate": 74.65
+    },
+    "examples/advanced/14-bridge-validators": {
+      "lines_covered": 43,
+      "lines_valid": 52,
+      "line_rate": 82.69
+    },
+    "examples/advanced/15-oracle-integration": {
+      "lines_covered": 52,
+      "lines_valid": 62,
+      "line_rate": 83.87
+    },
+    "examples/advanced/15-reentrancy-guard": {
+      "lines_covered": 27,
+      "lines_valid": 28,
+      "line_rate": 96.43
+    },
+    "examples/advanced/16-cross-contract-integration-testing": {
+      "lines_covered": 13,
+      "lines_valid": 23,
+      "line_rate": 56.52
+    },
+    "examples/advanced/16-hierarchical-access-control": {
+      "lines_covered": 125,
+      "lines_valid": 135,
+      "line_rate": 92.59
+    },
+    "examples/advanced/17-bridge-security": {
+      "lines_covered": 97,
+      "lines_valid": 104,
+      "line_rate": 93.27
+    },
+    "examples/advanced/18-diamond-facets": {
+      "lines_covered": 118,
+      "lines_valid": 126,
+      "line_rate": 93.65
+    },
+    "examples/advanced/19-diamond-security": {
+      "lines_covered": 37,
+      "lines_valid": 45,
+      "line_rate": 82.22
+    },
+    "examples/advanced/19-diamond-security/facet-adder": {
+      "lines_covered": 16,
+      "lines_valid": 18,
+      "line_rate": 88.89
+    },
+    "examples/advanced/19-diamond-security/facet-multiplier": {
+      "lines_covered": 15,
+      "lines_valid": 18,
+      "line_rate": 83.33
+    },
+    "examples/advanced/20-batch-transfer": {
+      "lines_covered": 31,
+      "lines_valid": 31,
+      "line_rate": 100.0
+    },
+    "examples/advanced/21-merkle-proofs": {
+      "lines_covered": 46,
+      "lines_valid": 49,
+      "line_rate": 93.88
+    },
+    "examples/advanced/22-batch-builder": {
+      "lines_covered": 91,
+      "lines_valid": 101,
+      "line_rate": 90.1
+    },
+    "examples/advanced/25-cross-contract-optimization": {
+      "lines_covered": 12,
+      "lines_valid": 12,
+      "line_rate": 100.0
+    },
+    "examples/advanced/26-data-aggregation-oracle": {
+      "lines_covered": 77,
+      "lines_valid": 80,
+      "line_rate": 96.25
+    },
+    "examples/advanced/27-gasless-relayer": {
+      "lines_covered": 55,
+      "lines_valid": 62,
+      "line_rate": 88.71
+    },
+    "examples/advanced/28-merkle-airdrop": {
+      "lines_covered": 36,
+      "lines_valid": 40,
+      "line_rate": 90.0
+    },
+    "examples/advanced/29-merkle-whitelist": {
+      "lines_covered": 185,
+      "lines_valid": 238,
+      "line_rate": 77.73
+    },
+    "examples/advanced/30-permit-pattern": {
+      "lines_covered": 48,
+      "lines_valid": 56,
+      "line_rate": 85.71
+    },
+    "examples/advanced/31-proxy-admin": {
+      "lines_covered": 48,
+      "lines_valid": 50,
+      "line_rate": 96.0
+    },
+    "examples/advanced/32-rbac-modifiers": {
+      "lines_covered": 95,
+      "lines_valid": 101,
+      "line_rate": 94.06
+    },
+    "examples/advanced/33-registry-access-controls": {
+      "lines_covered": 29,
+      "lines_valid": 39,
+      "line_rate": 74.36
+    },
+    "examples/advanced/34-state-channel-disputes": {
+      "lines_covered": 74,
+      "lines_valid": 81,
+      "line_rate": 91.36
+    },
+    "examples/advanced/35-gas-optimization": {
+      "lines_covered": 59,
+      "lines_valid": 74,
+      "line_rate": 79.73
+    },
+    "examples/advanced/36-price-oracle": {
+      "lines_covered": 81,
+      "lines_valid": 94,
+      "line_rate": 86.17
+    },
+    "examples/advanced/37-beacon-management": {
+      "lines_covered": 46,
+      "lines_valid": 55,
+      "line_rate": 83.64
+    },
+    "examples/advanced/38-diamond-pattern": {
+      "lines_covered": 101,
+      "lines_valid": 119,
+      "line_rate": 84.87
+    },
+    "examples/advanced/39-batch-operations": {
+      "lines_covered": 53,
+      "lines_valid": 54,
+      "line_rate": 98.15
+    },
+    "examples/advanced/40-computation-optimization": {
+      "lines_covered": 46,
+      "lines_valid": 48,
+      "line_rate": 95.83
+    },
+    "examples/advanced/41-gas-reporter": {
+      "lines_covered": 5,
+      "lines_valid": 5,
+      "line_rate": 100.0
+    },
+    "examples/advanced/42-multicall": {
+      "lines_covered": 24,
+      "lines_valid": 25,
+      "line_rate": 96.0
+    },
+    "examples/advanced/43-payment-channels": {
+      "lines_covered": 82,
+      "lines_valid": 82,
+      "line_rate": 100.0
+    },
+    "examples/advanced/contract-registry": {
+      "lines_covered": 27,
+      "lines_valid": 36,
+      "line_rate": 75.0
+    },
+    "examples/basics/01-hello-world": {
+      "lines_covered": 2,
+      "lines_valid": 2,
+      "line_rate": 100.0
+    },
+    "examples/basics/02-storage-patterns": {
+      "lines_covered": 32,
+      "lines_valid": 33,
+      "line_rate": 96.97
+    },
+    "examples/basics/03-authentication": {
+      "lines_covered": 142,
+      "lines_valid": 148,
+      "line_rate": 95.95
+    },
+    "examples/basics/03-custom-errors": {
+      "lines_covered": 3,
+      "lines_valid": 52,
+      "line_rate": 5.77
+    },
+    "examples/basics/04-events": {
+      "lines_covered": 34,
+      "lines_valid": 36,
+      "line_rate": 94.44
+    },
+    "examples/basics/05-auth-context": {
+      "lines_covered": 14,
+      "lines_valid": 14,
+      "line_rate": 100.0
+    },
+    "examples/basics/05-error-handling": {
+      "lines_covered": 47,
+      "lines_valid": 49,
+      "line_rate": 95.92
+    },
+    "examples/basics/06-validation-patterns": {
+      "lines_covered": 62,
+      "lines_valid": 73,
+      "line_rate": 84.93
+    },
+    "examples/basics/07-type-conversions": {
+      "lines_covered": 43,
+      "lines_valid": 45,
+      "line_rate": 95.56
+    },
+    "examples/basics/08-soroban-types": {
+      "lines_covered": 52,
+      "lines_valid": 55,
+      "line_rate": 94.55
+    },
+    "examples/basics/09-enum-types": {
+      "lines_covered": 56,
+      "lines_valid": 57,
+      "line_rate": 98.25
+    },
+    "examples/basics/10-custom-structs": {
+      "lines_covered": 69,
+      "lines_valid": 75,
+      "line_rate": 92.0
+    },
+    "examples/basics/11-primitive-types": {
+      "lines_covered": 122,
+      "lines_valid": 177,
+      "line_rate": 68.93
+    },
+    "examples/basics/12-data-types": {
+      "lines_covered": 41,
+      "lines_valid": 52,
+      "line_rate": 78.85
+    },
+    "examples/basics/13-collection-types": {
+      "lines_covered": 50,
+      "lines_valid": 56,
+      "line_rate": 89.29
+    },
+    "examples/basics/13-compressed-storage": {
+      "lines_covered": 29,
+      "lines_valid": 29,
+      "line_rate": 100.0
+    },
+    "examples/basics/13-queue-variants": {
+      "lines_covered": 59,
+      "lines_valid": 69,
+      "line_rate": 85.51
+    },
+    "examples/basics/14-event-filtering": {
+      "lines_covered": 12,
+      "lines_valid": 12,
+      "line_rate": 100.0
+    },
+    "examples/basics/14-fifo-queue": {
+      "lines_covered": 19,
+      "lines_valid": 23,
+      "line_rate": 82.61
+    },
+    "examples/basics/lazy-cache": {
+      "lines_covered": 42,
+      "lines_valid": 53,
+      "line_rate": 79.25
+    },
+    "examples/defi/01-simple-swap": {
+      "lines_covered": 33,
+      "lines_valid": 49,
+      "line_rate": 67.35
+    },
+    "examples/defi/02-constant-product-amm": {
+      "lines_covered": 97,
+      "lines_valid": 102,
+      "line_rate": 95.1
+    },
+    "examples/defi/03-lending-pool": {
+      "lines_covered": 87,
+      "lines_valid": 87,
+      "line_rate": 100.0
+    },
+    "examples/defi/04-collateralized-lending": {
+      "lines_covered": 101,
+      "lines_valid": 104,
+      "line_rate": 97.12
+    },
+    "examples/defi/05-flash-loans": {
+      "lines_covered": 27,
+      "lines_valid": 27,
+      "line_rate": 100.0
+    },
+    "examples/defi/06-flash-loan-use-cases": {
+      "lines_covered": 54,
+      "lines_valid": 85,
+      "line_rate": 63.53
+    },
+    "examples/defi/07-staking-pool": {
+      "lines_covered": 5,
+      "lines_valid": 67,
+      "line_rate": 7.46
+    },
+    "examples/defi/08-liquidity-mining": {
+      "lines_covered": 107,
+      "lines_valid": 110,
+      "line_rate": 97.27
+    },
+    "examples/defi/09-vault-strategies": {
+      "lines_covered": 51,
+      "lines_valid": 57,
+      "line_rate": 89.47
+    },
+    "examples/defi/10-swap-liquidity": {
+      "lines_covered": 9,
+      "lines_valid": 59,
+      "line_rate": 15.25
+    },
+    "examples/defi/11-amm-price-oracle": {
+      "lines_covered": 68,
+      "lines_valid": 89,
+      "line_rate": 76.4
+    },
+    "examples/defi/12-farming-pool": {
+      "lines_covered": 85,
+      "lines_valid": 92,
+      "line_rate": 92.39
+    },
+    "examples/defi/13-amm-router": {
+      "lines_covered": 29,
+      "lines_valid": 31,
+      "line_rate": 93.55
+    },
+    "examples/defi/14-automatic-snapshot-triggers": {
+      "lines_covered": 62,
+      "lines_valid": 79,
+      "line_rate": 78.48
+    },
+    "examples/defi/15-reward-strategies": {
+      "lines_covered": 46,
+      "lines_valid": 53,
+      "line_rate": 86.79
+    },
+    "examples/defi/staking-pool": {
+      "lines_covered": 31,
+      "lines_valid": 31,
+      "line_rate": 100.0
+    },
+    "examples/governance/01-simple-voting": {
+      "lines_covered": 55,
+      "lines_valid": 60,
+      "line_rate": 91.67
+    },
+    "examples/governance/02-token-voting": {
+      "lines_covered": 157,
+      "lines_valid": 170,
+      "line_rate": 92.35
+    },
+    "examples/governance/03-voting-time-constraints": {
+      "lines_covered": 90,
+      "lines_valid": 94,
+      "line_rate": 95.74
+    },
+    "examples/governance/04-proposal-lifecycle": {
+      "lines_covered": 72,
+      "lines_valid": 84,
+      "line_rate": 85.71
+    },
+    "examples/governance/05-proposal-validation": {
+      "lines_covered": 30,
+      "lines_valid": 35,
+      "line_rate": 85.71
+    },
+    "examples/governance/06-vote-delegation": {
+      "lines_covered": 66,
+      "lines_valid": 72,
+      "line_rate": 91.67
+    },
+    "examples/governance/07-delegation": {
+      "lines_covered": 98,
+      "lines_valid": 106,
+      "line_rate": 92.45
+    },
+    "examples/governance/08-delegation-marketplace": {
+      "lines_covered": 55,
+      "lines_valid": 57,
+      "line_rate": 96.49
+    },
+    "examples/governance/09-timelock-governance": {
+      "lines_covered": 51,
+      "lines_valid": 55,
+      "line_rate": 92.73
+    },
+    "examples/governance/10-dao-treasury": {
+      "lines_covered": 99,
+      "lines_valid": 108,
+      "line_rate": 91.67
+    },
+    "examples/governance/11-automatic-snapshot-triggers": {
+      "lines_covered": 62,
+      "lines_valid": 79,
+      "line_rate": 78.48
+    },
+    "examples/hello-world": {
+      "lines_covered": 2,
+      "lines_valid": 2,
+      "line_rate": 100.0
+    },
+    "examples/intermediate/02-role-based-access-control": {
+      "lines_covered": 44,
+      "lines_valid": 45,
+      "line_rate": 97.78
+    },
+    "examples/intermediate/03-pause-unpause": {
+      "lines_covered": 30,
+      "lines_valid": 36,
+      "line_rate": 83.33
+    },
+    "examples/intermediate/03-priority-queue": {
+      "lines_covered": 73,
+      "lines_valid": 74,
+      "line_rate": 98.65
+    },
+    "examples/intermediate/access-control": {
+      "lines_covered": 96,
+      "lines_valid": 129,
+      "line_rate": 74.42
+    },
+    "examples/intermediate/ajo": {
+      "lines_covered": 6,
+      "lines_valid": 7,
+      "line_rate": 85.71
+    },
+    "examples/intermediate/ajo-factory": {
+      "lines_covered": 14,
+      "lines_valid": 69,
+      "line_rate": 20.29
+    },
+    "examples/intermediate/event-aggregation": {
+      "lines_covered": 12,
+      "lines_valid": 15,
+      "line_rate": 80.0
+    },
+    "examples/intermediate/event-history": {
+      "lines_covered": 67,
+      "lines_valid": 70,
+      "line_rate": 95.71
+    },
+    "examples/intermediate/event-subscriptions": {
+      "lines_covered": 45,
+      "lines_valid": 46,
+      "line_rate": 97.83
+    },
+    "examples/intermediate/iterable-mapping": {
+      "lines_covered": 33,
+      "lines_valid": 48,
+      "line_rate": 68.75
+    },
+    "examples/intermediate/iterable-mappings": {
+      "lines_covered": 49,
+      "lines_valid": 79,
+      "line_rate": 62.03
+    },
+    "examples/intermediate/lazy-loading": {
+      "lines_covered": 41,
+      "lines_valid": 42,
+      "line_rate": 97.62
+    },
+    "examples/intermediate/multi-sig-patterns": {
+      "lines_covered": 50,
+      "lines_valid": 61,
+      "line_rate": 81.97
+    },
+    "examples/intermediate/storage-migration": {
+      "lines_covered": 59,
+      "lines_valid": 77,
+      "line_rate": 76.62
+    },
+    "examples/intermediate/storage-pagination": {
+      "lines_covered": 30,
+      "lines_valid": 30,
+      "line_rate": 100.0
+    },
+    "examples/nfts/01-basic-nft": {
+      "lines_covered": 79,
+      "lines_valid": 96,
+      "line_rate": 82.29
+    },
+    "examples/nfts/03-nft-metadata-standards": {
+      "lines_covered": 37,
+      "lines_valid": 145,
+      "line_rate": 25.52
+    },
+    "examples/nfts/04-nft-marketplace": {
+      "lines_covered": 74,
+      "lines_valid": 78,
+      "line_rate": 94.87
+    },
+    "examples/nfts/05-automatic-snapshot-triggers": {
+      "lines_covered": 62,
+      "lines_valid": 79,
+      "line_rate": 78.48
+    },
+    "examples/tokens/01-sep41-token": {
+      "lines_covered": 77,
+      "lines_valid": 93,
+      "line_rate": 82.8
+    },
+    "examples/tokens/01-vesting-management": {
+      "lines_covered": 86,
+      "lines_valid": 97,
+      "line_rate": 88.66
+    },
+    "examples/tokens/02-minting-strategies": {
+      "lines_covered": 83,
+      "lines_valid": 96,
+      "line_rate": 86.46
+    },
+    "examples/tokens/02-sep41-extensions": {
+      "lines_covered": 79,
+      "lines_valid": 86,
+      "line_rate": 91.86
+    },
+    "examples/tokens/03-optimized-operations": {
+      "lines_covered": 26,
+      "lines_valid": 48,
+      "line_rate": 54.17
+    },
+    "examples/tokens/03-pausable-token": {
+      "lines_covered": 109,
+      "lines_valid": 115,
+      "line_rate": 94.78
+    },
+    "examples/tokens/04-mint-burn": {
+      "lines_covered": 40,
+      "lines_valid": 45,
+      "line_rate": 88.89
+    },
+    "examples/tokens/04-snapshot-token": {
+      "lines_covered": 113,
+      "lines_valid": 120,
+      "line_rate": 94.17
+    },
+    "examples/tokens/05-allowance-pattern": {
+      "lines_covered": 53,
+      "lines_valid": 58,
+      "line_rate": 91.38
+    },
+    "examples/tokens/05-vesting": {
+      "lines_covered": 50,
+      "lines_valid": 54,
+      "line_rate": 92.59
+    },
+    "examples/tokens/06-reward-token": {
+      "lines_covered": 85,
+      "lines_valid": 89,
+      "line_rate": 95.51
+    },
+    "examples/tokens/06-token-wrapper": {
+      "lines_covered": 63,
+      "lines_valid": 69,
+      "line_rate": 91.3
+    },
+    "examples/tokens/07-token-metadata": {
+      "lines_covered": 73,
+      "lines_valid": 76,
+      "line_rate": 96.05
+    },
+    "examples/tokens/08-multi-token-balance-manager": {
+      "lines_covered": 33,
+      "lines_valid": 38,
+      "line_rate": 86.84
+    },
+    "examples/tokens/09-optimized-token-ops": {
+      "lines_covered": 0,
+      "lines_valid": 47,
+      "line_rate": 0.0
+    },
+    "examples/tokens/10-automatic-snapshot-triggers": {
+      "lines_covered": 80,
+      "lines_valid": 93,
+      "line_rate": 86.02
+    },
+    "examples/tokens/10-custom-token": {
+      "lines_covered": 124,
+      "lines_valid": 137,
+      "line_rate": 90.51
+    },
+    "examples/tokens/10-pausable-permissions": {
+      "lines_covered": 72,
+      "lines_valid": 91,
+      "line_rate": 79.12
+    },
+    "examples/tokens/token-lock": {
+      "lines_covered": 31,
+      "lines_valid": 38,
+      "line_rate": 81.58
+    },
+    "shared": {
+      "lines_covered": 19,
+      "lines_valid": 26,
+      "line_rate": 73.08
+    },
+    "templates/nft-marketplace-dapp/contracts/marketplace": {
+      "lines_covered": 59,
+      "lines_valid": 65,
+      "line_rate": 90.77
+    },
+    "tests/integration": {
+      "lines_covered": 0,
+      "lines_valid": 14,
+      "line_rate": 0.0
+    },
+    "tests/security": {
+      "lines_covered": 0,
+      "lines_valid": 30,
+      "line_rate": 0.0
+    }
+  }
+}

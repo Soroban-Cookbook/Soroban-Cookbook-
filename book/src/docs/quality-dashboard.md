@@ -27,7 +27,7 @@ The pass rate below is the success share among the latest 20 completed `test.yml
 ## Measurement Sources
 
 - **Test pass rates:** The `test.yml` workflow runs the test, lint, and build gates. Its run history is the source of truth for successful and failed runs.
-- **Coverage trends:** `test.yml` generates Cobertura coverage and uploads it to Codecov. The graph above tracks changes on `main`.
+- **Coverage trends:** `test.yml` generates Cobertura coverage and uploads it to Codecov. The graph above tracks changes on `main`. For coverage per example and a weekly history, see the [Coverage Dashboard](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/coverage-dashboard.md).
 - **Performance trends:** `benchmarks.yml` runs `scripts/benchmark.sh` and uploads the raw benchmark logs for each run. Results depend on the runner and toolchain, so compare like-for-like commits and environments.
 - **Security status:** `security-audit.yml` runs the dependency audit; its badge and run history show the latest and historical outcomes.
 

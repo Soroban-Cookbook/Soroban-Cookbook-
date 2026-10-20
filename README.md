@@ -170,12 +170,17 @@ unambiguous words (like words after a `\` escape).
 ### 📊 Community Health & Metrics
 We track community health transparently so everyone can see how the project is growing:
 
+[![Coverage workflow](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/coverage.yml/badge.svg)](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/actions/workflows/coverage.yml)
+[![codecov](https://codecov.io/gh/Soroban-Cookbook/Soroban-Cookbook-/branch/main/graph/badge.svg)](./docs/coverage-dashboard.md)
+
 | Resource | Description |
 |---|---|
 | [Project Showcase](./SHOWCASE.md) | 10+ real production Stellar/Soroban projects built with the cookbook, with case studies and tracking |
 | [Ecosystem Partnerships](./docs/ecosystem-partnerships.md) | Partner projects, active collaborations, joint content, and the reciprocal cross-promotion model |
 | [Formal Partnership Proposal](./docs/formal-partnership-proposal.md) | Partnership qualification criteria, benefits, MOU agreement template, and onboarding roadmap |
 | [Featured Projects](./docs/featured-projects.md) | First 5 projects featured, each with a case study, runnable demo, developer interview, and promotion plan |
+| [First Workshop](./docs/workshop-plan.md) | Plan for the first Soroban workshop: agenda, registration, delivery, and follow-up materials |
+| [Coverage Dashboard](./docs/coverage-dashboard.md) | Test coverage per example with weekly history, regenerated every Monday |
 | [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
 | [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
 | [Documentation Metrics](./docs/documentation-metrics.md) | Page views, search queries, popular content, and user path analysis |

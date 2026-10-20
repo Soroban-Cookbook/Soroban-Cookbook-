@@ -92,6 +92,19 @@ Run tests for smart contracts with comprehensive options and coverage reporting.
 - **Flexible Targeting**: Test individual contracts, directories, or entire workspace
 - **Performance Optimized**: Uses workspace-level testing when possible
 
+### 📊 coverage-dashboard.py
+
+Turn a `cargo tarpaulin` Cobertura report into the [Coverage Dashboard](../docs/coverage-dashboard.md). Run by [`coverage.yml`](../.github/workflows/coverage.yml) every Monday; Python 3 standard library only.
+
+**Usage:**
+
+```bash
+cargo tarpaulin --run-types Tests --run-types Examples --fail-under 0
+python3 scripts/coverage-dashboard.py coverage/cobertura.xml
+```
+
+It rewrites `docs/coverage-dashboard.md` and `docs/coverage-data/` (per-example numbers and run history), and refuses to overwrite them if the report has no measured lines.
+
 ### 🚀 deploy.sh
 
 Deploy smart contracts to testnet or mainnet.
