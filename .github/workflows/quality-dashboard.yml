@@ -1,0 +1,103 @@
+name: Quality Dashboard
+
+on:
+  schedule:
+    - cron: "0 10 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: quality-dashboard-pages
+  cancel-in-progress: false
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Collect recent workflow outcomes
+        id: metrics
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          TEST_RUNS=$(gh api "repos/${REPOSITORY}/actions/workflows/test.yml/runs?branch=main&per_page=20" \
+            --jq '[.workflow_runs[] | select(.status == "completed")] | .[0:20] | {total: length, passed: map(select(.conclusion == "success")) | length}')
+          TEST_TOTAL=$(jq -r '.total' <<< "$TEST_RUNS")
+          TEST_PASSED=$(jq -r '.passed' <<< "$TEST_RUNS")
+          if [[ "$TEST_TOTAL" -gt 0 ]]; then
+            TEST_RATE=$(awk -v passed="$TEST_PASSED" -v total="$TEST_TOTAL" 'BEGIN { printf "%.1f", passed * 100 / total }')
+          else
+            TEST_RATE="N/A"
+          fi
+
+          SECURITY_STATUS=$(gh api "repos/${REPOSITORY}/actions/workflows/security-audit.yml/runs?branch=main&per_page=20" \
+            --jq '[.workflow_runs[] | select(.status == "completed")][0].conclusion // "no runs"')
+          BENCHMARK_STATUS=$(gh api "repos/${REPOSITORY}/actions/workflows/benchmarks.yml/runs?branch=main&per_page=20" \
+            --jq '[.workflow_runs[] | select(.status == "completed")][0].conclusion // "no runs"')
+
+          echo "test_rate=${TEST_RATE}" >> "$GITHUB_OUTPUT"
+          echo "test_passed=${TEST_PASSED}" >> "$GITHUB_OUTPUT"
+          echo "test_total=${TEST_TOTAL}" >> "$GITHUB_OUTPUT"
+          echo "security_status=${SECURITY_STATUS}" >> "$GITHUB_OUTPUT"
+          echo "benchmark_status=${BENCHMARK_STATUS}" >> "$GITHUB_OUTPUT"
+          echo "snapshot_date=$(date -u '+%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Update dashboard history
+        env:
+          TEST_RATE: ${{ steps.metrics.outputs.test_rate }}
+          TEST_PASSED: ${{ steps.metrics.outputs.test_passed }}
+          TEST_TOTAL: ${{ steps.metrics.outputs.test_total }}
+          SECURITY_STATUS: ${{ steps.metrics.outputs.security_status }}
+          BENCHMARK_STATUS: ${{ steps.metrics.outputs.benchmark_status }}
+          SNAPSHOT_DATE: ${{ steps.metrics.outputs.snapshot_date }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          path = Path("book/src/docs/quality-dashboard.md")
+          content = path.read_text()
+          start_marker = "<!-- QUALITY-SNAPSHOT-START -->"
+          end_marker = "<!-- QUALITY-SNAPSHOT-END -->"
+          before, remainder = content.split(start_marker, 1)
+          _, after = remainder.split(end_marker, 1)
+
+          tests = f"{os.environ['TEST_RATE']}% ({os.environ['TEST_PASSED']}/{os.environ['TEST_TOTAL']})" if os.environ["TEST_RATE"] != "N/A" else "N/A"
+          row = f"| {os.environ['SNAPSHOT_DATE']} | {tests} | {os.environ['SECURITY_STATUS']} | {os.environ['BENCHMARK_STATUS']} |"
+          previous = [line for line in remainder.split(end_marker, 1)[0].splitlines() if line.startswith("|") and "Pending first run" not in line]
+          rows = [row] + previous[:11]
+          path.write_text(before + start_marker + "\n" + "\n".join(rows) + "\n" + end_marker + after)
+          PY
+
+      - name: Commit dashboard snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet -- book/src/docs/quality-dashboard.md; then
+            git add book/src/docs/quality-dashboard.md
+            git commit -m "chore(quality): weekly dashboard snapshot"
+            git push
+          fi
+
+      - name: Install mdBook
+        run: cargo install mdbook --locked
+
+      - name: Build documentation
+        working-directory: book
+        run: mdbook build
+
+      - name: Publish dashboard
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book/book-output
+          publish_branch: gh-pages
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com

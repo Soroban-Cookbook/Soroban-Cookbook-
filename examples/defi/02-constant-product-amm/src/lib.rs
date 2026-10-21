@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, token::TokenClient, Address, Env,
@@ -11,6 +12,7 @@ pub enum DataKey {
     TokenY,
     TotalSupply,
     LpBalance(Address),
+    SwapEntered,
 }
 
 #[contracterror]
@@ -26,10 +28,36 @@ pub enum AmmError {
     RatioMismatch = 7,
     InvalidTokenPair = 8,
     ArithmeticOverflow = 9,
+    Reentrancy = 10,
 }
 
 const FEE_NUMERATOR: i128 = 997;
 const FEE_DENOMINATOR: i128 = 1000;
+
+// Keep the lock alive across authorization, reserve reads, and both transfers.
+// Drop releases it on normal returns (including Err); host rollback handles traps.
+struct SwapGuard(Env);
+
+impl SwapGuard {
+    fn enter(env: &Env) -> Result<Self, AmmError> {
+        if env
+            .storage()
+            .instance()
+            .get(&DataKey::SwapEntered)
+            .unwrap_or(false)
+        {
+            return Err(AmmError::Reentrancy);
+        }
+        env.storage().instance().set(&DataKey::SwapEntered, &true);
+        Ok(Self(env.clone()))
+    }
+}
+
+impl Drop for SwapGuard {
+    fn drop(&mut self) {
+        self.0.storage().instance().remove(&DataKey::SwapEntered);
+    }
+}
 
 #[contract]
 pub struct ConstantProductAmm;
@@ -165,6 +193,7 @@ impl ConstantProductAmm {
         sell_amount: i128,
         min_buy_amount: i128,
     ) -> Result<i128, AmmError> {
+        let _guard = SwapGuard::enter(&env)?;
         require_positive(sell_amount)?;
         if min_buy_amount < 0 {
             return Err(AmmError::InvalidAmount);
@@ -323,7 +352,7 @@ fn integer_sqrt(value: i128) -> i128 {
     if value <= 0 {
         return 0;
     }
-    let mut n = value as u128;
+    let n = value as u128;
     let mut x = n;
     let mut y = (x + 1) >> 1;
     while y < x {
@@ -345,6 +374,10 @@ mod test {
     pub enum TokenDataKey {
         Initialized,
         Balance(Address),
+        Hook,
+        HookStage,
+        RejectedCallbacks,
+        FailTransfers,
     }
 
     #[contracterror]
@@ -361,6 +394,28 @@ mod test {
 
     #[contractimpl]
     impl TestToken {
+        pub fn set_hook(env: Env, amm: Address, trader: Address, sell_token: Address, stage: u32) {
+            env.storage()
+                .instance()
+                .set(&TokenDataKey::Hook, &(amm, trader, sell_token));
+            env.storage()
+                .instance()
+                .set(&TokenDataKey::HookStage, &stage);
+        }
+
+        pub fn rejected_callbacks(env: Env) -> u32 {
+            env.storage()
+                .instance()
+                .get(&TokenDataKey::RejectedCallbacks)
+                .unwrap_or(0)
+        }
+
+        pub fn fail_transfers(env: Env, fail: bool) {
+            env.storage()
+                .instance()
+                .set(&TokenDataKey::FailTransfers, &fail);
+        }
+
         pub fn initialize(env: Env, owner: Address, balance: i128) -> Result<(), TokenError> {
             if env.storage().instance().has(&TokenDataKey::Initialized) {
                 return Err(TokenError::AlreadyInitialized);
@@ -385,7 +440,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(to.clone()))
-                .unwrap_or(0);
+                .unwrap_or(0i128);
             let next = current
                 .checked_add(amount)
                 .ok_or(TokenError::InvalidAmount)?;
@@ -401,6 +456,15 @@ mod test {
             to: Address,
             amount: i128,
         ) -> Result<(), TokenError> {
+            attempt_callback(&env, 2);
+            if env
+                .storage()
+                .instance()
+                .get(&TokenDataKey::FailTransfers)
+                .unwrap_or(false)
+            {
+                return Err(TokenError::InsufficientBalance);
+            }
             if amount <= 0 {
                 return Err(TokenError::InvalidAmount);
             }
@@ -409,7 +473,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(from.clone()))
-                .unwrap_or(0);
+                .unwrap_or(0i128);
             if current < amount {
                 return Err(TokenError::InsufficientBalance);
             }
@@ -418,7 +482,7 @@ mod test {
                 .storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(to.clone()))
-                .unwrap_or(0)
+                .unwrap_or(0i128)
                 .checked_add(amount)
                 .ok_or(TokenError::InvalidAmount)?;
             env.storage()
@@ -431,11 +495,39 @@ mod test {
         }
 
         pub fn balance(env: Env, who: Address) -> i128 {
+            attempt_callback(&env, 1);
             env.storage()
                 .persistent()
                 .get(&TokenDataKey::Balance(who))
-                .unwrap_or(0)
+                .unwrap_or(0i128)
         }
+    }
+
+    fn attempt_callback(env: &Env, stage: u32) {
+        if env
+            .storage()
+            .instance()
+            .get::<_, u32>(&TokenDataKey::HookStage)
+            != Some(stage)
+        {
+            return;
+        }
+        let (amm, trader, sell_token): (Address, Address, Address) =
+            env.storage().instance().get(&TokenDataKey::Hook).unwrap();
+        // The host rejects a callback before the AMM body is reached. Test the
+        // application mutex separately below rather than attributing this to it.
+        assert_eq!(
+            ConstantProductAmmClient::new(env, &amm).try_swap(&trader, &sell_token, &100, &0),
+            Err(Err(soroban_sdk::InvokeError::Abort))
+        );
+        let count: u32 = env
+            .storage()
+            .instance()
+            .get(&TokenDataKey::RejectedCallbacks)
+            .unwrap_or(0);
+        env.storage()
+            .instance()
+            .set(&TokenDataKey::RejectedCallbacks, &(count + 1));
     }
 
     struct Fixture {
@@ -451,22 +543,22 @@ mod test {
         let env = Env::default();
         env.mock_all_auths();
 
-        let alice = Address::random(&env);
-        let bob = Address::random(&env);
+        let alice = Address::generate(&env);
+        let bob = Address::generate(&env);
 
-        let token_x_id = env.register_contract(None, TestToken);
-        let token_y_id = env.register_contract(None, TestToken);
+        let token_x_id = env.register(TestToken, ());
+        let token_y_id = env.register(TestToken, ());
         let token_x = TestTokenClient::new(&env, &token_x_id);
         let token_y = TestTokenClient::new(&env, &token_y_id);
 
-        token_x.initialize(&alice, &10_000).unwrap();
-        token_x.mint(&bob, &5_000).unwrap();
-        token_y.initialize(&alice, &10_000).unwrap();
-        token_y.mint(&bob, &5_000).unwrap();
+        token_x.initialize(&alice, &10_000);
+        token_x.mint(&bob, &5_000);
+        token_y.initialize(&alice, &10_000);
+        token_y.mint(&bob, &5_000);
 
-        let amm_id = env.register_contract(None, ConstantProductAmm);
+        let amm_id = env.register(ConstantProductAmm, ());
         let amm = ConstantProductAmmClient::new(&env, &amm_id);
-        amm.initialize(&token_x_id, &token_y_id).unwrap();
+        amm.initialize(&token_x_id, &token_y_id);
 
         Fixture {
             env,
@@ -482,7 +574,7 @@ mod test {
     fn add_initial_liquidity_mints_lp_tokens() {
         let f = setup();
 
-        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000).unwrap();
+        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000);
 
         assert_eq!(minted, 1_000);
         assert_eq!(f.amm.lp_balance(&f.alice), 1_000);
@@ -490,7 +582,7 @@ mod test {
         assert_eq!(f.token_x.balance(&f.alice), 9_000);
         assert_eq!(f.token_y.balance(&f.alice), 9_000);
 
-        let (reserve_x, reserve_y) = f.amm.reserves().unwrap();
+        let (reserve_x, reserve_y) = f.amm.reserves();
         assert_eq!(reserve_x, 1_000);
         assert_eq!(reserve_y, 1_000);
     }
@@ -499,42 +591,163 @@ mod test {
     fn add_liquidity_requires_exact_ratio() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &1_000, &2_000).unwrap_err();
+        f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+        let _ = f
+            .amm
+            .try_add_liquidity(&f.alice, &1_000, &2_000)
+            .unwrap_err();
     }
 
     #[test]
     fn swap_applies_fee_and_price_impact() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &10_000, &10_000).unwrap();
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
 
-        let out = f
-            .amm
-            .swap(&f.bob, &f.token_x.contract_id(), &1_000, &900)
-            .unwrap();
+        let out = f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900);
 
         assert_eq!(out, 906);
         assert_eq!(f.token_y.balance(&f.bob), 5_906);
         assert_eq!(f.token_x.balance(&f.bob), 4_000);
 
-        let (reserve_x, reserve_y) = f.amm.reserves().unwrap();
+        let (reserve_x, reserve_y) = f.amm.reserves();
         assert_eq!(reserve_x, 11_000);
         assert_eq!(reserve_y, 9_094);
+    }
+
+    fn assert_swap_unlocked(f: &Fixture) {
+        f.env.as_contract(&f.amm.address, || {
+            assert!(!f.env.storage().instance().has(&DataKey::SwapEntered));
+        });
+    }
+
+    #[test]
+    fn swap_rejects_an_active_lock_without_moving_tokens() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().set(&DataKey::SwapEntered, &true);
+        });
+
+        assert_eq!(
+            f.amm.try_swap(&f.bob, &f.token_x.address, &1_000, &0),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(f.amm.reserves(), (10_000, 10_000));
+        assert_eq!(f.token_x.balance(&f.bob), 5_000);
+        assert_eq!(f.token_y.balance(&f.bob), 5_000);
+        f.env.as_contract(&f.amm.address, || {
+            assert_eq!(
+                f.env.storage().instance().get(&DataKey::SwapEntered),
+                Some(true)
+            );
+            f.env.storage().instance().remove(&DataKey::SwapEntered);
+        });
+        assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
+        assert_swap_unlocked(&f);
+    }
+
+    #[test]
+    fn swap_guard_releases_on_early_return() {
+        let f = setup();
+        f.env.as_contract(&f.amm.address, || {
+            let result: Result<(), AmmError> = (|| {
+                let _guard = SwapGuard::enter(&f.env)?;
+                assert_eq!(
+                    f.env.storage().instance().get(&DataKey::SwapEntered),
+                    Some(true)
+                );
+                assert!(matches!(
+                    SwapGuard::enter(&f.env),
+                    Err(AmmError::Reentrancy)
+                ));
+                Err(AmmError::InvalidAmount)
+            })();
+            assert_eq!(result, Err(AmmError::InvalidAmount));
+            assert!(!f.env.storage().instance().has(&DataKey::SwapEntered));
+        });
+    }
+
+    #[test]
+    fn failed_swaps_leave_the_pool_usable() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
+        assert_eq!(
+            f.amm.try_swap(&f.bob, &f.token_x.address, &0, &0),
+            Err(Ok(AmmError::InvalidAmount))
+        );
+        assert_swap_unlocked(&f);
+        assert_eq!(
+            f.amm.try_swap(&f.bob, &f.token_x.address, &1_000, &1_000),
+            Err(Ok(AmmError::InsufficientOutputAmount))
+        );
+        assert_swap_unlocked(&f);
+        // Input transfer fails after the lock has been acquired.
+        assert!(f
+            .amm
+            .try_swap(&f.bob, &f.token_x.address, &6_000, &0)
+            .is_err());
+        assert_swap_unlocked(&f);
+        assert_eq!(f.amm.reserves(), (10_000, 10_000));
+        assert_eq!(f.token_x.balance(&f.bob), 5_000);
+        assert_eq!(f.token_y.balance(&f.bob), 5_000);
+        assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
+        assert_swap_unlocked(&f);
+        assert!(f.amm.swap(&f.bob, &f.token_y.address, &1_000, &0) > 0);
+        assert_swap_unlocked(&f);
+    }
+
+    #[test]
+    fn token_callbacks_are_rejected_during_reserve_reads_and_both_transfers() {
+        // Cover either token's balance hook, input transfer, and output transfer.
+        for stage in [1, 2] {
+            for hook_input in [true, false] {
+                let f = setup();
+                f.amm.add_liquidity(&f.alice, &10_000, &10_000);
+                let hook_token = if hook_input { &f.token_x } else { &f.token_y };
+                hook_token.set_hook(&f.amm.address, &f.bob, &f.token_x.address, &stage);
+                assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
+                assert_eq!(hook_token.rejected_callbacks(), 1);
+                assert_swap_unlocked(&f);
+                hook_token.set_hook(&f.amm.address, &f.bob, &f.token_x.address, &0);
+                assert_eq!(f.amm.reserves(), (11_000, 9_094));
+                assert_eq!(f.token_x.balance(&f.bob), 4_000);
+                assert_eq!(f.token_y.balance(&f.bob), 5_906);
+            }
+        }
+    }
+
+    #[test]
+    fn failed_output_transfer_rolls_back_input_and_releases_lock() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
+        f.token_y.fail_transfers(&true);
+        assert!(f
+            .amm
+            .try_swap(&f.bob, &f.token_x.address, &1_000, &900)
+            .is_err());
+        assert_swap_unlocked(&f);
+        assert_eq!(f.amm.reserves(), (10_000, 10_000));
+        assert_eq!(f.token_x.balance(&f.bob), 5_000);
+        assert_eq!(f.token_y.balance(&f.bob), 5_000);
+        f.token_y.fail_transfers(&false);
+        assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
+        assert_swap_unlocked(&f);
     }
 
     #[test]
     fn remove_liquidity_returns_proportional_amounts() {
         let f = setup();
 
-        f.amm.add_liquidity(&f.alice, &6_000, &6_000).unwrap();
-        f.amm.add_liquidity(&f.bob, &3_000, &3_000).unwrap();
+        f.amm.add_liquidity(&f.alice, &6_000, &6_000);
+        f.amm.add_liquidity(&f.bob, &3_000, &3_000);
 
-        let (returned_x, returned_y) = f.amm.remove_liquidity(&f.bob, &1_000).unwrap();
+        let (returned_x, returned_y) = f.amm.remove_liquidity(&f.bob, &1_000);
 
         assert_eq!(returned_x, 1_000);
         assert_eq!(returned_y, 1_000);
         assert_eq!(f.amm.lp_balance(&f.bob), 2_000);
-        assert_eq!(f.amm.total_supply(), 5_000);
+        assert_eq!(f.amm.total_supply(), 8_000);
         assert_eq!(f.token_x.balance(&f.bob), 3_000);
         assert_eq!(f.token_y.balance(&f.bob), 3_000);
     }

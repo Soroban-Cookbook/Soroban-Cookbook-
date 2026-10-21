@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soroban Token dApp</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-group">
+        <div class="token-badge">🪙</div>
+        <div>
+          <h1>Soroban Token Portal</h1>
+          <p class="subtitle">SEP-41 Fungible Token Management on Stellar</p>
+        </div>
+      </div>
+      <button id="connectWalletBtn" class="btn btn-primary">Connect Wallet</button>
+    </header>
+
+    <main class="dashboard">
+      <!-- Token Overview Card -->
+      <section class="card token-summary-card">
+        <div class="card-header">
+          <h2>Token Information</h2>
+          <span class="badge" id="tokenNetwork">Testnet</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric">
+            <span class="label">Token Name</span>
+            <span class="value" id="tokenName">Community Token</span>
+          </div>
+          <div class="metric">
+            <span class="label">Symbol</span>
+            <span class="value" id="tokenSymbol">COMM</span>
+          </div>
+          <div class="metric">
+            <span class="label">Decimals</span>
+            <span class="value" id="tokenDecimals">7</span>
+          </div>
+          <div class="metric">
+            <span class="label">Total Supply</span>
+            <span class="value" id="tokenTotalSupply">1,000,000 COMM</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- User Balance Card -->
+      <section class="card balance-card">
+        <div class="card-header">
+          <h2>Your Balance</h2>
+        </div>
+        <div class="balance-display">
+          <span class="balance-amount" id="userBalance">0.0000000</span>
+          <span class="balance-symbol" id="userBalanceSymbol">COMM</span>
+        </div>
+        <p class="connected-account" id="accountAddress">Wallet Not Connected</p>
+      </section>
+
+      <!-- Action Tabs Grid -->
+      <div class="action-grid">
+        <!-- Transfer Card -->
+        <section class="card form-card">
+          <h3>💸 Transfer Tokens</h3>
+          <form id="transferForm">
+            <div class="form-group">
+              <label for="transferRecipient">Recipient Address (Public Key / Contract ID)</label>
+              <input type="text" id="transferRecipient" placeholder="G..." required>
+            </div>
+            <div class="form-group">
+              <label for="transferAmount">Amount</label>
+              <input type="number" id="transferAmount" step="0.0000001" placeholder="10.0" required>
+            </div>
+            <button type="submit" class="btn btn-action" id="transferBtn">Send Tokens</button>
+          </form>
+        </section>
+
+        <!-- Mint Card (Admin) -->
+        <section class="card form-card">
+          <h3>⚡ Mint Tokens (Admin)</h3>
+          <form id="mintForm">
+            <div class="form-group">
+              <label for="mintRecipient">Recipient Address</label>
+              <input type="text" id="mintRecipient" placeholder="G..." required>
+            </div>
+            <div class="form-group">
+              <label for="mintAmount">Amount to Mint</label>
+              <input type="number" id="mintAmount" step="0.0000001" placeholder="100.0" required>
+            </div>
+            <button type="submit" class="btn btn-secondary" id="mintBtn">Mint Tokens</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- Transaction Log -->
+      <section class="card logs-card">
+        <h3>Activity Log</h3>
+        <div id="activityLogs" class="logs-container">
+          <div class="log-entry log-info">System initialized. Connect Freighter wallet to interact.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

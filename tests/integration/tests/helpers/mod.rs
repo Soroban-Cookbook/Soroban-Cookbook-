@@ -3,6 +3,8 @@
 //! Reusable test infrastructure for Soroban Cookbook integration tests.
 //! Provides environment setup, contract registration, and assertion helpers.
 
+#![allow(dead_code)]
+
 use soroban_sdk::{
     testutils::Address as _, testutils::Ledger as _, Address, Env, IntoVal, Symbol, Vec,
 };
@@ -114,14 +116,12 @@ impl AuthFixture {
         let admin = Address::generate(env);
         let users = generate_addresses(env, user_count);
 
-        // Initialize
         env.invoke_contract::<()>(
             &contract_id,
             &Symbol::new(env, "initialize"),
             Vec::from_array(env, [admin.clone().into_val(env)]),
         );
 
-        // Fund each user
         for user in &users {
             env.invoke_contract::<()>(
                 &contract_id,
@@ -202,3 +202,5 @@ impl StorageFixture {
         )
     }
 }
+
+pub mod perf;

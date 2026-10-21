@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 /// Build script for integration-tests.
 ///
 /// Previously this script patched WASM binaries produced by the release build

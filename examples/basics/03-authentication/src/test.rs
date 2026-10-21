@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 use super::*;
 use soroban_sdk::{
     symbol_short,
@@ -97,6 +98,7 @@ fn test_transfer_updates_balances() {
 /// Benchmark the transfer function with authentication.
 #[test]
 fn test_transfer_benchmark() {
+    extern crate std;
     let env = Env::default();
     let (client, admin) = setup_initialized(&env);
     let user1 = Address::generate(&env);
@@ -104,6 +106,7 @@ fn test_transfer_benchmark() {
 
     client.set_balance(&admin, &user1, &1000);
 
+    std::println!("--- Transfer with Auth Benchmark ---");
     env.budget().reset_default();
     client.transfer(&user1, &user2, &100);
     env.budget().print();
@@ -303,6 +306,7 @@ fn test_multi_sig_missing_one_auth() {
     client.multi_sig_action(&signers, &10);
 }
 
+// ---------------------------------------------------------------------------
 // Role-Based Access Control Tests
 // ---------------------------------------------------------------------------
 
@@ -534,4 +538,56 @@ fn test_default_state_is_active() {
 
     assert_eq!(client.get_state(), ContractState::Active as u32);
     assert_eq!(client.active_only_action(&user), 1000);
+}
+
+// ---------------------------------------------------------------------------
+// Negative Amount Tests
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_transfer_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let user1 = Address::generate(&env);
+    let user2 = Address::generate(&env);
+
+    client.set_balance(&admin, &user1, &1000);
+
+    let res_zero = client.try_transfer(&user1, &user2, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_transfer(&user1, &user2, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
+}
+
+#[test]
+fn test_approve_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, _admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+
+    let res_zero = client.try_approve(&owner, &spender, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_approve(&owner, &spender, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
+}
+
+#[test]
+fn test_transfer_from_negative_or_zero_amount_fails() {
+    let env = Env::default();
+    let (client, admin) = setup_initialized(&env);
+    let owner = Address::generate(&env);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.set_balance(&admin, &owner, &1000);
+    client.approve(&owner, &spender, &500);
+
+    let res_zero = client.try_transfer_from(&spender, &owner, &recipient, &0);
+    assert_eq!(res_zero, Err(Ok(AuthError::InvalidAmount)));
+
+    let res_neg = client.try_transfer_from(&spender, &owner, &recipient, &-50);
+    assert_eq!(res_neg, Err(Ok(AuthError::InvalidAmount)));
 }

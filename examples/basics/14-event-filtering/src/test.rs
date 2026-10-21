@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for event filtering patterns.
 //!
 //! Each test validates:

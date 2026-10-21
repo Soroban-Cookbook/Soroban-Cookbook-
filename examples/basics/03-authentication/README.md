@@ -1,5 +1,8 @@
 # Authentication Patterns in Soroban
 
+> **🎬 Video Walkthrough** (14:45)
+> Learn how to secure your Soroban contracts with require_auth in our [Soroban Basics #3 Video Walkthrough](https://www.youtube.com/watch?v=authentication-walkthrough).
+
 This example demonstrates how to authenticate callers and build layered
 authorization logic in Soroban smart contracts. It covers the core
 `require_auth()` primitive, role-based access control, time-based

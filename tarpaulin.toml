@@ -38,3 +38,6 @@ ignore-panics = true
 
 # Follow symbolic links when discovering source files
 follow-exec = true
+
+# Fail CI if workspace line coverage drops below 90% (issue #742)
+fail-under = 90

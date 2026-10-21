@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Arbitrage Example
 //!
 //! Exploits a price difference between two AMM pools using a flash loan.

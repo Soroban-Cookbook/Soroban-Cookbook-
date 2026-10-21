@@ -49,6 +49,7 @@ Run the example's tests with:
 
 ```bash
 cargo test -p queue-variants
+cargo build --target wasm32-unknown-unknown --release -p queue-variants
 ```
 
 ## Recommendation

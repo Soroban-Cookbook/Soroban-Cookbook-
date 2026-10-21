@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol,
@@ -22,6 +23,12 @@ pub struct TransferEventData {
     pub amount: i128,
 }
 
+#[contracttype]
+#[derive(Clone)]
+pub struct ApprovalEventData {
+    pub amount: i128,
+}
+
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[repr(u32)]
@@ -37,6 +44,7 @@ pub enum TokenError {
 
 const EVENT_NAMESPACE: Symbol = symbol_short!("events");
 const EVENT_TRANSFER: Symbol = symbol_short!("transfer");
+const EVENT_APPROVE: Symbol = symbol_short!("approve");
 
 #[contract]
 pub struct Sep41Token;
@@ -115,7 +123,9 @@ impl Sep41Token {
 
         env.storage()
             .persistent()
-            .set(&DataKey::Allowance(owner, spender), &amount);
+            .set(&DataKey::Allowance(owner.clone(), spender.clone()), &amount);
+
+        publish_approval(&env, owner, spender, amount);
 
         Ok(())
     }
@@ -257,6 +267,13 @@ fn publish_transfer(env: &Env, from: Address, to: Address, amount: i128) {
     env.events().publish(
         (EVENT_NAMESPACE, EVENT_TRANSFER, from, to),
         TransferEventData { amount },
+    );
+}
+
+fn publish_approval(env: &Env, owner: Address, spender: Address, amount: i128) {
+    env.events().publish(
+        (EVENT_NAMESPACE, EVENT_APPROVE, owner, spender),
+        ApprovalEventData { amount },
     );
 }
 

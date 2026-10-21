@@ -1,0 +1,14 @@
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/serde-cc3487ab26fb2e45.d: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/build/serde-77aef4189176bd0e/out/private.rs
+
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/libserde-cc3487ab26fb2e45.rlib: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/build/serde-77aef4189176bd0e/out/private.rs
+
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/deps/libserde-cc3487ab26fb2e45.rmeta: /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs /home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs /home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/build/serde-77aef4189176bd0e/out/private.rs
+
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/lib.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/integer128.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/mod.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/de.rs:
+/home/vahalla/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-1.0.228/src/private/ser.rs:
+/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/build/serde-77aef4189176bd0e/out/private.rs:
+
+# env-dep:OUT_DIR=/home/vahalla/Desktop/Soroban-Cookbook-/target-wasm-ci/release/build/serde-77aef4189176bd0e/out

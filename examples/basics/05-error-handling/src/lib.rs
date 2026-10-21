@@ -32,7 +32,8 @@
 //! └────────────────────┴────────────────────────────────────────────┘
 //! ```
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, panic_with_error, symbol_short, Address,
@@ -143,7 +144,7 @@ impl ErrorDemoContract {
     /// corrected parameters.
     pub fn deposit(env: Env, from: Address, amount: i128) -> Result<i128, ContractError> {
         // ── Guard: predictable user mistakes → typed errors ─────────────────
-        if amount == 0 {
+        if amount <= 0 {
             return Err(ContractError::ZeroAmount);
         }
 
@@ -192,7 +193,7 @@ impl ErrorDemoContract {
     /// - [`ContractError::ContractPaused`]      – contract is paused
     /// - [`ContractError::InsufficientBalance`] – balance < amount
     pub fn withdraw(env: Env, from: Address, amount: i128) -> Result<i128, ContractError> {
-        if amount == 0 {
+        if amount <= 0 {
             return Err(ContractError::ZeroAmount);
         }
 

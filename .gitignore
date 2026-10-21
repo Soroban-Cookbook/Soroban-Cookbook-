@@ -29,6 +29,14 @@ soroban-ledger*.json
 coverage/
 *.profraw
 test_snapshots/
+tests/fuzz/artifacts/
+tests/fuzz/corpus/
+
+# Node / webapp
+webapp/node_modules/
+
+# Local binaries (e.g. accidental `typos` copy in repo root)
+/typos
 
 # Build artifacts
 *.so
@@ -63,3 +71,4 @@ GEMINI.md
 
 .GITHUB_ISSUES_BATCH_REPORT.md
 issues.md
+.opencode

@@ -1,0 +1,23 @@
+[package]
+name = "beacon-proxy"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[features]
+# Select which contract to compile to the WASM binary.
+# Exactly one should be active for a production WASM build.
+# In tests (rlib) all contracts are compiled simultaneously via env.register().
+beacon   = []
+proxy    = []
+impl-v1  = []
+impl-v2  = []
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

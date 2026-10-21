@@ -1,4 +1,5 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Vec,
@@ -162,10 +163,7 @@ impl BasicNftContract {
             &approved,
         );
         env.events().publish(
-            (
-                soroban_sdk::Symbol::new(&env, "set_approval_for_all"),
-                symbol_short!("nft"),
-            ),
+            (symbol_short!("set_aprv"), symbol_short!("nft")),
             (owner, operator, approved),
         );
         Ok(())

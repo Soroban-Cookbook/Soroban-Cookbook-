@@ -16,4 +16,14 @@ done < "$EXCLUDE_FILE"
 cd "$ROOT"
 SUBCMD=$1
 shift
-cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+if [ "$SUBCMD" = "clippy" ]; then
+  RUSTFLAGS="${RUSTFLAGS:-} -A deprecated" cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+elif [ "$SUBCMD" = "build" ]; then
+  # Host-only test crates, proptest, and the fuzz harness cannot compile for
+  # wasm32v1-none.
+  cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" \
+    --exclude integration-tests --exclude security-tests \
+    --exclude soroban-cookbook-fuzz "$@"
+else
+  cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
+fi

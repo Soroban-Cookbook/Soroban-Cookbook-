@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Flash Loan Use Cases
 //!
 //! Practical examples of flash loan receiver contracts built on top of the
@@ -11,10 +12,15 @@
 //! - **Security patterns**: Demonstrate safe callback practices including
 //!   validation, event emission, and rejection of untrusted callers.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 pub mod arbitrage;
+
+// Secondary example contracts share export names (`init` / `execute` / `on_flash_loan`).
+// Keep them for host tests; omit from wasm so the cdylib has a single export set.
+#[cfg(any(test, not(target_family = "wasm")))]
 pub mod refinancing;
+#[cfg(any(test, not(target_family = "wasm")))]
 pub mod security;
 
 #[cfg(test)]

@@ -26,3 +26,10 @@ The queue uses two indices (`head` and `tail`) stored in contract storage:
 - Items are stored with indices as keys
 - Empty queue: `head == tail`
 - Size: `tail - head`
+
+## Running Tests
+
+```bash
+cargo test -p fifo-queue
+cargo build --target wasm32-unknown-unknown --release -p fifo-queue
+```

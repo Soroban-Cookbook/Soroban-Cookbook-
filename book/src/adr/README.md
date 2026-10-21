@@ -23,6 +23,10 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | [ADR-003](./003-testing-approach.md) | Test Contracts at Multiple Levels | Proposed |
 | [ADR-004](./004-ci-cd.md) | Validate Changes with GitHub Actions | Proposed |
 | [ADR-005](./005-documentation-publishing.md) | Publish Documentation with mdBook | Proposed |
+| [ADR-002](./002-rust-version.md) | Rust Version | Accepted |
+| [ADR-003](./003-soroban-sdk-version.md) | Soroban SDK Version | Accepted |
+| [ADR-004](./004-testing-framework.md) | Testing Framework | Accepted |
+| [ADR-005](./005-documentation-platform.md) | Documentation Platform | Accepted |
 
 ## Creating a New ADR
 

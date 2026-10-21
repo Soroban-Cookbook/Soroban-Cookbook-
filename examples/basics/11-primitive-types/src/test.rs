@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for the Primitive Types contract.
 //!
 //! Each test uses the auto-generated `PrimitiveTypesContractClient`, which

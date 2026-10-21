@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Hello World Soroban Contract
 //!
 //! This is the simplest possible Soroban smart contract. It demonstrates the
@@ -16,7 +17,7 @@
 //! Soroban examples) is idiomatic: it is cheap, composable, and easy for
 //! frontends to decode.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
 

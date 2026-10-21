@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Validation Patterns
 //!
 //! This contract demonstrates comprehensive input validation patterns in Soroban contracts.
@@ -23,7 +24,7 @@
 //! - Multi-signature requirements
 //! - Permission checks for specific operations
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, String, Vec};
 use soroban_validation::*;
 

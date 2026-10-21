@@ -4,12 +4,9 @@ version.workspace = true
 edition.workspace = true
 publish = false
 
-[lib]
-crate-type = ["cdylib", "rlib"]
-
 [dependencies]
 soroban-sdk = { workspace = true }
 soroban-validation = { path = "../../../shared" }
 
-[dev-dependencies]
+[dep]
 soroban-sdk = { workspace = true, features = ["testutils"] }

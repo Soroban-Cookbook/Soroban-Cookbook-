@@ -6,29 +6,30 @@
 //!
 //! ## Architecture
 //!
-//! ```
+//! ```text
 //! Admin
-//!  ├── add_pool(pool_id, lp_token, reward_token, reward_rate)
-//!  └── set_reward_rate(pool_id, new_rate)
+//!  - add_pool(pool_id, lp_token, reward_token, reward_rate)
+//!  - set_reward_rate(pool_id, new_rate)
 //!
 //! User
-//!  ├── stake(pool_id, amount)       — deposit LP tokens
-//!  ├── unstake(pool_id, amount)     — withdraw LP tokens
-//!  └── harvest(pool_id)             — claim accumulated reward tokens
+//!  - stake(pool_id, amount)       - deposit LP tokens
+//!  - unstake(pool_id, amount)     - withdraw LP tokens
+//!  - harvest(pool_id)             - claim accumulated reward tokens
 //! ```
 //!
 //! ## Reward Maths
 //!
 //! The contract uses the standard "reward-per-share accumulator" pattern:
 //!
-//! ```
+//! ```text
 //! acc_reward_per_share += elapsed_ledgers * reward_rate / total_staked
 //! user_pending          = user_staked * acc_reward_per_share - user_reward_debt
 //! ```
 //!
 //! This gives O(1) updates regardless of the number of stakers.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Symbol};
 
@@ -109,6 +110,7 @@ impl LiquidityMining {
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("Already initialized");
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.events()
             .publish((Symbol::new(&env, "initialized"),), admin);
@@ -337,7 +339,7 @@ impl LiquidityMining {
         let info = Self::load_user(&env, pool_id, &user);
 
         // Simulate what update_pool would do
-        let simulated_acc = if pool.total_staked > 0 {
+        let simulated_acc = if pool.total_staked > 0 && pool.active {
             let elapsed = (env.ledger().sequence() - pool.last_update_ledger) as i128;
             let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
             pool.acc_reward_per_share
@@ -372,7 +374,7 @@ impl LiquidityMining {
         if current_ledger <= pool.last_update_ledger {
             return;
         }
-        if pool.total_staked > 0 {
+        if pool.total_staked > 0 && pool.active {
             let elapsed = (current_ledger - pool.last_update_ledger) as i128;
             let reward = elapsed.checked_mul(pool.reward_rate).expect("Overflow");
             pool.acc_reward_per_share = pool

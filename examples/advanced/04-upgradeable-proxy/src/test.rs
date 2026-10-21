@@ -1,73 +1,108 @@
 #![cfg(test)]
+#![allow(deprecated)]
 
 use soroban_sdk::{testutils::Address as _, Address, Env};
 
-// Note: In a real test, you would deploy both contracts and test the upgrade flow.
-// This is a simplified test structure.
+use crate::{ImplementationV1, ImplementationV2, ProxyContract, ProxyContractClient};
 
-#[test]
-fn test_proxy_initialization() {
+struct Contracts {
+    proxy: ProxyContractClient<'static>,
+    implementation_v1: Address,
+    implementation_v2: Address,
+    admin: Address,
+}
+
+fn setup() -> Contracts {
     let env = Env::default();
-
-    // In a real scenario, we would:
-    // 1. Deploy implementation contract
-    // 2. Deploy proxy contract
-    // 3. Call init with admin and implementation addresses
-
-    // This test demonstrates the expected flow
+    env.mock_all_auths();
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let implementation_v2 = env.register(ImplementationV2, ());
+    let proxy = env.register(ProxyContract, ());
     let admin = Address::generate(&env);
-    let implementation = Address::generate(&env);
-
-    // ProxyContract::init(&env, admin, implementation);
-    // assert_eq!(ProxyContract::get_implementation(&env), implementation);
-    let _ = (admin, implementation);
+    let client = ProxyContractClient::new(&env, &proxy);
+    client.init(&admin, &implementation_v1);
+    Contracts {
+        proxy: client,
+        implementation_v1,
+        implementation_v2,
+        admin,
+    }
 }
 
 #[test]
-fn test_upgrade_only_by_admin() {
+fn forwards_calls_to_v1() {
+    let contracts = setup();
+    assert_eq!(
+        contracts.proxy.get_implementation(),
+        contracts.implementation_v1
+    );
+    assert_eq!(contracts.proxy.add(&5, &3), 8);
+    assert_eq!(contracts.proxy.subtract(&10, &4), 6);
+    assert_eq!(contracts.proxy.increment(&7), 7);
+    assert_eq!(contracts.proxy.counter(), 7);
+}
+
+#[test]
+fn upgrade_preserves_proxy_storage_and_changes_behavior() {
+    let contracts = setup();
+    contracts.proxy.increment(&7);
+    contracts.proxy.upgrade(&contracts.implementation_v2);
+
+    assert_eq!(
+        contracts.proxy.get_implementation(),
+        contracts.implementation_v2
+    );
+    assert_eq!(contracts.proxy.counter(), 7);
+    assert_eq!(contracts.proxy.multiply(&6, &7), 42);
+    assert_eq!(contracts.proxy.increment(&3), 13);
+    assert_eq!(contracts.proxy.add(&2, &4), 6);
+}
+
+#[test]
+#[should_panic(expected = "Already initialized")]
+fn initialization_is_one_time() {
+    let contracts = setup();
+    contracts
+        .proxy
+        .init(&contracts.admin, &contracts.implementation_v2);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn upgrade_requires_admin_auth() {
     let env = Env::default();
-
-    // In a real scenario:
-    // 1. Only admin can call upgrade()
-    // 2. Non-admin calls should panic
-
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let implementation_v2 = env.register(ImplementationV2, ());
+    let proxy = env.register(ProxyContract, ());
+    let client = ProxyContractClient::new(&env, &proxy);
     let admin = Address::generate(&env);
-    let non_admin = Address::generate(&env);
-    let impl_v1 = Address::generate(&env);
-    let impl_v2 = Address::generate(&env);
 
-    // ProxyContract::init(&env, admin.clone(), impl_v1);
-    // ProxyContract::upgrade(&env, impl_v2); // called by admin, should succeed
-    // ProxyContract::upgrade(&env, impl_v2); // called by non_admin, should panic
-    let _ = (admin, non_admin, impl_v1, impl_v2);
+    env.mock_all_auths();
+    client.init(&admin, &implementation_v1);
+    env.set_auths(&[]);
+    client.upgrade(&implementation_v2);
 }
 
 #[test]
-fn test_arithmetic_operations_via_proxy() {
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn init_requires_admin_auth() {
     let env = Env::default();
-
-    // In a real scenario:
-    // 1. Deploy implementation contract
-    // 2. Deploy proxy contract initialized with implementation
-    // 3. Call add() through proxy
-    // 4. Verify result matches direct call to implementation
-
-    // ProxyContract::add(&env, 5, 3) -> 8
-    // ProxyContract::subtract(&env, 10, 4) -> 6
-    let _ = env;
+    // do NOT call mock_all_auths
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let proxy = env.register(ProxyContract, ());
+    let client = ProxyContractClient::new(&env, &proxy);
+    let admin = Address::generate(&env);
+    client.init(&admin, &implementation_v1); // should panic — no auth mocked
 }
 
 #[test]
-fn test_upgrade_adds_new_functionality() {
+fn init_with_auth_succeeds() {
     let env = Env::default();
-
-    // In a real scenario:
-    // 1. Deploy implementation v1 (only add, subtract)
-    // 2. Deploy proxy with v1
-    // 3. Verify multiply is not available
-    // 4. Deploy implementation v2 (adds multiply)
-    // 5. Upgrade proxy to v2
-    // 6. Verify multiply is now available
-    // 7. Verify add/subtract still work (backwards compatibility)
-    let _ = env;
+    env.mock_all_auths();
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let proxy = env.register(ProxyContract, ());
+    let client = ProxyContractClient::new(&env, &proxy);
+    let admin = Address::generate(&env);
+    client.init(&admin, &implementation_v1);
+    assert_eq!(client.get_implementation(), implementation_v1);
 }

@@ -1,8 +1,11 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map, Symbol};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, token::TokenClient, Address, Env, Map, Symbol,
+};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[contracttype]
 pub struct Position {
     pub collateral: i128,
@@ -12,10 +15,22 @@ pub struct Position {
 #[contract]
 pub struct LendingContract;
 
+fn token_client<'a>(env: &'a Env, key: &str) -> TokenClient<'a> {
+    let token: Address = env
+        .storage()
+        .instance()
+        .get(&Symbol::new(env, key))
+        .unwrap();
+    TokenClient::new(env, &token)
+}
+
 #[contractimpl]
 impl LendingContract {
     pub fn initialize(
         env: Env,
+        admin: Address,
+        collateral_token: Address,
+        loan_token: Address,
         ltv_ratio: i128,
         liquidation_threshold: i128,
         liquidation_incentive: i128,
@@ -28,6 +43,15 @@ impl LendingContract {
         {
             panic!("already initialized");
         }
+        env.storage()
+            .instance()
+            .set(&Symbol::new(&env, "admin"), &admin);
+        env.storage()
+            .instance()
+            .set(&Symbol::new(&env, "collateral_token"), &collateral_token);
+        env.storage()
+            .instance()
+            .set(&Symbol::new(&env, "loan_token"), &loan_token);
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "ltv_ratio"), &ltv_ratio);
@@ -53,6 +77,14 @@ impl LendingContract {
     }
 
     pub fn set_emergency_pause(env: Env, admin: Address, paused: bool) {
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&Symbol::new(&env, "admin"))
+            .unwrap();
+        if admin != stored_admin {
+            panic!("not admin");
+        }
         admin.require_auth();
         env.storage()
             .instance()
@@ -82,10 +114,16 @@ impl LendingContract {
             debt: 0,
         });
         position.collateral += amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "positions"), &positions);
+
+        token_client(&env, "collateral_token").transfer(
+            &user,
+            env.current_contract_address(),
+            &amount,
+        );
     }
 
     pub fn withdraw_collateral(env: Env, user: Address, amount: i128) {
@@ -123,10 +161,16 @@ impl LendingContract {
             panic!("health factor too low");
         }
         position.collateral = new_collateral;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "positions"), &positions);
+
+        token_client(&env, "collateral_token").transfer(
+            &env.current_contract_address(),
+            &user,
+            &amount,
+        );
     }
 
     pub fn borrow(env: Env, user: Address, amount: i128) {
@@ -161,10 +205,12 @@ impl LendingContract {
             panic!("exceeds maximum borrow amount");
         }
         position.debt += amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "positions"), &positions);
+
+        token_client(&env, "loan_token").transfer(&env.current_contract_address(), &user, &amount);
     }
 
     pub fn repay(env: Env, user: Address, amount: i128) {
@@ -187,10 +233,18 @@ impl LendingContract {
             amount
         };
         position.debt -= repay_amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "positions"), &positions);
+
+        if repay_amount > 0 {
+            token_client(&env, "loan_token").transfer(
+                &user,
+                env.current_contract_address(),
+                &repay_amount,
+            );
+        }
     }
 
     pub fn liquidate(env: Env, liquidator: Address, borrower: Address, repay_amount: i128) {
@@ -234,15 +288,20 @@ impl LendingContract {
         if actual_repay <= 0 {
             panic!("repay amount too small");
         }
-        let collateral_to_seize = actual_repay * (100 + liquidation_incentive) / 100;
-        position.debt -= actual_repay;
+        let mut collateral_to_seize = actual_repay * (100 + liquidation_incentive) / 100;
+        let mut final_repay = actual_repay;
+        if collateral_to_seize > position.collateral {
+            collateral_to_seize = position.collateral;
+            final_repay = collateral_to_seize * 100 / (100 + liquidation_incentive);
+        }
+        position.debt -= final_repay;
         position.collateral -= collateral_to_seize;
         let mut liquidator_position = positions.get(liquidator.clone()).unwrap_or(Position {
             collateral: 0,
             debt: 0,
         });
         liquidator_position.collateral += collateral_to_seize;
-        positions.set(liquidator, liquidator_position);
+        positions.set(liquidator.clone(), liquidator_position);
         if position.debt == 0 {
             positions.remove(borrower);
         } else {
@@ -251,16 +310,24 @@ impl LendingContract {
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "positions"), &positions);
+
+        // The liquidator pays down the debt in loan tokens; the seized
+        // collateral stays in the contract, credited to their position.
+        token_client(&env, "loan_token").transfer(
+            &liquidator,
+            env.current_contract_address(),
+            &final_repay,
+        );
     }
 
     pub fn emergency_liquidate(env: Env, admin: Address, borrower: Address) {
         admin.require_auth();
-        if !env
+        let paused: bool = env
             .storage()
             .instance()
             .get(&Symbol::new(&env, "emergency_paused"))
-            .unwrap()
-        {
+            .unwrap();
+        if !paused {
             panic!("not in emergency mode");
         }
         let mut positions: Map<Address, Position> = env

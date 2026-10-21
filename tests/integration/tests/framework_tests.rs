@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Integration Test Framework
 //!
 //! Demonstrates the comprehensive test framework architecture for Soroban

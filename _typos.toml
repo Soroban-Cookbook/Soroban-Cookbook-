@@ -1,0 +1,49 @@
+[default.extend-words]
+soroban = "soroban"
+IST = "IST"
+teh = "teh"
+Supress = "Supress"
+Soroban = "Soroban"
+Stellar = "Stellar"
+XLM = "XLM"
+mdbook = "mdbook"
+WASM = "WASM"
+wasm = "wasm"
+Env = "Env"
+Bytes = "Bytes"
+BytesN = "BytesN"
+require_auth = "require_auth"
+symbol_short = "symbol_short"
+Symbol = "Symbol"
+Val = "Val"
+Vec = "Vec"
+Map = "Map"
+WebAssembly = "WebAssembly"
+Friendbot = "Friendbot"
+Horizon = "Horizon"
+RPC = "RPC"
+SEP-41 = "SEP-41"
+stroop = "stroop"
+stroops = "stroops"
+Ledger = "Ledger"
+Testnet = "Testnet"
+Mainnet = "Mainnet"
+contractimpl = "contractimpl"
+contracttype = "contracttype"
+soroban-sdk = "soroban-sdk"
+wasm-opt = "wasm-opt"
+wasm32-unknown-unknown = "wasm32-unknown-unknown"
+astroid = "astroid"
+
+[default.extend-identifiers]
+set_thr = "set_thr"
+
+[files]
+extend-exclude = [
+  "examples/basics/events/**",
+  "test_out.txt",
+  "README.md",
+  "**/node_modules/**",
+  "doc/**",
+]
+

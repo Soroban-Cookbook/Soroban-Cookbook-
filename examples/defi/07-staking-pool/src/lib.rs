@@ -1,8 +1,7 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env};
 
 const REWARD_PRECISION: i128 = 1_000_000_000_000_000_000;
 
@@ -24,6 +23,7 @@ pub enum DataKey {
 }
 
 impl StakingPoolContract {
+    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -32,6 +32,7 @@ impl StakingPoolContract {
             .expect("not initialized");
         owner.require_auth();
     }
+    */
 
     fn staking_token(&self, env: &Env) -> Address {
         env.storage()
@@ -75,7 +76,7 @@ impl StakingPoolContract {
             .unwrap_or(0i128)
     }
 
-    fn balance_of(&self, env: &Env, account: &Address) -> i128 {
+    fn balance_of_internal(&self, env: &Env, account: &Address) -> i128 {
         env.storage()
             .instance()
             .get(&DataKey::Balance(account.clone()))
@@ -97,7 +98,7 @@ impl StakingPoolContract {
     }
 
     fn update_reward(&self, env: &Env, account: &Address) {
-        let reward_per_token = self.reward_per_token(env);
+        let reward_per_token = self.reward_per_token_internal(env);
         env.storage()
             .instance()
             .set(&DataKey::RewardPerTokenStored, &reward_per_token);
@@ -115,14 +116,14 @@ impl StakingPoolContract {
         );
     }
 
-    fn reward_per_token(&self, env: &Env) -> i128 {
+    fn reward_per_token_internal(&self, env: &Env) -> i128 {
         let total_supply = self.total_supply(env);
         if total_supply == 0 {
             return self.reward_per_token_stored(env);
         }
         let last_time = self.last_update_time(env);
         let now = env.ledger().timestamp();
-        let elapsed = now.checked_sub(last_time).unwrap_or(0u64) as i128;
+        let elapsed = now.saturating_sub(last_time) as i128;
         let accumulated = elapsed
             .checked_mul(self.reward_rate(env))
             .unwrap()
@@ -136,7 +137,7 @@ impl StakingPoolContract {
     }
 
     fn earned_at(&self, env: &Env, account: &Address, reward_per_token: i128) -> i128 {
-        let balance = self.balance_of(env, account);
+        let balance = self.balance_of_internal(env, account);
         let paid = self.user_reward_per_token_paid(env, account);
         let reward = balance
             .checked_mul(reward_per_token.checked_sub(paid).unwrap())
@@ -156,6 +157,10 @@ impl StakingPoolContract {
         reward_token: Address,
         reward_rate: i128,
     ) {
+        if env.storage().instance().has(&DataKey::Owner) {
+            panic!("already initialized");
+        }
+        owner.require_auth();
         assert!(reward_rate >= 0, "reward rate must be non-negative");
         env.storage().instance().set(&DataKey::Owner, &owner);
         env.storage()
@@ -177,14 +182,14 @@ impl StakingPoolContract {
     }
 
     pub fn stake(env: Env, staker: Address, amount: i128) {
+        staker.require_auth();
         assert!(amount > 0, "stake amount must be positive");
         let this = StakingPoolContract;
         this.update_reward(&env, &staker);
 
         let contract = env.current_contract_address();
         token::Client::new(&env, &this.staking_token(&env)).transfer(&staker, &contract, &amount);
-
-        let new_balance = this.balance_of(&env, &staker) + amount;
+        let new_balance = this.balance_of_internal(&env, &staker) + amount;
         env.storage()
             .instance()
             .set(&DataKey::Balance(staker.clone()), &new_balance);
@@ -194,9 +199,10 @@ impl StakingPoolContract {
     }
 
     pub fn unstake(env: Env, staker: Address, amount: i128) {
+        staker.require_auth();
         assert!(amount > 0, "unstake amount must be positive");
         let this = StakingPoolContract;
-        let balance = this.balance_of(&env, &staker);
+        let balance = this.balance_of_internal(&env, &staker);
         assert!(balance >= amount, "insufficient staked balance");
 
         this.update_reward(&env, &staker);
@@ -213,6 +219,7 @@ impl StakingPoolContract {
     }
 
     pub fn claim_rewards(env: Env, staker: Address) {
+        staker.require_auth();
         let this = StakingPoolContract;
         this.update_reward(&env, &staker);
         let reward = this.rewards(&env, &staker);
@@ -227,17 +234,17 @@ impl StakingPoolContract {
 
     pub fn earned(env: Env, staker: Address) -> i128 {
         let this = StakingPoolContract;
-        let reward_per_token = this.reward_per_token(&env);
+        let reward_per_token = this.reward_per_token_internal(&env);
         this.earned_at(&env, &staker, reward_per_token)
     }
 
     pub fn balance_of(env: Env, staker: Address) -> i128 {
         let this = StakingPoolContract;
-        this.balance_of(&env, &staker)
+        this.balance_of_internal(&env, &staker)
     }
 
     pub fn reward_per_token(env: Env) -> i128 {
         let this = StakingPoolContract;
-        this.reward_per_token(&env)
+        this.reward_per_token_internal(&env)
     }
 }

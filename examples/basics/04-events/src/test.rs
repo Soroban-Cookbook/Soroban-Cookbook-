@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Unit tests for the structured event patterns contract.
 //!
 //! Tests verify:

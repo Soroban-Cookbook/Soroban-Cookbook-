@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Soroban Types Demonstration
 //!
 //! This example demonstrates the unique types available in Soroban:
@@ -18,7 +19,7 @@
 //!   `cfg(test)` / `soroban_sdk::testutils`). In production code, addresses
 //!   must come from the contract caller.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contractimpl, symbol_short, Address, Bytes, BytesN, Env, String, Symbol,

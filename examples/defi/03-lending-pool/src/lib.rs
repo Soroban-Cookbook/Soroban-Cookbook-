@@ -1,8 +1,9 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, Address, Env, Map};
+use soroban_sdk::{contract, contractimpl, contracttype, token::TokenClient, Address, Env, Map};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 #[contracttype]
 pub struct UserPosition {
     pub deposit: i128,
@@ -12,9 +13,24 @@ pub struct UserPosition {
 #[contract]
 pub struct LendingPool;
 
+fn token_client(env: &Env) -> TokenClient<'_> {
+    let token: Address = env
+        .storage()
+        .instance()
+        .get(&soroban_sdk::Symbol::new(env, "token"))
+        .unwrap();
+    TokenClient::new(env, &token)
+}
+
 #[contractimpl]
 impl LendingPool {
-    pub fn initialize(env: Env, base_rate: i128, kink_rate: i128, kink_utilization: i128) {
+    pub fn initialize(
+        env: Env,
+        token: Address,
+        base_rate: i128,
+        kink_rate: i128,
+        kink_utilization: i128,
+    ) {
         if env
             .storage()
             .instance()
@@ -22,6 +38,9 @@ impl LendingPool {
         {
             panic!("already initialized");
         }
+        env.storage()
+            .instance()
+            .set(&soroban_sdk::Symbol::new(&env, "token"), &token);
         env.storage()
             .instance()
             .set(&soroban_sdk::Symbol::new(&env, "total_deposits"), &0i128);
@@ -59,7 +78,7 @@ impl LendingPool {
             borrow: 0,
         });
         position.deposit += amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
 
         let mut total_deposits: i128 = env
             .storage()
@@ -75,6 +94,8 @@ impl LendingPool {
             &soroban_sdk::Symbol::new(&env, "total_deposits"),
             &total_deposits,
         );
+
+        token_client(&env).transfer(&user, env.current_contract_address(), &amount);
     }
 
     pub fn withdraw(env: Env, user: Address, amount: i128) {
@@ -95,7 +116,11 @@ impl LendingPool {
             panic!("insufficient deposit");
         }
         position.deposit -= amount;
-        positions.set(user, position);
+        let max_borrow = position.deposit * 80 / 100;
+        if position.borrow > max_borrow {
+            panic!("insufficient collateral remaining");
+        }
+        positions.set(user.clone(), position);
 
         let mut total_deposits: i128 = env
             .storage()
@@ -111,6 +136,8 @@ impl LendingPool {
             &soroban_sdk::Symbol::new(&env, "total_deposits"),
             &total_deposits,
         );
+
+        token_client(&env).transfer(&env.current_contract_address(), &user, &amount);
     }
 
     pub fn borrow(env: Env, user: Address, amount: i128) {
@@ -147,9 +174,9 @@ impl LendingPool {
         }
 
         position.borrow += amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
 
-        let mut new_total_borrows = total_borrows + amount;
+        let new_total_borrows = total_borrows + amount;
         env.storage()
             .instance()
             .set(&soroban_sdk::Symbol::new(&env, "positions"), &positions);
@@ -157,6 +184,8 @@ impl LendingPool {
             &soroban_sdk::Symbol::new(&env, "total_borrows"),
             &new_total_borrows,
         );
+
+        token_client(&env).transfer(&env.current_contract_address(), &user, &amount);
     }
 
     pub fn repay(env: Env, user: Address, amount: i128) {
@@ -179,7 +208,7 @@ impl LendingPool {
             amount
         };
         position.borrow -= repay_amount;
-        positions.set(user, position);
+        positions.set(user.clone(), position);
 
         let mut total_borrows: i128 = env
             .storage()
@@ -195,6 +224,10 @@ impl LendingPool {
             &soroban_sdk::Symbol::new(&env, "total_borrows"),
             &total_borrows,
         );
+
+        if repay_amount > 0 {
+            token_client(&env).transfer(&user, env.current_contract_address(), &repay_amount);
+        }
     }
 
     pub fn get_utilization(env: Env) -> i128 {

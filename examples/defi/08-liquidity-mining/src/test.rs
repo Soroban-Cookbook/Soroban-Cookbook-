@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 extern crate std;
 
 use super::*;
@@ -367,6 +368,16 @@ fn test_paused_pool_stops_reward_accrual() {
     // Pending should reflect 5 + 5 = 10 ledgers of rewards (not 20)
     let pending = t.mining.pending_rewards(&1u32, &user);
     assert_eq!(pending, 10_000); // 10 * 1000
+}
+
+#[test]
+fn test_initialize_requires_admin_auth() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let contract_id = env.register_contract(None, LiquidityMining);
+    let client = LiquidityMiningClient::new(&env, &contract_id);
+
+    assert!(client.try_initialize(&admin).is_err());
 }
 
 // ─── 9. Unstake accumulates pending before withdrawal ────────────────────────

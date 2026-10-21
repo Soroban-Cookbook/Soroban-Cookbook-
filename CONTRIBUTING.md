@@ -1,13 +1,161 @@
-Markdown
-# Contributing to Soroban Cookbook 🍳
+# Contributing to Soroban-Cookbook
 
-Thank you for your interest in contributing to the Soroban Cookbook! This project aims to be a comprehensive resource for Soroban developers, and your contributions are what make it great.
+> 🎉 **Phase 8 (Community & Ecosystem) Complete!** See our [Phase 8 Completion Report](./PHASE_8_COMPLETION_REPORT.md) and join the celebration event!
 
-Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
+Before participating, please read our [Community Guidelines](./COMMUNITY_GUIDELINES.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
+
+## Built With the Cookbook
+
+We showcase **10+ real production projects** built using the Soroban Cookbook in
+our [Showcase](./SHOWCASE.md). It includes featured projects, case studies, and a
+developer-support section for anyone building on Soroban.
+
+**Built a project with the cookbook?** Open a pull request that adds your project
+to `SHOWCASE.md` (name, repo link, one-line description, and which cookbook
+patterns you used). This also helps us keep the Phase 8 "#441: 10+ Projects Built"
+milestone current.
+
+## Ecosystem Partnerships
+
+We collaborate with other Soroban projects so the patterns documented here are
+shaped by the teams actually shipping contracts. The full picture — partner
+projects, active collaborations, joint content, cross-promotion, and how to join
+— lives in [docs/ecosystem-partnerships.md](./docs/ecosystem-partnerships.md).
+
+For information about our outreach to the Stellar Development Foundation, see [docs/stellar-foundation-contact.md](./docs/stellar-foundation-contact.md).
+
+**Current collaboration tracks:**
+
+| Collaboration | What it produces |
+|---|---|
+| Streaming payments (SoroStream, StellarStream) | Shared storage trade-off case study for stream state |
+| NFT marketplace (soroban-nft-marketplace) | Reviewed [NFT patterns](./docs/nft-patterns.md) and escrow guidance |
+| Explorer and verification (soroban-verify, Soroban Smart Block Explorer) | Corrected [deployment](./book/src/guides/deployment.md) and upgrade guidance |
+| Oracle safety (soroban-oracle-safety) | Staleness and sanity-bound guidance in the oracle examples |
+| Wallet stack (astroid) | Integration notes in the [wallet integration guide](./docs/wallet-integration.md) |
+| Monthly community call | Demos, Q&A, and announcements on the [governance cadence](./GOVERNANCE/) |
+
+**Cross-promotion is reciprocal:** we list a project and describe precisely which
+cookbook patterns it uses, and we ask for exactly one thing in return — a line in
+your README linking to the page you used. Any project can ask to be removed from
+all listings and we will remove it in the next pull request.
+
+**Want to collaborate?** Open an issue describing your project, which cookbook
+pages you used, and whether you want a case study, a documentation review, or a
+demo slot on the monthly call. See
+[How to propose a partnership](./docs/ecosystem-partnerships.md#7-how-to-propose-a-partnership).
+For institutions, protocols, and developer tool providers seeking formal collaboration, review our
+[Formal Partnership Proposal Framework](./docs/formal-partnership-proposal.md), which details qualification criteria, mutual commitments, and an executable MOU template.
+
+## Featured Projects
+
+We feature the first projects built with the cookbook, each with a case study, a
+runnable demo, and an interview. The full page lives in
+[docs/featured-projects.md](./docs/featured-projects.md).
+
+| # | Project | Focus |
+|---|---|---|
+| 1 | [SoroStream](https://github.com/SoroStream/sorostream-contracts) | Storage-type trade-offs under a rent budget |
+| 2 | [soroban-nft-marketplace](https://github.com/waveforge-labs/soroban-nft-marketplace) | Escrow authorization in marketplace settlement |
+| 3 | [soroban-verify](https://github.com/SorobanVerify/soroban-verify) | Reproducible deployments and contract verification |
+| 4 | [Micopay Protocol](https://github.com/Micopay/micopay-protocol) | Balances that survive TTL expiry |
+| 5 | [astroid](https://github.com/ASTROIDX556) | One error vocabulary across contract, SDK, API, and UI |
+
+**Promotion is scheduled:** a weekly demo clip, a monthly case study or interview
+published on the [monthly call](./GOVERNANCE/), and a re-check of each promoted
+link every release. Any project can ask to be removed from all listings.
+
+**Want to be featured?** Build something that ships a Soroban contract, tell us
+which cookbook pages you used, and we will write the case study and schedule the
+demo slot. See
+[How a project gets featured](./docs/featured-projects.md#7-how-a-project-gets-featured).
+
+## Feedback System
+
+We have implemented a comprehensive feedback system to collect and manage input from our community. The system is located in the `docs/feedback-system/` directory.
+
+### How to Provide Feedback
+
+1. **Use the Feedback Form**: Copy the template from `docs/feedback-system/forms/feedback-form-template.md` and fill it out.
+2. **Submit via GitHub**: Create an issue or pull request with your feedback.
+3. **Participate in Surveys**: Copy and fill out our [Community Survey Template](./docs/feedback-system/surveys/USER_SURVEY_TEMPLATE.md) or join external survey links.
+
+### Community & Feedback Channels
+
+To make providing feedback as easy and integrated as possible, you can access the following channels:
+- **Quarterly Surveys**: We run regular user surveys to gather structured feedback on cookbook clarity, missing examples, and environment setup ease. See our [User Surveys Documentation & Process](./docs/feedback-system/surveys/README.md).
+- **Google Forms Survey**: Submit quick structured feedback online via our [Google Forms Survey Link](https://forms.google.com/soroban-cookbook-community-survey).
+- **GitHub Discussions**: Share ideas and participate in community polls in the [Discussions Forums](https://github.com/gloriaibrahim2002-blip/Soroban-Cookbook-/discussions).
+- **Discord Community**: Chat live with maintainers and other Soroban developers in the `#soroban` channel on [Stellar Discord](https://discord.gg/stellardev).
+
+### Review Process
+
+All feedback and contributions go through our review process:
+1. Initial acknowledgment within 2 business days
+2. Content and quality review
+3. Decision and communication
+4. Action tracking and implementation
+
+### Action Tracking
+
+We track all feedback-driven actions using:
+- GitHub Issues for individual tasks
+- Project boards for status visualization
+- Regular status updates in our community channels
+
+### Communication
+
+We commit to:
+- Acknowledging all feedback within 2 business days
+- Providing regular status updates
+- Closing the loop on all submitted feedback
+
+For more details, see the [Feedback System Documentation](docs/feedback-system/README.md).
+
+## Monthly Community Call Governance
+
+The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
+
+- [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
+- [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
+- [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
+- [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
+- [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+
+To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
+
+## Project Templates
+
+We provide three complete full-stack starter templates in the [`templates/`](./templates/) directory to help developers build and launch dApps rapidly:
+
+- [Templates Overview & Guide](./templates/README.md)
+- [🪙 Fungible Token dApp](./templates/token-dapp/)
+- [🎨 NFT Marketplace dApp](./templates/nft-marketplace-dapp/)
+- [🏛️ DAO Governance & Treasury dApp](./templates/dao-governance-dapp/)
+
+To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
+
+---
+
+## Roadmap Input Process
+
+The Soroban Cookbook has a structured process for community members to propose additions to the project roadmap. See [docs/roadmap-input-process.md](./docs/roadmap-input-process.md) for:
+
+- How to submit roadmap proposals (GitHub Discussions, issues, community calls)
+- The review and triage process
+- How community votes work
+- The quarterly update cadence
 
 ---
 
 ## 📍 Table of Contents
+- [New Here? Start with Onboarding](#-new-here-start-with-onboarding)
+- [Featured Projects](#featured-projects)
+- [Community Office Hours](#️-community-office-hours)
+- [Monthly Community Call Governance](#monthly-community-call-governance)
+- [Ecosystem Partnerships](#ecosystem-partnerships)
+- [Grants Application Process](#grants-application-process)
+- [Project Templates](#project-templates)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
@@ -18,201 +166,164 @@ Please read our [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
 - [Validation Steps](#-validation-steps)
 - [Bug Bounty Program](#-bug-bounty-program)
 - [Recognition System](#-recognition-system)
+- [Community Metrics](#-community-metrics)
+
+## 👋 New Here? Start with Onboarding
+
+If this is your first time in the Soroban Cookbook community, head to **[docs/onboarding.md](./docs/onboarding.md)** before reading the rest of this file.
+
+The onboarding guide covers:
+
+- Learning paths tailored to your background (new to Stellar, Rust dev, EVM dev, or ready to contribute)
+- A first-steps checklist to get your environment running and your first PR open
+- Community channels and how to ask for help effectively
+- External resources — official docs, tools, and learning materials
+- Answers to common first-timer questions
+
+Once you have worked through the onboarding guide and run `cargo test --workspace` successfully, come back here for the full contribution process.
+
+---
+
+## 📊 Community Metrics
+
+The Soroban Cookbook tracks community health transparently so contributors can see
+the impact of their work and maintainers can identify friction early.
+
+| Resource | Description |
+|---|---|
+| [Community Metrics](./docs/community-metrics.md) | Full metric definitions, targets, and alert thresholds |
+| [Community Dashboard](./docs/community-dashboard.md) | Rolling weekly data table + monthly narrative reports |
+| [Documentation Metrics](./docs/documentation-metrics.md) | Page views, search queries, popular content, user paths |
+| [Automated Workflow](./.github/workflows/community-metrics.yml) | GitHub Actions job that collects community data every Monday |
+| [Docs Metrics Workflow](./.github/workflows/documentation-metrics.yml) | GitHub Actions job that collects docs usage data every Monday |
+
+### What We Track
+
+- **Growth** — new contributors, stars, forks, unique clone traffic
+- **Engagement** — issue response time, PR review velocity, discussion activity
+- **Content Quality** — CI pass rate, test coverage, Clippy warnings
+- **Community Health** — bus factor, contributor retention, CoC incidents
+- **Documentation** — page views, search queries, popular content, user paths, feedback submissions, satisfaction scores
+
+### Documentation Analytics
+
+The project uses privacy-respecting analytics to understand how developers
+use the documentation:
+
+- **mdBook** — `book/analytics.js` tracks page views, search queries, and user paths
+- **Webapp** — `webapp/src/lib/analytics.ts` tracks page views and search queries
+
+Both scripts are cookie-free, PII-free, respect Do-Not-Track, and use
+`navigator.sendBeacon` for non-blocking data transmission. See the
+[privacy section](./docs/documentation-metrics.md#privacy--data-handling) of
+the documentation metrics dashboard for full details.
+
+### How You Contribute to the Numbers
+
+Every merged PR, answered issue, and submitted feedback form flows into these metrics
+and feeds the [Recognition System](./docs/recognition-system.md). You can:
+
+- Participate in quarterly satisfaction surveys (announced in GitHub Discussions).
+- Flag data anomalies by opening an issue tagged `metrics-anomaly`.
+- Propose new metrics in a GitHub Discussion under the `Ideas` category.
 
 ---
 
 ## 🎯 Ways to Contribute
 
-1.  **Add New Examples**: Create well-documented smart contract examples demonstrating specific patterns.
-2.  **Improve Documentation**: Fix typos, clarify guides, or add new documentation.
-3.  **Bug Reports & Feature Requests**: Use [GitHub Issues] to report bugs or suggest new features.
-4.  **Code Review**: Review open pull requests and provide constructive feedback.
+## 📋 Submission Guidelines
 
----
+All contributions must follow these guidelines:
 
-## 🛠️ Development Environment Setup
+1. **Test Coverage**: Every change touching contract logic requires test coverage (see [Testing Requirements](#-testing-requirements))
+2. **Code Style**: Run `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` locally before opening a PR
+3. **Documentation**: Update relevant documentation when adding or modifying examples
+4. **Commits**: Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`)
+5. **PR Process**: Link related issues using `Closes #<issue-number>` in the PR description
 
-### 1. Prerequisites
+### 🗓️ Community Office Hours
 
-- **Rust**: Latest stable version.
-- **WASM Target**: Required for compiling Soroban contracts.
-- **Stellar CLI**: Used for building, testing, and deploying (Note: `stellar-cli` has replaced `soroban-cli`).
+We run **regular office hours** so you can bring questions, get unblocked, and
+talk through contract design with maintainers and other contributors. Office
+hours complement the [monthly community call](#monthly-community-call-governance):
+the call is for demos and announcements, office hours are for open Q&A.
 
-### 2. Installation Steps
+**Schedule**
+
+- **Weekly**, every **Thursday at 16:00 UTC** (60 minutes).
+- No session on the week of the monthly community call — join the call instead.
+- The next session date is always posted in the [README](./README.md#community-office-hours)
+  and in GitHub Discussions under the `Office Hours` category.
+
+**Platform**
+
+- Hosted on **Discord** in the `#soroban` channel on
+  [Stellar Discord](https://discord.gg/stellardev), with a fallback video room
+  link posted in the Discussion thread before each session.
+- No registration required; drop in for any part of the hour.
+
+**Promotion**
+
+- Announced in GitHub Discussions and the `#soroban` Discord channel at least
+  48 hours ahead, with the agenda and any pre-submitted questions.
+- Included in the monthly call recap and the [Community Dashboard](./docs/community-dashboard.md).
+
+**Q&A format**
+
+1. **Pre-submitted questions** — post in the Discussion thread or comment on the
+   tracking issue; these are answered first.
+2. **Live questions** — raise your hand in the channel; the moderator queues them.
+3. **Deep dives** — anything needing more than ~5 minutes is moved to a follow-up
+   issue or a dedicated pairing session.
+
+See the [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md) for the moderation
+conventions we reuse.
+
+**Recording and notes**
+
+- Sessions are **not recorded by default** to keep the space open for candid
+  questions; if a session is recorded, everyone is told at the start.
+- Written notes, answered questions, and links are published after each session
+  in the `Office Hours` Discussion category and summarized in the
+  [Community Dashboard](./docs/community-dashboard.md).
+- Action items become GitHub issues tagged `office-hours`.
+
+**Want to host or propose a topic?** Open an issue describing the topic and
+which cookbook pages it relates to, or volunteer as moderator in the Discussion
+thread.
+
+## 🧪 Testing Requirements
+
+Every change that touches contract logic needs test coverage before it merges. This section covers the commands you need day-to-day; for testing patterns, fixtures, and best practices, see the [Testing Guide](./book/src/guides/testing.md) and [Testing Best Practices](./book/src/docs/testing-best-practices.md).
+
+### Running Tests
 
 ```bash
-# 1. Install Rust
-curl --proto '=https' --tlsv1.2 -sSf [https://sh.rustup.rs](https://sh.rustup.rs) | sh
-
-# 2. Add WASM target
-rustup target add wasm32-unknown-unknown
-
-# 3. Install Stellar CLI (version 22.1.0+ recommended)
-cargo install --locked stellar-cli --version 22.1.0
-
-# 4. Clone the repository
-git clone [https://github.com/username/Soroban-Cookbook-.git]
-cd Soroban-Cookbook-
-
-# 5. Verify installation
-cargo test --workspace
-For more detailed setup, see the Getting Started Guide.
-
-To maintain a consistent and high-quality codebase, please follow our [Style Guide](./docs/style-guide.md).
-
-Key highlights:
-- **Naming**: Follow standard [Rust naming conventions](https://rust-lang.github.io/api-guidelines/naming.html) and our specific contract patterns.
-- **Formatting**: Always run `cargo fmt` before committing.
-- **Linting**: Ensure `cargo clippy` passes with no warnings (`-D warnings`).
-- **Documentation**: Use `///` for public interface docs and `//!` for module-level explanations.
-- **Testing**: Every example must include comprehensive unit tests.
-- **No-std**: All contract code must be `#![no_std]`.
-
-🏗️ Project Structure
-examples/: Categorized smart contract examples.
-
-docs/: General documentation and ADRs.
-
-guides/: Step-by-step tutorials and guides.
-
-book/: Source for the mdBook documentation.
-
-tests/: Integration tests for the workspace.
-
-🔄 Pull Request Process
-Branching: Create a feature branch from main.
-
-Bash
-git checkout -b feature/your-feature-name
-Development: Implement your changes following the style guidelines.
-
-Local Testing: Run the validation suite (see below).
-
-Commit: Use descriptive commit messages.
-
-Documentation: If adding an example, ensure it has a README.md and is added to the main README.md and SUMMARY.md if applicable.
-
-Submit PR: Fill out the Pull Request Template.
-
-🧪 Testing Requirements
-All contributions must include tests:
-
-- **Unit Tests**: In `src/test.rs` for individual function logic.
-- **Integration Tests**: In `tests/` for multi-contract or complex interactions.
-- **Mocking**: Use `env.mock_all_auths()` for testing authorization flows.
-- **Coverage**: Aim for high test coverage. Run coverage locally with:
-  ```bash
-  cargo tarpaulin
-  # Reports are written to coverage/ (XML, HTML, LCOV)
-  # Open coverage/tarpaulin-report.html in a browser for a line-by-line view
-  ```
-
-📋 Example Contribution Template
-When adding a new example in examples/category/name/:
-
-Plaintext
-name/
-├── src/
-│   ├── lib.rs       # Contract implementation
-│   └── test.rs      # Unit tests
-├── Cargo.toml       # Metadata and dependencies
-└── README.md        # Description, how to run, and explanation
-The README.md for the example should include:
-
-What it does: Clear purpose statement.
-
-Key Concepts: Explanation of Soroban features used.
-
-How to Run: Commands for testing and building.
-
-✅ Validation Steps
-Before submitting your PR, ensure all these checks pass:
-
-Bash
-# 1. Format check
-cargo fmt --all --check
-
-# 2. Lint check
-cargo clippy --workspace --all-targets --all-features -- -D warnings
-
-# 3. Run all tests
+# Run everything in the workspace (what CI runs by default)
 cargo test --workspace
 
-# 4. Build Wasm (for contracts)
-cargo build --workspace --target wasm32-unknown-unknown --release
-🚀 Definition of Done
-[ ] Acceptance criteria of the issue are met.
+# Run tests for a single example you're working on
+cd examples/<category>/<example-name>
+cargo test
 
-[ ] Code follows style guidelines and passes all checks.
+# Run the shared integration test suite
+cargo test -p integration-tests
 
-[ ] Tests are included and passing.
+# Run the security-focused test suite
+cargo test --package security-tests
 
-[ ] Documentation (README, guides, SUMMARY.md) is updated.
+# Run the audit-prep documentation consistency checks
+cargo test -p docs-audit-tests
+```
 
-[ ] PR is linked to relevant issues.
-### CI Testing Strategy
+CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
 
-- We run targeted tests for changed paths on pull requests to enable fast feedback.
-- For merges to main, the CI fallback runs the entire workspace check to ensure full compatibility.
+### Where to Add a Test
 
----
+- **Example-level test** (`src/test.rs` or `tests/` inside the example crate): the default for any new or changed example. If the behavior only involves that one contract, it belongs here.
+- **Shared integration test** (`tests/integration/`): for scenarios that span multiple contracts — cross-contract calls, multi-step workflows, or state coordination between examples. See `tests/integration/README.md` for existing patterns before adding a new one.
+- **Security test** (`tests/security/`): for authorization bypass, reentrancy, and other security-relevant regressions. See `tests/security/README.md` for the threat models already covered.
+- **Fuzz target** (`tests/fuzz/`): for property-based testing of parsing/serialization boundaries. Only needed when you're adding a new fuzzable surface, not for typical example changes.
+- **Documentation consistency** (`tests/docs-audit/`): for checks that a maintained document (e.g. an audit-scope or checklist file) stays in sync with the filesystem it describes. See `tests/docs-audit/README.md`.
 
-## 🛡️ Bug Bounty Program
-
-The Soroban Cookbook Bug Bounty Program rewards community members who responsibly disclose security vulnerabilities in the contract examples and shared library code.
-
-### Scope
-
-**In scope:**
-- Smart contract examples in `examples/` that contain logic vulnerabilities, incorrect auth patterns, or integer overflow/underflow bugs
-- The `shared/` library (validation helpers, test utilities)
-- Integration tests in `tests/` that mask rather than catch security issues
-- Documentation that provides insecure guidance or incorrect security advice
-
-**Out of scope:**
-- Third-party dependencies (report upstream)
-- Issues in the `webapp/` Next.js frontend
-- Theoretical vulnerabilities without a working proof-of-concept
-- Style or formatting issues
-
-### Reward Tiers
-
-| Severity | Description | Reward |
-|----------|-------------|--------|
-| **Critical** | Auth bypass, fund theft, or arbitrary state manipulation in any example contract | $500–$1,000 USD equivalent |
-| **High** | Logic flaw enabling incorrect behavior affecting core contract functions | $200–$500 USD equivalent |
-| **Medium** | Incorrect documentation that teaches insecure patterns; test gaps hiding real bugs | $50–$200 USD equivalent |
-| **Low** | Minor issues, missing input validation, documentation inaccuracies | $10–$50 USD equivalent or public acknowledgment |
-
-Rewards are paid in XLM at the time of payout. The triage team makes final severity determinations.
-
-### Rules and Guidelines
-
-1. **Responsible Disclosure**: Report vulnerabilities privately before public disclosure. Do not open a public GitHub issue for security bugs.
-2. **Report Channel**: Email `security@soroban-cookbook.dev` or open a [GitHub Security Advisory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new) with full details.
-3. **Proof of Concept**: Include a minimal failing test or reproduction steps. Reports without a PoC may not qualify for rewards.
-4. **No Destructive Testing**: Do not test on mainnet. All testing must be done locally or on testnet using the provided tooling.
-5. **One Report Per Issue**: Duplicate reports are not rewarded. The first valid submission receives the reward.
-6. **Good Faith**: Researchers must not access, modify, or delete data beyond what is needed to demonstrate the vulnerability.
-7. **No Social Engineering**: Do not attempt to compromise maintainer accounts or CI infrastructure.
-8. **Response SLA**: The team will acknowledge reports within 5 business days and provide a resolution timeline within 14 business days.
-
-### Disclosure Timeline
-
-- **Day 0**: Vulnerability reported privately
-- **Day 1–5**: Team acknowledges receipt
-- **Day 1–14**: Severity triage and fix timeline communicated
-- **Day 14–60**: Fix developed, reviewed, and merged
-- **Day 60+**: Coordinated public disclosure with researcher credit (if desired)
-
-### Budget
-
-The program is funded from the project's community treasury. Total annual budget: **$5,000 USD**. Awards are distributed on a first-come, first-served basis until the annual budget is exhausted.
-
-For full details, see [`docs/security-audit/bug-bounty.md`](./docs/security-audit/bug-bounty.md).
-
-## 🏆 Recognition System
-
-All contributors are recognized for their work. We have a tiered recognition system with rewards ranging from public acknowledgment to Stellar swag and community spotlights.
-
-See [docs/recognition-system.md](./docs/recognition-system.md) for the full criteria, tiers, rewards, and automation plan.
+Coverage is measured with `cargo tarpaulin` in CI and uploaded to Codecov; run `cargo tarpaulin` locally if you want to check coverage before pushing.

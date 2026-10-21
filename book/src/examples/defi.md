@@ -2,6 +2,19 @@
 
 Decentralized finance on Soroban: AMMs, lending, yield protocols.
 
+## Staking Pool
+
+**[07 · Staking Pool](./defi/07-staking-pool.md)** — the canonical staking example. A single-asset pool that distributes reward tokens proportionally to stakers over time.
+
+**Key Concepts:**
+- Time-based reward accrual through a global `reward_per_share` accumulator
+- Per-user `reward_debt` snapshots, so pending rewards resolve in O(1) instead of iterating over every staker
+- Claiming rewards without unstaking
+- Stake, unstake, and claim move real SEP-41 tokens via `token::Client::transfer`
+
+> **Also in this category:** [`staking-pool`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/staking-pool) implements a *different* design — fixed 30 / 90 / 180-day lockups, a tiered maturity boost (0% / 10% / 25%), and a 20% penalty for withdrawing early. It is **not** the canonical example. See [how the two differ](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/defi/staking-pool/README.md#how-this-differs-from-the-canonical-example).
+
+## 📋 Coming Soon
 ## 📋 Examples (1 currently)
 
 ### [01-vault-strategies](../examples/vault-strategies/)
@@ -42,6 +55,26 @@ let yield_amount = client.estimate_yield(&10_000, &365);
 - Oracle price feeds
 - Liquidation thresholds
 - Interest accrual
+
+### Yield Vault
+**Automated yield optimization**.
+
+**Key Concepts:**
+- Strategy rotation
+- Performance fees
+- Emergency withdrawal
+
+## Playground Use Cases
+
+The [Playground Use Cases](../playground-use-cases.md) page walks through complete, runnable DeFi scenarios — swaps, liquidity provision, and yield vaults — that you can try in the playground and then reproduce locally.
+
+Run any DeFi example interactively from the repository:
+
+```bash
+cd examples/defi/01-simple-swap && cargo test
+```
+
+Swap in the example name for the one you want to explore (for example `examples/defi/vault-strategies`), then follow the matching playground use case to see the same flow step by step.
 
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)

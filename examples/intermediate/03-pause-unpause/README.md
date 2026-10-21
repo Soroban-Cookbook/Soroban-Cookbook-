@@ -84,6 +84,7 @@ client.increment(); // succeeds again
 
 ```bash
 cargo test -p pause-unpause
+cargo build --target wasm32-unknown-unknown --release -p pause-unpause
 ```
 
 ## Related Examples

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Collection Types in Soroban
 //!
 //! This example demonstrates `Vec<T>` and `Map<K, V>` — Soroban's two built-in
@@ -23,7 +24,7 @@
 //! - Use `Vec` for ordered sequences and batch operations.
 //! - Use `Map` when you need O(log n) key lookups or a sorted key-value store.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contractimpl, symbol_short, Env, Map, Symbol, Vec};
 

@@ -1,9 +1,12 @@
 [package]
 name = "security-tests"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 publish = false
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
-token-wrapper = { path = "../../examples/tokens/token-wrapper" }
+token_wrapper = { path = "../../examples/tokens/06-token-wrapper", package = "token-wrapper" }
+role_based_access_control = { path = "../../examples/intermediate/02-role-based-access-control", package = "role-based-access-control" }
+multi_sig_patterns = { path = "../../examples/intermediate/multi-sig-patterns", package = "multi-sig-patterns" }
+timelock = { path = "../../examples/advanced/02-timelock", package = "timelock" }

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Unit tests for the Hello World contract.
 
 use super::*;

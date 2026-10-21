@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soroban DAO Governance</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-group">
+        <div class="dao-badge">🏛️</div>
+        <div>
+          <h1>Soroban DAO Portal</h1>
+          <p class="subtitle">Decentralized Governance & Community Treasury on Stellar</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="openProposeModalBtn" class="btn btn-secondary">+ New Proposal</button>
+        <button id="connectWalletBtn" class="btn btn-primary">Connect Wallet</button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <!-- DAO Metrics -->
+      <section class="card metrics-card">
+        <div class="metrics-grid">
+          <div class="metric">
+            <span class="label">Treasury Balance</span>
+            <span class="value" id="treasuryBalance">250,000 XLM</span>
+          </div>
+          <div class="metric">
+            <span class="label">Active Proposals</span>
+            <span class="value" id="activePropsCount">2 Active</span>
+          </div>
+          <div class="metric">
+            <span class="label">Quorum Requirement</span>
+            <span class="value" id="quorumRequirement">10,000 Votes</span>
+          </div>
+          <div class="metric">
+            <span class="label">Voting Power</span>
+            <span class="value" id="userVotingPower">1,250 Votes</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Proposals List -->
+      <section class="proposals-section">
+        <div class="section-header">
+          <h2>Community Proposals</h2>
+          <span class="connected-account" id="accountAddress">Wallet Not Connected</span>
+        </div>
+
+        <div class="proposals-list" id="proposalsList">
+          <!-- Proposal 1 -->
+          <div class="proposal-card">
+            <div class="proposal-header">
+              <div>
+                <span class="proposal-id">#1</span>
+                <h3>Community Grant: Soroban Security Linter</h3>
+              </div>
+              <span class="badge badge-active">Active</span>
+            </div>
+            <p class="proposal-desc">Fund development of open-source CLI static security analyzer for Soroban contracts.</p>
+            <div class="proposal-meta">
+              <span>Target: GDF...39B</span>
+              <span>Amount: 15,000 XLM</span>
+              <span>Ends in: ~18 hours</span>
+            </div>
+            <!-- Tally bar -->
+            <div class="tally-container">
+              <div class="tally-labels">
+                <span class="for-label">For: 12,400 (82%)</span>
+                <span class="against-label">Against: 2,700 (18%)</span>
+              </div>
+              <div class="tally-bar">
+                <div class="tally-for" style="width: 82%;"></div>
+                <div class="tally-against" style="width: 18%;"></div>
+              </div>
+            </div>
+            <div class="vote-actions">
+              <button class="btn btn-for vote-btn" data-id="1" data-vote="for">Vote For</button>
+              <button class="btn btn-against vote-btn" data-id="1" data-vote="against">Vote Against</button>
+            </div>
+          </div>
+
+          <!-- Proposal 2 -->
+          <div class="proposal-card">
+            <div class="proposal-header">
+              <div>
+                <span class="proposal-id">#2</span>
+                <h3>Expand Multilingual Documentation</h3>
+              </div>
+              <span class="badge badge-active">Active</span>
+            </div>
+            <p class="proposal-desc">Translate key cookbook DeFi recipes into Spanish, French, and Japanese.</p>
+            <div class="proposal-meta">
+              <span>Target: GZX...82A</span>
+              <span>Amount: 8,000 XLM</span>
+              <span>Ends in: ~2 days</span>
+            </div>
+            <div class="tally-container">
+              <div class="tally-labels">
+                <span class="for-label">For: 18,900 (94%)</span>
+                <span class="against-label">Against: 1,100 (6%)</span>
+              </div>
+              <div class="tally-bar">
+                <div class="tally-for" style="width: 94%;"></div>
+                <div class="tally-against" style="width: 6%;"></div>
+              </div>
+            </div>
+            <div class="vote-actions">
+              <button class="btn btn-for vote-btn" data-id="2" data-vote="for">Vote For</button>
+              <button class="btn btn-against vote-btn" data-id="2" data-vote="against">Vote Against</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity Logs -->
+      <section class="card logs-card">
+        <h3>Governance Events Log</h3>
+        <div id="activityLogs" class="logs-container">
+          <div class="log-entry log-info">Governance contracts loaded. Connect Freighter wallet to cast votes.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Proposal Modal -->
+  <div id="proposeModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Create New DAO Proposal</h3>
+        <button id="closeProposeModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="proposeForm">
+        <div class="form-group">
+          <label for="proposalTitle">Proposal Title & Description</label>
+          <input type="text" id="proposalTitle" placeholder="Treasury Grant for..." required>
+        </div>
+        <div class="form-group">
+          <label for="targetAddress">Beneficiary Public Key</label>
+          <input type="text" id="targetAddress" placeholder="G..." required>
+        </div>
+        <div class="form-group">
+          <label for="requestedAmount">Requested Amount (XLM)</label>
+          <input type="number" id="requestedAmount" placeholder="5000" required>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-full">Submit Proposal</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

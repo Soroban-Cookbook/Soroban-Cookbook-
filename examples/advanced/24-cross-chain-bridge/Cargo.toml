@@ -1,0 +1,15 @@
+[package]
+name = "cross-chain-bridge"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true, features = ["alloc"] }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils", "alloc"] }
+ed25519-dalek = "2"

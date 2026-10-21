@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Unit tests for the Data Types contract.
 
 use super::*;

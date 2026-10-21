@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 use super::*;
 use soroban_sdk::{testutils::Address as _, Address, Env};
 
 fn setup() -> (Env, Address, PausableContractClient<'static>) {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, PausableContract);
+    let contract_id = env.register(PausableContract, ());
     let client = PausableContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     client.initialize(&admin);
@@ -65,7 +66,7 @@ fn test_unpause_already_unpaused() {
 #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_non_admin_cannot_pause() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, PausableContract);
+    let contract_id = env.register(PausableContract, ());
     let client = PausableContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     env.mock_all_auths();
@@ -78,7 +79,7 @@ fn test_non_admin_cannot_pause() {
 #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn test_non_admin_cannot_unpause() {
     let env = Env::default();
-    let contract_id = env.register_contract(None, PausableContract);
+    let contract_id = env.register(PausableContract, ());
     let client = PausableContractClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
     env.mock_all_auths();

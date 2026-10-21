@@ -1,8 +1,9 @@
+#![allow(deprecated)]
 //! # Storage Migration Example
 //!
 //! Demonstrates a versioned migration pattern for upgrading contract storage safely.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, Vec};
 
@@ -106,6 +107,71 @@ impl StorageMigration {
             &MigrationState::Prepared(target_version, 0),
         );
         Ok(())
+    }
+
+    pub fn migrate_v1_to_v2(env: Env, batch_size: u32) -> Result<u32, MigrationError> {
+        admin_require_auth(&env)?;
+        if batch_size == 0 {
+            return Err(MigrationError::InvalidBatchSize);
+        }
+
+        let current_version = read_version(&env);
+        if current_version != 1 {
+            return Err(MigrationError::InvalidVersion);
+        }
+
+        let users: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::UserList)
+            .unwrap_or_else(|| Vec::new(&env));
+
+        let total_entries = users.len();
+        if total_entries == 0 {
+            env.storage().instance().set(&DataKey::Version, &2u32);
+            env.storage()
+                .instance()
+                .set(&DataKey::MigrationState, &MigrationState::None);
+            return Ok(0);
+        }
+
+        let mut processed = 0u32;
+        let mut index = 0u32;
+        while processed < batch_size && index < total_entries {
+            let user = users.get(index).unwrap().clone();
+            let legacy_balance: i128 = env
+                .storage()
+                .persistent()
+                .get(&DataKey::LegacyBalance(user.clone()))
+                .unwrap_or(0);
+            let profile = Profile {
+                balance: legacy_balance,
+                member_since: env.ledger().timestamp(),
+            };
+            env.storage()
+                .persistent()
+                .set(&DataKey::Profile(user.clone()), &profile);
+            env.storage()
+                .persistent()
+                .remove(&DataKey::LegacyBalance(user));
+
+            processed += 1;
+            index += 1;
+        }
+
+        if index >= total_entries {
+            env.storage().instance().set(&DataKey::Version, &2u32);
+            env.storage()
+                .instance()
+                .set(&DataKey::MigrationState, &MigrationState::None);
+        } else {
+            env.storage().instance().set(
+                &DataKey::MigrationState,
+                &MigrationState::Prepared(2, index),
+            );
+        }
+
+        Ok(processed)
     }
 
     pub fn migrate_batch(env: Env, batch_size: u32) -> Result<u32, MigrationError> {

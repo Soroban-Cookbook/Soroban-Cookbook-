@@ -13,11 +13,11 @@ A comprehensive collection of Soroban smart contract examples, ranging from basi
 ### [Intermediate](./intermediate/)
 **Common patterns and real-world use cases** for developers who have mastered the basics.
 - **Key Topics:** Multi-sig patterns, Token interactions, Access Control, Data Structures.
-- **Status:** Several patterns implemented, more planned.
+- **Status:** RBAC implementation added; several patterns implemented, more planned.
 
 ### [Advanced](./advanced/)
 **Complex architectural designs and optimizations** for production-grade systems.
-- **Key Topics:** Multi-party auth, Timelocks, Factories, Bonding Curves.
+- **Key Topics:** Multi-party auth, Timelocks, Factories, Bonding Curves, Payment Channels.
 - **Status:** Advanced patterns being added incrementally.
 
 ### [DeFi](./defi/)
@@ -87,7 +87,7 @@ Common patterns and more complex contract interactions.
 
 ### [Advanced](./advanced/)
 Complex systems and architectural patterns.
-- Timelocks, Multi-party auth, Proxy patterns, Upgradeability
+- Timelocks, Multi-party auth, Payment Channels, Proxy patterns, Upgradeability
 
 ### [DeFi](./defi/)
 Financial application examples and protocols.

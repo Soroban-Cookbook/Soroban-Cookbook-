@@ -1,106 +1,111 @@
 #![cfg(test)]
+#![allow(deprecated)]
 
 use super::*;
 use soroban_sdk::{symbol_short, Env};
 
+fn setup() -> (Env, QueueContractClient<'static>) {
+    let env = Env::default();
+    let contract_id = env.register(QueueContract, ());
+    let client = QueueContractClient::new(&env, &contract_id);
+    (env, client)
+}
+
 #[test]
 fn test_empty_queue() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    assert!(QueueContract::is_empty(&env));
-    assert_eq!(QueueContract::size(&env), 0);
+    assert!(client.is_empty());
+    assert_eq!(client.size(), 0);
 }
 
 #[test]
 fn test_single_item() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    QueueContract::enqueue(&env, symbol_short!("A"));
-    assert!(!QueueContract::is_empty(&env));
-    assert_eq!(QueueContract::size(&env), 1);
-    assert_eq!(QueueContract::peek(&env), symbol_short!("A"));
-    assert_eq!(QueueContract::dequeue(&env), symbol_short!("A"));
-    assert!(QueueContract::is_empty(&env));
+    client.enqueue(&symbol_short!("A"));
+    assert!(!client.is_empty());
+    assert_eq!(client.size(), 1);
+    assert_eq!(client.peek(), symbol_short!("A"));
+    assert_eq!(client.dequeue(), symbol_short!("A"));
+    assert!(client.is_empty());
 }
 
 #[test]
 fn test_fifo_order() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    QueueContract::enqueue(&env, symbol_short!("A"));
-    QueueContract::enqueue(&env, symbol_short!("B"));
-    QueueContract::enqueue(&env, symbol_short!("C"));
+    client.enqueue(&symbol_short!("A"));
+    client.enqueue(&symbol_short!("B"));
+    client.enqueue(&symbol_short!("C"));
 
-    assert_eq!(QueueContract::size(&env), 3);
-    assert_eq!(QueueContract::dequeue(&env), symbol_short!("A"));
-    assert_eq!(QueueContract::dequeue(&env), symbol_short!("B"));
-    assert_eq!(QueueContract::dequeue(&env), symbol_short!("C"));
+    assert_eq!(client.size(), 3);
+    assert_eq!(client.dequeue(), symbol_short!("A"));
+    assert_eq!(client.dequeue(), symbol_short!("B"));
+    assert_eq!(client.dequeue(), symbol_short!("C"));
 }
 
 #[test]
 fn test_peek_preserves_queue() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    QueueContract::enqueue(&env, symbol_short!("X"));
-    assert_eq!(QueueContract::peek(&env), symbol_short!("X"));
-    assert_eq!(QueueContract::size(&env), 1);
-    assert_eq!(QueueContract::peek(&env), symbol_short!("X"));
-    assert_eq!(QueueContract::dequeue(&env), symbol_short!("X"));
+    client.enqueue(&symbol_short!("X"));
+    assert_eq!(client.peek(), symbol_short!("X"));
+    assert_eq!(client.size(), 1);
+    assert_eq!(client.peek(), symbol_short!("X"));
+    assert_eq!(client.dequeue(), symbol_short!("X"));
 }
 
 #[test]
 #[should_panic(expected = "Queue is empty")]
 fn test_dequeue_empty_panics() {
-    let env = Env::default();
-    let contract = QueueContract {};
-
-    QueueContract::dequeue(&env);
+    let (_env, client) = setup();
+    client.dequeue();
 }
 
 #[test]
 #[should_panic(expected = "Queue is empty")]
 fn test_peek_empty_panics() {
-    let env = Env::default();
-    let contract = QueueContract {};
-
-    QueueContract::peek(&env);
+    let (_env, client) = setup();
+    client.peek();
 }
 
 #[test]
 fn test_large_queue() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    // Enqueue many items
-    for i in 0..100 {
-        let symbol = Symbol::short(format!("item{}", i).as_str());
-        QueueContract::enqueue(&env, symbol);
+    let items = [
+        symbol_short!("q0"),
+        symbol_short!("q1"),
+        symbol_short!("q2"),
+        symbol_short!("q3"),
+        symbol_short!("q4"),
+        symbol_short!("q5"),
+        symbol_short!("q6"),
+        symbol_short!("q7"),
+        symbol_short!("q8"),
+        symbol_short!("q9"),
+    ];
+
+    for item in &items {
+        client.enqueue(item);
     }
 
-    assert_eq!(QueueContract::size(&env), 100);
+    assert_eq!(client.size(), 10);
 
-    // Dequeue and verify FIFO order
-    for i in 0..100 {
-        let symbol = Symbol::short(format!("item{}", i).as_str());
-        assert_eq!(QueueContract::dequeue(&env), symbol);
+    for item in &items {
+        assert_eq!(client.dequeue(), *item);
     }
 
-    assert!(QueueContract::is_empty(&env));
+    assert!(client.is_empty());
 }
 
 #[test]
 #[should_panic(expected = "Queue is full")]
 fn test_overflow() {
-    let env = Env::default();
-    let contract = QueueContract {};
+    let (_env, client) = setup();
 
-    // Try to exceed max queue size
-    for i in 0..=super::MAX_QUEUE_SIZE {
-        let symbol = Symbol::short(format!("item{}", i).as_str());
-        QueueContract::enqueue(&env, symbol);
+    for _ in 0..=MAX_QUEUE_SIZE {
+        client.enqueue(&symbol_short!("item"));
     }
 }

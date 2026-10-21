@@ -1,8 +1,9 @@
+#![allow(deprecated)]
 //! # Ajo Template Contract
 //!
 //! Rotating savings pool template deployed by [`ajo_factory::AjoFactory`].
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env};
 
 #[contracterror]

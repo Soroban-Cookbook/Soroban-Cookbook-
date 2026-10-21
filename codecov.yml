@@ -14,11 +14,11 @@ coverage:
       default:
         informational: true
         threshold: "1%"   # allow up to 1% drop before flagging
-    # Per-PR patch coverage — warn if new code is under-tested
+    # Per-PR patch coverage — new code must meet 90% target (issue #742)
     patch:
       default:
-        informational: true
-        target: "80%"     # aim for 80% coverage on new/changed lines
+        informational: false
+        target: "90%"     # 90%+ coverage required on new/changed lines
 
 # Pull request comment layout
 comment:

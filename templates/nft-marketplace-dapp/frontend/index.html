@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soroban NFT Marketplace</title>
+  <link rel="stylesheet" href="./src/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-group">
+        <div class="nft-badge">🎨</div>
+        <div>
+          <h1>Soroban NFT Bazaar</h1>
+          <p class="subtitle">Mint, List & Trade Digital Collectibles on Stellar</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="openMintModalBtn" class="btn btn-secondary">+ Mint NFT</button>
+        <button id="connectWalletBtn" class="btn btn-primary">Connect Wallet</button>
+      </div>
+    </header>
+
+    <main class="dashboard">
+      <!-- Marketplace Stats -->
+      <section class="card stats-card">
+        <div class="metrics-grid">
+          <div class="metric">
+            <span class="label">Total Minted</span>
+            <span class="value" id="totalMinted">12 NFTs</span>
+          </div>
+          <div class="metric">
+            <span class="label">Active Listings</span>
+            <span class="value" id="activeListings">4 Items</span>
+          </div>
+          <div class="metric">
+            <span class="label">Floor Price</span>
+            <span class="value" id="floorPrice">50 XLM</span>
+          </div>
+          <div class="metric">
+            <span class="label">Network</span>
+            <span class="badge">Testnet</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- NFT Gallery -->
+      <section class="gallery-section">
+        <div class="section-header">
+          <h2>Explore Collectibles</h2>
+          <span class="connected-account" id="accountAddress">Wallet Not Connected</span>
+        </div>
+
+        <div class="nft-grid" id="nftGrid">
+          <!-- Card 1 -->
+          <div class="nft-card">
+            <div class="nft-image-placeholder">
+              <span>🌟 #1 Soroban Pioneer</span>
+            </div>
+            <div class="nft-card-body">
+              <h3>Soroban Genesis #1</h3>
+              <p class="nft-meta">Owner: GAB...91F</p>
+              <div class="nft-price-row">
+                <span class="price-label">Price</span>
+                <span class="price-val">150 XLM</span>
+              </div>
+              <button class="btn btn-action buy-btn" data-id="1">Buy Now</button>
+            </div>
+          </div>
+
+          <!-- Card 2 -->
+          <div class="nft-card">
+            <div class="nft-image-placeholder nft-glow">
+              <span>🚀 #2 Stellar Horizon</span>
+            </div>
+            <div class="nft-card-body">
+              <h3>Horizon Fleet #2</h3>
+              <p class="nft-meta">Owner: GZX...20A</p>
+              <div class="nft-price-row">
+                <span class="price-label">Price</span>
+                <span class="price-val">220 XLM</span>
+              </div>
+              <button class="btn btn-action buy-btn" data-id="2">Buy Now</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Transaction Log -->
+      <section class="card logs-card">
+        <h3>Marketplace Activity</h3>
+        <div id="activityLogs" class="logs-container">
+          <div class="log-entry log-info">Marketplace contracts connected. Ready for trading.</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Mint Modal -->
+  <div id="mintModal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Mint New NFT</h3>
+        <button id="closeMintModalBtn" class="close-btn">&times;</button>
+      </div>
+      <form id="mintForm">
+        <div class="form-group">
+          <label for="nftName">Asset Name</label>
+          <input type="text" id="nftName" placeholder="Cosmic Traveler #1" required>
+        </div>
+        <div class="form-group">
+          <label for="nftUri">Metadata IPFS / Arweave URI</label>
+          <input type="text" id="nftUri" placeholder="ipfs://bafybei..." required>
+        </div>
+        <button type="submit" class="btn btn-secondary btn-full">Mint to Wallet</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

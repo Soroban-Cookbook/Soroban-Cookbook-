@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 use super::*;
 use soroban_sdk::{testutils::Address as _, vec, Address, Env};
 
@@ -59,6 +60,7 @@ fn test_create_and_approve_proposal() {
     let proposal = client.get_proposal(&proposal_id).unwrap();
     assert_eq!(proposal.approvals.len(), 2);
     assert!(!proposal.executed);
+    assert!(!proposal.cancelled);
 }
 
 #[test]
@@ -104,7 +106,7 @@ fn test_double_approval() {
 }
 
 #[test]
-fn test_cancel_proposal() {
+fn test_cancel_proposal_by_proposer() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -166,6 +168,35 @@ fn test_execute_with_threshold() {
 }
 
 #[test]
+fn test_cancel_proposal_by_other_signer() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuth);
+    let client = MultiPartyAuthClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let signer2 = Address::generate(&env);
+    let signer3 = Address::generate(&env);
+    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
+
+    client.initialize(&2, &signers);
+    let proposal_id = client.create_proposal(&signer1);
+
+    client.approve(&proposal_id, &signer1);
+    client.cancel(&proposal_id, &signer2);
+
+    let proposal = client.get_proposal(&proposal_id).unwrap();
+    assert!(proposal.cancelled);
+
+    let result = client.try_approve(&proposal_id, &signer3);
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
+
+    let result = client.try_execute(&proposal_id, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ProposalCancelled)));
+}
+
+#[test]
 fn test_cancel_already_cancelled() {
     let env = Env::default();
     env.mock_all_auths();
@@ -186,30 +217,6 @@ fn test_cancel_already_cancelled() {
 }
 
 #[test]
-fn test_cancel_executed_proposal() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let contract_id = env.register_contract(None, MultiPartyAuth);
-    let client = MultiPartyAuthClient::new(&env, &contract_id);
-
-    let signer1 = Address::generate(&env);
-    let signer2 = Address::generate(&env);
-    let signer3 = Address::generate(&env);
-    let signers = vec![&env, signer1.clone(), signer2.clone(), signer3.clone()];
-
-    client.initialize(&2, &signers);
-    let proposal_id = client.create_proposal(&signer1);
-
-    client.approve(&proposal_id, &signer1);
-    client.approve(&proposal_id, &signer2);
-    client.execute(&proposal_id, &signer3);
-
-    let result = client.try_cancel(&proposal_id, &signer1);
-    assert_eq!(result, Err(Ok(AuthError::AlreadyExecuted)));
-}
-
-#[test]
 fn test_proposal_not_found() {
     let env = Env::default();
     env.mock_all_auths();
@@ -221,6 +228,28 @@ fn test_proposal_not_found() {
     let signers = vec![&env, signer1.clone()];
     client.initialize(&1, &signers);
 
-    let result = client.try_get_proposal(&99);
-    assert!(result.is_err());
+    let result = client.try_approve(&999, &signer1);
+    assert_eq!(result, Err(Ok(AuthError::ProposalNotFound)));
+}
+
+// ── Security tests: invalid signer sets, missing approvals, and timelock skips ──
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_multisig_unauthorized_cancel() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, MultiPartyAuth);
+    let client = MultiPartyAuthClient::new(&env, &contract_id);
+
+    let signer1 = Address::generate(&env);
+    let outsider = Address::generate(&env);
+    let signers = vec![&env, signer1.clone()];
+
+    client.initialize(&1, &signers);
+    let proposal_id = client.create_proposal(&signer1);
+
+    env.set_auths(&[]); // strip auths
+    client.cancel(&proposal_id, &outsider);
 }

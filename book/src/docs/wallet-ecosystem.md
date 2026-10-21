@@ -95,3 +95,9 @@ When building a decentralized application (dApp) on Soroban, prioritize wallet i
 2. **xBull Wallet (Priority 2 - High)**: Provides excellent desktop and mobile coverage, custom RPC switching for private devnets, and advanced multisig features.
 3. **Albedo (Priority 3 - Medium)**: Essential fallback for mobile users who want to avoid installing mobile apps or extensions.
 4. **Lobstr (Priority 4 - Low/Future)**: Integrate once your application is deployed to Mainnet and target retail users holding standard Stellar/Soroban assets.
+
+---
+
+## Testing Mobile Wallet Flows
+
+xBull and Lobstr are mobile-first for most end users, so a wallet integration that only works with the Freighter desktop extension is untested for the majority of retail traffic. See the [Mobile Testing Guide](../guides/mobile-testing.md) for the WalletConnect pairing/sign/reject flow to verify and a device/browser QA matrix.

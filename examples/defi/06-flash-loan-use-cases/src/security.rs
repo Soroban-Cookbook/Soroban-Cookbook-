@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Security Patterns for Flash Loan Receivers
 //!
 //! Demonstrates best practices every flash loan receiver must follow to avoid

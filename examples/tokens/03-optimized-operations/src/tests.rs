@@ -1,4 +1,5 @@
 #![cfg(test)]
+#![allow(deprecated)]
 
 use super::*;
 use soroban_sdk::{testutils::Address as _, vec, Address, Env};
@@ -16,8 +17,70 @@ fn test_standard_initialize() {
     let standard =
         StandardTokenOpsClient::new(&env, &env.register_contract(None, StandardTokenOps));
 
-    let result = standard.try_standard_initialize(&underlying);
-    assert!(result.is_ok());
+    standard.initialize(&underlying);
+}
+
+#[test]
+fn test_standard_initialize_twice_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let underlying = Address::generate(&env);
+    let standard =
+        StandardTokenOpsClient::new(&env, &env.register_contract(None, StandardTokenOps));
+
+    standard.initialize(&underlying);
+    assert_eq!(
+        standard.try_initialize(&Address::generate(&env)),
+        Err(Ok(StandardError::AlreadyInitialized))
+    );
+}
+
+#[test]
+fn test_standard_wrap_moves_underlying() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    let underlying = env
+        .register_stellar_asset_contract_v2(Address::generate(&env))
+        .address();
+    soroban_sdk::token::StellarAssetClient::new(&env, &underlying).mint(&user, &1000);
+
+    let standard_id = env.register_contract(None, StandardTokenOps);
+    let standard = StandardTokenOpsClient::new(&env, &standard_id);
+    standard.initialize(&underlying);
+
+    assert_eq!(standard.wrap(&user, &400), 400);
+    assert_eq!(standard.balance(&user), 400);
+
+    let underlying_client = soroban_sdk::token::Client::new(&env, &underlying);
+    assert_eq!(underlying_client.balance(&user), 600);
+    assert_eq!(underlying_client.balance(&standard_id), 400);
+}
+
+#[test]
+fn test_standard_wrap_rejects_reentry() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    let standard_id = env.register_contract(None, StandardTokenOps);
+    let standard = StandardTokenOpsClient::new(&env, &standard_id);
+    standard.initialize(&Address::generate(&env));
+
+    // Simulate a `wrap` that is still in flight (e.g. a hookable underlying
+    // token calling back into the wrapper).
+    env.as_contract(&standard_id, || {
+        env.storage()
+            .instance()
+            .set(&StandardDataKey::Entered, &true);
+    });
+
+    assert_eq!(
+        standard.try_wrap(&user, &100),
+        Err(Ok(StandardError::ReentrancyDetected))
+    );
 }
 
 #[test]
@@ -31,10 +94,10 @@ fn test_standard_wrap_and_balance() {
     let standard_id = env.register_contract(None, StandardTokenOps);
     let standard = StandardTokenOpsClient::new(&env, &standard_id);
 
-    standard.standard_initialize(&underlying);
+    standard.initialize(&underlying);
 
     // Test balance retrieval
-    let balance = standard.standard_balance(&user);
+    let balance = standard.balance(&user);
     assert_eq!(balance, 0);
 }
 
@@ -51,8 +114,7 @@ fn test_optimized_initialize() {
     let optimized_id = env.register_contract(None, OptimizedTokenOps);
     let optimized = OptimizedTokenOpsClient::new(&env, &optimized_id);
 
-    let result = optimized.try_initialize(&underlying);
-    assert!(result.is_ok());
+    optimized.initialize(&underlying);
 }
 
 #[test]

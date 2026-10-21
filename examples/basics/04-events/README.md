@@ -1,5 +1,8 @@
 # Structured Event Patterns
 
+> **🎬 Video Walkthrough** (12:05)
+> Learn how to design, emit, and filter query-friendly events in our [Soroban Basics #5 Video Walkthrough](https://www.youtube.com/watch?v=events-walkthrough).
+
 This example demonstrates how to emit well-structured, query-friendly events in Soroban smart contracts. It covers the full event anatomy — topics, data payloads, and `#[contracttype]` structs — and shows practical patterns for topic design, off-chain filtering, and gas-conscious emission.
 
 For a quick syntax reference, see [`EVENT_QUICK_REFERENCE.md`](./EVENT_QUICK_REFERENCE.md).

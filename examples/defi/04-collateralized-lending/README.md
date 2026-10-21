@@ -18,8 +18,14 @@ A Soroban smart contract implementing collateralized lending with comprehensive 
 ### Initialize
 
 ```rust
-client.initialize(&ltv_ratio, &liquidation_threshold, &liquidation_incentive, &partial_liquidation_ratio);
+client.initialize(&admin, &collateral_token, &loan_token, &ltv_ratio, &liquidation_threshold, &liquidation_incentive, &partial_liquidation_ratio);
 ```
+
+Both tokens are SEP-41 assets. `deposit_collateral`/`withdraw_collateral` move
+`collateral_token` into and out of the contract; `borrow`/`repay` move
+`loan_token`. A liquidator pays the repaid debt in `loan_token`, and the seized
+collateral is credited to their position (withdrawable via
+`withdraw_collateral`). The contract must hold `loan_token` liquidity to lend.
 
 ### Deposit Collateral
 

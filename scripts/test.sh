@@ -9,6 +9,7 @@
 #   -f, --format      Check code formatting
 #   -a, --all         Run all checks (clippy + format)
 #   --coverage        Generate coverage report
+#   --docs            Run documentation tests (mdbook test) in book/
 #   -h, --help        Show this help message
 #
 # Examples:
@@ -16,6 +17,7 @@
 #   ./scripts/test.sh examples/basics/01-hello-world     # Test specific example
 #   ./scripts/test.sh --coverage                         # Run with coverage
 #   ./scripts/test.sh -a examples/basics                 # Run all checks on basics
+#   ./scripts/test.sh --docs                             # Test documentation code examples
 
 set -e
 
@@ -53,6 +55,7 @@ show_help() {
     echo "  -f, --format      Check code formatting"
     echo "  -a, --all         Run all checks (clippy + format)"
     echo "  --coverage        Generate coverage report"
+    echo "  --docs            Run documentation tests (mdbook test) in book/"
     echo "  -h, --help        Show this help message"
     echo ""
     echo "Examples:"
@@ -60,6 +63,7 @@ show_help() {
     echo "  $0 examples/basics/01-hello-world     # Test specific example"
     echo "  $0 --coverage                         # Run with coverage"
     echo "  $0 -a examples/basics                 # Run all checks on basics"
+    echo "  $0 --docs                             # Test documentation code examples"
 }
 
 # Check dependencies
@@ -130,6 +134,58 @@ generate_coverage() {
             cd - > /dev/null
             return 1
         fi
+    fi
+}
+
+# Function to run documentation tests via mdbook
+test_docs() {
+    local book_dir="book"
+    local script_dir
+    script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    local repo_root
+    repo_root="$(cd "$script_dir/.." && pwd)"
+    local book_path="$repo_root/$book_dir"
+
+    print_test "Running documentation tests (mdbook test)..."
+
+    if [ ! -d "$book_path" ]; then
+        print_error "✗ Documentation directory not found: $book_path"
+        return 1
+    fi
+
+    if [ ! -f "$book_path/book.toml" ]; then
+        print_error "✗ No book.toml found in $book_path"
+        return 1
+    fi
+
+    # Install mdbook if missing
+    if ! command -v mdbook &> /dev/null; then
+        print_warn "mdbook not found. Installing..."
+        if ! cargo install mdbook --locked; then
+            print_error "✗ Failed to install mdbook"
+            return 1
+        fi
+    fi
+
+    # Run mdbook test from the book directory
+    local output
+    local result
+    if output=$(cd "$book_path" && mdbook test 2>&1); then
+        result=0
+    else
+        result=$?
+    fi
+
+    if [ $result -eq 0 ]; then
+        print_info "✓ All documentation tests passed"
+        return 0
+    else
+        print_error "✗ Documentation tests failed"
+        echo "----------------------------------------"
+        echo "$output"
+        echo "----------------------------------------"
+        print_error "Fix the failing code examples in book/src/ and re-run: $0 --docs"
+        return 1
     fi
 }
 
@@ -278,6 +334,7 @@ VERBOSE=false
 RUN_CLIPPY=false
 CHECK_FORMAT=false
 GENERATE_COVERAGE=false
+RUN_DOCS=false
 CONTRACT_PATH=""
 
 while [[ $# -gt 0 ]]; do
@@ -297,6 +354,10 @@ while [[ $# -gt 0 ]]; do
         --coverage)
             GENERATE_COVERAGE=true
             RUN_COVERAGE=true
+            shift
+            ;;
+        --docs)
+            RUN_DOCS=true
             shift
             ;;
         -a|--all)
@@ -322,6 +383,15 @@ done
 
 # Check dependencies
 check_dependencies
+
+# Documentation tests only (no contract path required)
+if [ "$RUN_DOCS" = true ] && [ -z "$CONTRACT_PATH" ]; then
+    if ! test_docs; then
+        exit 1
+    fi
+    print_info "Documentation tests passed! ✓"
+    exit 0
+fi
 
 # Main execution
 if [ -z "$CONTRACT_PATH" ]; then
@@ -370,6 +440,13 @@ if [ -z "$CONTRACT_PATH" ]; then
     if [ "$GENERATE_COVERAGE" = true ]; then
         if ! generate_coverage; then
             print_warn "Coverage generation failed, but tests passed"
+        fi
+    fi
+
+    # Run documentation tests if requested
+    if [ "$RUN_DOCS" = true ]; then
+        if ! test_docs; then
+            exit 1
         fi
     fi
     
@@ -456,5 +533,11 @@ else
     
     if [ "$RUN_COVERAGE" = true ]; then
         run_coverage "$CONTRACT_PATH"
+    fi
+
+    if [ "$RUN_DOCS" = true ]; then
+        if ! test_docs; then
+            exit 1
+        fi
     fi
 fi

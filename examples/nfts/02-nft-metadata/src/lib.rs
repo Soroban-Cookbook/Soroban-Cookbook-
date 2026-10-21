@@ -1,6 +1,7 @@
+#![allow(deprecated)]
 //! NFT with metadata storage and optional on-chain metadata.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, String, Vec};
 
@@ -230,3 +231,6 @@ fn write_u64_decimal(value: u64, buf: &mut [u8]) -> usize {
     }
     i
 }
+
+#[cfg(test)]
+mod test;

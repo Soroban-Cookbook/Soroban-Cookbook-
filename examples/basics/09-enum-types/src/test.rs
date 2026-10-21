@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 use super::*;
 use soroban_sdk::testutils::Address as AddressTest;
 use soroban_sdk::{symbol_short, Env};
@@ -367,7 +368,7 @@ fn test_comprehensive_workflow() {
     });
 
     // Test various operations
-    let operations = vec![
+    let operations = soroban_sdk::vec![
         &env,
         (TransactionType::Deposit, 1000, ValidationResult::Success),
         (TransactionType::Transfer, 500, ValidationResult::Success),

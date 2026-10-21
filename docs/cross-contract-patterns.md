@@ -165,6 +165,77 @@ sequenceDiagram
   tolerant; writes should fail fast and leave no ambiguous partial state.
 - Document every external contract address in deployment notes.
 
+## Optimizing Cross-Contract Calls
+
+Cross-contract calls dominate transaction cost in Soroban. Reduce overhead by
+packing arguments, batching related calls, and minimizing round trips.
+
+### Pack Arguments
+
+- Encode multiple fields into one `Bytes` or `String` value instead of passing
+  many small arguments.
+- Use a single `Vec` or map when the callee needs a set of related values.
+- For token transfers, follow SEP-41 and pass `Address` and `i128` values
+  directly; do not wrap them in an extra envelope unless the callee requires
+  it.
+
+### Batch Calls
+
+- Combine independent reads into one contract call that returns all requested
+  values.
+- Use factory or registry contracts to resolve addresses, then batch
+  operations against child contracts in one transaction.
+- If a workflow needs several writes, use one coordinator contract call that
+  performs the writes sequentially; avoid forcing the caller to make multiple
+  top-level transactions.
+
+### Minimize Round Trips
+
+- Prefer returning composite structs or `Vec`s over requiring many `get` calls.
+- Cache registry lookups and implementation addresses locally when a
+  transaction performs repeated calls to the same target.
+- Validate arguments before the first call so a failing batch does not waste
+  earlier work.
+
+Measure gas before and after each optimization. Packing arguments usually
+reduces calldata size, batching reduces ledger access overhead, and fewer round
+trips reduce CPU and storage costs.
+
+## Benchmarking Cross-Contract Calls
+
+Cross-contract calls add ledger I/O, host function calls, and authentication
+checks that do not appear in single-contract benchmarks. Measure them with the
+integration test suite under `tests/integration/`, not with isolated contract
+units, so the results include deployment, address resolution, and event
+emission overheads. Add these benchmarks to the existing `integration-tests`
+package by extending path dependencies in `tests/integration/Cargo.toml` and
+following the cross-contract patterns in `integration_tests.rs`.
+
+### Benchmark Checklist
+
+- Measure call overhead by timing a direct contract call and the same call
+  routed through a factory-deployed child, a proxy, and a registry lookup.
+- Use factory deployment benchmarks to capture deploy cost, initialization
+  cost, and the event cost of a single create transaction.
+- Use proxy call benchmarks to capture routing, version validation, and
+  implementation dispatch costs separately from business logic.
+- Record results in a reproducible benchmark document or CI job, including the
+  Soroban environment version, Wasm size, and storage footprint.
+
+### Optimization Recommendations
+
+- Remove external calls that can be replaced with a single read from a shared
+  registry or configuration contract.
+- Batch reads and writes inside one contract instead of making many small
+  cross-contract calls.
+- Keep proxies thin: any invariant checking that can be done by the caller or
+  implementation should not be repeated in the routing layer.
+- Reuse deployed child contracts through a registry when creation cost is the
+  bottleneck, but make sure callers still validate the returned address.
+- Document the expected gas and ledger cost per cross-contract action in the
+  deployment notes so regressions are visible in code review.
+
+
 ## Upgrade Safety Checklist
 
 - [ ] New implementation address is registered with an explicit version.
@@ -191,6 +262,17 @@ sequenceDiagram
 
 - [`examples/intermediate/ajo-factory`](../examples/intermediate/ajo-factory/)
   shows a factory deploying initialized child contracts.
+- [`examples/advanced/04-upgradeable-proxy`](../examples/advanced/04-upgradeable-proxy/)
+  shows a stable entry point routing to a versioned implementation.
+- [`examples/advanced/31-proxy-admin`](../examples/advanced/31-proxy-admin/)
+  shows the governance side of the upgrade checklist above: admin-authenticated
+  proposals, a timelock, and an emergency pause.
+- [`examples/advanced/contract-registry`](../examples/advanced/contract-registry/)
+  and [`examples/advanced/11-version-registry`](../examples/advanced/11-version-registry/)
+  show address discovery and version history with rollback.
+- [`examples/advanced/12-oracle-consumer`](../examples/advanced/12-oracle-consumer/)
+  shows the caller side of a cross-contract integration: validating what another
+  contract returns before acting on it.
 - [`docs/common-patterns`](./common-patterns.md) covers lower-level building
   blocks such as initialization guards, stored-admin checks, typed storage keys,
   and events.

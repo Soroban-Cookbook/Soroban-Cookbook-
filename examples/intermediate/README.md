@@ -1,43 +1,60 @@
 # Intermediate Examples
 
-This category contains examples that demonstrate common, real-world design patterns and use cases for Soroban smart contracts. These examples combine multiple basic concepts to solve practical problems and prepare you for production-grade contract development.
+These examples combine Soroban fundamentals into reusable contract patterns. Follow the order below when learning; after the first few examples, choose a branch that matches the problem you are solving.
 
-## 🎯 What's Inside?
+## Prerequisites
 
-- **Access Control**: Implement patterns like multi-sig, Role-Based Access Control (RBAC), and timelocks.
-- **Cross-Contract Communication**: See how to build systems with factory, proxy, and registry patterns.
-- **Token Interactions**: Learn how to create contracts that interact with or wrap standard tokens.
-- **Advanced Data Structures**: Examples of iterable maps, queues, and other complex data structures.
-- **Emergency Controls**: Pause/unpause pattern for halting sensitive operations.
+Complete the [basic examples](../basics/) first, especially storage, authentication, events, errors, and collections. You should also have a working Rust and Soroban CLI setup from the [getting started guide](../../guides/getting-started.md) and be comfortable with the [testing guide](../../guides/testing.md).
 
-## Implemented Examples
+## Curated Learning Path
 
-- [`multi-sig-patterns`](./multi-sig-patterns/) — Threshold signatures and multi-party auth
-- [`ajo-factory`](./ajo-factory/) — Contract deployment from within a contract
-- [`03-pause-unpause`](./03-pause-unpause/) — Emergency pause/unpause mechanism
-- [`storage-migration`](./storage-migration/) — Versioned storage upgrades with explicit staging and batch execution.
-- [`event-history`](./event-history/) — On-chain audit history storage with cursor-based pagination, filtering, and capacity management.
+Difficulty is relative to the basic examples: **Foundational** introduces the intermediate idea, **Intermediate** combines several patterns, and **Advanced** adds migration, caching, or cross-contract complexity.
 
-## 📋 Prerequisites
+| Order | Example | What it teaches | Difficulty | Prerequisites | Related docs |
+| --- | --- | --- | --- | --- | --- |
+| 1 | [Iterable mapping](./iterable-mapping/) | Enumerable maps with a maintained key index | Foundational | Storage, vectors, maps | [Storage types](../../docs/storage-types.md) |
+| 2 | [Priority queue](./03-priority-queue/) | Heap-backed ordering and bounded collection operations | Foundational | Collections, validation | [Testing best practices](../../docs/testing-best-practices.md) |
+| 3 | [Event subscriptions](./event-subscriptions/) | Subscriber registration and event-driven contract coordination | Foundational | Authentication, events | [Common patterns](../../docs/common-patterns.md) |
+| 4 | [Event aggregation](./event-aggregation/) | Batching related actions into one event | Foundational | Events, collections | [Event filtering](../basics/14-event-filtering/) |
+| 5 | [Event history](./event-history/) | Persistent audit history with filtering and pagination | Intermediate | Events, persistent storage | [Security best practices](../../docs/security-best-practices.md) |
+| 6 | [Role-based access control](./02-role-based-access-control/) | Numeric role hierarchy (Owner/Admin/Moderator/User) | Intermediate | Authentication, events | [**Canonical RBAC** (32-rbac-modifiers)](../advanced/32-rbac-modifiers/) |
+| 7 | [Access control guide](./access-control/) | Combined RBAC, multisig, and timelock governance | Intermediate | RBAC, multisig, timelock | [Governance & Auth Patterns](../../docs/governance-rbac-multisig-timelock.md) |
+| 8 | [Pause and unpause](./03-pause-unpause/) | Emergency controls for sensitive contract operations | Intermediate | Authentication, RBAC | [Token pause permissions](../tokens/10-pausable-permissions/) |
+| 8 | [Multi-sig patterns](./multi-sig-patterns/) | Threshold approvals and multi-party authorization | Intermediate | Authentication, RBAC | [Multi-sig reference](./multi-sig-patterns/QUICK_REFERENCE.md) |
+| 9 | [Ajo](./ajo/) | A rotating savings group with member and contribution rules | Intermediate | Authentication, storage, events | [Token examples](../tokens/) |
+| 10 | [Ajo factory](./ajo-factory/) | Registering templates and deploying contracts from a factory | Advanced | Cross-contract calls, Wasm deployment | [Factory pattern](./ajo-factory/README.md) |
+| 11 | [Lazy loading](./lazy-loading/) | Bounded caching and deferred reads for large state sets | Advanced | Persistent storage, pagination | [Gas benchmarks](../../docs/gas-benchmarks.md) |
+| 12 | [Storage pagination](./storage-pagination/) | Opaque cursors for stable, page-sized queries | Advanced | Persistent storage, collections | [Storage types](../../docs/storage-types.md) |
+| 13 | [Storage migration](./storage-migration/) | Staged, batched schema upgrades with rollback-friendly state | Advanced | Persistent storage, authorization | [Deployment guide](../../guides/deployment.md) |
 
-Before diving into intermediate examples, make sure you've completed:
-- [Basic Examples](../basics/) — Core Soroban concepts (storage, auth, errors, events)
-- [Getting Started Guide](../../book/src/guides/getting-started.md) — Development environment setup
-- [Testing Guide](../../book/src/guides/testing.md) — Unit and integration testing patterns
+### Iterable Map Companion
 
-## 🚀 Building & Testing
+[`iterable-mappings`](./iterable-mappings/) is **not** a second entry point for the pattern above. It is a workspace member kept for its collection utilities — filtering, mapping, and reducing over an iterable map — which build directly on the canonical example. Work through `iterable-mapping` first.
+
+## Related Learning Tracks
+
+- [SEP-41 token examples](../tokens/01-sep41-token/) — Start with the standard token interface before exploring wrappers, allowances, or pause permissions.
+- [Token examples index](../tokens/) — Token-specific implementations and extensions.
+- [Security best practices](../../docs/security-best-practices.md) — Threat modeling and defensive contract design.
+- [Cross-contract patterns](../../docs/cross-contract-patterns.md) — Factory and contract-composition concepts.
+
+## Building and Testing
 
 ```bash
-# Build the contract
+# Build all workspace contracts
 cargo build --target wasm32-unknown-unknown --release
 
-# Run tests
+# Run all workspace tests
 cargo test
 ```
 
-## ➡️ Next Steps
+To focus on one example, run its package commands from the repository root:
 
-Once comfortable with intermediate patterns, explore:
-- [Advanced Examples](../advanced/) — Complex systems and protocols
-- [DeFi Examples](../defi/) — Decentralized finance applications
-- [Governance Examples](../governance/) — DAO and voting systems
+```bash
+cargo test -p ajo-factory
+cargo build --target wasm32-unknown-unknown --release -p ajo-factory
+```
+
+## Next Steps
+
+Once comfortable with these patterns, continue to the [advanced examples](../advanced/), or apply the [SEP-41 token track](../tokens/) before exploring [DeFi](../defi/) and [governance](../governance/).

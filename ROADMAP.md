@@ -70,16 +70,16 @@ The Soroban Cookbook is a community-driven resource for building smart contracts
 
 ## 💰 Phase 3: Use Case Examples (Q3-Q4 2024)
 
-**Status:** 🟡 Partially Completed
+**Status:** ✅ Complete
 
 ### Milestones
 
 | Milestone           | Description                     | Status      |
 | ------------------- | ------------------------------- | ----------- |
-| DeFi Examples       | Swaps, liquidity pools, lending | 🟡 Planned  |
-| NFT Examples        | Minting, transfers, metadata    | 🟡 Planned  |
-| Governance Examples | Voting, DAOs, proposals         | 🟡 Planned  |
-| Token Standards     | Fungible tokens, custom tokens  | 🟡 Planned  |
+| DeFi Examples       | Swaps, liquidity pools, lending | ✅ Complete |
+| NFT Examples        | Minting, transfers, metadata    | ✅ Complete |
+| Governance Examples | Voting, DAOs, proposals         | ✅ Complete |
+| Token Standards     | Fungible tokens, custom tokens  | ✅ Complete |
 | Storage Patterns    | Advanced storage optimization   | ✅ Complete |
 
 ### Success Metrics
@@ -128,33 +128,37 @@ The Soroban Cookbook is a community-driven resource for building smart contracts
 
 ---
 
-## 📚 Phase 5: Community & Ecosystem (Q1-Q2 2025)
+## 📚 Phase 8: Community & Ecosystem (Q3 2026)
 
-**Status:** 🔵 Planned
+**Status:** ✅ Completed (See [Phase 8 Completion Report](./PHASE_8_COMPLETION_REPORT.md))
 
 ### Milestones
 
-| Milestone              | Description                    | Status     |
-| ---------------------- | ------------------------------ | ---------- |
-| Community Examples     | User-contributed patterns      | 🔵 Planned |
-| Integration Guides     | Third-party tool integration   | 🔵 Planned |
-| Video Tutorials        | Recorded walkthroughs          | 🔵 Planned |
-| Interactive Playground | Browser-based contract testing | 🔵 Planned |
-| Certification Program  | Developer skill validation     | 🔵 Planned |
+| Milestone              | Description                    | Status      |
+| ---------------------- | ------------------------------ | ----------- |
+| Community Call Gov     | Monthly call templates & guides| ✅ Complete |
+| Bug Bounty & Security  | Vulnerability disclosure policy| ✅ Complete |
+| Production Showcase    | 10+ real projects documented   | ✅ Complete |
+| Community Metrics      | Automated tracking & dashboard | ✅ Complete |
+| Contributor Badges     | Recognition & tier system      | ✅ Complete |
+| Feedback & Surveys     | Review workflows & forms       | ✅ Complete |
+| Grants Program         | Application & review framework | ✅ Complete |
+| Project Templates      | 3 full-stack starter templates | ✅ Complete |
 
 ### Success Metrics
 
-- 10+ community-contributed examples
-- 5+ integration guides with external tools
-- 20+ video tutorials covering all topics
-- 1000+ interactive playground users
-- 500+ certified developers
+- ✅ 50+ total smart contract recipes and guides
+- ✅ 11 real production projects featured in Showcase
+- ✅ 3 production-grade project templates (Tokens, NFTs, DAOs)
+- ✅ End-to-end community grants program operational
+- ✅ Automated weekly health metrics workflow in CI
 
 ### KPIs
 
-- Community contributions: 10+/quarter
-- Tutorial engagement: >80% completion rate
-- Playground usage: 1000+ monthly active users
+- Test coverage: >90%
+- CI pass rate: 100%
+- Showcase projects: 11 (Target: 10+)
+- Community satisfaction: >4.5/5
 
 ---
 
@@ -231,6 +235,7 @@ The Soroban Cookbook is a community-driven resource for building smart contracts
 ## 🔗 Related Resources
 
 - [Contributing Guide](./CONTRIBUTING.md)
+- [Roadmap Input Process](./docs/roadmap-input-process.md)
 - [Style Guide](./docs/style-guide.md)
 - [Testing Guide](./docs/testing-guide.md)
 - [Best Practices](./docs/best-practices.md)

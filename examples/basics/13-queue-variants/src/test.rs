@@ -1,7 +1,8 @@
+#![allow(deprecated)]
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::Address as _, Address, Bytes, Env};
+use soroban_sdk::{Bytes, Env};
 
 fn bytes(env: &Env, s: &[u8]) -> Bytes {
     Bytes::from_slice(env, s)
@@ -13,7 +14,7 @@ fn bytes(env: &Env, s: &[u8]) -> Bytes {
 fn bounded_fifo_push_pop() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, BoundedQueueContract);
+    let contract_id = env.register(BoundedQueueContract, ());
     let client = BoundedQueueContractClient::new(&env, &contract_id);
     client.initialize(&3_i128, &DropPolicy::DropNewest);
 
@@ -35,7 +36,7 @@ fn bounded_fifo_push_pop() {
 fn bounded_drop_oldest_on_full() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, BoundedQueueContract);
+    let contract_id = env.register(BoundedQueueContract, ());
     let client = BoundedQueueContractClient::new(&env, &contract_id);
     client.initialize(&2_i128, &DropPolicy::DropOldest);
 
@@ -57,7 +58,7 @@ fn bounded_drop_oldest_on_full() {
 fn bounded_drop_newest_rejects() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, BoundedQueueContract);
+    let contract_id = env.register(BoundedQueueContract, ());
     let client = BoundedQueueContractClient::new(&env, &contract_id);
     client.initialize(&2_i128, &DropPolicy::DropNewest);
 
@@ -76,7 +77,7 @@ fn bounded_drop_newest_rejects() {
 fn bounded_pop_empty_panics() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, BoundedQueueContract);
+    let contract_id = env.register(BoundedQueueContract, ());
     let client = BoundedQueueContractClient::new(&env, &contract_id);
     client.initialize(&1_i128, &DropPolicy::DropNewest);
     client.pop();
@@ -88,7 +89,7 @@ fn bounded_pop_empty_panics() {
 fn circular_overwrite_behavior() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, CircularBufferContract);
+    let contract_id = env.register(CircularBufferContract, ());
     let client = CircularBufferContractClient::new(&env, &contract_id);
     client.initialize(&2_i128);
 
@@ -111,7 +112,7 @@ fn circular_overwrite_behavior() {
 fn circular_pop_empty_panics() {
     let env = Env::default();
     env.mock_all_auths();
-    let contract_id = env.register_contract(None, CircularBufferContract);
+    let contract_id = env.register(CircularBufferContract, ());
     let client = CircularBufferContractClient::new(&env, &contract_id);
     client.initialize(&3_i128);
     client.pop();

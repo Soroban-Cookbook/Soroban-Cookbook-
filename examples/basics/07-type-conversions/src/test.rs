@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Test suite for the Type Conversions contract.
 //!
 //! Tests use the generated contract client so the full host dispatch path is

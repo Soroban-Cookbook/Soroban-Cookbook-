@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for collection type operations.
 
 extern crate std;

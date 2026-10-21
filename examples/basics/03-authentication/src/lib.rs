@@ -18,7 +18,8 @@
 //! - **Time-Based Restrictions**: Time-locks and cooldown periods
 //! - **State-Based Authorization**: Contract state gating (Active/Paused/Frozen)
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, vec, Address, Env, Symbol,
@@ -106,6 +107,8 @@ pub enum AuthError {
     InvalidState = 7,
     /// The caller does not have the required role.
     InsufficientRole = 8,
+    /// The specified amount is invalid (e.g. negative or zero).
+    InvalidAmount = 9,
 }
 
 // ---------------------------------------------------------------------------
@@ -258,6 +261,10 @@ impl AuthContract {
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -> Result<(), AuthError> {
         from.require_auth();
 
+        if amount <= 0 {
+            return Err(AuthError::InvalidAmount);
+        }
+
         let from_balance: i128 = env
             .storage()
             .persistent()
@@ -275,12 +282,19 @@ impl AuthContract {
             .get(&DataKey::Balance(to.clone()))
             .unwrap_or(0);
 
+        let new_from_balance = from_balance
+            .checked_sub(amount)
+            .ok_or(AuthError::InsufficientBalance)?;
+        let new_to_balance = to_balance
+            .checked_add(amount)
+            .ok_or(AuthError::Unauthorized)?;
+
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(from), &(from_balance - amount));
+            .set(&DataKey::Balance(from), &new_from_balance);
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(to), &(to_balance + amount));
+            .set(&DataKey::Balance(to), &new_to_balance);
 
         Ok(())
     }
@@ -295,6 +309,11 @@ impl AuthContract {
         amount: i128,
     ) -> Result<(), AuthError> {
         from.require_auth();
+
+        if amount <= 0 {
+            return Err(AuthError::InvalidAmount);
+        }
+
         env.storage()
             .persistent()
             .set(&DataKey::Allowance(from, spender), &amount);
@@ -315,6 +334,10 @@ impl AuthContract {
         amount: i128,
     ) -> Result<(), AuthError> {
         spender.require_auth();
+
+        if amount <= 0 {
+            return Err(AuthError::InvalidAmount);
+        }
 
         let allowance: i128 = env
             .storage()
@@ -342,15 +365,25 @@ impl AuthContract {
             .get(&DataKey::Balance(to.clone()))
             .unwrap_or(0);
 
+        let new_from_balance = from_balance
+            .checked_sub(amount)
+            .ok_or(AuthError::InsufficientBalance)?;
+        let new_to_balance = to_balance
+            .checked_add(amount)
+            .ok_or(AuthError::Unauthorized)?;
+        let new_allowance = allowance
+            .checked_sub(amount)
+            .ok_or(AuthError::Unauthorized)?;
+
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+            .set(&DataKey::Balance(from.clone()), &new_from_balance);
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(to), &(to_balance + amount));
+            .set(&DataKey::Balance(to), &new_to_balance);
         env.storage()
             .persistent()
-            .set(&DataKey::Allowance(from, spender), &(allowance - amount));
+            .set(&DataKey::Allowance(from, spender), &new_allowance);
 
         Ok(())
     }

@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 use super::*;
 use soroban_sdk::{symbol_short, testutils::Address as _, vec, Address, Env};
 use std::println;

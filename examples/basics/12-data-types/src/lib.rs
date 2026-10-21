@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Data Types Example
 //!
 //! This contract demonstrates Soroban's comprehensive type system and how to work
@@ -12,7 +13,7 @@
 //! Each type is optimized for specific use cases and has different gas costs.
 //! Understanding when to use each type is crucial for writing efficient contracts.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contractimpl, symbol_short, vec, Address, Bytes, BytesN, Env, Map, String, Symbol,

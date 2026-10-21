@@ -50,13 +50,29 @@ New to Soroban? Start here:
 - **[Common Patterns](./common-patterns.md)** - Extracted patterns with when-to-use guide
 - **[Factory, Proxy, and Registry Patterns](./cross-contract-patterns.md)** - Cross-contract architecture guide with diagrams and upgrade notes
 - **[Best Practices](./best-practices.md)** - Recommended patterns
+- **[Documentation Platform Evaluation](./documentation-platform-evaluation.md)** - mdBook vs Docusaurus decision record and migration criteria
+- **[Translation Infrastructure](./translation-infrastructure.md)** - Crowdin-based workflow for managing translated documentation
 - **[Performance Benchmarks](./benchmarks.md)** - Resource usage comparison and optimization tips
 - **[Common Pitfalls](./common-pitfalls.md)** - Avoid these mistakes
 - **[Security Guide](./security.md)** - Security checklist
 - **[Token Development Walkthrough](./token-development-video.md)** - Video tutorial and script
 
 
+### Documentation Testing
+
+All Rust code examples in this book are compiled and tested in CI using `mdbook test`, so snippets stay in sync with the Soroban SDK.
+
+- **Framework**: `mdbook test` extracts Rust code blocks from every page and compiles them as doctests. Run it locally with `cd book && mdbook test`.
+- **Coverage**: Every Rust snippet in `book/src/` is tested. Snippets that cannot run in isolation (e.g. `#![no_std]` contract crates, `main`-less examples) are annotated with `no_run` or `ignore` and reviewed manually.
+- **CI integration**: The `deploy-docs.yml` workflow runs `mdbook build` and `mdbook test` on every pull request; failures block merge.
+- **Failure reporting**: Failing snippets are reported with the source file, line number, and compiler error in the CI log, and the PR check is marked failed with a link to the log.
+- **Maintenance**: Keep snippets compilable — prefer complete, runnable examples; use `no_run` for code that compiles but should not execute, and `ignore` only for illustrative pseudocode. When updating the SDK, re-run `mdbook test` and fix any broken snippets.
+
+See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[Docs Audit Tests](../../tests/docs-audit/)** for automated checks on documentation links and structure.
+
+
 ### Technical References
+=======
 
 - **[Storage Types](./storage-types.md)** - Persistent, Temporary, Instance
 - **[Authorization](./authorization.md)** - Auth patterns and security

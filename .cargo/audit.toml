@@ -1,5 +1,13 @@
 [advisories]
+
 ignore = [
     # Transitive unmaintained crate from soroban-sdk dependency tree.
     "RUSTSEC-2024-0436",
+    # keccak 0.1.5 via sha3 in soroban-env-host v26.1.3 — wait for upstream SDK bump.
+    "RUSTSEC-2026-0012",
+    # rand 0.8.5 via ark-std in soroban-env-host test/dev tree — not used in contracts.
+    "RUSTSEC-2026-0097",
 ]
+
+[yanked]
+enabled = false # keccak 0.1.5 is yanked but pinned by sha3 in soroban-env-host v26.1.3

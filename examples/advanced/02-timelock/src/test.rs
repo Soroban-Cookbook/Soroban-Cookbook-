@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 extern crate std;
 
 use super::*;
@@ -18,6 +19,34 @@ fn setup() -> (Env, Address, TimelockContractClient<'static>) {
 
 fn op_id(env: &Env, s: &[u8]) -> Bytes {
     Bytes::from_slice(env, s)
+}
+
+#[test]
+fn test_initialize_requires_admin_auth_and_leaves_contract_uninitialized() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, TimelockContract);
+    let client = TimelockContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // An unauthenticated caller cannot select another account as admin.
+    assert!(client.try_initialize(&admin).is_err());
+    assert!(client.try_admin().is_err());
+
+    // The intended admin can still initialize with the default configuration.
+    env.mock_all_auths();
+    client.initialize(&admin);
+    assert_eq!(client.admin(), admin);
+    assert_eq!(client.get_delay_bounds(), (60, 86_400));
+    assert!(!client.is_paused());
+}
+
+#[test]
+#[should_panic(expected = "Already initialized")]
+fn test_initialize_twice_fails() {
+    let (env, _admin, client) = setup();
+    let replacement_admin = Address::generate(&env);
+
+    client.initialize(&replacement_admin);
 }
 
 // ── queue ────────────────────────────────────────────────────────────────────
@@ -214,4 +243,87 @@ fn test_execute_when_paused() {
 
     client.set_pause(&true);
     client.execute(&id);
+}
+
+// ── Security tests: timelock bypass attempts ──
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_execute_unauthorized() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, TimelockContract);
+    let client = TimelockContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    env.mock_all_auths();
+    client.initialize(&admin);
+
+    let id = op_id(&env, b"unauth_exec");
+    let (min_delay, _) = client.get_delay_bounds();
+    client.queue(&id, &min_delay);
+    env.ledger().with_mut(|l| l.timestamp += min_delay + 1);
+
+    // Strip auths and try to execute
+    env.set_auths(&[]);
+    client.execute(&id);
+}
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_cancel_unauthorized() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, TimelockContract);
+    let client = TimelockContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let _attacker = Address::generate(&env);
+
+    env.mock_all_auths();
+    client.initialize(&admin);
+
+    let id = op_id(&env, b"unauth_cancel");
+    let (min_delay, _) = client.get_delay_bounds();
+    client.queue(&id, &min_delay);
+
+    // Strip auths and try to cancel
+    env.set_auths(&[]);
+    client.cancel(&id);
+}
+
+#[test]
+fn test_timelock_skip_prevented() {
+    let (env, _admin, client) = setup();
+    let id = op_id(&env, b"skip_test");
+    let (min_delay, _) = client.get_delay_bounds();
+
+    // Queue operation with minimum delay
+    client.queue(&id, &min_delay);
+
+    // Try to execute before delay - should fail
+    let result = client.try_execute(&id);
+    assert!(result.is_err());
+
+    // Advance time
+    env.ledger().with_mut(|l| l.timestamp += min_delay + 1);
+
+    // Now execute should succeed
+    client.execute(&id);
+}
+
+#[test]
+fn test_paused_state_blocks_execute_after_threshold() {
+    let (env, _admin, client) = setup();
+    let id = op_id(&env, b"pause_block");
+    let (min_delay, _) = client.get_delay_bounds();
+
+    client.queue(&id, &min_delay);
+    // Simulate approvals would have happened (in threshold contract)
+    // For this simple timelock, we just test pause blocks execution
+    client.set_pause(&true);
+
+    env.ledger().with_mut(|l| l.timestamp += min_delay + 1);
+
+    // Execute should fail because contract is paused
+    let result = client.try_execute(&id);
+    assert!(result.is_err());
+    client.set_pause(&false); // unpause for cleanup
 }

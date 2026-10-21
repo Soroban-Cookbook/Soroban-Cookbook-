@@ -386,6 +386,56 @@ fn check_not_paused(env: &Env) {
 
 ---
 
+## Monitoring & Alerting
+
+Deploying a contract is not the end of the operational lifecycle — a mainnet
+contract needs ongoing monitoring so the team hears about problems before
+users do.
+
+### What to Monitor
+
+| Signal | Why it matters | How to check |
+| --- | --- | --- |
+| Invocation failures | Spikes usually mean a bad client release, an auth regression, or an upstream RPC issue | Poll `soroban events` or a Horizon/RPC operations feed for the contract ID and track failure rate over time |
+| Storage TTL / rent | Persistent or instance entries that expire mid-operation cause unexpected `MissingValue` panics | Track `env.storage().*().get_ttl()` output for key entries, or query ledger entry TTL via RPC `getLedgerEntries` |
+| Admin / fee-payer account balance | A drained fee-payer account blocks every invocation until refunded | Check balance with `soroban keys balance <identity> --network mainnet` on a schedule |
+| Contract paused state | Confirms an emergency pause (see [Pause / Unpause Pattern](#pause--unpause-pattern)) was intentional and not accidental | Invoke a read-only status/`paused` getter and compare against the expected state |
+| CI/CD pipeline health | A red pipeline on `main` means the next deploy is blocked | Watch the **Test and Lint** and **Deploy Docs** workflow runs described in `.github/workflows/README.md` |
+
+### Dashboards
+
+- **Stellar Expert** (`https://stellar.expert`) and **Stellar Laboratory** — inspect contract invocations, events, and balances for a given contract ID without any extra setup.
+- **GitHub Actions** — the *Actions* tab on the repository is the dashboard of record for build/test/deploy health; failing runs on `main` should be treated as a P1 signal.
+- **Codecov** — the coverage dashboard configured in `codecov.yml` flags coverage regressions on each PR.
+
+For teams that need alerting rather than manual dashboard checks, a small
+cron job or scheduled Action that polls `soroban events` / RPC and posts to
+your existing chat/pager tooling on threshold breaches is enough to start —
+there is no dependency on a specific vendor.
+
+### Alert Response Runbook
+
+1. **Acknowledge** — confirm the alert is real (check the dashboard/RPC query
+   named in the "How to check" column above) before taking action.
+2. **Assess blast radius** — is this one failing invocation type, or every
+   call to the contract? Check recent events for the contract ID to see
+   whether it correlates with a specific function or caller.
+3. **Contain if needed** — if funds or state integrity are at risk, use the
+   [Pause / Unpause Pattern](#pause--unpause-pattern) to stop further writes
+   while you investigate.
+4. **Diagnose** — reproduce against Testnet with the same inputs where
+   possible, and check the [Fee Estimation](#fee-estimation) simulate output
+   for resource/fee-related failures.
+5. **Resolve** — deploy a fix via the normal [Mainnet Deployment
+   Steps](#mainnet-deployment-steps), or extend TTL for entries close to
+   expiry using `extend_ttl`.
+6. **Unpause and verify** — once the fix is confirmed on Testnet and deployed,
+   unpause and re-run the read-only checks from the monitoring table above.
+7. **Record** — note the trigger, timeline, and resolution somewhere durable
+   (issue tracker or incident log) so the next on-call has context.
+
+---
+
 ## Additional Resources
 
 - [Soroban CLI Reference](https://developers.stellar.org/docs/tools/developer-tools/cli)

@@ -1,0 +1,49 @@
+[package]
+name = "soroban-cookbook-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+soroban-sdk = { workspace = true, features = ["testutils"] }
+
+[dependencies.hello-world]
+path = "../../examples/basics/01-hello-world"
+
+[dependencies.fuzz-testing]
+path = "../../examples/advanced/09-fuzz-testing"
+features = ["testutils"]
+
+[dependencies.timelock]
+path = "../../examples/advanced/02-timelock"
+
+[dependencies.multi-party-auth]
+path = "../../examples/advanced/01-multi-party-auth"
+
+[[bin]]
+name = "example_fuzz"
+path = "fuzz_targets/example_fuzz.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "advanced_claimable_balance"
+path = "fuzz_targets/advanced_claimable_balance.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "advanced_timelock"
+path = "fuzz_targets/advanced_timelock.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "advanced_multi_party_auth"
+path = "fuzz_targets/advanced_multi_party_auth.rs"
+test = false
+doc = false

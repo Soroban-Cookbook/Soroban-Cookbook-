@@ -1,4 +1,5 @@
 #![cfg(test)]
+#![allow(deprecated)]
 
 use soroban_sdk::testutils::Address as _;
 use soroban_sdk::{token, Address, Env, Ledger, Symbol};
@@ -133,4 +134,54 @@ fn test_total_supply_updates_when_staking() {
     client.stake(&bob, &200i128);
     assert_eq!(client.balance_of(&alice), 100i128);
     assert_eq!(client.balance_of(&bob), 200i128);
+}
+
+#[test]
+#[should_panic(expected = "missing required authorization")]
+fn test_stake_requires_auth() {
+    let (env, _owner, alice, _bob, client, staking_token, _reward_token) = setup();
+    let staking = token::Client::new(&env, &staking_token);
+
+    staking.mint(&alice, &1000i128);
+    client.stake(&alice, &100i128);
+}
+
+#[test]
+#[should_panic(expected = "missing required authorization")]
+fn test_unstake_requires_auth() {
+    let (env, _owner, alice, _bob, client, staking_token, _reward_token) = setup();
+    let staking = token::Client::new(&env, &staking_token);
+
+    staking.mint(&alice, &1000i128);
+    client.stake(&alice, &100i128);
+    client.unstake(&alice, &25i128);
+}
+
+#[test]
+#[should_panic(expected = "missing required authorization")]
+fn test_claim_rewards_requires_auth() {
+    let (env, _owner, alice, _bob, client, staking_token, reward_token) = setup();
+    let staking = token::Client::new(&env, &staking_token);
+    let reward = token::Client::new(&env, &reward_token);
+
+    staking.mint(&alice, &1000i128);
+    reward.mint(&env.current_contract_address(), &1000i128);
+    client.stake(&alice, &100i128);
+    env.ledger().set(Ledger::timestamp(500));
+    client.claim_rewards(&alice);
+}
+
+#[test]
+#[should_panic(expected = "missing required authorization")]
+fn test_initialize_requires_owner_auth() {
+    let env = Env::default();
+    let owner = Address::generate(&env);
+    let attacker = Address::generate(&env);
+    let staking_token = register_token(&env, &owner, &Symbol::short("Stake"), &Symbol::short("STK"));
+    let reward_token = register_token(&env, &owner, &Symbol::short("Reward"), &Symbol::short("RWD"));
+
+    let contract_id = env.register_contract(None, StakingPoolContract);
+    let client = StakingPoolContractClient::new(&env, &contract_id);
+
+    client.initialize(&attacker, &staking_token, &reward_token, &10i128);
 }

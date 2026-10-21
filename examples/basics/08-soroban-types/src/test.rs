@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! Tests for Soroban Types demonstration.
 
 use super::*;

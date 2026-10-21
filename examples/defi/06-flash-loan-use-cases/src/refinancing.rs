@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Refinancing Example
 //!
 //! Atomically moves a collateralised debt position from one lending pool to

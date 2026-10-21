@@ -1,5 +1,8 @@
 # Auth Context Example
 
+> **🎬 Video Walkthrough** (12:50)
+> Learn how to verify authorization context and secure inter-contract call chains in our [Soroban Basics #6 Video Walkthrough](https://www.youtube.com/watch?v=auth-context-walkthrough).
+
 This example demonstrates how to retrieve and use authorization context in Soroban smart contracts, specifically focusing on the difference between the `invoker` and the `current_contract_address`.
 
 ## Overview

@@ -1,5 +1,6 @@
 #![cfg(not(target_arch = "wasm32"))]
 #![cfg(test)]
+#![allow(deprecated)]
 
 use soroban_sdk::{contract, contractimpl, symbol_short, testutils::Address as _, Address, Env};
 

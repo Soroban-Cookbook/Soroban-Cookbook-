@@ -789,6 +789,116 @@ env.ledger().with_mut(|li| { li.sequence_number = 100; li.timestamp = 1_000_000;
 
 ---
 
+## Use-Case Examples
+
+The basic examples above teach individual Soroban primitives. The use-case
+examples below combine those primitives into realistic contracts you can run,
+edit, and deploy. Each section links to the example directory in the repo and
+to the matching book page.
+
+### DeFi — Simple Swap
+
+> **Example:** [`examples/defi/simple-swap`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/simple-swap)
+> **Book page:** [DeFi Examples →](./defi.md)
+
+A constant-product (x·y = k) liquidity pool with `deposit`, `swap`, and
+`withdraw` entry points. It demonstrates token transfers between contracts,
+slippage checks, and LP-share accounting.
+
+```bash
+cd examples/defi/simple-swap
+cargo test
+```
+
+**What to try:**
+- Change the fee constant (e.g. from 30 bps to 100 bps) and re-run the swap
+  tests to see how output amounts shift.
+- Add a `get_price` view function that returns the current reserve ratio.
+- Write a test that performs two swaps in a row and asserts the invariant
+  `reserve_a * reserve_b` never decreases (minus fees).
+
+### NFT — Basic NFT
+
+> **Example:** [`examples/nft/basic-nft`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nft/basic-nft)
+> **Book page:** [NFT Examples →](./nft.md)
+
+A minimal non-fungible token implementing `mint`, `owner_of`, `transfer`, and
+`approve`, with per-token metadata stored under persistent keys.
+
+```bash
+cd examples/nft/basic-nft
+cargo test
+```
+
+**What to try:**
+- Add a `burn` function that requires the owner's auth and removes the token
+  from storage.
+- Emit a `transfer` event with `(from, to, token_id)` topics and assert on it
+  in a test using `env.events().all()`.
+- Add a max-supply cap and a test that minting past the cap returns an error.
+
+### Governance — Simple Voting
+
+> **Example:** [`examples/governance/simple-voting`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/simple-voting)
+> **Book page:** [Governance Examples →](./governance.md)
+
+An on-chain proposal-and-vote contract: create a proposal with a deadline,
+cast weighted votes, and finalize the result once voting closes.
+
+```bash
+cd examples/governance/simple-voting
+cargo test
+```
+
+**What to try:**
+- Add a `quorum` check so a proposal only passes if total votes exceed a
+  threshold.
+- Prevent double-voting by keying votes on `(proposal_id, voter)`.
+- Use `env.ledger().set_timestamp(...)` in a test to advance past the deadline
+  and assert that late votes are rejected.
+
+### Token — SEP-41 Token
+
+> **Example:** [`examples/tokens/sep41-token`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/sep41-token)
+> **Book page:** [Token Examples →](./tokens.md)
+
+A fungible token implementing the SEP-41 interface: `allowance`, `approve`,
+`balance`, `transfer`, `transfer_from`, `burn`, and `burn_from`, plus
+`decimals`, `name`, and `symbol` metadata.
+
+```bash
+cd examples/tokens/sep41-token
+cargo test
+```
+
+**What to try:**
+- Add a `mint` function gated on an admin address stored in instance storage.
+- Write a test for the approve → `transfer_from` → allowance-decrement flow.
+- Verify that `transfer` without `from.require_auth()` fails the auth tests.
+
+### Running All Use-Case Examples
+
+```bash
+# From the workspace root
+cargo test -p soroban-simple-swap-example \
+           -p soroban-basic-nft-example \
+           -p soroban-simple-voting-example \
+           -p soroban-sep41-token-example
+```
+
+Or build every use-case Wasm artifact:
+
+```bash
+for dir in examples/defi/*/ examples/nft/*/ examples/governance/*/ examples/tokens/*/; do
+    echo "Building $dir..."
+    cargo build --manifest-path "$dir/Cargo.toml" \
+                --target wasm32-unknown-unknown \
+                --release
+done
+```
+
+---
+
 ## Next Steps
 
 - [Intermediate Examples →](./intermediate.md) — tokens, multi-sig, pause/unpause

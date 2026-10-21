@@ -1,37 +1,77 @@
-# GitHub Workflows
+# Community Metrics Workflow — Usage Guide
 
-Automated CI/CD pipelines for the Soroban Cookbook project.
+This directory contains GitHub Actions workflows that automate CI, CD, and community
+operations for the Soroban Cookbook.
 
-## 📋 Available Workflows
+## Workflow Inventory
 
-### [Test and Lint](./test.yml)
-Runs on every pull request and push to the main branch.
-- **Tasks:** Format check, Clippy lint, workspace tests, WASM release build, and code coverage.
+| Workflow | File | Trigger | Purpose |
+|---|---|---|---|
+| Test & Lint | `test.yml` | `push`, `pull_request` | Rust fmt, Clippy, tests, WASM build |
+| Security Audit | `security-audit.yml` | Schedule (weekly) | `cargo audit` for known CVEs |
+| Deploy Docs | `deploy-docs.yml` | Push to `main` | mdBook → GitHub Pages |
+| Dependabot Auto-merge | `dependabot-auto-merge.yml` | Dependabot PRs | Auto-merge patch updates |
+| Fuzz | `fuzz.yml` | Schedule | Fuzz testing of contract inputs |
+| **Community Metrics** | `community-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect engagement/health data |
+| **Documentation Metrics** | `documentation-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect page views, search queries, user paths |
 
-### [Deploy Docs](./deploy-docs.yml)
-Automatically builds and deploys the mdBook documentation to GitHub Pages.
-- **Tasks:** Builds the book from `book/src/` and pushes the output to the `gh-pages` branch.
+## Community Metrics Workflow
 
-### [Security Audit](./security-audit.yml)
-Audits all workspace dependencies for known vulnerabilities using `cargo audit`.
-- **Triggers:** Push/PR to `main` when `Cargo.toml` or `Cargo.lock` changes, weekly on Mondays at 08:00 UTC, and manual dispatch.
-- **Tasks:** Runs `cargo audit --deny warnings --deny unsound` against the RustSec Advisory Database. Fails the job on any HIGH or CRITICAL severity advisory. Uploads a full JSON audit report as a workflow artifact (retained for 30 days).
+The `community-metrics.yml` workflow queries the GitHub API each week and:
 
-### [Dependabot](./dependabot-auto-merge.yml)
-Automates dependency updates and auto-merges safe PRs.
-- **Tasks:** Keeps Rust and Node.js dependencies up-to-date.
+1. Records a snapshot of issues, PRs, and discussion activity.
+2. Appends a row to `docs/community-dashboard.md`.
+3. Opens a `metrics-alert` issue if any threshold is breached.
 
-## 🛠️ Local Development
+### Required Secrets
 
-You can run the CI checks locally before pushing your changes:
+| Secret | Purpose |
+|---|---|
+| `GITHUB_TOKEN` | Built-in; grants read access to the repository API |
+| `METRICS_GH_TOKEN` | Optional PAT with `discussions:write` scope for posting summaries |
+
+### Manual Trigger
 
 ```bash
-# Check formatting
-cargo fmt --all -- --check
+# Trigger via the GitHub CLI
+gh workflow run community-metrics.yml
+```
 
-# Run linter
-cargo clippy --all-targets -- -D warnings
+### Alert Labels
 
-# Run all tests
-cargo test --all
+Ensure the following labels exist in the repository before the first run:
+
+```bash
+gh label create "metrics-alert" --color "d93f0b" --description "Automated metrics threshold alert"
+gh label create "metrics-anomaly" --color "e4e669" --description "Suspected metric data anomaly"
+```
+
+## Documentation Metrics Workflow
+
+The `documentation-metrics.yml` workflow runs each Monday at 09:00 UTC and:
+
+1. Collects repository page views and popular paths via the GitHub Traffic API.
+2. Parses analytics event logs (if available) for search queries and user path analysis.
+3. Updates `docs/documentation-metrics.md` with page view counts, top search terms,
+   popular content, entry/exit pages, average path length, and top user flows.
+4. Identifies zero-result search terms as candidates for new documentation.
+
+### Analytics Instrumentation
+
+Two privacy-respecting scripts collect the raw data:
+
+| Surface | Script | What it tracks |
+|---|---|---|
+| mdBook | `book/analytics.js` | Page views, search queries, user paths (sessionStorage) |
+| Webapp | `webapp/src/lib/analytics.ts` | Page views, search queries, user paths (sessionStorage) |
+
+Both scripts respect Do-Not-Track, use no cookies, collect no PII, and send data
+via `navigator.sendBeacon`. To enable beacon collection, set
+`window.SOROBAN_ANALYTICS_ENDPOINT` (mdBook) or
+`NEXT_PUBLIC_ANALYTICS_ENDPOINT` (webapp) to your collection endpoint.
+
+### Manual Trigger
+
+```bash
+gh workflow run documentation-metrics.yml
 ```

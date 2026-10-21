@@ -1,0 +1,16 @@
+[package]
+name = "settlement-oracle-consumer"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+oracle-consumer-common = { path = "../common" }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }
+oracle-consumer-common = { path = "../common", features = ["testutils"] }

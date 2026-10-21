@@ -1,8 +1,7 @@
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
+#![allow(deprecated)]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, Bytes, Env};
 
 // Bounded queue -----------------------------------------------------------
 
@@ -113,6 +112,10 @@ impl BoundedQueueContract {
         m.len
     }
 
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
+    }
+
     pub fn capacity(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.capacity
@@ -120,10 +123,13 @@ impl BoundedQueueContract {
 }
 
 // Circular buffer ---------------------------------------------------------
+// Host/tests only: shares wasm export names with BoundedQueueContract.
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contract]
 pub struct CircularBufferContract;
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum CBKey {
@@ -131,6 +137,7 @@ pub enum CBKey {
     Element(i128),
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[derive(Clone, Debug, Eq, PartialEq)]
 #[contracttype]
 pub struct CBMeta {
@@ -140,6 +147,7 @@ pub struct CBMeta {
     pub len: i128,
 }
 
+#[cfg(any(test, not(target_family = "wasm")))]
 #[contractimpl]
 impl CircularBufferContract {
     pub fn initialize(env: Env, capacity: i128) {
@@ -207,6 +215,10 @@ impl CircularBufferContract {
     pub fn len(env: Env) -> i128 {
         let m = Self::meta(&env);
         m.len
+    }
+
+    pub fn is_empty(env: Env) -> bool {
+        Self::len(env) == 0
     }
 
     pub fn capacity(env: Env) -> i128 {

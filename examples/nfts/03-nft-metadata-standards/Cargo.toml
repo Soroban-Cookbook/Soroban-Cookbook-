@@ -1,0 +1,20 @@
+[package]
+name = "nft-metadata-standards"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[package.metadata]
+# This crate is intentionally excluded from the root workspace `members` list.
+# Build it explicitly with:
+#   cargo check --manifest-path examples/nfts/03-nft-metadata-standards/Cargo.toml
+# It uses the workspace SDK via `soroban-sdk = { workspace = true }`.
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+soroban-sdk = { workspace = true, features = ["alloc"] }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils", "alloc"] }

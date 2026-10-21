@@ -1,0 +1,15 @@
+[package]
+name = "nft-marketplace-dapp"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "contracts/marketplace/src/lib.rs"
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

@@ -2,12 +2,19 @@
 name = "upgradeable-proxy"
 version = "0.1.0"
 edition = "2021"
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 soroban-sdk = { workspace = true }
+
+[features]
+default = ["proxy"]
+proxy = []
+impl-v1 = []
+impl-v2 = []
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }

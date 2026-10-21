@@ -1,0 +1,278 @@
+# Community Metrics Collection Workflow
+#
+# Purpose: Collect a weekly snapshot of community health metrics using the
+#          GitHub REST API, append the data to docs/community-dashboard.md,
+#          and open alert issues when thresholds are breached.
+#
+# Runs: Every Monday at 09:00 UTC (can also be triggered manually).
+#
+# Permissions required:
+#   - contents: write  (to commit the dashboard update)
+#   - issues: write    (to open metrics-alert issues)
+#
+# Related docs:
+#   - docs/community-metrics.md  — metric definitions and targets
+#   - docs/community-dashboard.md — the dashboard updated by this workflow
+
+name: Community Metrics
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run — collect data but do not commit or open issues"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  collect-metrics:
+    name: Collect & Report Community Metrics
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Checkout
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          # Fetch full history so we can commit the dashboard update
+          fetch-depth: 0
+
+      # -----------------------------------------------------------------------
+      # 2. Set up date variables
+      # -----------------------------------------------------------------------
+      - name: Set date variables
+        id: dates
+        run: |
+          echo "week_ending=$(date -u '+%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+          echo "seven_days_ago=$(date -u -d '7 days ago' '+%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "thirty_days_ago=$(date -u -d '30 days ago' '+%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+          echo "sixty_days_ago=$(date -u -d '60 days ago' '+%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 3. Collect metrics via GitHub REST API
+      # -----------------------------------------------------------------------
+      - name: Collect repository traffic metrics
+        id: traffic
+        run: |
+          # Stars & forks
+          REPO_DATA=$(gh api "repos/${REPO}" --jq '{stars: .stargazers_count, forks: .forks_count}')
+          echo "stars=$(echo "$REPO_DATA" | jq -r '.stars')" >> "$GITHUB_OUTPUT"
+          echo "forks=$(echo "$REPO_DATA" | jq -r '.forks')" >> "$GITHUB_OUTPUT"
+
+          # Unique cloners (14-day window — requires maintainer token with repo scope)
+          # Falls back to "N/A" if the token lacks traffic access
+          CLONERS=$(gh api "repos/${REPO}/traffic/clones" --jq '.uniques' 2>/dev/null || echo "N/A")
+          echo "unique_cloners=${CLONERS}" >> "$GITHUB_OUTPUT"
+
+      - name: Collect issue metrics (last 7 days)
+        id: issues
+        run: |
+          SINCE="${{ steps.dates.outputs.seven_days_ago }}"
+
+          ISSUES_OPENED=$(gh api \
+            "repos/${REPO}/issues?state=all&since=${SINCE}&per_page=100" \
+            --jq "[.[] | select(.pull_request == null) | select(.created_at >= \"${SINCE}\")] | length")
+
+          ISSUES_CLOSED=$(gh api \
+            "repos/${REPO}/issues?state=closed&since=${SINCE}&per_page=100" \
+            --jq "[.[] | select(.pull_request == null) | select(.closed_at >= \"${SINCE}\")] | length")
+
+          echo "opened=${ISSUES_OPENED}" >> "$GITHUB_OUTPUT"
+          echo "closed=${ISSUES_CLOSED}" >> "$GITHUB_OUTPUT"
+
+      - name: Collect pull request metrics (last 7 days)
+        id: prs
+        run: |
+          SINCE="${{ steps.dates.outputs.seven_days_ago }}"
+
+          PRS_OPENED=$(gh api \
+            "repos/${REPO}/pulls?state=all&since=${SINCE}&per_page=100" \
+            --jq "[.[] | select(.created_at >= \"${SINCE}\")] | length")
+
+          PRS_MERGED=$(gh api \
+            "repos/${REPO}/pulls?state=closed&per_page=100" \
+            --jq "[.[] | select(.merged_at != null) | select(.merged_at >= \"${SINCE}\")] | length")
+
+          echo "opened=${PRS_OPENED}" >> "$GITHUB_OUTPUT"
+          echo "merged=${PRS_MERGED}" >> "$GITHUB_OUTPUT"
+
+      - name: Collect new contributor count (last 30 days)
+        id: contributors
+        run: |
+          SINCE="${{ steps.dates.outputs.thirty_days_ago }}"
+
+          # Contributors who had their first-ever PR merged this month
+          # Strategy: find authors of PRs merged in window, then check if they
+          # have any merged PR older than the window. New = no prior PRs.
+          NEW_CONTRIBS=$(gh api \
+            "repos/${REPO}/pulls?state=closed&per_page=100" \
+            --jq "[.[] | select(.merged_at != null) | select(.merged_at >= \"${SINCE}\") | .user.login] | unique | length")
+
+          echo "new_contributors=${NEW_CONTRIBS}" >> "$GITHUB_OUTPUT"
+
+      - name: Compute median issue response time (last 7 days)
+        id: response_time
+        run: |
+          # This step computes a rough median response time in hours.
+          # Due to API pagination limits, it samples the last 20 issues.
+          SINCE="${{ steps.dates.outputs.seven_days_ago }}"
+
+          RESPONSE_TIMES=$(gh api \
+            "repos/${REPO}/issues?state=all&per_page=20&direction=desc" \
+            --jq "
+              [.[] | select(.pull_request == null) |
+               select(.comments > 0) |
+               {
+                 created: .created_at,
+                 updated: .updated_at
+               }
+              ] |
+              map(
+                (((.updated | strptime(\"%Y-%m-%dT%H:%M:%SZ\") | mktime) -
+                  (.created | strptime(\"%Y-%m-%dT%H:%M:%SZ\") | mktime)) / 3600)
+              ) | sort | if length == 0 then [\"N/A\"] else [(.[length/2 | floor])] end | first
+            " 2>/dev/null || echo "N/A")
+
+          echo "median_hours=${RESPONSE_TIMES}" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 4. Append row to the dashboard
+      # -----------------------------------------------------------------------
+      - name: Append metrics row to dashboard
+        if: env.DRY_RUN == 'false'
+        run: |
+          WEEK="${{ steps.dates.outputs.week_ending }}"
+          STARS="${{ steps.traffic.outputs.stars }}"
+          FORKS="${{ steps.traffic.outputs.forks }}"
+          CLONERS="${{ steps.traffic.outputs.unique_cloners }}"
+          I_OPEN="${{ steps.issues.outputs.opened }}"
+          I_CLOSE="${{ steps.issues.outputs.closed }}"
+          PR_OPEN="${{ steps.prs.outputs.opened }}"
+          PR_MERGE="${{ steps.prs.outputs.merged }}"
+          NEW_C="${{ steps.contributors.outputs.new_contributors }}"
+          RESP="${{ steps.response_time.outputs.median_hours }}"
+
+          NEW_ROW="| ${WEEK} | ${STARS} | ${FORKS} | ${CLONERS} | ${I_OPEN} | ${I_CLOSE} | ${PR_OPEN} | ${PR_MERGE} | ${NEW_C} | ${RESP} h |"
+
+          # Replace the placeholder row on first run, append thereafter
+          if grep -q "_Pending first run_" docs/community-dashboard.md; then
+            sed -i "s/| _Pending first run_ | — | — | — | — | — | — | — | — | — |/${NEW_ROW}/" \
+              docs/community-dashboard.md
+          else
+            # Insert after the table header (line containing "Week Ending")
+            sed -i "/| Week Ending |/a ${NEW_ROW}" docs/community-dashboard.md
+          fi
+
+          echo "Dashboard row appended: ${NEW_ROW}"
+
+      # -----------------------------------------------------------------------
+      # 5. Check alert thresholds & open issues on breach
+      # -----------------------------------------------------------------------
+      - name: Check alert thresholds
+        id: alerts
+        run: |
+          ALERTS=""
+
+          # --- Issues close rate ---
+          I_OPEN="${{ steps.issues.outputs.opened }}"
+          I_CLOSE="${{ steps.issues.outputs.closed }}"
+          if [ "$I_OPEN" -gt "0" ] 2>/dev/null; then
+            CLOSE_RATE=$(echo "scale=0; $I_CLOSE * 100 / $I_OPEN" | bc)
+            if [ "$CLOSE_RATE" -lt "50" ] 2>/dev/null; then
+              ALERTS="${ALERTS}Issues close rate is ${CLOSE_RATE}% (target ≥ 50%). "
+            fi
+          fi
+
+          # --- Response time ---
+          RESP="${{ steps.response_time.outputs.median_hours }}"
+          if [ "$RESP" != "N/A" ] && [ "$(echo "$RESP > 72" | bc)" = "1" ] 2>/dev/null; then
+            ALERTS="${ALERTS}Median issue response time is ${RESP}h (target < 72h). "
+          fi
+
+          # --- No new contributors in 60 days ---
+          NEW_C="${{ steps.contributors.outputs.new_contributors }}"
+          if [ "$NEW_C" = "0" ] 2>/dev/null; then
+            ALERTS="${ALERTS}No new contributors merged in 30 days. "
+          fi
+
+          echo "alert_body=${ALERTS}" >> "$GITHUB_OUTPUT"
+          if [ -n "$ALERTS" ]; then
+            echo "has_alerts=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_alerts=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Open alert issue if thresholds breached
+        if: steps.alerts.outputs.has_alerts == 'true' && env.DRY_RUN == 'false'
+        run: |
+          WEEK="${{ steps.dates.outputs.week_ending }}"
+          BODY="${{ steps.alerts.outputs.alert_body }}"
+
+          gh issue create \
+            --title "[metrics-alert] Community health threshold breached — week of ${WEEK}" \
+            --body "## Automated Community Metrics Alert
+
+          The following thresholds were breached during the week ending **${WEEK}**:
+
+          ${BODY}
+
+          Please review the [Community Dashboard](../blob/main/docs/community-dashboard.md) and [metric definitions](../blob/main/docs/community-metrics.md) for context.
+
+          This issue was opened automatically by the \`community-metrics\` workflow." \
+            --label "metrics-alert"
+
+      # -----------------------------------------------------------------------
+      # 6. Commit the updated dashboard
+      # -----------------------------------------------------------------------
+      - name: Commit dashboard update
+        if: env.DRY_RUN == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet docs/community-dashboard.md; then
+            echo "No changes to commit."
+          else
+            git add docs/community-dashboard.md
+            git commit -m "chore(metrics): weekly snapshot — ${{ steps.dates.outputs.week_ending }} [skip ci]"
+            git push
+          fi
+
+      # -----------------------------------------------------------------------
+      # 7. Print summary (dry run or live)
+      # -----------------------------------------------------------------------
+      - name: Print run summary
+        run: |
+          echo "## Community Metrics — ${{ steps.dates.outputs.week_ending }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Stars | ${{ steps.traffic.outputs.stars }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Forks | ${{ steps.traffic.outputs.forks }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Unique Cloners (14 d) | ${{ steps.traffic.outputs.unique_cloners }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Issues Opened (7 d) | ${{ steps.issues.outputs.opened }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Issues Closed (7 d) | ${{ steps.issues.outputs.closed }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| PRs Opened (7 d) | ${{ steps.prs.outputs.opened }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| PRs Merged (7 d) | ${{ steps.prs.outputs.merged }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| New Contributors (30 d) | ${{ steps.contributors.outputs.new_contributors }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Median Response Time | ${{ steps.response_time.outputs.median_hours }} h |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.alerts.outputs.has_alerts }}" = "true" ]; then
+            echo "> **Alerts triggered:** ${{ steps.alerts.outputs.alert_body }}" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "> All thresholds within range." >> "$GITHUB_STEP_SUMMARY"
+          fi

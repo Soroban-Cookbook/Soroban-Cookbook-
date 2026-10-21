@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Primitive Types in Soroban
 //!
 //! This example demonstrates the usage of primitive types in Soroban smart
@@ -35,7 +36,7 @@
 //! - Counter and balance storage using instance storage.
 //! - Financial calculations using `i128` for precision.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Env};
 
 // Contract Errors

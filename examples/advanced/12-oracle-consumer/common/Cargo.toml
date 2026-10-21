@@ -1,0 +1,21 @@
+[package]
+name = "oracle-consumer-common"
+version.workspace = true
+edition.workspace = true
+publish = false
+
+[lib]
+# Shared interface crate — linked into the consumer contracts, never deployed
+# on its own, so no `cdylib`.
+crate-type = ["rlib"]
+
+[features]
+# Exposes `MockFeed`, a price feed test double the consumer crates use in
+# their own test suites.
+testutils = ["soroban-sdk/testutils"]
+
+[dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

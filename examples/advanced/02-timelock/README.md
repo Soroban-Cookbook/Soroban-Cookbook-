@@ -65,8 +65,8 @@ Build as WASM:
 cargo build --target wasm32-unknown-unknown --release
 ```
 
-## 📚 Related Examples
+## 🍔 Further Examples
 
 - [01-multi-party-auth](../01-multi-party-auth/) — Multi-party authorization patterns
 - [Governance Examples](../../governance/) — DAOs and voting systems that use timelocks
-- [Advanced Examples](../) — Other complex patterns
+- [Advanced Examples)](../) — Other complex patterns

@@ -1,8 +1,9 @@
+#![allow(deprecated)]
 //! # Event History Example
 //!
 //! Demonstrates on-chain history storage, pagination, and time filtering for audit trails.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
@@ -39,15 +40,9 @@ pub struct HistoryStats {
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct HistoryCursor {
-    pub index: u32,
-}
-
-#[contracttype]
-#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct HistoryPage {
     pub entries: Vec<AuditEntry>,
-    pub next_cursor: Option<HistoryCursor>,
+    pub next_cursor: Option<u32>,
 }
 
 #[contracterror]
@@ -168,7 +163,7 @@ impl EventHistory {
     /// expired cursor is rejected with `InvalidCursor`.
     pub fn get_events_page(
         env: Env,
-        cursor: Option<HistoryCursor>,
+        cursor: Option<u32>,
         limit: u32,
     ) -> Result<HistoryPage, HistoryError> {
         if limit == 0 {
@@ -180,7 +175,7 @@ impl EventHistory {
 
         let start_index = read_start_index(&env);
         let next_index = read_next_index(&env);
-        let start = cursor.map_or(start_index, |c| c.index);
+        let start = cursor.unwrap_or(start_index);
 
         if start < start_index || start > next_index {
             return Err(HistoryError::InvalidCursor);
@@ -204,11 +199,7 @@ impl EventHistory {
             index += 1;
         }
 
-        let next_cursor = if end >= next_index {
-            None
-        } else {
-            Some(HistoryCursor { index: end })
-        };
+        let next_cursor = if end >= next_index { None } else { Some(end) };
 
         Ok(HistoryPage {
             entries: result,

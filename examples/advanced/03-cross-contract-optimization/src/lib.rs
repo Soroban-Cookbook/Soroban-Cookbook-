@@ -1,10 +1,11 @@
+#![allow(deprecated)]
 //! # Cross-Contract Optimization
 //!
 //! This example compares an unoptimized sequential caller contract with an
 //! optimized batched caller contract. The target contract stores and updates
 //! numeric values keyed by `Symbol`.
 
-#![no_std]
+#![cfg_attr(target_family = "wasm", no_std)]
 
 #[cfg(test)]
 extern crate std;

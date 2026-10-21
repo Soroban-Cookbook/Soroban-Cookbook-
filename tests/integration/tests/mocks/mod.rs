@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 //! # Mock Contracts
 //!
 //! Lightweight mock contracts for testing cross-contract interactions without
