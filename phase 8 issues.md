@@ -634,10 +634,12 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 
 
 - **Priority:** Medium
-- **Status:** Planned
+- **Status:** In Progress
+- **GitHub issue:** [#931](https://github.com/my908-hue/Soroban-Cookbook-/issues/931)
 
-- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
-- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Current state:** A quarterly metrics guide and report template are available in [`docs/social-media-analytics.md`](./docs/social-media-analytics.md) and linked from the README and documentation index. No verified baseline or completed report exists yet.
+- **Remaining work:** Confirm official social profiles, arrange authorized analytics access, collect and publish the first report, then continue quarterly reporting.
+- **Implementation hints:** Publish reviewed reports to `docs/reports/social-media/YYYY-QN.md`; link reports from the README or documentation index.
 - **Verification:** Manual verification against acceptance criteria; update phase file when done.
 - **Scope:** M
 - **Description:** Social media analytics
