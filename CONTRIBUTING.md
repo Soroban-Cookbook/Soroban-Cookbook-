@@ -124,6 +124,8 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
+For conference talks, workshops, booth planning, and recording event outcomes, see the [Blockchain Event Outreach register](./docs/event-outreach.md).
+
 ## Project Templates
 
 We provide three complete full-stack starter templates in the [`templates/`](./templates/) directory to help developers build and launch dApps rapidly:

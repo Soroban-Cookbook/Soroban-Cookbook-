@@ -2,7 +2,7 @@
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
 **Completion:** 14% (7/50)
-**Last Audit Date:** October 19, 2026
+**Last Audit Date:** October 21, 2026
 
 Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
 
@@ -157,12 +157,30 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - ✅ Dashboard — [`docs/documentation-metrics.md`](./docs/documentation-metrics.md) provides page view tables, search query analysis, popular content rankings, user path analysis, rolling weekly data, monthly trends, zero-result search terms, and mdBook vs webapp comparison.
   - ✅ Verification — Metric definitions added to [`docs/community-metrics.md`](./docs/community-metrics.md) § 3.6 (14 documentation usage metrics). Links added to [`README.md`](./README.md) and [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
+## Events & Workshops
+
+### Issue #425: Present at blockchain events
+
+- **Priority:** Low
+- **Status:** In Progress
+- **Current state:** [`docs/event-outreach.md`](./docs/event-outreach.md) identifies target event programs and discovery channels, provides a reusable talk abstract, and tracks submission, presentation, booth, and networking evidence. No submission, delivered presentation, booth booking, or event-specific networking outcome is claimed as complete.
+- **Implementation hints:** Link completed outcomes from [`CONTRIBUTING.md`](./CONTRIBUTING.md#monthly-community-call-governance) and this phase file; link organizer resources and evidence.
+- **Verification:** Manual; confirm submission receipts, agendas or recordings, booth confirmation, and documented follow-ups before marking criteria complete.
+- **Scope:** M
+- **Description:** Present the Soroban Cookbook at blockchain events.
+- **Acceptance Criteria:**
+  - ✅ Events identified — [`docs/event-outreach.md` § Event Discovery](./docs/event-outreach.md#event-discovery) lists relevant event programs and discovery channels; dates and opportunities remain to be confirmed.
+  - ⏳ Submissions made — no submission evidence recorded.
+  - ⏳ Presentations delivered — no delivery evidence recorded.
+  - ⏳ Booth presence — no booking or attendance evidence recorded.
+  - ⏳ Networking — no event-specific outcomes or follow-ups recorded.
+
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629, #927)
 **Completed:** 7
-**In Progress:** 0  
-**Planned:** 59
+**In Progress:** 1
+**Planned:** 58
 
 **Phase 8 Status:** 📋 **14% COMPLETE (Ongoing)**
 
