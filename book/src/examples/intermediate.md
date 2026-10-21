@@ -2,6 +2,10 @@
 
 Advanced patterns, real-world use cases, and more complex contracts.
 
+> **Hands-on:** work through the
+> [Interactive Playground — Intermediate Examples](./playground-intermediate.md)
+> for runnable token, cross-contract and access-control walkthroughs.
+
 ## 🍍 Examples
 
 ### Multi-Sig Patterns [./multi-sig-patterns/](../examples/intermediate/multi-sig-patterns/)
