@@ -246,6 +246,7 @@ cargo build --workspace --target wasm32-unknown-unknown --release
 - [Stellar Developer Portal](https://developers.stellar.org)
 - [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
 - [Stellar Community Discord](https://discord.gg/stellardev)
+- [Social Media Analytics](./docs/social-media-analytics.md) — Quarterly reporting process
 
 ## License
 

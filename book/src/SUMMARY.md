@@ -73,4 +73,8 @@
 
 - [ADR Index](./adr/README.md)
   - [ADR-001: Record Architecture Decisions](./adr/001-record-architecture-decisions.md)
+  - [ADR-002: Workspace Structure](./adr/002-workspace-structure.md)
+  - [ADR-003: Testing Approach](./adr/003-testing-approach.md)
+  - [ADR-004: CI/CD](./adr/004-ci-cd.md)
+  - [ADR-005: Documentation Publishing](./adr/005-documentation-publishing.md)
   - [ADR Template](./adr/template.md)

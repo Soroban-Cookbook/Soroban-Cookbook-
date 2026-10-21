@@ -35,6 +35,7 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 - [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds
 - [Dependabot Setup](./dependabot-setup.md) — Automated dependency update configuration
 - [Performance Benchmarks](./benchmarks.md) — Resource usage comparison and optimization tips
+- [Social Media Analytics](./social-media-analytics.md) — Quarterly audience, engagement, mention, and sentiment reporting process
 - [Security Audit Preparation](./security-audit/README.md) — Audit scope, prep checklist, and known-issues log for the intermediate examples
 
 ### 🎬 Video Walkthrough
@@ -49,6 +50,10 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 ### Architecture Decision Records
 
 - [ADR-001: Record Architecture Decisions](./adr/001-record-architecture-decisions.md)
+- [ADR-002: Workspace Structure](../book/src/adr/002-workspace-structure.md)
+- [ADR-003: Testing Approach](../book/src/adr/003-testing-approach.md)
+- [ADR-004: CI/CD](../book/src/adr/004-ci-cd.md)
+- [ADR-005: Documentation Publishing](../book/src/adr/005-documentation-publishing.md)
 - [ADR Template](./adr/template.md)
 
 ## Guides

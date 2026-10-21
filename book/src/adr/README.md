@@ -19,6 +19,10 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | ADR | Title | Status |
 | --- | ----- | ------ |
 | [ADR-001](./001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted |
+| [ADR-002](./002-workspace-structure.md) | Organize Contracts in a Cargo Workspace | Proposed |
+| [ADR-003](./003-testing-approach.md) | Test Contracts at Multiple Levels | Proposed |
+| [ADR-004](./004-ci-cd.md) | Validate Changes with GitHub Actions | Proposed |
+| [ADR-005](./005-documentation-publishing.md) | Publish Documentation with mdBook | Proposed |
 
 ## Creating a New ADR
 
@@ -26,7 +30,7 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 2. Fill in all sections — context, decision, and consequences
 3. Set the status to `Proposed`
 4. Open a PR; once merged and agreed upon, update the status to `Accepted`
-5. Add the new ADR to the index table above and in [`docs/adr/README.md`](../../docs/adr/README.md)
+5. Add the new ADR to the index table above and in [`docs/adr/README.md`](../../../docs/adr/README.md)
 
 ## ADR Statuses
 
