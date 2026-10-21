@@ -10,19 +10,20 @@ Community and ecosystem initiatives — no in-repo deliverables yet.
 
 
 - **Priority:** High
-- **Status:** Planned
-
-- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Status:** ✅ Complete
+- **Completed:** 2026-10-21
+- **Deliverables:** `GOVERNANCE/infrastructure-setup.md`, `GOVERNANCE/calendar/soroban-cookbook-community-call.ics`, `GOVERNANCE/registration/README.md`, `GOVERNANCE/recording/README.md`
+- **Current state:** Infrastructure fully documented in-repo. Jitsi Meet selected as platform; recurring ICS calendar published; GitHub Discussions registration system; recording workflow with YouTube archive. Linked from CONTRIBUTING.md and README.md.
 - **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
 - **Verification:** Manual verification against acceptance criteria; update phase file when done.
 - **Scope:** M
 - **Description:** Set up infrastructure for monthly calls
 - **Acceptance Criteria:**
-  - Video conferencing platform selected
-  - Calendar created
-  - Registration system
-  - Recording setup
-  - Documentation
+  - [x] Video conferencing platform selected — Jitsi Meet (`https://meet.jit.si/SorobanCookbookCommunityCall`)
+  - [x] Calendar created — `GOVERNANCE/calendar/soroban-cookbook-community-call.ics` (first Tuesday, 16:00 UTC)
+  - [x] Registration system — GitHub Discussions RSVP (see `GOVERNANCE/registration/README.md`)
+  - [x] Recording setup — Jitsi local recording → YouTube upload → caption review → archive (see `GOVERNANCE/recording/README.md`)
+  - [x] Documentation — `GOVERNANCE/infrastructure-setup.md` with full acceptance criteria checklist
 
 
 ### Issue #380: Plan First Community Call

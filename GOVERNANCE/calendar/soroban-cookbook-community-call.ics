@@ -1,0 +1,35 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Soroban Cookbook//Community Call//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Soroban Cookbook Monthly Community Call
+X-WR-TIMEZONE:UTC
+X-WR-CALDESC:Recurring monthly community call for the Soroban Cookbook project. First Tuesday of every month at 16:00 UTC.
+BEGIN:VTIMEZONE
+TZID:UTC
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0000
+TZOFFSETTO:+0000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:soroban-cookbook-community-call@soroban-cookbook
+DTSTAMP:20261021T160000Z
+DTSTART:20261103T160000Z
+DTEND:20261103T170000Z
+RRULE:FREQ=MONTHLY;BYDAY=1TU;BYHOUR=16;BYMINUTE=0
+SUMMARY:Soroban Cookbook Monthly Community Call
+DESCRIPTION:Monthly community call for project updates, feature spotlights, community showcase, and Q&A.\n\nJoin link: https://meet.jit.si/SorobanCookbookCommunityCall\nPassword: posted in the monthly RSVP Discussion thread.\n\nAgenda template: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/GOVERNANCE/monthly-call-agenda-template.md\nRegister: https://github.com/Soroban-Cookbook/Soroban-Cookbook-/discussions (look for "Community Call RSVP — YYYY-MM")\n\nAll calls are governed by the project Code of Conduct.
+LOCATION:https://meet.jit.si/SorobanCookbookCommunityCall
+STATUS:CONFIRMED
+ORGANIZER;CN=Soroban Cookbook Maintainers:mailto:noreply@soroban-cookbook.dev
+URL:https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/GOVERNANCE
+BEGIN:VALARM
+TRIGGER:-PT1H
+ACTION:DISPLAY
+DESCRIPTION:Community call starts in 1 hour. Join: https://meet.jit.si/SorobanCookbookCommunityCall
+END:VALARM
+END:VEVENT
+END:VCALENDAR

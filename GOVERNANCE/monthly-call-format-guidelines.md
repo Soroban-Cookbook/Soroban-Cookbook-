@@ -13,11 +13,11 @@ These guidelines define the standard format for Soroban Cookbook monthly communi
 
 | Requirement | Standard | Notes |
 | ----------- | -------- | ----- |
-| Video platform | [Platform TBD] | Must support recording, closed captions, and breakout rooms. |
+| Video platform | **Jitsi Meet** (`https://meet.jit.si/SorobanCookbookCommunityCall`) | Open-source, browser-based. Supports recording, live captions, and breakout rooms. See [Infrastructure Setup](./infrastructure-setup.md) for configuration details. |
 | Audio standards | 16 kHz minimum | Recommend noise suppression and a dedicated broadcast channel for speakers. |
-| Closed captions | Live captions for entire call | Provide a volunteer captioner or auto-captions with human review. |
+| Closed captions | Live captions for entire call | Jitsi live captions (Vosk) during the call; YouTube auto-captions reviewed within 48 hours after upload. See [Recording Workflow](./recording/README.md). |
 | Chat / Q&A | Platform-native chat + GitHub Discussions | Dual-surface queue reduces lost questions. |
-| Registration | Optional RSVP | Collect timezone info and topics of interest as planning input. |
+| Registration | GitHub Discussions RSVP | Monthly RSVP thread collects timezone and topic info. See [Registration Guide](./registration/README.md). |
 
 ## Recording & Accessibility
 
@@ -54,6 +54,22 @@ Rotate these roles among active contributors each month to share ownership of th
 - Describe visual content verbally during demos.
 - Encourage speakers to identify themselves before speaking for the recording transcript.
 - Avoid flashing animations and provide content warnings for sensitive topics.
+
+## Calendar
+
+- **Recurring schedule:** First Tuesday of every month at 16:00 UTC.
+- **ICS file:** [calendar/soroban-cookbook-community-call.ics](./calendar/soroban-cookbook-community-call.ics) — import into any calendar client.
+- **Time zones:** 11:00 EST, 08:00 PST, 17:00 CET, 01:00+1 JST.
+
+## Registration
+
+- **System:** GitHub Discussions — no external tooling required.
+- **Guide:** [registration/README.md](./registration/README.md) — form template and host workflow.
+
+## Recording
+
+- **Workflow:** Jitsi local recording → YouTube upload → caption review → archive in `GOVERNANCE/notes/`.
+- **Guide:** [recording/README.md](./recording/README.md) — recording, captioning, upload, and retention policy.
 
 ## Cancellation Policy
 

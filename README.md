@@ -177,6 +177,7 @@ We track community health transparently so everyone can see how the project is g
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
 | [Iterable Mapping](./docs/iterable-mapping.md) | Enumeration pattern for key-value maps using a side list, with `keys(page)` and `values(page)` pagination helpers |
+| [Community Call Infrastructure](./GOVERNANCE/infrastructure-setup.md) | Monthly call setup — Jitsi Meet, calendar, registration, and recording workflow |
 
 The dashboard is updated automatically every Monday by a GitHub Actions workflow.
 

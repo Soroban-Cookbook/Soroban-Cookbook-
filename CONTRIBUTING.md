@@ -59,13 +59,24 @@ For more details, see the [Feedback System Documentation](docs/feedback-system/R
 
 ## Monthly Community Call Governance
 
-The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
+The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates, governance documents, and infrastructure configuration are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
+
+### Infrastructure
+
+- [Infrastructure Setup](./GOVERNANCE/infrastructure-setup.md) — video platform (Jitsi Meet), calendar, registration, and recording configuration
+- [Calendar (ICS)](./GOVERNANCE/calendar/soroban-cookbook-community-call.ics) — importable recurring event (first Tuesday, 16:00 UTC)
+- [Registration Guide](./GOVERNANCE/registration/README.md) — GitHub Discussions RSVP form and workflow
+- [Recording Workflow](./GOVERNANCE/recording/README.md) — recording, captioning, upload, and archival
+
+### Process Templates & Guides
 
 - [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
 - [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
 - [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
 - [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
 - [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+
+**To join the next call:** Subscribe to the [calendar](./GOVERNANCE/calendar/soroban-cookbook-community-call.ics) and watch [GitHub Discussions](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/discussions) for the monthly RSVP thread.
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
