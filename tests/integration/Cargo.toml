@@ -13,6 +13,11 @@ name = "integration_tests"
 path = "integration_tests.rs"
 harness = true
 
+[[test]]
+name = "snapshot_tests"
+path = "tests/snapshot_tests.rs"
+harness = true
+
 [lib]
 path = "lib.rs"
 
@@ -90,3 +95,82 @@ facet_multiplier = { path = "../../examples/advanced/19-diamond-security/facet-m
 bridge_security = { path = "../../examples/advanced/17-bridge-security", package = "bridge-security" }
 price_oracle = { path = "../../examples/advanced/36-price-oracle", package = "price-oracle" }
 diamond_facets = { path = "../../examples/advanced/18-diamond-facets", package = "diamond-facets" }
+soroban_hello_world_contract = { path = "../../examples/hello-world", package = "soroban-hello-world-contract" }
+event_aggregation = { path = "../../examples/intermediate/event-aggregation", package = "event-aggregation" }
+iterable_mappings = { path = "../../examples/intermediate/iterable-mappings", package = "iterable-mappings" }
+priority_queue = { path = "../../examples/intermediate/03-priority-queue", package = "priority-queue" }
+event_subscriptions = { path = "../../examples/intermediate/event-subscriptions", package = "event-subscriptions" }
+beacon_proxy = { path = "../../examples/advanced/02-beacon-proxy", package = "beacon-proxy" }
+state_channel_disputes = { path = "../../examples/advanced/34-state-channel-disputes", package = "state-channel-disputes" }
+beacon_proxy_factory = { path = "../../examples/advanced/23-beacon-proxy-factory", package = "beacon-proxy-factory" }
+gasless_relayer = { path = "../../examples/advanced/27-gasless-relayer", package = "gasless-relayer" }
+batch_builder = { path = "../../examples/advanced/22-batch-builder", package = "batch-builder" }
+merkle_whitelist = { path = "../../examples/advanced/29-merkle-whitelist", package = "merkle-whitelist" }
+hierarchical_access_control = { path = "../../examples/advanced/16-hierarchical-access-control", package = "hierarchical-access-control" }
+state_channels = { path = "../../examples/advanced/07-state-channels", package = "state-channels" }
+trusted_forwarder = { path = "../../examples/advanced/07-trusted-forwarder", package = "trusted-forwarder" }
+storage_layout_validator = { path = "../../examples/advanced/09-storage-layout-validator", package = "storage-layout-validator" }
+permit_pattern = { path = "../../examples/advanced/30-permit-pattern", package = "permit-pattern" }
+circuit_breaker = { path = "../../examples/advanced/04-circuit-breaker", package = "circuit-breaker" }
+computation_optimization = { path = "../../examples/advanced/40-computation-optimization", package = "computation-optimization" }
+multicall = { path = "../../examples/advanced/42-multicall", package = "multicall" }
+rate_limiting = { path = "../../examples/advanced/05-rate-limiting", package = "rate-limiting" }
+merkle_proofs = { path = "../../examples/advanced/21-merkle-proofs", package = "merkle-proofs" }
+merkle_airdrop = { path = "../../examples/advanced/28-merkle-airdrop", package = "merkle-airdrop" }
+oracle_integration = { path = "../../examples/advanced/15-oracle-integration", package = "oracle-integration" }
+reentrancy_guard = { path = "../../examples/advanced/15-reentrancy-guard", package = "reentrancy-guard" }
+cross_chain_bridge = { path = "../../examples/advanced/24-cross-chain-bridge", package = "cross-chain-bridge" }
+cross_contract_optimization_03 = { path = "../../examples/advanced/03-cross-contract-optimization", package = "cross-contract-optimization-03" }
+cross_contract_optimization = { path = "../../examples/advanced/25-cross-contract-optimization", package = "cross-contract-optimization" }
+data_aggregation_oracle = { path = "../../examples/advanced/26-data-aggregation-oracle", package = "data-aggregation-oracle" }
+gas_optimization = { path = "../../examples/advanced/35-gas-optimization", package = "gas-optimization" }
+upgrade_patterns = { path = "../../examples/advanced/07-upgrade-patterns", package = "upgrade-patterns" }
+payment_channels = { path = "../../examples/advanced/43-payment-channels", package = "payment-channels" }
+gas_reporter = { path = "../../examples/advanced/41-gas-reporter", package = "gas-reporter" }
+fuzz_testing = { path = "../../examples/advanced/09-fuzz-testing", package = "fuzz-testing" }
+contract_migrations = { path = "../../examples/advanced/10-contract-migrations", package = "contract-migrations" }
+oracle_consumer_common = { path = "../../examples/advanced/12-oracle-consumer/common", package = "oracle-consumer-common" }
+guarded_oracle_consumer = { path = "../../examples/advanced/12-oracle-consumer/guarded", package = "guarded-oracle-consumer" }
+aggregating_oracle_consumer = { path = "../../examples/advanced/12-oracle-consumer/aggregating", package = "aggregating-oracle-consumer" }
+settlement_oracle_consumer = { path = "../../examples/advanced/12-oracle-consumer/settlement", package = "settlement-oracle-consumer" }
+diamond_pattern = { path = "../../examples/advanced/38-diamond-pattern", package = "diamond-pattern" }
+batch_transfer = { path = "../../examples/advanced/20-batch-transfer", package = "batch-transfer" }
+beacon_management = { path = "../../examples/advanced/37-beacon-management", package = "beacon-management" }
+nft_metadata_advanced = { path = "../../examples/nfts/02-nft-metadata", package = "nft-metadata-advanced" }
+storage_migration = { path = "../../examples/intermediate/storage-migration", package = "storage-migration" }
+event_history = { path = "../../examples/intermediate/event-history", package = "event-history" }
+vesting_management = { path = "../../examples/tokens/01-vesting-management", package = "vesting-management" }
+minting_strategies_token = { path = "../../examples/tokens/02-minting-strategies", package = "minting-strategies-token" }
+sep41_extensions = { path = "../../examples/tokens/02-sep41-extensions", package = "sep41-extensions" }
+optimized_token_operations = { path = "../../examples/tokens/03-optimized-operations", package = "optimized-token-operations" }
+snapshot_token = { path = "../../examples/tokens/04-snapshot-token", package = "snapshot-token" }
+allowance_pattern = { path = "../../examples/tokens/05-allowance-pattern", package = "allowance-pattern" }
+reward_token = { path = "../../examples/tokens/06-reward-token", package = "reward-token" }
+token_metadata = { path = "../../examples/tokens/07-token-metadata", package = "token-metadata" }
+optimized_token_ops = { path = "../../examples/tokens/09-optimized-token-ops", package = "optimized-token-ops" }
+pausable_permissions = { path = "../../examples/tokens/10-pausable-permissions", package = "pausable-permissions" }
+custom_token = { path = "../../examples/tokens/10-custom-token", package = "custom-token" }
+token_lock = { path = "../../examples/tokens/token-lock", package = "token-lock" }
+token_voting = { path = "../../examples/governance/02-token-voting", package = "token-voting" }
+vote_delegation = { path = "../../examples/governance/06-vote-delegation", package = "vote-delegation" }
+delegation = { path = "../../examples/governance/07-delegation", package = "delegation" }
+delegation_marketplace = { path = "../../examples/governance/08-delegation-marketplace", package = "delegation-marketplace" }
+timelock_governance = { path = "../../examples/governance/09-timelock-governance", package = "timelock-governance" }
+snapshot_triggers_governance = { path = "../../examples/governance/11-automatic-snapshot-triggers", package = "snapshot-triggers-governance" }
+nft_metadata_standards = { path = "../../examples/nfts/03-nft-metadata-standards", package = "nft-metadata-standards" }
+snapshot_triggers_nfts = { path = "../../examples/nfts/05-automatic-snapshot-triggers", package = "snapshot-triggers-nfts" }
+lazy_loading = { path = "../../examples/intermediate/lazy-loading", package = "lazy-loading" }
+iterable_mapping = { path = "../../examples/intermediate/iterable-mapping", package = "iterable-mapping" }
+storage_pagination = { path = "../../examples/intermediate/storage-pagination", package = "storage-pagination" }
+multi_token_balance_manager = { path = "../../examples/tokens/08-multi-token-balance-manager", package = "multi-token-balance-manager" }
+snapshot_triggers_defi = { path = "../../examples/defi/14-automatic-snapshot-triggers", package = "snapshot-triggers-defi" }
+reward_strategies = { path = "../../examples/defi/15-reward-strategies", package = "reward-strategies" }
+real_world_case_studies = { path = "../../examples/advanced/12-real-world-case-studies", package = "real-world-case-studies" }
+virtual_channel = { path = "../../examples/advanced/13-virtual-channel", package = "virtual-channel" }
+bridge_monitor = { path = "../../examples/advanced/14-bridge-monitor", package = "bridge-monitor" }
+bridge_validators = { path = "../../examples/advanced/14-bridge-validators", package = "bridge-validators" }
+access_control = { path = "../../examples/intermediate/access-control", package = "access-control" }
+snapshot_triggers_tokens = { path = "../../examples/tokens/10-automatic-snapshot-triggers", package = "snapshot-triggers-tokens" }
+
+[dev-dependencies]
+insta = "1.41.0"

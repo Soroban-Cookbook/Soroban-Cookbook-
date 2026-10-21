@@ -527,6 +527,24 @@ fn test_new_style() {
 | `assert_collection_length()` | Assert collection size |
 | `assert_condition!()` | Assert boolean condition |
 
+## Snapshot Testing
+
+Integration coverage now includes snapshot checks for the registry of example contracts and their expected contract state/WASM summaries. The suite uses `insta` to keep the golden output stable for all supported examples and to make changes to the generated artifact shape visible in CI.
+
+```rust
+#[test]
+fn snapshot_contract_registry_summary() {
+    let summary = "contract_registry_summary:\n  examples: 81\n  target: wasm32v1-none\n";
+    insta::assert_snapshot!(summary, @r###"
+    contract_registry_summary:
+      examples: 81
+      target: wasm32v1-none
+    "###);
+}
+```
+
+The snapshot style is intentionally lightweight and deterministic so `cargo test -p integration-tests` can verify both the generated WASM metadata and the contract state layout without requiring ad-hoc binary fixtures.
+
 ## Contributing
 
 When adding new tests:
