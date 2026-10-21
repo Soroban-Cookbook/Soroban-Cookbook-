@@ -5,9 +5,11 @@ These guidelines define the standard format for Soroban Cookbook monthly communi
 ## Frequency & Scheduling
 
 - **Recurrence:** First Tuesday of every month.
-- **Time:** 16:00 UTC, adjusted seasonally if attendance data supports a better time.
+- **Time:** 16:00 UTC year-round. Keeping the time in UTC avoids daylight-saving changes shifting the published start time; calendar apps display the equivalent local time.
 - **Duration:** 60 minutes, with a 5-minute buffer after for hallway chat.
-- **Calendar:** Publish at least 30 days in advance and update if the time or platform changes.
+- **Calendar:** Subscribe to the [monthly community call calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics). It contains the recurring event and calendar reminders seven days and one day before each call. Update the calendar at least 30 days before any schedule change.
+- **Time zones:** Include local-time conversions in each announcement and collect attendee feedback. Review participation across regions periodically; announce schedule changes at least 30 days in advance and update the calendar.
+- **Meeting link:** The platform and join link are announced with each call and added to the calendar when confirmed.
 
 ## Platform Setup
 
@@ -34,7 +36,8 @@ These guidelines define the standard format for Soroban Cookbook monthly communi
 | 14 days before | Draft commit with agenda and speaker line-up pushed to the repo |
 | 10 days before | Announce on Discord, X/Twitter, and GitHub Discussions |
 | 5 days before | Publish final agenda and collect questions |
-| 1 day before | Reminder post with direct join link |
+| 7 days before | Calendar reminder; confirm the platform and join link are in the event |
+| 1 day before | Calendar reminder and reminder post with direct join link |
 | Day of | Last-minute reminder 1 hour before the call |
 
 ## Host Roles
