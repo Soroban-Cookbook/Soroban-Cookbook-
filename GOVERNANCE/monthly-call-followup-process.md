@@ -6,9 +6,9 @@ The follow-up process converts discussions from the monthly call into documented
 
 | Deadline | Owner | Action |
 | -------- | ----- | ------ |
-| +24 hours | Note-taker | Publish raw notes to `GOVERNANCE/notes/YYYY-MM-notes.md` |
-| +48 hours | Host + Note-taker | Create follow-up entry in GitHub Discussions with recording, transcript, and action items |
-| +72 hours | Note-taker | Publish closed captions and final transcript link |
+| +24 hours | Note-taker | Publish notes to `GOVERNANCE/notes/YYYY-MM-notes.md` using the [notes template](./notes/TEMPLATE.md), then add the call to the [archive index](./notes/README.md) |
+| +48 hours | Host + Note-taker | Upload the recording to the project's approved media host, add its stable link to the archive record, and create a GitHub Discussions follow-up with the recording, transcript, and action items |
+| +72 hours | Note-taker | Publish reviewed closed captions and the final transcript link; update the archive record |
 | +7 days | Maintainer | Review action items and sync with GitHub Issues and project board |
 
 ## Notes Template
@@ -49,9 +49,10 @@ Copy and complete this template for every call:
 
 ## Storage & Archive
 
-- Call notes, recordings, and transcripts are stored under `GOVERNANCE/notes/`.
-- The archive index is updated in [docs/README.md](../book/src/README.md) or linked from the community section.
-- Recordings older than 2 years that have no active references may be moved to cold storage, but links must remain valid.
+- The [Community Call Archive](./notes/README.md) is the canonical index. Store notes, transcripts, and captions as Markdown or text files under `GOVERNANCE/notes/`; link to large assets rather than committing them.
+- Store video recordings on the project's approved media host, not in Git. Add a stable video URL to both the call's archive record and the index, and verify access before publishing.
+- The archive index is linked from the repository's community documentation and the mdBook [Community Calls page](../book/src/community-calls.md).
+- Keep published media links valid. If a recording must move, update its archive record and the index together.
 
 ## Feedback Loop
 

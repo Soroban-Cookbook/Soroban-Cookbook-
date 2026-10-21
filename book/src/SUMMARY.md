@@ -7,6 +7,10 @@
 - [Setup Environment](./guides/getting-started.md)
 - [macOS Setup Guide](./guides/macos-setup.md)
 
+# Community
+
+- [Community Calls](./community-calls.md)
+
 # Guides
 
 - [Testing Guide](./guides/testing.md)
@@ -182,4 +186,3 @@
   - [ADR-004: Testing Framework](./adr/004-testing-framework.md)
   - [ADR-005: Documentation Platform](./adr/005-documentation-platform.md)
   - [ADR Template](./adr/template.md)
-

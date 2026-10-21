@@ -25,7 +25,7 @@ These guidelines define the standard format for Soroban Cookbook monthly communi
 
 - Record every call with both video and a separate audio track.
 - Add automated and reviewed closed captions within 48 hours.
-- Upload to the project's media host and link from [docs/community/archive].
+- Upload to the project's media host and link from the [Community Call Archive](./notes/README.md).
 - Provide a transcript or timestamped outline alongside the video.
 - All materials must be licensed under the same open license as the repository.
 

@@ -123,6 +123,7 @@ The Soroban Cookbook runs monthly community calls to share progress, demo exampl
 - [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
 - [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
 - [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+- [Community Call Archive](./GOVERNANCE/notes/README.md) — searchable notes, recordings, transcripts, and action items
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
