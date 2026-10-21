@@ -10,6 +10,7 @@ New to Soroban? Start here:
 2. **[Your First Contract](../examples/basics/01-hello-world/)** - Write, test, and deploy
 3. **[Testing Guide](../guides/testing.md)** - Learn to test effectively
 4. **[Deployment Guide](../guides/deployment.md)** - Deploy to testnet and mainnet
+5. **[Code Examples](./code-examples.md)** - Tested snippets for every topic
 
 ## 🎓 Learning Paths
 
