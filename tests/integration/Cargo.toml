@@ -90,3 +90,38 @@ facet_multiplier = { path = "../../examples/advanced/19-diamond-security/facet-m
 bridge_security = { path = "../../examples/advanced/17-bridge-security", package = "bridge-security" }
 price_oracle = { path = "../../examples/advanced/36-price-oracle", package = "price-oracle" }
 diamond_facets = { path = "../../examples/advanced/18-diamond-facets", package = "diamond-facets" }
+
+# --- Advanced-example coverage (issue #904) -------------------------------
+circuit_breaker = { path = "../../examples/advanced/04-circuit-breaker", package = "circuit-breaker" }
+rate_limiting = { path = "../../examples/advanced/05-rate-limiting", package = "rate-limiting" }
+reentrancy_guard = { path = "../../examples/advanced/15-reentrancy-guard", package = "reentrancy-guard" }
+permit_pattern = { path = "../../examples/advanced/30-permit-pattern", package = "permit-pattern" }
+merkle_proofs = { path = "../../examples/advanced/21-merkle-proofs", package = "merkle-proofs" }
+merkle_airdrop = { path = "../../examples/advanced/28-merkle-airdrop", package = "merkle-airdrop" }
+merkle_whitelist = { path = "../../examples/advanced/29-merkle-whitelist", package = "merkle-whitelist" }
+batch_transfer = { path = "../../examples/advanced/20-batch-transfer", package = "batch-transfer" }
+batch_builder = { path = "../../examples/advanced/22-batch-builder", package = "batch-builder" }
+multicall = { path = "../../examples/advanced/42-multicall", package = "multicall" }
+hierarchical_access_control = { path = "../../examples/advanced/16-hierarchical-access-control", package = "hierarchical-access-control" }
+data_aggregation_oracle = { path = "../../examples/advanced/26-data-aggregation-oracle", package = "data-aggregation-oracle" }
+upgrade_patterns = { path = "../../examples/advanced/07-upgrade-patterns", package = "upgrade-patterns", features = ["testutils"] }
+beacon_management = { path = "../../examples/advanced/37-beacon-management", package = "beacon-management" }
+
+# --- Use-case coverage (issue #901) ---------------------------------------
+
+snapshot_triggers_defi = { path = "../../examples/defi/14-automatic-snapshot-triggers", package = "snapshot-triggers-defi" }
+reward_strategies = { path = "../../examples/defi/15-reward-strategies", package = "reward-strategies" }
+nft_metadata_advanced = { path = "../../examples/nfts/02-nft-metadata", package = "nft-metadata-advanced" }
+nft_metadata_standards = { path = "../../examples/nfts/03-nft-metadata-standards", package = "nft-metadata-standards" }
+snapshot_triggers_nfts = { path = "../../examples/nfts/05-automatic-snapshot-triggers", package = "snapshot-triggers-nfts" }
+vote_delegation = { path = "../../examples/governance/06-vote-delegation", package = "vote-delegation" }
+timelock_governance = { path = "../../examples/governance/09-timelock-governance", package = "timelock-governance" }
+snapshot_triggers_governance = { path = "../../examples/governance/11-automatic-snapshot-triggers", package = "snapshot-triggers-governance" }
+vesting_management = { path = "../../examples/tokens/01-vesting-management", package = "vesting-management" }
+minting_strategies_token = { path = "../../examples/tokens/02-minting-strategies", package = "minting-strategies-token" }
+allowance_pattern = { path = "../../examples/tokens/05-allowance-pattern", package = "allowance-pattern" }
+reward_token = { path = "../../examples/tokens/06-reward-token", package = "reward-token" }
+token_metadata = { path = "../../examples/tokens/07-token-metadata", package = "token-metadata" }
+multi_token_balance_manager = { path = "../../examples/tokens/08-multi-token-balance-manager", package = "multi-token-balance-manager" }
+custom_token = { path = "../../examples/tokens/10-custom-token", package = "custom-token" }
+token_lock = { path = "../../examples/tokens/token-lock", package = "token-lock" }

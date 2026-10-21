@@ -219,6 +219,36 @@ Run compatibility tests:
 cargo test -p integration-tests --test compatibility_tests
 ```
 
+## Advanced Coverage Tests (`advanced_coverage_tests.rs`)
+
+Cross-example integration tests for the **advanced** examples (issue #904).
+Covers the circuit breaker, rate limiter, reentrancy guard, permit pattern,
+Merkle proofs / airdrop / whitelist, batch transfer, batch builder, multicall,
+hierarchical access control, data aggregation oracle, upgrade patterns and
+beacon management — including the edge cases listed in
+[`COVERAGE_REPORT.md`](./COVERAGE_REPORT.md).
+
+```bash
+cargo test -p integration-tests --test advanced_coverage_tests
+```
+
+## Use-Case Coverage Tests (`use_case_coverage_tests.rs`)
+
+Cross-example integration tests for the **use-case** examples (issue #901):
+DeFi (AMM, snapshot triggers, reward strategies), NFTs (metadata, metadata
+standards, snapshot triggers), governance (vote delegation, timelock, DAO
+treasury, snapshot triggers) and tokens (vesting, minting strategies,
+allowance, rewards, metadata, multi-token manager, custom token, lock).
+
+```bash
+cargo test -p integration-tests --test use_case_coverage_tests
+```
+
+## Coverage Report
+
+[`COVERAGE_REPORT.md`](./COVERAGE_REPORT.md) maps every example to the suite
+that covers it and documents how the 90% coverage gate is measured.
+
 ## Running the Tests
 
 Deploy a contract to the test environment:
