@@ -12,7 +12,7 @@ pub enum DataKey {
     TokenY,
     TotalSupply,
     LpBalance(Address),
-    SwapEntered,
+    Entered,
 }
 
 #[contracterror]
@@ -34,28 +34,32 @@ pub enum AmmError {
 const FEE_NUMERATOR: i128 = 997;
 const FEE_DENOMINATOR: i128 = 1000;
 
-// Keep the lock alive across authorization, reserve reads, and both transfers.
+// Keep the lock alive across authorization, reserve reads, and every transfer.
 // Drop releases it on normal returns (including Err); host rollback handles traps.
-struct SwapGuard(Env);
+//
+// One lock is shared by every reserve-changing entry point (`add_liquidity`,
+// `remove_liquidity`, and `swap`), so a hookable token cannot re-enter the AMM
+// while any of them is between its checks and its external calls.
+struct AmmGuard(Env);
 
-impl SwapGuard {
+impl AmmGuard {
     fn enter(env: &Env) -> Result<Self, AmmError> {
         if env
             .storage()
             .instance()
-            .get(&DataKey::SwapEntered)
+            .get(&DataKey::Entered)
             .unwrap_or(false)
         {
             return Err(AmmError::Reentrancy);
         }
-        env.storage().instance().set(&DataKey::SwapEntered, &true);
+        env.storage().instance().set(&DataKey::Entered, &true);
         Ok(Self(env.clone()))
     }
 }
 
-impl Drop for SwapGuard {
+impl Drop for AmmGuard {
     fn drop(&mut self) {
-        self.0.storage().instance().remove(&DataKey::SwapEntered);
+        self.0.storage().instance().remove(&DataKey::Entered);
     }
 }
 
@@ -87,6 +91,10 @@ impl ConstantProductAmm {
         amount_x: i128,
         amount_y: i128,
     ) -> Result<i128, AmmError> {
+        // Acquire the shared lock before authorization and before any token
+        // call, so a hookable token cannot re-enter the AMM while the deposit
+        // is being priced.
+        let _guard = AmmGuard::enter(&env)?;
         require_positive(amount_x)?;
         require_positive(amount_y)?;
         provider.require_auth();
@@ -98,9 +106,8 @@ impl ConstantProductAmm {
         let reserve_y = TokenClient::new(&env, &token_y).balance(&contract);
         let total_supply = read_total_supply(&env);
 
-        TokenClient::new(&env, &token_x).transfer(&provider, &contract, &amount_x);
-        TokenClient::new(&env, &token_y).transfer(&provider, &contract, &amount_y);
-
+        // Checks: the ratio, share, and overflow checks all run before any
+        // state changes, so a rejected deposit never mints LP shares.
         let minted = if total_supply == 0 {
             let liquidity = integer_sqrt(
                 amount_x
@@ -141,7 +148,15 @@ impl ConstantProductAmm {
             minted
         };
 
+        // Effects: the LP accounting is finalized before the external calls, so
+        // reserves and LP supply can never be observed half-updated.
         mint_lp(&env, &provider, minted)?;
+
+        // Interactions: the token transfers happen last. If either transfer
+        // fails, Soroban rolls the whole invocation back, including the mint.
+        TokenClient::new(&env, &token_x).transfer(&provider, &contract, &amount_x);
+        TokenClient::new(&env, &token_y).transfer(&provider, &contract, &amount_y);
+
         Ok(minted)
     }
 
@@ -150,6 +165,9 @@ impl ConstantProductAmm {
         provider: Address,
         lp_amount: i128,
     ) -> Result<(i128, i128), AmmError> {
+        // Same shared lock as `add_liquidity` and `swap`: the burn below is an
+        // effect that must not be interleaved with a re-entrant transfer.
+        let _guard = AmmGuard::enter(&env)?;
         require_positive(lp_amount)?;
         provider.require_auth();
 
@@ -179,7 +197,9 @@ impl ConstantProductAmm {
             return Err(AmmError::InsufficientLiquidity);
         }
 
+        // Effects: the burn happens before the external calls.
         burn_lp(&env, &provider, lp_amount)?;
+        // Interactions: the payout transfers happen last.
         TokenClient::new(&env, &token_x).transfer(&contract, &provider, &amount_x);
         TokenClient::new(&env, &token_y).transfer(&contract, &provider, &amount_y);
 
@@ -193,7 +213,7 @@ impl ConstantProductAmm {
         sell_amount: i128,
         min_buy_amount: i128,
     ) -> Result<i128, AmmError> {
-        let _guard = SwapGuard::enter(&env)?;
+        let _guard = AmmGuard::enter(&env)?;
         require_positive(sell_amount)?;
         if min_buy_amount < 0 {
             return Err(AmmError::InvalidAmount);
@@ -378,6 +398,8 @@ mod test {
         HookStage,
         RejectedCallbacks,
         FailTransfers,
+        ObserveAmm,
+        ObservedLpBalance,
     }
 
     #[contracterror]
@@ -414,6 +436,21 @@ mod test {
             env.storage()
                 .instance()
                 .set(&TokenDataKey::FailTransfers, &fail);
+        }
+
+        /// Record the AMM's LP balance from inside the next `transfer`, so a
+        /// test can observe the AMM state at the moment of the external call.
+        pub fn observe_amm(env: Env, amm: Address) {
+            env.storage()
+                .instance()
+                .set(&TokenDataKey::ObserveAmm, &amm);
+        }
+
+        pub fn observed_lp_balance(env: Env) -> i128 {
+            env.storage()
+                .instance()
+                .get(&TokenDataKey::ObservedLpBalance)
+                .unwrap_or(0)
         }
 
         pub fn initialize(env: Env, owner: Address, balance: i128) -> Result<(), TokenError> {
@@ -457,6 +494,7 @@ mod test {
             amount: i128,
         ) -> Result<(), TokenError> {
             attempt_callback(&env, 2);
+            observe_amm_state(&env, &from);
             if env
                 .storage()
                 .instance()
@@ -520,6 +558,10 @@ mod test {
             ConstantProductAmmClient::new(env, &amm).try_swap(&trader, &sell_token, &100, &0),
             Err(Err(soroban_sdk::InvokeError::Abort))
         );
+        assert_eq!(
+            ConstantProductAmmClient::new(env, &amm).try_add_liquidity(&trader, &100, &100),
+            Err(Err(soroban_sdk::InvokeError::Abort))
+        );
         let count: u32 = env
             .storage()
             .instance()
@@ -528,6 +570,26 @@ mod test {
         env.storage()
             .instance()
             .set(&TokenDataKey::RejectedCallbacks, &(count + 1));
+    }
+
+    /// Read the AMM's LP balance while the token transfer is still running, so
+    /// a test can tell whether the AMM finalized its LP accounting before the
+    /// external call. Persistent entries are read straight from the ledger map,
+    /// so this sees the value the AMM has written so far.
+    fn observe_amm_state(env: &Env, provider: &Address) {
+        let amm: Option<Address> = env.storage().instance().get(&TokenDataKey::ObserveAmm);
+        let Some(amm) = amm else {
+            return;
+        };
+        let lp_balance: i128 = env.as_contract(&amm, || {
+            env.storage()
+                .persistent()
+                .get(&DataKey::LpBalance(provider.clone()))
+                .unwrap_or(0)
+        });
+        env.storage()
+            .instance()
+            .set(&TokenDataKey::ObservedLpBalance, &lp_balance);
     }
 
     struct Fixture {
@@ -599,6 +661,154 @@ mod test {
     }
 
     #[test]
+    fn add_liquidity_rejects_an_active_lock_without_moving_tokens() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().set(&DataKey::Entered, &true);
+        });
+
+        assert_eq!(
+            f.amm.try_add_liquidity(&f.bob, &1_000, &1_000),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(f.amm.reserves(), (1_000, 1_000));
+        assert_eq!(f.amm.total_supply(), 1_000);
+        assert_eq!(f.amm.lp_balance(&f.bob), 0);
+        assert_eq!(f.token_x.balance(&f.bob), 5_000);
+        assert_eq!(f.token_y.balance(&f.bob), 5_000);
+
+        // A rejected call must not release a lock that it does not own.
+        f.env.as_contract(&f.amm.address, || {
+            assert_eq!(
+                f.env.storage().instance().get(&DataKey::Entered),
+                Some(true)
+            );
+            f.env.storage().instance().remove(&DataKey::Entered);
+        });
+        assert_eq!(f.amm.add_liquidity(&f.bob, &1_000, &1_000), 1_000);
+        assert_lock_released(&f);
+    }
+
+    #[test]
+    fn remove_liquidity_rejects_an_active_lock_without_moving_tokens() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &6_000, &6_000);
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().set(&DataKey::Entered, &true);
+        });
+
+        assert_eq!(
+            f.amm.try_remove_liquidity(&f.alice, &1_000),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(f.amm.lp_balance(&f.alice), 6_000);
+        assert_eq!(f.amm.total_supply(), 6_000);
+        assert_eq!(f.amm.reserves(), (6_000, 6_000));
+        assert_eq!(f.token_x.balance(&f.alice), 4_000);
+        assert_eq!(f.token_y.balance(&f.alice), 4_000);
+
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().remove(&DataKey::Entered);
+        });
+        assert_eq!(f.amm.remove_liquidity(&f.alice, &1_000), (1_000, 1_000));
+        assert_lock_released(&f);
+    }
+
+    #[test]
+    fn liquidity_entry_points_share_one_lock() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &6_000, &6_000);
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().set(&DataKey::Entered, &true);
+        });
+
+        // Every reserve-changing entry point refuses to run while the shared
+        // lock is held, so a nested call cannot price against half-updated
+        // reserves or mint LP shares twice.
+        assert_eq!(
+            f.amm.try_add_liquidity(&f.bob, &1_000, &1_000),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(
+            f.amm.try_remove_liquidity(&f.alice, &1_000),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(
+            f.amm.try_swap(&f.bob, &f.token_x.address, &1_000, &0),
+            Err(Ok(AmmError::Reentrancy))
+        );
+        assert_eq!(f.amm.reserves(), (6_000, 6_000));
+        assert_eq!(f.amm.total_supply(), 6_000);
+        assert_eq!(f.amm.lp_balance(&f.bob), 0);
+
+        f.env.as_contract(&f.amm.address, || {
+            f.env.storage().instance().remove(&DataKey::Entered);
+        });
+        assert_eq!(f.amm.add_liquidity(&f.bob, &1_000, &1_000), 1_000);
+        assert_lock_released(&f);
+    }
+
+    #[test]
+    fn add_liquidity_releases_the_lock_after_a_rejected_deposit() {
+        let f = setup();
+        f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+
+        assert_eq!(
+            f.amm.try_add_liquidity(&f.bob, &1_000, &2_000),
+            Err(Ok(AmmError::RatioMismatch))
+        );
+        assert_lock_released(&f);
+        assert_eq!(f.amm.reserves(), (1_000, 1_000));
+        assert_eq!(f.amm.total_supply(), 1_000);
+        assert_eq!(f.amm.lp_balance(&f.bob), 0);
+        assert_eq!(f.token_x.balance(&f.bob), 5_000);
+        assert_eq!(f.token_y.balance(&f.bob), 5_000);
+
+        // The pool is still usable after the rejected deposit.
+        assert_eq!(f.amm.add_liquidity(&f.bob, &1_000, &1_000), 1_000);
+        assert_lock_released(&f);
+    }
+
+    #[test]
+    fn add_liquidity_finalizes_lp_state_before_the_token_transfers() {
+        let f = setup();
+        // The token records the AMM's LP balance from inside the transfer.
+        f.token_x.observe_amm(&f.amm.address);
+
+        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+
+        assert_eq!(minted, 1_000);
+        // The LP accounting was already finalized when the external call ran.
+        // Transferring before the mint would still read 0 here.
+        assert_eq!(f.token_x.observed_lp_balance(), 1_000);
+        assert_eq!(f.amm.total_supply(), 1_000);
+        assert_eq!(f.amm.lp_balance(&f.alice), 1_000);
+        assert_eq!(f.amm.reserves(), (1_000, 1_000));
+        assert_lock_released(&f);
+    }
+
+    #[test]
+    fn token_callbacks_are_rejected_during_add_liquidity() {
+        // A hookable token must not be able to re-enter the AMM from the
+        // reserve read or from either transfer of a deposit.
+        for stage in [1, 2] {
+            let f = setup();
+            f.token_x
+                .set_hook(&f.amm.address, &f.bob, &f.token_x.address, &stage);
+
+            let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+
+            assert_eq!(minted, 1_000);
+            assert_eq!(f.token_x.rejected_callbacks(), 1);
+            assert_eq!(f.amm.total_supply(), 1_000);
+            assert_eq!(f.amm.lp_balance(&f.alice), 1_000);
+            assert_eq!(f.amm.reserves(), (1_000, 1_000));
+            assert_lock_released(&f);
+        }
+    }
+
+    #[test]
     fn swap_applies_fee_and_price_impact() {
         let f = setup();
 
@@ -615,9 +825,9 @@ mod test {
         assert_eq!(reserve_y, 9_094);
     }
 
-    fn assert_swap_unlocked(f: &Fixture) {
+    fn assert_lock_released(f: &Fixture) {
         f.env.as_contract(&f.amm.address, || {
-            assert!(!f.env.storage().instance().has(&DataKey::SwapEntered));
+            assert!(!f.env.storage().instance().has(&DataKey::Entered));
         });
     }
 
@@ -626,7 +836,7 @@ mod test {
         let f = setup();
         f.amm.add_liquidity(&f.alice, &10_000, &10_000);
         f.env.as_contract(&f.amm.address, || {
-            f.env.storage().instance().set(&DataKey::SwapEntered, &true);
+            f.env.storage().instance().set(&DataKey::Entered, &true);
         });
 
         assert_eq!(
@@ -638,13 +848,13 @@ mod test {
         assert_eq!(f.token_y.balance(&f.bob), 5_000);
         f.env.as_contract(&f.amm.address, || {
             assert_eq!(
-                f.env.storage().instance().get(&DataKey::SwapEntered),
+                f.env.storage().instance().get(&DataKey::Entered),
                 Some(true)
             );
-            f.env.storage().instance().remove(&DataKey::SwapEntered);
+            f.env.storage().instance().remove(&DataKey::Entered);
         });
         assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
     }
 
     #[test]
@@ -652,19 +862,16 @@ mod test {
         let f = setup();
         f.env.as_contract(&f.amm.address, || {
             let result: Result<(), AmmError> = (|| {
-                let _guard = SwapGuard::enter(&f.env)?;
+                let _guard = AmmGuard::enter(&f.env)?;
                 assert_eq!(
-                    f.env.storage().instance().get(&DataKey::SwapEntered),
+                    f.env.storage().instance().get(&DataKey::Entered),
                     Some(true)
                 );
-                assert!(matches!(
-                    SwapGuard::enter(&f.env),
-                    Err(AmmError::Reentrancy)
-                ));
+                assert!(matches!(AmmGuard::enter(&f.env), Err(AmmError::Reentrancy)));
                 Err(AmmError::InvalidAmount)
             })();
             assert_eq!(result, Err(AmmError::InvalidAmount));
-            assert!(!f.env.storage().instance().has(&DataKey::SwapEntered));
+            assert!(!f.env.storage().instance().has(&DataKey::Entered));
         });
     }
 
@@ -676,25 +883,25 @@ mod test {
             f.amm.try_swap(&f.bob, &f.token_x.address, &0, &0),
             Err(Ok(AmmError::InvalidAmount))
         );
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
         assert_eq!(
             f.amm.try_swap(&f.bob, &f.token_x.address, &1_000, &1_000),
             Err(Ok(AmmError::InsufficientOutputAmount))
         );
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
         // Input transfer fails after the lock has been acquired.
         assert!(f
             .amm
             .try_swap(&f.bob, &f.token_x.address, &6_000, &0)
             .is_err());
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
         assert_eq!(f.amm.reserves(), (10_000, 10_000));
         assert_eq!(f.token_x.balance(&f.bob), 5_000);
         assert_eq!(f.token_y.balance(&f.bob), 5_000);
         assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
         assert!(f.amm.swap(&f.bob, &f.token_y.address, &1_000, &0) > 0);
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
     }
 
     #[test]
@@ -708,7 +915,7 @@ mod test {
                 hook_token.set_hook(&f.amm.address, &f.bob, &f.token_x.address, &stage);
                 assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
                 assert_eq!(hook_token.rejected_callbacks(), 1);
-                assert_swap_unlocked(&f);
+                assert_lock_released(&f);
                 hook_token.set_hook(&f.amm.address, &f.bob, &f.token_x.address, &0);
                 assert_eq!(f.amm.reserves(), (11_000, 9_094));
                 assert_eq!(f.token_x.balance(&f.bob), 4_000);
@@ -726,13 +933,13 @@ mod test {
             .amm
             .try_swap(&f.bob, &f.token_x.address, &1_000, &900)
             .is_err());
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
         assert_eq!(f.amm.reserves(), (10_000, 10_000));
         assert_eq!(f.token_x.balance(&f.bob), 5_000);
         assert_eq!(f.token_y.balance(&f.bob), 5_000);
         f.token_y.fail_transfers(&false);
         assert_eq!(f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900), 906);
-        assert_swap_unlocked(&f);
+        assert_lock_released(&f);
     }
 
     #[test]
