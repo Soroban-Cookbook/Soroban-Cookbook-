@@ -79,6 +79,7 @@
 - [03 Â· NFT Metadata Standards](./examples/nfts/03-nft-metadata-standards.md)
 - [04 Â· NFT Marketplace](./examples/nfts/04-nft-marketplace.md)
 - [NFT Patterns Reference](./docs/nft-patterns.md)
+- [NFT Best Practices](./docs/nft-best-practices.md)
 - [NFT Development Video Walkthrough](./docs/nft-development-video.md)
 
 ## Governance (11 examples)

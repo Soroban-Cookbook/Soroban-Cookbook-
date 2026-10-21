@@ -29,7 +29,7 @@ For information about our outreach to the Stellar Development Foundation, see [d
 | Collaboration | What it produces |
 |---|---|
 | Streaming payments (SoroStream, StellarStream) | Shared storage trade-off case study for stream state |
-| NFT marketplace (soroban-nft-marketplace) | Reviewed [NFT patterns](./docs/nft-patterns.md) and escrow guidance |
+| NFT marketplace (soroban-nft-marketplace) | Reviewed [NFT patterns](./docs/nft-patterns.md), [NFT best practices](./docs/nft-best-practices.md), and escrow guidance |
 | Explorer and verification (soroban-verify, Soroban Smart Block Explorer) | Corrected [deployment](./book/src/guides/deployment.md) and upgrade guidance |
 | Oracle safety (soroban-oracle-safety) | Staleness and sanity-bound guidance in the oracle examples |
 | Wallet stack (astroid) | Integration notes in the [wallet integration guide](./docs/wallet-integration.md) |
@@ -317,6 +317,10 @@ cargo test -p docs-audit-tests
 ```
 
 CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
+
+The repository's [pre-commit hooks](./doc/pre-commit.md) run formatting and typo
+checks before commits, then Clippy and integration tests before pushes. Install
+both hooks during setup so these checks run automatically.
 
 ### Where to Add a Test
 

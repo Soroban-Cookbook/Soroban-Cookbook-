@@ -1,0 +1,25 @@
+repos:
+  - repo: local
+    hooks:
+      - id: rustfmt
+        name: Check Rust formatting
+        entry: cargo fmt --all -- --check
+        language: system
+        pass_filenames: false
+      - id: clippy
+        name: Run Clippy
+        entry: cargo clippy --tests --lib -- -D warnings
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+      - id: integration-tests
+        name: Run integration tests
+        entry: cargo test -p integration-tests
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.28.0
+    hooks:
+      - id: typos
+        args: []
