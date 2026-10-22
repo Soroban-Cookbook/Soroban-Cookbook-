@@ -61,7 +61,39 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - Cross-linking
   - Regular sync meetings
 
+## Security & Safety
+
+### Issue #928: Launch Bug Bounty Program
+
+- **Priority:** High
+- **Status:** In Progress
+- **Current state:** The published [bug bounty policy](./docs/security-audit/bug-bounty.md) states that reports are accepted on a rolling basis. A [launch kit](./docs/security-audit/bug-bounty-launch.md) now contains announcement copy, an outreach plan, and a launch record. No external announcement, campaign activity, community notification, or initial participant is verified in-repo.
+- **Implementation hints:** Publish the announcement in GitHub Discussions, notify the Stellar Developer Discord, and record public links and participant confirmation in the launch kit. A participant must opt in before being publicly acknowledged.
+- **Verification:** Manually checked the existing program policy, reporting channel, rewards, README and `CONTRIBUTING.md` links. External publication and participant activity remain unverified; no project build or tests were run.
+- **Scope:** M
+- **Description:** Public launch of bug bounty
+- **Acceptance Criteria:**
+  - ✅ Program live — the program policy says reports are accepted on a rolling basis.
+  - ⬜ Announcement published — prepared in the launch kit; public post URL still pending.
+  - ⬜ Marketing campaign — outreach plan prepared; campaign posts still pending.
+  - ⬜ Community notified — GitHub Discussions and Discord posts still pending.
+  - ⬜ Initial participants — no eligible participant has been confirmed in-repo.
+
 ## Metrics & Analytics
+
+### Issue #923: Track GitHub Metrics
+
+- **Priority:** High
+- **Status:** ✅ Complete
+- **Current state:** Existing weekly GitHub Actions collection records repository stars and forks, contributors with merged PRs in the last 30 days, issue activity, and pull request activity in the [Community Dashboard](./docs/community-dashboard.md).
+- **Implementation hints:** Outcomes documented in the [README Community Health & Metrics section](./README.md#-community-health--metrics); metric definitions and collection details are linked there.
+- **Verification:** Manually checked the collection workflow, metric definitions, dashboard columns, and README links against all five acceptance criteria. No project build or tests were run.
+- **Acceptance Criteria:**
+  - ✅ Stars tracked
+  - ✅ Forks tracked
+  - ✅ Contributors counted
+  - ✅ Issue metrics
+  - ✅ PR metrics
 
 ### Issue #426: Track Community Metrics
 

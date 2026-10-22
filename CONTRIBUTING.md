@@ -203,6 +203,20 @@ Once you have worked through the onboarding guide and run `cargo test --workspac
 
 ---
 
+## 🛡️ Bug Bounty Program
+
+The Soroban Cookbook bug bounty is open for eligible security findings in
+contract examples, shared utilities, tests, and security documentation. Review
+the [program scope and rewards](./docs/security-audit/bug-bounty.md) and submit
+reports privately through the linked GitHub Security Advisory channel. Never
+post vulnerability details in a public issue.
+
+The [launch kit](./docs/security-audit/bug-bounty-launch.md) contains the
+announcement draft and outreach checklist; external publication and participant
+milestones are recorded there only after verification.
+
+---
+
 ## 📊 Community Metrics
 
 The Soroban Cookbook tracks community health transparently so contributors can see

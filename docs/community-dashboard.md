@@ -20,7 +20,7 @@ For full metric definitions, targets, and alert thresholds see
 | Growth | Stars | — | Upward trend | — |
 | Growth | Forks | — | Upward trend | — |
 | Growth | Unique Cloners (14 d) | — | ≥ 100 | — |
-| Growth | New Contributors (month) | — | ≥ 2 | — |
+| Growth | Contributors (30 d) | — | ≥ 2 | — |
 | Engagement | Open Issues | — | — | — |
 | Engagement | Issue Response Time (median) | — | < 48 h | — |
 | Engagement | PR Review Time (median) | — | < 72 h | — |
@@ -48,7 +48,7 @@ For full metric definitions, targets, and alert thresholds see
 <!-- AUTO-GENERATED: the community-metrics workflow appends rows here -->
 <!-- Do not edit the table below manually -->
 
-| Week Ending | Stars | Forks | Unique Cloners | Issues Opened | Issues Closed | PRs Opened | PRs Merged | New Contributors | Median Response Time |
+| Week Ending | Stars | Forks | Unique Cloners | Issues Opened | Issues Closed | PRs Opened | PRs Merged | Contributors (30 d) | Median Response Time |
 |---|---|---|---|---|---|---|---|---|---|
 | _Pending first run_ | — | — | — | — | — | — | — | — | — |
 
@@ -100,7 +100,7 @@ For full metric definitions, targets, and alert thresholds see
 
 | Metric | Jul 2026 | Jun 2026 | Δ |
 |---|---|---|---|
-| New Contributors | — | — | — |
+| Contributors | — | — | — |
 | Stars | — | — | — |
 | Unique Cloners | — | — | — |
 

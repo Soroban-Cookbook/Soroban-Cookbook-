@@ -168,7 +168,7 @@ detecting non-words (like hashes) or
 unambiguous words (like words after a `\` escape).
 
 ### 📊 Community Health & Metrics
-We track community health transparently so everyone can see how the project is growing:
+The weekly GitHub metrics track repository stars and forks, contributor activity, and issue and pull request activity. Definitions, snapshots, and collection details are linked below:
 
 | Resource | Description |
 |---|---|
@@ -182,7 +182,9 @@ We track community health transparently so everyone can see how the project is g
 | [Deployment Best Practices](./docs/deployment-best-practices.md) | Pre-deployment checklist, network selection, monitoring setup, and upgrade strategies |
 | [Featured Projects](./docs/featured-projects.md) | First 5 projects featured, each with a case study, runnable demo, developer interview, and promotion plan |
 | [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
-| [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
+| [Bug Bounty Program](./docs/security-audit/bug-bounty.md) | Active responsible-disclosure program, scope, rewards, and private reporting channel |
+| [Bug Bounty Launch Kit](./docs/security-audit/bug-bounty-launch.md) | Announcement draft, outreach plan, and launch record |
+| [Community Dashboard](./docs/community-dashboard.md) | Weekly snapshots of stars, forks, contributors, issues, PRs, and response times |
 | [Documentation Metrics](./docs/documentation-metrics.md) | Page views, search queries, popular content, and user path analysis |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
