@@ -18,6 +18,27 @@ fn setup() -> (Env, BeaconManagementContractClient<'static>, Address) {
 }
 
 #[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn initialize_requires_auth() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let contract_id = env.register(BeaconManagementContract, ());
+    let client = BeaconManagementContractClient::new(&env, &contract_id);
+
+    // Strip all authorizations so `admin.require_auth()` in `initialize` fails.
+    env.set_auths(&[]);
+    client.initialize(&admin);
+}
+
+#[test]
+fn prevents_double_initialization() {
+    let (_env, client, admin) = setup();
+
+    let result = client.try_initialize(&admin);
+    assert!(result.is_err());
+}
+
+#[test]
 fn registers_and_tracks_versions_for_a_beacon() {
     let (env, client, admin) = setup();
     let beacon_name: Symbol = symbol_short!("alpha");

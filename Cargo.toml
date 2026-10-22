@@ -27,6 +27,7 @@ members = [
     "examples/advanced/05-diamond-security",
     "examples/advanced/05-diamond-security/facet-adder",
     "examples/advanced/05-diamond-security/facet-multiplier",
+    "examples/advanced/06-beacon-management",
     "examples/advanced/07-state-channels",
     "examples/advanced/07-trusted-forwarder",
     "examples/advanced/09-storage-layout-validator",
