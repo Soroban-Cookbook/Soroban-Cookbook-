@@ -340,3 +340,7 @@ fn read_allowance(env: &Env, owner: &Address, spender: &Address) -> i128 {
         .get(&DataKey::Allowance(owner.clone(), spender.clone()))
         .unwrap_or(0)
 }
+
+// Include the tests module only when running tests.
+#[cfg(test)]
+mod test;
