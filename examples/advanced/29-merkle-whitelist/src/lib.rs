@@ -3,8 +3,7 @@
 
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, token, Address, Bytes, BytesN, Env,
-    Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype, token, Address, Bytes, BytesN, Env, Vec,
 };
 
 // ---------------------------------------------------------------------------

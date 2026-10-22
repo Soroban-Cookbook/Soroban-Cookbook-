@@ -46,5 +46,6 @@ copy-js = true
 # or PII.  Set window.SOROBAN_ANALYTICS_ENDPOINT in a theme override to enable
 # beacon collection; without an endpoint the script silently no-ops.
 # See: docs/documentation-metrics.md for dashboard and metric definitions.
-[output.html.additional-js]
-js = ["analytics.js"]
+# NOTE: the analytics script is loaded through the `additional-js` array above
+# (`theme/analytics.js`).  Do not add a second `[output.html.additional-js]`
+# table here - mdBook rejects the duplicate key and the build fails.

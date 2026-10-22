@@ -26,6 +26,7 @@
 # Playground
 
 - [Playground Infrastructure](./playground.md)
+- [Interactive Playground — Intermediate Examples](./examples/playground-intermediate.md)
 
 ## Interactive Tutorials
 
@@ -129,6 +130,7 @@
 
 # API Reference
 
+- [Code Examples](./docs/code-examples.md)
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
 - [Code Review Checklist](./docs/review-checklist.md)
@@ -143,7 +145,6 @@
 - [Featured Projects](./../docs/featured-projects.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
-- [Documentation Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
 - [Glossary](./docs/glossary.md)
 - [Translation Infrastructure](./docs/translation-infrastructure.md)
@@ -168,7 +169,6 @@
 
 - [Community Guidelines](./community-guidelines.md)
 - [Quality Dashboard](./docs/quality-dashboard.md)
-- [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Grants Application Process](./docs/grants-process.md)
