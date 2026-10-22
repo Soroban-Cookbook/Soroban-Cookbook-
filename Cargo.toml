@@ -112,6 +112,7 @@ members = [
     "examples/intermediate/event-history",
     "examples/intermediate/ajo-factory",
     "examples/intermediate/ajo",
+    "examples/nfts/04-nft-marketplace",
     "examples/tokens/01-sep41-token",
     "examples/tokens/01-vesting-management",
     "examples/tokens/02-minting-strategies",
