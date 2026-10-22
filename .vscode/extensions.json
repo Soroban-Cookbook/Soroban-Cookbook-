@@ -1,0 +1,14 @@
+{
+  // Recommended extensions for the Soroban Cookbook. VS Code prompts to
+  // install these when the folder is opened. See docs/ide-integration.md.
+  "recommendations": [
+    "rust-lang.rust-analyzer",
+    "tamasfe.even-better-toml",
+    "fill-labs.dependi",
+    "vadimcn.vscode-lldb",
+    "tekumara.typos-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "davidanson.vscode-markdownlint",
+    "ryanluker.vscode-coverage-gutters"
+  ]
+}

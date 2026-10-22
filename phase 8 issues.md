@@ -1,7 +1,7 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 14% (7/50)
+**Completion:** 18% (9/50)
 **Last Audit Date:** October 19, 2026
 
 Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
@@ -157,14 +157,52 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - ✅ Dashboard — [`docs/documentation-metrics.md`](./docs/documentation-metrics.md) provides page view tables, search query analysis, popular content rankings, user path analysis, rolling weekly data, monthly trends, zero-result search terms, and mdBook vs webapp comparison.
   - ✅ Verification — Metric definitions added to [`docs/community-metrics.md`](./docs/community-metrics.md) § 3.6 (14 documentation usage metrics). Links added to [`README.md`](./README.md) and [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
+## Developer Tooling
+
+### Issue: Integrate with IDEs and Tools
+
+- **Priority:** Medium
+- **Status:** ✅ Complete
+
+- **Current state:** Deliverables created in-repo. A shared VS Code configuration lives in [`.vscode/`](./.vscode/) (extensions, settings, tasks, launch, and Soroban snippets), and [`docs/ide-integration.md`](./docs/ide-integration.md) documents it alongside IntelliJ/RustRover setup and the linting and testing tools. Summarized in [`CONTRIBUTING.md`](./CONTRIBUTING.md#ide--tooling-integration) and linked from the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria. All five are met (see below), and this phase file has been updated.
+- **Scope:** M
+- **Description:** Integrate with IDEs and tools
+- **Acceptance Criteria:**
+  - ✅ VS Code extension: [`.vscode/extensions.json`](./.vscode/extensions.json) lists the recommended extensions. [`.vscode/soroban.code-snippets`](./.vscode/soroban.code-snippets) adds 8 Soroban snippets, and [`tasks.json`](./.vscode/tasks.json) and [`launch.json`](./.vscode/launch.json) add one-click tests, lint, coverage, and debugging. See [`docs/ide-integration.md` § 1](./docs/ide-integration.md#1-vs-code).
+  - ✅ IntelliJ plugin (optional): [`docs/ide-integration.md` § 2](./docs/ide-integration.md#2-intellij-idea--rustrover-optional) gives RustRover / Rust plugin setup with clippy, rustfmt, macro expansion, run configurations, and live templates.
+  - ✅ Linting tools: [`docs/ide-integration.md` § 3](./docs/ide-integration.md#3-linting-tools) covers rustfmt, clippy (`.clippy.toml`), typos, cspell, cargo-audit, and `scripts/lint.sh`, all matching CI flags.
+  - ✅ Testing tools: [`docs/ide-integration.md` § 4](./docs/ide-integration.md#4-testing-tools) covers cargo test, smoke tests, nextest, proptest, cargo-fuzz, tarpaulin with Coverage Gutters, and the Stellar CLI.
+  - ✅ Documentation: [`docs/ide-integration.md`](./docs/ide-integration.md), including troubleshooting and external resources.
+
+## Wallet Integration
+
+### Issue: Support for Additional Wallets
+
+- **Priority:** Medium
+- **Status:** ✅ Complete
+
+- **Current state:** Deliverables created in-repo. [`docs/additional-wallets.md`](./docs/additional-wallets.md) adds Hana, LOBSTR, and Ledger to the wallets already covered in [`docs/wallet-integration.md`](./docs/wallet-integration.md), with TypeScript adapters and vitest tests in [`docs/wallet-examples/`](./docs/wallet-examples/). Summarized in [`CONTRIBUTING.md`](./CONTRIBUTING.md#wallet-support) and linked from the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria. All five are met (see below), and this phase file has been updated.
+- **Scope:** M
+- **Description:** Support for additional wallets
+- **Acceptance Criteria:**
+  - ✅ 2-3 more wallets supported: Hana, LOBSTR, and Ledger, plus Stellar Wallets Kit for multi-wallet coverage.
+  - ✅ Examples for each: [`hana.ts`](./docs/wallet-examples/src/hana.ts), [`lobstr.ts`](./docs/wallet-examples/src/lobstr.ts), [`ledger.ts`](./docs/wallet-examples/src/ledger.ts), and [`wallets-kit.ts`](./docs/wallet-examples/src/wallets-kit.ts), all behind one `WalletAdapter` interface, with a wallet-agnostic [`invoke.ts`](./docs/wallet-examples/src/invoke.ts).
+  - ✅ Comparison guide: [`docs/additional-wallets.md` § 6](./docs/additional-wallets.md#6-comparison-guide) has a feature matrix across 6 wallets, a guide to which wallets to support for each app type, and UX differences.
+  - ✅ Testing: [`docs/wallet-examples/test/adapters.test.ts`](./docs/wallet-examples/test/adapters.test.ts) covers each adapter against mocks, including real signature verification for Ledger. [§ 7](./docs/additional-wallets.md#7-testing) adds a manual testnet checklist for each wallet.
+  - ✅ Documentation: [`docs/additional-wallets.md`](./docs/additional-wallets.md) and [`docs/wallet-examples/README.md`](./docs/wallet-examples/README.md), with a cross-link from the Wallet Integration Guide.
+
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629, #927)
-**Completed:** 7
+**Completed:** 9
 **In Progress:** 0  
-**Planned:** 59
+**Planned:** 57
 
-**Phase 8 Status:** 📋 **14% COMPLETE (Ongoing)**
+**Phase 8 Status:** 📋 **18% COMPLETE (Ongoing)**
 
 Community categories:
 

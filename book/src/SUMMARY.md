@@ -13,6 +13,7 @@
 - [Mobile Testing Guide](./guides/mobile-testing.md)
 - [Local Simulation](./guides/local-simulation.md)
 - [Deployment Guide](./guides/deployment.md)
+- [Deployment Best Practices](./docs/deployment-best-practices.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
 - [Project Templates](./docs/project-templates.md)
 - [Video Creation Tools](./guides/video-creation.md)

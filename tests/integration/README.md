@@ -13,6 +13,8 @@ This directory contains comprehensive integration tests for Soroban smart contra
 - [Best Practices](#best-practices)
 - [Migration Guide](#migration-guide)
 
+> **Smoke tests:** for a quick check of the critical paths before running everything, run `cargo test -p integration-tests --test smoke_tests`. See [SMOKE_TESTS.md](./SMOKE_TESTS.md).
+
 ## Overview
 
 The test utilities library (`src/lib.rs`) provides reusable components to simplify Soroban integration testing:

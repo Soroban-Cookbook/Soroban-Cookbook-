@@ -1,0 +1,74 @@
+{
+  // Run with: Terminal → Run Task… (or Ctrl/Cmd+Shift+P → "Tasks: Run Task").
+  // These mirror the commands CI runs; see docs/ide-integration.md.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "cookbook: test current example",
+      "type": "shell",
+      "command": "cargo test",
+      "options": { "cwd": "${fileDirname}/.." },
+      "problemMatcher": ["$rustc"],
+      "group": { "kind": "test", "isDefault": true }
+    },
+    {
+      "label": "cookbook: smoke tests",
+      "type": "shell",
+      "command": "cargo test -p integration-tests --test smoke_tests",
+      "problemMatcher": ["$rustc"],
+      "group": "test"
+    },
+    {
+      "label": "cookbook: integration tests",
+      "type": "shell",
+      "command": "cargo test -p integration-tests",
+      "problemMatcher": ["$rustc"],
+      "group": "test"
+    },
+    {
+      "label": "cookbook: workspace tests",
+      "type": "shell",
+      "command": "cargo test --workspace",
+      "problemMatcher": ["$rustc"],
+      "group": "test"
+    },
+    {
+      "label": "cookbook: coverage (tarpaulin)",
+      "type": "shell",
+      "command": "cargo tarpaulin",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "cookbook: lint (fmt + clippy)",
+      "type": "shell",
+      "command": "./scripts/lint.sh",
+      "windows": { "command": "cargo fmt --all -- --check; cargo clippy --tests --lib -- -D warnings -A deprecated" },
+      "problemMatcher": ["$rustc"],
+      "group": "build"
+    },
+    {
+      "label": "cookbook: spelling (typos)",
+      "type": "shell",
+      "command": "typos",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "cookbook: build contract (wasm)",
+      "type": "shell",
+      "command": "stellar contract build",
+      "options": { "cwd": "${fileDirname}/.." },
+      "problemMatcher": ["$rustc"],
+      "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "cookbook: serve book",
+      "type": "shell",
+      "command": "mdbook serve --open",
+      "options": { "cwd": "${workspaceFolder}/book" },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

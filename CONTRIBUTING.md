@@ -137,6 +137,22 @@ To contribute a new template or improve an existing one, check out the [Project 
 
 ---
 
+## IDE & Tooling Integration
+
+The repo ships a shared VS Code setup in [`.vscode/`](./.vscode/): recommended extensions, rust-analyzer running clippy with CI flags, tasks for tests, smoke tests, coverage, lint, and the book, CodeLLDB debug configs, and Soroban snippets. Setup steps for IntelliJ IDEA and RustRover, the linting tools, and the testing tools are covered in [docs/ide-integration.md](./docs/ide-integration.md).
+
+If you change a CI lint or test command, update the matching task in `.vscode/tasks.json` and the tables in `docs/ide-integration.md` too.
+
+---
+
+## Wallet Support
+
+Besides Freighter, xBull, and Albedo ([Wallet Integration Guide](./docs/wallet-integration.md)), the cookbook has tested adapter examples for **Hana**, **LOBSTR**, and **Ledger**, and shows how to use Stellar Wallets Kit for multi-wallet support. See [docs/additional-wallets.md](./docs/additional-wallets.md) for the examples, comparison guide, and testing checklist. The code is in [`docs/wallet-examples/`](./docs/wallet-examples/), and `npm test` there runs the unit tests.
+
+To add a wallet, implement the `WalletAdapter` interface in `docs/wallet-examples/src/`, add tests to `test/adapters.test.ts`, and add a column to the comparison matrix.
+
+---
+
 ## Roadmap Input Process
 
 The Soroban Cookbook has a structured process for community members to propose additions to the project roadmap. See [docs/roadmap-input-process.md](./docs/roadmap-input-process.md) for:
@@ -305,6 +321,9 @@ cargo test --workspace
 # Run tests for a single example you're working on
 cd examples/<category>/<example-name>
 cargo test
+
+# Run the fast smoke tests (critical paths, < 2 min; runs first in CI)
+cargo test -p integration-tests --test smoke_tests
 
 # Run the shared integration test suite
 cargo test -p integration-tests

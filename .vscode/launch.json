@@ -1,0 +1,37 @@
+{
+  // Debug Soroban tests natively with CodeLLDB (vadimcn.vscode-lldb).
+  // Contracts registered with `env.register_contract(None, Contract)` run as
+  // ordinary Rust, so breakpoints inside contract code are hit.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug smoke tests",
+      "cargo": {
+        "args": ["test", "--no-run", "-p", "integration-tests", "--test", "smoke_tests"],
+        "filter": { "kind": "test" }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug integration test by name",
+      "cargo": {
+        "args": ["test", "--no-run", "-p", "integration-tests"],
+        "filter": { "kind": "test" }
+      },
+      "args": ["${input:testName}", "--nocapture"],
+      "cwd": "${workspaceFolder}"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "testName",
+      "type": "promptString",
+      "description": "Test name (or substring) to run"
+    }
+  ]
+}
