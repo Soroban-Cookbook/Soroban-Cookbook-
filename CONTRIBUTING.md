@@ -138,6 +138,20 @@ We provide three complete full-stack starter templates in the [`templates/`](./t
 
 To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
 
+## Workshop Materials
+
+We provide a complete, reusable workshop curriculum for teaching Soroban development in [`docs/workshop/`](./docs/workshop/). The materials cover five modules spanning environment setup through advanced patterns and testnet deployment:
+
+| Material | Description |
+|---|---|
+| [Workshop README](./docs/workshop/README.md) | Overview, agenda, prerequisites, and setup instructions |
+| [Slide Decks](./docs/workshop/slides/) | Marp-compatible Markdown slides for all 5 modules |
+| [Hands-on Exercises](./docs/workshop/exercises/) | Lab exercises with starter code and solutions, referencing cookbook examples |
+| [Facilitator Guide](./docs/workshop/facilitator-guide.md) | Timing, talking points, common pitfalls, and Q&A prep per module |
+| [Participant Guide](./docs/workshop/participant-guide.md) | Setup instructions, step-by-step workbook, and reference links |
+
+The workshop is designed for instructor-led delivery (2 days or 4 half-day sessions) but also works for self-paced study. To adapt or contribute improvements, open a pull request modifying files under `docs/workshop/`.
+
 ---
 
 ## IDE & Tooling Integration
@@ -175,6 +189,7 @@ The Soroban Cookbook has a structured process for community members to propose a
 - [Ecosystem Partnerships](#ecosystem-partnerships)
 - [Grants Application Process](#grants-application-process)
 - [Project Templates](#project-templates)
+- [Workshop Materials](#workshop-materials)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
