@@ -165,6 +165,14 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - [x] Links and documentation updated in `CONTRIBUTING.md`
   - [x] Phase issue status updated for manual verification
 
+### Issue #939: Implement Feature Voting
+
+- **Priority:** Medium
+- **Status:** ✅ Process documented
+- **Current state:** [`docs/roadmap-input-process.md`](./docs/roadmap-input-process.md) defines GitHub Discussions as the proposal and voting platform, provides a feature proposal template, and documents polling, advisory decisions, implementation tracking, and community updates.
+- **Verification:** The guide requires published vote totals and reasoning, an implementation issue and roadmap link for accepted proposals, and progress updates through completion. No live vote or outcome is claimed by this documentation change.
+- **Source:** Phase issue #433
+
 ## Project Showcase
 
 ### Issue #441: 10+ Projects Built
