@@ -12,13 +12,21 @@ build-dir = "book-output"
 edition = "2021"
 
 [output.html]
+
+<<<<<<< HEAD
+edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/{path}"
+=======
+
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
+
 default-theme = "rust"
 preferred-dark-theme = "navy"
 site-url = "/Soroban-Cookbook/"
 git-repository-url = "https://github.com/Soroban-Cookbook/Soroban-Cookbook"
-edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/{path}"
 additional-js = ["theme/analytics.js"]
-
+edit-url-template = "https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/{path}"
+additional-css = ["theme/language-selector.css"]
+additional-js = ["theme/language-selector.js"]
 [output.html.code]
 
 [output.html.search]

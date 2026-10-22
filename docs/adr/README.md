@@ -19,6 +19,12 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | ADR | Title | Status |
 | --- | ----- | ------ |
 | [ADR-001](./001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted |
+| [ADR-002](./002-select-storage-tier.md) | Select Storage Tier by Lifetime | Proposed |
+| [ADR-003](./003-stable-storage-keys-and-ttl.md) | Keep Storage Keys Stable and Manage TTL Explicitly | Proposed |
+| [ADR-004](./004-authenticate-before-state-changes.md) | Authenticate Before Protected State Changes | Proposed |
+| [ADR-005](./005-use-least-privilege-access-control.md) | Use Least-Privilege Access Control | Proposed |
+| [ADR-006](./006-guard-contract-upgrades.md) | Guard Contract Code Upgrades | Proposed |
+| [ADR-007](./007-version-state-migrations.md) | Version and Migrate Persistent State Explicitly | Proposed |
 
 ## Creating a New ADR
 

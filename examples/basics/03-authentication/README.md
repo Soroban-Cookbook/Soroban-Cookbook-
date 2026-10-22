@@ -1,7 +1,11 @@
 # Authentication Patterns in Soroban
 
+<<<<<<< HEAD
 > **🎬 Video Walkthrough** (14:45)
 > Learn how to secure your Soroban contracts with require_auth in our [Soroban Basics #3 Video Walkthrough](https://www.youtube.com/watch?v=authentication-walkthrough).
+=======
+Related decisions: [ADR-004: Authenticate Before State Changes](../../../docs/adr/004-authenticate-before-state-changes.md) and [ADR-005: Least-Privilege Access Control](../../../docs/adr/005-use-least-privilege-access-control.md).
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
 
 This example demonstrates how to authenticate callers and build layered
 authorization logic in Soroban smart contracts. It covers the core

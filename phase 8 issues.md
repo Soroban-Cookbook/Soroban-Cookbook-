@@ -55,11 +55,76 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
 - **Scope:** M
 - **Description:** Define, track, and report community health metrics for the Soroban Cookbook.
 - **Acceptance Criteria:**
+<<<<<<< HEAD
   - ✅ Metrics defined — [`docs/community-metrics.md`](./docs/community-metrics.md) defines 20+ metrics across 5 categories (Growth, Engagement, Content Quality, Community Health, Documentation).
   - ✅ Tracking tools setup — GitHub native Insights + automated GitHub Actions workflow (`.github/workflows/community-metrics.yml`) runs every Monday at 09:00 UTC via the GitHub REST API.
   - ✅ Dashboard created — [`docs/community-dashboard.md`](./docs/community-dashboard.md) provides a rolling weekly data table, live CI/quality badges, quarterly health report template, and monthly narrative structure.
   - ✅ Regular reporting — Weekly automated snapshot; monthly narrative by rotating maintainer; quarterly full health report with satisfaction survey defined in [`docs/community-metrics.md § 5`](./docs/community-metrics.md#5-reporting-cadence).
   - ✅ Documentation — Linked from [`README.md` Community Health & Metrics section](./README.md#-community-health--metrics) and [`CONTRIBUTING.md` Community Metrics section](./CONTRIBUTING.md#-community-metrics).
+=======
+  - Stars tracked
+  - Forks tracked
+  - Contributors counted
+  - Issue metrics
+  - PR metrics
+
+
+### Issue #428: Track Documentation Metrics
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Monitor documentation usage
+- **Acceptance Criteria:**
+  - Page views tracked
+  - Search queries analyzed
+  - Popular content identified
+  - User paths tracked
+  - Dashboard
+
+
+### Issue #429: Monitor Social Media
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Social media analytics
+- **Acceptance Criteria:**
+  - Followers tracked
+  - Engagement measured
+  - Mentions monitored
+  - Sentiment analysis
+  - Regular reports
+
+
+### Issue #430: Create Community Health Report
+
+
+- **Priority:** Medium
+- **Status:** In Progress (template and publication process ready; first quarterly report pending)
+
+- **Current state:** Reusable quarterly report template is available at `docs/community-health-report-template.md` and linked from the README. No measured quarterly report has been published yet.
+- **Implementation hints:** Copy the template into `docs/community-health-reports/` each quarter, fill it from the linked sources, publish within 15 days of quarter end, and link the report from the README.
+- **Verification:** Manually verify the first published report includes current and prior-period metrics, analysis, and owned action items.
+- **Scope:** M
+- **Description:** Regular community health reports
+- **Acceptance Criteria:**
+  - [x] Reusable report template
+  - [x] Participation, responsiveness, issue health, feedback, and safety metrics defined
+  - [x] Previous-period comparisons and trend analysis included
+  - [x] Quarterly publication cadence and location documented
+  - [x] Action items include owner, due date, and success measure
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
 
 ## Feedback & Improvement
 

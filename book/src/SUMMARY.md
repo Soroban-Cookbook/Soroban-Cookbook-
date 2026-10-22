@@ -154,7 +154,13 @@
 - [Security Best Practices](./docs/security-best-practices.md)
 - [Site Search](./docs/search.md)
 
+<<<<<<< HEAD
 # Community
+=======
+# Languages
+
+- [Language Support](./language-support.md)
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
 
 - [Community Guidelines](./community-guidelines.md)
 - [Quality Dashboard](./docs/quality-dashboard.md)
@@ -178,9 +184,18 @@
 
 - [ADR Index](./adr/README.md)
   - [ADR-001: Record Architecture Decisions](./adr/001-record-architecture-decisions.md)
+<<<<<<< HEAD
   - [ADR-002: Rust Version](./adr/002-rust-version.md)
   - [ADR-003: Soroban SDK Version](./adr/003-soroban-sdk-version.md)
   - [ADR-004: Testing Framework](./adr/004-testing-framework.md)
   - [ADR-005: Documentation Platform](./adr/005-documentation-platform.md)
+=======
+  - [ADR-002: Select Storage Tier by Lifetime](./adr/002-select-storage-tier.md)
+  - [ADR-003: Stable Storage Keys and TTL](./adr/003-stable-storage-keys-and-ttl.md)
+  - [ADR-004: Authenticate Before State Changes](./adr/004-authenticate-before-state-changes.md)
+  - [ADR-005: Least-Privilege Access Control](./adr/005-use-least-privilege-access-control.md)
+  - [ADR-006: Guard Contract Code Upgrades](./adr/006-guard-contract-upgrades.md)
+  - [ADR-007: Versioned State Migrations](./adr/007-version-state-migrations.md)
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
   - [ADR Template](./adr/template.md)
 

@@ -204,6 +204,9 @@ Recurring community office hours for questions, troubleshooting, and pairing on 
 Have a question you'd like covered? Open a thread in [GitHub Discussions](https://github.com/crate-ci/typos/discussions) or drop it in the agenda before the session.
 
 
+### Community Health
+Community health reports will be published quarterly using the [report template](./docs/community-health-report-template.md). They cover participation, responsiveness, project trends, and follow-up actions, compare results with previous periods, and use aggregate public data to protect contributor privacy.
+
 ## Additional Resources
 If it is showing up, likely `typos` doesn't know about it yet.
 
