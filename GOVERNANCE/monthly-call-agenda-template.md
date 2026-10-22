@@ -10,7 +10,7 @@ Use this template for every Soroban Cookbook monthly community call. Fill in the
 | Time | HH:MM UTC (list 1–2 additional time zones) |
 | Duration | 60 minutes |
 | Platform | [Link/Meeting ID] |
-| Calendar | [Link to Google Calendar / .ics] |
+| Calendar | [Subscribe to the monthly community call calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics) |
 | Recording | [Link or placeholder] |
 
 ---
@@ -59,6 +59,7 @@ Use this template for every Soroban Cookbook monthly community call. Fill in the
 ## Pre-Call Checklist
 
 - [ ] Agenda published in GitHub Discussions and social channels
+- [ ] Confirmed platform and join link added to the calendar event
 - [ ] Recording link tested and permissions set
 - [ ] Moderator and co-host confirmed
 - [ ] Questions collected via GitHub Discussions / form

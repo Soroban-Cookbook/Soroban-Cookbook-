@@ -116,6 +116,8 @@ For more details, see the [Feedback System Documentation](docs/feedback-system/R
 
 The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
 
+- **Schedule:** First Tuesday of every month at 16:00 UTC. Subscribe to the [monthly community call calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics); calendar apps convert the UTC time to your local time and include reminders one week and one day before each call.
+- **Join details:** The call platform and join link are announced for each event and added to the calendar when confirmed. Announcements include local-time conversions; schedule changes are announced at least 30 days ahead.
 - [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
 - [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
 - [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
