@@ -143,6 +143,7 @@ impl AmmPoolContract {
         if env.storage().instance().has(&PoolDataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         assert!(token_a != token_b, "pool tokens must differ");
         env.storage().instance().set(&PoolDataKey::Owner, &owner);
         env.storage().instance().set(&PoolDataKey::TokenA, &token_a);
@@ -271,6 +272,7 @@ impl AmmOracleContract {
         if env.storage().instance().has(&OracleDataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         env.storage().instance().set(&OracleDataKey::Owner, &owner);
         env.storage()
             .instance()
