@@ -7,6 +7,10 @@
 - [Setup Environment](./guides/getting-started.md)
 - [macOS Setup Guide](./guides/macos-setup.md)
 
+# Community
+
+- [Community Calls](./community-calls.md)
+
 # Guides
 
 - [Testing Guide](./guides/testing.md)
@@ -198,4 +202,3 @@
   - [ADR-007: Versioned State Migrations](./adr/007-version-state-migrations.md)
 >>>>>>> 8c99210 (Create Pattern Selection ADRs)
   - [ADR Template](./adr/template.md)
-

@@ -6,6 +6,25 @@
 
 Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
 
+## Community Calls
+
+### Issue #383: Archive Past Community Calls
+
+- **Priority:** Medium
+- **Status:** 🟡 Archive infrastructure ready; published call materials are still needed.
+
+- **Current state:** The searchable [Community Call Archive](./GOVERNANCE/notes/README.md), reusable [call notes template](./GOVERNANCE/notes/TEMPLATE.md), and publication workflow are in place and linked from [`README.md`](./README.md#-community-health--metrics), [`CONTRIBUTING.md`](./CONTRIBUTING.md#monthly-community-call-governance), and the mdBook [Community Calls page](./book/src/community-calls.md). No prior call notes, recordings, or media URLs were provided, so no historical entries have been fabricated.
+- **Implementation hints:** Recording links are hosted externally; notes and transcripts are stored in the repository.
+- **Verification:** Manual review of the index, template, publication process, and documentation links. Add real call records and stable media URLs as they become available.
+- **Scope:** M
+- **Description:** Archive past community calls.
+- **Acceptance Criteria:**
+  - ✅ Recording storage process documented — video assets belong on the project's approved media host, with stable links in the archive.
+  - ⏳ Notes published — the index and template are ready; historical notes await source materials.
+  - ⏳ Video uploads — upload and linking steps are defined; historical recordings await source URLs or files.
+  - ✅ Searchable archive — date/topic index and full-text searchable Markdown call records are established.
+  - ✅ Linked from docs — linked from the repository README, CONTRIBUTING guide, governance index, and mdBook navigation.
+
 ## Partnership with Stellar Foundation
 
 ### Issue #395: Propose Partnership
