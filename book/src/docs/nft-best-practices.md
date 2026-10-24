@@ -1,0 +1,1 @@
+{{#include ../../../docs/nft-best-practices.md}}

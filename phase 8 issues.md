@@ -1,10 +1,29 @@
 # Phase 8: Community & Ecosystem -
 
 **Phase Status:** 📋 PLANNED (Ongoing)  
-**Completion:** 14% (7/50)
+**Completion:** 18% (9/50)
 **Last Audit Date:** October 19, 2026
 
 Community and ecosystem initiatives — in-repo deliverables are tracked per issue below.
+
+## Community Calls
+
+### Issue #383: Archive Past Community Calls
+
+- **Priority:** Medium
+- **Status:** 🟡 Archive infrastructure ready; published call materials are still needed.
+
+- **Current state:** The searchable [Community Call Archive](./GOVERNANCE/notes/README.md), reusable [call notes template](./GOVERNANCE/notes/TEMPLATE.md), and publication workflow are in place and linked from [`README.md`](./README.md#-community-health--metrics), [`CONTRIBUTING.md`](./CONTRIBUTING.md#monthly-community-call-governance), and the mdBook [Community Calls page](./book/src/community-calls.md). No prior call notes, recordings, or media URLs were provided, so no historical entries have been fabricated.
+- **Implementation hints:** Recording links are hosted externally; notes and transcripts are stored in the repository.
+- **Verification:** Manual review of the index, template, publication process, and documentation links. Add real call records and stable media URLs as they become available.
+- **Scope:** M
+- **Description:** Archive past community calls.
+- **Acceptance Criteria:**
+  - ✅ Recording storage process documented — video assets belong on the project's approved media host, with stable links in the archive.
+  - ⏳ Notes published — the index and template are ready; historical notes await source materials.
+  - ⏳ Video uploads — upload and linking steps are defined; historical recordings await source URLs or files.
+  - ✅ Searchable archive — date/topic index and full-text searchable Markdown call records are established.
+  - ✅ Linked from docs — linked from the repository README, CONTRIBUTING guide, governance index, and mdBook navigation.
 
 ## Partnership with Stellar Foundation
 
@@ -42,7 +61,39 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - Cross-linking
   - Regular sync meetings
 
+## Security & Safety
+
+### Issue #928: Launch Bug Bounty Program
+
+- **Priority:** High
+- **Status:** In Progress
+- **Current state:** The published [bug bounty policy](./docs/security-audit/bug-bounty.md) states that reports are accepted on a rolling basis. A [launch kit](./docs/security-audit/bug-bounty-launch.md) now contains announcement copy, an outreach plan, and a launch record. No external announcement, campaign activity, community notification, or initial participant is verified in-repo.
+- **Implementation hints:** Publish the announcement in GitHub Discussions, notify the Stellar Developer Discord, and record public links and participant confirmation in the launch kit. A participant must opt in before being publicly acknowledged.
+- **Verification:** Manually checked the existing program policy, reporting channel, rewards, README and `CONTRIBUTING.md` links. External publication and participant activity remain unverified; no project build or tests were run.
+- **Scope:** M
+- **Description:** Public launch of bug bounty
+- **Acceptance Criteria:**
+  - ✅ Program live — the program policy says reports are accepted on a rolling basis.
+  - ⬜ Announcement published — prepared in the launch kit; public post URL still pending.
+  - ⬜ Marketing campaign — outreach plan prepared; campaign posts still pending.
+  - ⬜ Community notified — GitHub Discussions and Discord posts still pending.
+  - ⬜ Initial participants — no eligible participant has been confirmed in-repo.
+
 ## Metrics & Analytics
+
+### Issue #923: Track GitHub Metrics
+
+- **Priority:** High
+- **Status:** ✅ Complete
+- **Current state:** Existing weekly GitHub Actions collection records repository stars and forks, contributors with merged PRs in the last 30 days, issue activity, and pull request activity in the [Community Dashboard](./docs/community-dashboard.md).
+- **Implementation hints:** Outcomes documented in the [README Community Health & Metrics section](./README.md#-community-health--metrics); metric definitions and collection details are linked there.
+- **Verification:** Manually checked the collection workflow, metric definitions, dashboard columns, and README links against all five acceptance criteria. No project build or tests were run.
+- **Acceptance Criteria:**
+  - ✅ Stars tracked
+  - ✅ Forks tracked
+  - ✅ Contributors counted
+  - ✅ Issue metrics
+  - ✅ PR metrics
 
 ### Issue #426: Track Community Metrics
 
@@ -117,11 +168,76 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
 - **Scope:** M
 - **Description:** Define, track, and report community health metrics for the Soroban Cookbook.
 - **Acceptance Criteria:**
+<<<<<<< HEAD
   - ✅ Metrics defined — [`docs/community-metrics.md`](./docs/community-metrics.md) defines 20+ metrics across 5 categories (Growth, Engagement, Content Quality, Community Health, Documentation).
   - ✅ Tracking tools setup — GitHub native Insights + automated GitHub Actions workflow (`.github/workflows/community-metrics.yml`) runs every Monday at 09:00 UTC via the GitHub REST API.
   - ✅ Dashboard created — [`docs/community-dashboard.md`](./docs/community-dashboard.md) provides a rolling weekly data table, live CI/quality badges, quarterly health report template, and monthly narrative structure.
   - ✅ Regular reporting — Weekly automated snapshot; monthly narrative by rotating maintainer; quarterly full health report with satisfaction survey defined in [`docs/community-metrics.md § 5`](./docs/community-metrics.md#5-reporting-cadence).
   - ✅ Documentation — Linked from [`README.md` Community Health & Metrics section](./README.md#-community-health--metrics) and [`CONTRIBUTING.md` Community Metrics section](./CONTRIBUTING.md#-community-metrics).
+=======
+  - Stars tracked
+  - Forks tracked
+  - Contributors counted
+  - Issue metrics
+  - PR metrics
+
+
+### Issue #428: Track Documentation Metrics
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Monitor documentation usage
+- **Acceptance Criteria:**
+  - Page views tracked
+  - Search queries analyzed
+  - Popular content identified
+  - User paths tracked
+  - Dashboard
+
+
+### Issue #429: Monitor Social Media
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Social media analytics
+- **Acceptance Criteria:**
+  - Followers tracked
+  - Engagement measured
+  - Mentions monitored
+  - Sentiment analysis
+  - Regular reports
+
+
+### Issue #430: Create Community Health Report
+
+
+- **Priority:** Medium
+- **Status:** In Progress (template and publication process ready; first quarterly report pending)
+
+- **Current state:** Reusable quarterly report template is available at `docs/community-health-report-template.md` and linked from the README. No measured quarterly report has been published yet.
+- **Implementation hints:** Copy the template into `docs/community-health-reports/` each quarter, fill it from the linked sources, publish within 15 days of quarter end, and link the report from the README.
+- **Verification:** Manually verify the first published report includes current and prior-period metrics, analysis, and owned action items.
+- **Scope:** M
+- **Description:** Regular community health reports
+- **Acceptance Criteria:**
+  - [x] Reusable report template
+  - [x] Participation, responsiveness, issue health, feedback, and safety metrics defined
+  - [x] Previous-period comparisons and trend analysis included
+  - [x] Quarterly publication cadence and location documented
+  - [x] Action items include owner, due date, and success measure
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
 
 ## Feedback & Improvement
 
@@ -142,6 +258,14 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - [x] Action items and feedback loop clearly mapped to repo issues
   - [x] Links and documentation updated in `CONTRIBUTING.md`
   - [x] Phase issue status updated for manual verification
+
+### Issue #939: Implement Feature Voting
+
+- **Priority:** Medium
+- **Status:** ✅ Process documented
+- **Current state:** [`docs/roadmap-input-process.md`](./docs/roadmap-input-process.md) defines GitHub Discussions as the proposal and voting platform, provides a feature proposal template, and documents polling, advisory decisions, implementation tracking, and community updates.
+- **Verification:** The guide requires published vote totals and reasoning, an implementation issue and roadmap link for accepted proposals, and progress updates through completion. No live vote or outcome is claimed by this documentation change.
+- **Source:** Phase issue #433
 
 ## Project Showcase
 
@@ -219,14 +343,52 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
   - ✅ Dashboard — [`docs/documentation-metrics.md`](./docs/documentation-metrics.md) provides page view tables, search query analysis, popular content rankings, user path analysis, rolling weekly data, monthly trends, zero-result search terms, and mdBook vs webapp comparison.
   - ✅ Verification — Metric definitions added to [`docs/community-metrics.md`](./docs/community-metrics.md) § 3.6 (14 documentation usage metrics). Links added to [`README.md`](./README.md) and [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
+## Developer Tooling
+
+### Issue: Integrate with IDEs and Tools
+
+- **Priority:** Medium
+- **Status:** ✅ Complete
+
+- **Current state:** Deliverables created in-repo. A shared VS Code configuration lives in [`.vscode/`](./.vscode/) (extensions, settings, tasks, launch, and Soroban snippets), and [`docs/ide-integration.md`](./docs/ide-integration.md) documents it alongside IntelliJ/RustRover setup and the linting and testing tools. Summarized in [`CONTRIBUTING.md`](./CONTRIBUTING.md#ide--tooling-integration) and linked from the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria. All five are met (see below), and this phase file has been updated.
+- **Scope:** M
+- **Description:** Integrate with IDEs and tools
+- **Acceptance Criteria:**
+  - ✅ VS Code extension: [`.vscode/extensions.json`](./.vscode/extensions.json) lists the recommended extensions. [`.vscode/soroban.code-snippets`](./.vscode/soroban.code-snippets) adds 8 Soroban snippets, and [`tasks.json`](./.vscode/tasks.json) and [`launch.json`](./.vscode/launch.json) add one-click tests, lint, coverage, and debugging. See [`docs/ide-integration.md` § 1](./docs/ide-integration.md#1-vs-code).
+  - ✅ IntelliJ plugin (optional): [`docs/ide-integration.md` § 2](./docs/ide-integration.md#2-intellij-idea--rustrover-optional) gives RustRover / Rust plugin setup with clippy, rustfmt, macro expansion, run configurations, and live templates.
+  - ✅ Linting tools: [`docs/ide-integration.md` § 3](./docs/ide-integration.md#3-linting-tools) covers rustfmt, clippy (`.clippy.toml`), typos, cspell, cargo-audit, and `scripts/lint.sh`, all matching CI flags.
+  - ✅ Testing tools: [`docs/ide-integration.md` § 4](./docs/ide-integration.md#4-testing-tools) covers cargo test, smoke tests, nextest, proptest, cargo-fuzz, tarpaulin with Coverage Gutters, and the Stellar CLI.
+  - ✅ Documentation: [`docs/ide-integration.md`](./docs/ide-integration.md), including troubleshooting and external resources.
+
+## Wallet Integration
+
+### Issue: Support for Additional Wallets
+
+- **Priority:** Medium
+- **Status:** ✅ Complete
+
+- **Current state:** Deliverables created in-repo. [`docs/additional-wallets.md`](./docs/additional-wallets.md) adds Hana, LOBSTR, and Ledger to the wallets already covered in [`docs/wallet-integration.md`](./docs/wallet-integration.md), with TypeScript adapters and vitest tests in [`docs/wallet-examples/`](./docs/wallet-examples/). Summarized in [`CONTRIBUTING.md`](./CONTRIBUTING.md#wallet-support) and linked from the [`README.md` Community Health & Metrics table](./README.md#-community-health--metrics).
+- **Implementation hints:** Outcomes documented in README and `CONTRIBUTING.md`; external resources linked.
+- **Verification:** Manual verification against acceptance criteria. All five are met (see below), and this phase file has been updated.
+- **Scope:** M
+- **Description:** Support for additional wallets
+- **Acceptance Criteria:**
+  - ✅ 2-3 more wallets supported: Hana, LOBSTR, and Ledger, plus Stellar Wallets Kit for multi-wallet coverage.
+  - ✅ Examples for each: [`hana.ts`](./docs/wallet-examples/src/hana.ts), [`lobstr.ts`](./docs/wallet-examples/src/lobstr.ts), [`ledger.ts`](./docs/wallet-examples/src/ledger.ts), and [`wallets-kit.ts`](./docs/wallet-examples/src/wallets-kit.ts), all behind one `WalletAdapter` interface, with a wallet-agnostic [`invoke.ts`](./docs/wallet-examples/src/invoke.ts).
+  - ✅ Comparison guide: [`docs/additional-wallets.md` § 6](./docs/additional-wallets.md#6-comparison-guide) has a feature matrix across 6 wallets, a guide to which wallets to support for each app type, and UX differences.
+  - ✅ Testing: [`docs/wallet-examples/test/adapters.test.ts`](./docs/wallet-examples/test/adapters.test.ts) covers each adapter against mocks, including real signature verification for Ledger. [§ 7](./docs/additional-wallets.md#7-testing) adds a manual testnet checklist for each wallet.
+  - ✅ Documentation: [`docs/additional-wallets.md`](./docs/additional-wallets.md) and [`docs/wallet-examples/README.md`](./docs/wallet-examples/README.md), with a cross-link from the Wallet Integration Guide.
+
 ## Summary
 
 **Total Issues Created:** 70 (Issues #379-#534, #629, #927)
-**Completed:** 7
+**Completed:** 9
 **In Progress:** 0  
-**Planned:** 59
+**Planned:** 57
 
-**Phase 8 Status:** 📋 **14% COMPLETE (Ongoing)**
+**Phase 8 Status:** 📋 **18% COMPLETE (Ongoing)**
 
 Community categories:
 

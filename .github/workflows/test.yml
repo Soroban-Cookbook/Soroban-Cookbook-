@@ -51,8 +51,28 @@ jobs:
       - name: Run Clippy
         run: ./scripts/ci-workspace.sh clippy --tests --lib --target x86_64-unknown-linux-gnu -- -D warnings
 
+  smoke:
+    name: Smoke Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+
+      - name: Build smoke tests
+        run: cargo test -p integration-tests --test smoke_tests --target x86_64-unknown-linux-gnu --no-run
+
+      - name: Run smoke tests (2 minute budget)
+        timeout-minutes: 2
+        run: cargo test -p integration-tests --test smoke_tests --target x86_64-unknown-linux-gnu
+
   test:
     name: Test Suite
+    needs: smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@7

@@ -168,16 +168,23 @@ detecting non-words (like hashes) or
 unambiguous words (like words after a `\` escape).
 
 ### 📊 Community Health & Metrics
-We track community health transparently so everyone can see how the project is growing:
+The weekly GitHub metrics track repository stars and forks, contributor activity, and issue and pull request activity. Definitions, snapshots, and collection details are linked below:
 
 | Resource | Description |
 |---|---|
+| [Monthly Community Call Calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics) | Recurring first-Tuesday call at 16:00 UTC, with calendar reminders |
+| [Community Call Archive](./GOVERNANCE/notes/README.md) | Searchable notes, recordings, transcripts, and follow-up actions |
 | [Project Showcase](./SHOWCASE.md) | 10+ real production Stellar/Soroban projects built with the cookbook, with case studies and tracking |
 | [Ecosystem Partnerships](./docs/ecosystem-partnerships.md) | Partner projects, active collaborations, joint content, and the reciprocal cross-promotion model |
 | [Formal Partnership Proposal](./docs/formal-partnership-proposal.md) | Partnership qualification criteria, benefits, MOU agreement template, and onboarding roadmap |
+| [IDE & Tooling Integration](./docs/ide-integration.md) | Shared VS Code setup (extensions, tasks, debug, Soroban snippets), IntelliJ/RustRover setup, linting and testing tools |
+| [Additional Wallet Support](./docs/additional-wallets.md) | Hana, LOBSTR, and Ledger adapter examples with tests, Stellar Wallets Kit, and a wallet comparison guide |
+| [Deployment Best Practices](./docs/deployment-best-practices.md) | Pre-deployment checklist, network selection, monitoring setup, and upgrade strategies |
 | [Featured Projects](./docs/featured-projects.md) | First 5 projects featured, each with a case study, runnable demo, developer interview, and promotion plan |
 | [Project Templates](./templates/) | Full-stack starter templates for Fungible Token, NFT Marketplace, and DAO dApps |
-| [Community Dashboard](./docs/community-dashboard.md) | Live rolling metrics — stars, PRs, response times, satisfaction |
+| [Bug Bounty Program](./docs/security-audit/bug-bounty.md) | Active responsible-disclosure program, scope, rewards, and private reporting channel |
+| [Bug Bounty Launch Kit](./docs/security-audit/bug-bounty-launch.md) | Announcement draft, outreach plan, and launch record |
+| [Community Dashboard](./docs/community-dashboard.md) | Weekly snapshots of stars, forks, contributors, issues, PRs, and response times |
 | [Documentation Metrics](./docs/documentation-metrics.md) | Page views, search queries, popular content, and user path analysis |
 | [Metric Definitions](./docs/community-metrics.md) | What we measure, how we collect it, and alert thresholds |
 | [Recognition System](./docs/recognition-system.md) | How contribution activity earns contributor tier badges |
@@ -200,6 +207,9 @@ Recurring community office hours for questions, troubleshooting, and pairing on 
 
 Have a question you'd like covered? Open a thread in [GitHub Discussions](https://github.com/crate-ci/typos/discussions) or drop it in the agenda before the session.
 
+
+### Community Health
+Community health reports will be published quarterly using the [report template](./docs/community-health-report-template.md). They cover participation, responsiveness, project trends, and follow-up actions, compare results with previous periods, and use aggregate public data to protect contributor privacy.
 
 ## Additional Resources
 If it is showing up, likely `typos` doesn't know about it yet.

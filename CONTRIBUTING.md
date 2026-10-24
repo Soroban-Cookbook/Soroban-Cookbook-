@@ -29,7 +29,7 @@ For information about our outreach to the Stellar Development Foundation, see [d
 | Collaboration | What it produces |
 |---|---|
 | Streaming payments (SoroStream, StellarStream) | Shared storage trade-off case study for stream state |
-| NFT marketplace (soroban-nft-marketplace) | Reviewed [NFT patterns](./docs/nft-patterns.md) and escrow guidance |
+| NFT marketplace (soroban-nft-marketplace) | Reviewed [NFT patterns](./docs/nft-patterns.md), [NFT best practices](./docs/nft-best-practices.md), and escrow guidance |
 | Explorer and verification (soroban-verify, Soroban Smart Block Explorer) | Corrected [deployment](./book/src/guides/deployment.md) and upgrade guidance |
 | Oracle safety (soroban-oracle-safety) | Staleness and sanity-bound guidance in the oracle examples |
 | Wallet stack (astroid) | Integration notes in the [wallet integration guide](./docs/wallet-integration.md) |
@@ -116,11 +116,14 @@ For more details, see the [Feedback System Documentation](docs/feedback-system/R
 
 The Soroban Cookbook runs monthly community calls to share progress, demo examples, and answer questions. All call templates and governance documents are maintained in the [GOVERNANCE/](./GOVERNANCE/) directory:
 
+- **Schedule:** First Tuesday of every month at 16:00 UTC. Subscribe to the [monthly community call calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics); calendar apps convert the UTC time to your local time and include reminders one week and one day before each call.
+- **Join details:** The call platform and join link are announced for each event and added to the calendar when confirmed. Announcements include local-time conversions; schedule changes are announced at least 30 days ahead.
 - [Agenda Template](./GOVERNANCE/monthly-call-agenda-template.md)
 - [Format Guidelines](./GOVERNANCE/monthly-call-format-guidelines.md)
 - [Moderation Guide](./GOVERNANCE/monthly-call-moderation-guide.md)
 - [Q&A Process](./GOVERNANCE/monthly-call-qa-process.md)
 - [Follow-up Process](./GOVERNANCE/monthly-call-followup-process.md)
+- [Community Call Archive](./GOVERNANCE/notes/README.md) — searchable notes, recordings, transcripts, and action items
 
 To propose a topic, moderate a session, or improve the process, open an issue or pull request in this repository.
 
@@ -134,6 +137,36 @@ We provide three complete full-stack starter templates in the [`templates/`](./t
 - [🏛️ DAO Governance & Treasury dApp](./templates/dao-governance-dapp/)
 
 To contribute a new template or improve an existing one, check out the [Project Templates Guide](./docs/project-templates.md).
+
+## Workshop Materials
+
+We provide a complete, reusable workshop curriculum for teaching Soroban development in [`docs/workshop/`](./docs/workshop/). The materials cover five modules spanning environment setup through advanced patterns and testnet deployment:
+
+| Material | Description |
+|---|---|
+| [Workshop README](./docs/workshop/README.md) | Overview, agenda, prerequisites, and setup instructions |
+| [Slide Decks](./docs/workshop/slides/) | Marp-compatible Markdown slides for all 5 modules |
+| [Hands-on Exercises](./docs/workshop/exercises/) | Lab exercises with starter code and solutions, referencing cookbook examples |
+| [Facilitator Guide](./docs/workshop/facilitator-guide.md) | Timing, talking points, common pitfalls, and Q&A prep per module |
+| [Participant Guide](./docs/workshop/participant-guide.md) | Setup instructions, step-by-step workbook, and reference links |
+
+The workshop is designed for instructor-led delivery (2 days or 4 half-day sessions) but also works for self-paced study. To adapt or contribute improvements, open a pull request modifying files under `docs/workshop/`.
+
+---
+
+## IDE & Tooling Integration
+
+The repo ships a shared VS Code setup in [`.vscode/`](./.vscode/): recommended extensions, rust-analyzer running clippy with CI flags, tasks for tests, smoke tests, coverage, lint, and the book, CodeLLDB debug configs, and Soroban snippets. Setup steps for IntelliJ IDEA and RustRover, the linting tools, and the testing tools are covered in [docs/ide-integration.md](./docs/ide-integration.md).
+
+If you change a CI lint or test command, update the matching task in `.vscode/tasks.json` and the tables in `docs/ide-integration.md` too.
+
+---
+
+## Wallet Support
+
+Besides Freighter, xBull, and Albedo ([Wallet Integration Guide](./docs/wallet-integration.md)), the cookbook has tested adapter examples for **Hana**, **LOBSTR**, and **Ledger**, and shows how to use Stellar Wallets Kit for multi-wallet support. See [docs/additional-wallets.md](./docs/additional-wallets.md) for the examples, comparison guide, and testing checklist. The code is in [`docs/wallet-examples/`](./docs/wallet-examples/), and `npm test` there runs the unit tests.
+
+To add a wallet, implement the `WalletAdapter` interface in `docs/wallet-examples/src/`, add tests to `test/adapters.test.ts`, and add a column to the comparison matrix.
 
 ---
 
@@ -156,6 +189,7 @@ The Soroban Cookbook has a structured process for community members to propose a
 - [Ecosystem Partnerships](#ecosystem-partnerships)
 - [Grants Application Process](#grants-application-process)
 - [Project Templates](#project-templates)
+- [Workshop Materials](#workshop-materials)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
 - [Code Style Guidelines](#-code-style-guidelines)
@@ -181,6 +215,20 @@ The onboarding guide covers:
 - Answers to common first-timer questions
 
 Once you have worked through the onboarding guide and run `cargo test --workspace` successfully, come back here for the full contribution process.
+
+---
+
+## 🛡️ Bug Bounty Program
+
+The Soroban Cookbook bug bounty is open for eligible security findings in
+contract examples, shared utilities, tests, and security documentation. Review
+the [program scope and rewards](./docs/security-audit/bug-bounty.md) and submit
+reports privately through the linked GitHub Security Advisory channel. Never
+post vulnerability details in a public issue.
+
+The [launch kit](./docs/security-audit/bug-bounty-launch.md) contains the
+announcement draft and outreach checklist; external publication and participant
+milestones are recorded there only after verification.
 
 ---
 
@@ -306,6 +354,9 @@ cargo test --workspace
 cd examples/<category>/<example-name>
 cargo test
 
+# Run the fast smoke tests (critical paths, < 2 min; runs first in CI)
+cargo test -p integration-tests --test smoke_tests
+
 # Run the shared integration test suite
 cargo test -p integration-tests
 
@@ -317,6 +368,10 @@ cargo test -p docs-audit-tests
 ```
 
 CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
+
+The repository's [pre-commit hooks](./doc/pre-commit.md) run formatting and typo
+checks before commits, then Clippy and integration tests before pushes. Install
+both hooks during setup so these checks run automatically.
 
 ### Where to Add a Test
 

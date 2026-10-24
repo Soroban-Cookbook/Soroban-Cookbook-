@@ -902,6 +902,8 @@ done
 ## Next Steps
 
 - [Intermediate Examples →](./intermediate.md) — tokens, multi-sig, pause/unpause
+- [Interactive Playground — Intermediate Examples →](./playground-intermediate.md) — hands-on token, cross-contract and access-control walkthroughs
+- [Code Examples →](../docs/code-examples.md) — tested snippet for every topic
 - [Advanced Examples →](./advanced.md) — cross-contract calls, oracle patterns, upgradeable proxies
 - [Testing Guide →](../guides/testing.md) — mocking auth, time manipulation, event assertions
 - [Best Practices →](../docs/best-practices.md) — production-ready patterns

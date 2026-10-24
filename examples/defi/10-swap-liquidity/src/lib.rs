@@ -104,6 +104,7 @@ impl SwapLiquidityContract {
         if env.storage().instance().has(&DataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         assert!(token_a != token_b, "tokens must differ");
         env.storage().instance().set(&DataKey::Owner, &owner);
         env.storage().instance().set(&DataKey::TokenA, &token_a);
@@ -247,3 +248,6 @@ impl SwapLiquidityContract {
         this.total_shares(&env)
     }
 }
+
+#[cfg(test)]
+mod test;

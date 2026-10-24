@@ -28,6 +28,14 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | [ADR-004](./004-testing-framework.md) | Testing Framework | Accepted |
 | [ADR-005](./005-documentation-platform.md) | Documentation Platform | Accepted |
 
+| [ADR-002](./002-select-storage-tier.md) | Select Storage Tier by Lifetime | Proposed |
+| [ADR-003](./003-stable-storage-keys-and-ttl.md) | Keep Storage Keys Stable and Manage TTL Explicitly | Proposed |
+| [ADR-004](./004-authenticate-before-state-changes.md) | Authenticate Before Protected State Changes | Proposed |
+| [ADR-005](./005-use-least-privilege-access-control.md) | Use Least-Privilege Access Control | Proposed |
+| [ADR-006](./006-guard-contract-upgrades.md) | Guard Contract Code Upgrades | Proposed |
+| [ADR-007](./007-version-state-migrations.md) | Version and Migrate Persistent State Explicitly | Proposed |
+ 8c99210 (Create Pattern Selection ADRs)
+
 ## Creating a New ADR
 
 1. Copy [`template.md`](./template.md) to a new file named `NNN-short-title.md` (e.g. `002-workspace-structure.md`)

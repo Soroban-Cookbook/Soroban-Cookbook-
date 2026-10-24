@@ -12,6 +12,31 @@ The roadmap is a living document maintained in [`ROADMAP.md`](../ROADMAP.md). It
 
 ## 1. Input Mechanism
 
+### Feature Proposals
+
+Use GitHub Discussions in the [Ideas category](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/discussions)
+as the voting platform. Start a discussion titled `[Feature] <short name>` and
+include:
+
+```text
+## Problem
+Who has this problem, and what are they trying to do?
+
+## Proposed feature
+What should the cookbook add or change?
+
+## Expected impact
+Which users or learning paths would benefit?
+
+## Scope and trade-offs
+What is the smallest useful version, and what might it cost to maintain?
+```
+
+Maintainers acknowledge proposals within 48 hours, triage them for roadmap fit,
+and leave the discussion open for community feedback. Proposals that need a
+decision are added to a public poll; votes are advisory and do not replace
+maintainer review.
+
 ### GitHub Discussions (preferred)
 
 Open a discussion in the [Ideas category](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/discussions) with the label `roadmap-input`. Use this format:
@@ -95,15 +120,25 @@ Quarterly review notes are published as a comment in the relevant GitHub Discuss
 
 ---
 
-## 5. Community Votes
+## 5. Feature Voting and Outcomes
 
-For significant decisions (e.g., adopting a new platform, restructuring phases), the core team will:
+For feature proposals or significant roadmap decisions, maintainers will:
 
-1. Post a GitHub Discussion summarizing the options
-2. Run a 👍 / 👎 / 🤔 emoji poll for at least 7 days
-3. Publish the vote outcome and the final decision with reasoning
+1. Post a GitHub Discussion summarizing the proposal and any alternatives.
+2. Run a GitHub Discussions poll for at least 7 days. If native polling is
+	unavailable, use 👍 / 👎 / 🤔 reactions and state that clearly.
+3. Publish the vote totals, decision, and reasoning in the discussion, including
+	when maintainers decide not to proceed.
+4. For accepted proposals, open or link an implementation issue, identify an
+	owner when available, and add the item to `ROADMAP.md` with a link to the
+	discussion and issue.
+5. Post progress in the implementation issue and report completion or changes
+	to the decision in the discussion and the next monthly community call recap.
 
-Votes are advisory — the core team makes the final call — but community input carries meaningful weight and is documented in the decision record.
+Votes are advisory — the core team makes the final call — but community input
+carries meaningful weight and is documented alongside the outcome. See
+[`CONTRIBUTING.md`](../CONTRIBUTING.md) for the repository's contribution and
+review process.
 
 ---
 

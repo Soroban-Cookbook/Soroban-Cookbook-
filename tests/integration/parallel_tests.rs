@@ -1,3 +1,4 @@
+#![allow(unused_imports)]
 /// Parallel Test Suite for Soroban Contracts
 ///
 /// Tests that demonstrate parallel execution capabilities and verify
@@ -13,7 +14,7 @@ use soroban_sdk::Env;
 #[test]
 fn test_parallel_independent_contract_instances() {
     let config = GeneratorConfig::default();
-    let generator = ContractDataGenerator::with_config(config);
+    let _generator = ContractDataGenerator::with_config(config);
 
     let amounts = ContractDataGenerator::generate_defi_amounts();
 
@@ -31,7 +32,7 @@ fn test_parallel_isolated_storage_state() {
 
     // Each test should have isolated environment
     env.storage().instance().set(&key, &42u128);
-    let value: u128 = env.storage().instance().get(&key).unwrap().unwrap();
+    let value: u128 = env.storage().instance().get::<_, u128>(&key).unwrap();
     assert_eq!(value, 42);
 }
 

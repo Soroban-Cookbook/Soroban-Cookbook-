@@ -110,19 +110,17 @@ jobs:
           echo "opened=${PRS_OPENED}" >> "$GITHUB_OUTPUT"
           echo "merged=${PRS_MERGED}" >> "$GITHUB_OUTPUT"
 
-      - name: Collect new contributor count (last 30 days)
+      - name: Collect contributor count (last 30 days)
         id: contributors
         run: |
           SINCE="${{ steps.dates.outputs.thirty_days_ago }}"
 
-          # Contributors who had their first-ever PR merged this month
-          # Strategy: find authors of PRs merged in window, then check if they
-          # have any merged PR older than the window. New = no prior PRs.
-          NEW_CONTRIBS=$(gh api \
+          # Count unique accounts with a merged PR in the reporting window.
+          CONTRIBUTORS=$(gh api \
             "repos/${REPO}/pulls?state=closed&per_page=100" \
             --jq "[.[] | select(.merged_at != null) | select(.merged_at >= \"${SINCE}\") | .user.login] | unique | length")
 
-          echo "new_contributors=${NEW_CONTRIBS}" >> "$GITHUB_OUTPUT"
+          echo "contributors=${CONTRIBUTORS}" >> "$GITHUB_OUTPUT"
 
       - name: Compute median issue response time (last 7 days)
         id: response_time
@@ -163,7 +161,7 @@ jobs:
           I_CLOSE="${{ steps.issues.outputs.closed }}"
           PR_OPEN="${{ steps.prs.outputs.opened }}"
           PR_MERGE="${{ steps.prs.outputs.merged }}"
-          NEW_C="${{ steps.contributors.outputs.new_contributors }}"
+          NEW_C="${{ steps.contributors.outputs.contributors }}"
           RESP="${{ steps.response_time.outputs.median_hours }}"
 
           NEW_ROW="| ${WEEK} | ${STARS} | ${FORKS} | ${CLONERS} | ${I_OPEN} | ${I_CLOSE} | ${PR_OPEN} | ${PR_MERGE} | ${NEW_C} | ${RESP} h |"
@@ -203,10 +201,10 @@ jobs:
             ALERTS="${ALERTS}Median issue response time is ${RESP}h (target < 72h). "
           fi
 
-          # --- No new contributors in 60 days ---
-          NEW_C="${{ steps.contributors.outputs.new_contributors }}"
+          # --- No contributors with merged PRs in the last 30 days ---
+          NEW_C="${{ steps.contributors.outputs.contributors }}"
           if [ "$NEW_C" = "0" ] 2>/dev/null; then
-            ALERTS="${ALERTS}No new contributors merged in 30 days. "
+            ALERTS="${ALERTS}No contributors with merged PRs in 30 days. "
           fi
 
           echo "alert_body=${ALERTS}" >> "$GITHUB_OUTPUT"
@@ -268,7 +266,7 @@ jobs:
           echo "| Issues Closed (7 d) | ${{ steps.issues.outputs.closed }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| PRs Opened (7 d) | ${{ steps.prs.outputs.opened }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| PRs Merged (7 d) | ${{ steps.prs.outputs.merged }} |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| New Contributors (30 d) | ${{ steps.contributors.outputs.new_contributors }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Contributors (30 d) | ${{ steps.contributors.outputs.contributors }} |" >> "$GITHUB_STEP_SUMMARY"
           echo "| Median Response Time | ${{ steps.response_time.outputs.median_hours }} h |" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
           if [ "${{ steps.alerts.outputs.has_alerts }}" = "true" ]; then

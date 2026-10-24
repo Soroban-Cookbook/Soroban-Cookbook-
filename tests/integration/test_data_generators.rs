@@ -1,3 +1,4 @@
+#![allow(unused_imports, dead_code)]
 /// Test Data Generators for Soroban Integration Tests
 ///
 /// Provides reusable test data generation utilities for creating

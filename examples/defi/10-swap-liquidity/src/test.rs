@@ -1,45 +1,77 @@
 #![allow(deprecated)]
-use soroban_validation::test_events::EventList;
-#![cfg(test)]
 
+use crate::{SwapLiquidityContract, SwapLiquidityContractClient};
 use soroban_sdk::testutils::Address as _;
-use soroban_sdk::{token, Address, Env, Symbol};
-use crate::SwapLiquidityContractClient;
+use soroban_sdk::testutils::Events as _;
+use soroban_sdk::{token, Address, Env};
+use soroban_validation::test_events::EventList;
 
-fn register_token(env: &Env, admin: &Address, name: &Symbol, symbol: &Symbol) -> Address {
-    let token_id = env.register_contract(None, token::Contract);
-    let token_client = token::Client::new(env, &token_id);
-    token_client.initialize(admin, name, symbol, &8u32);
-    token_id
+fn register_token(
+    env: &Env,
+    admin: &Address,
+) -> (
+    Address,
+    token::Client<'static>,
+    token::StellarAssetClient<'static>,
+) {
+    let id = env.register_stellar_asset_contract(admin.clone());
+    let token = token::Client::new(env, &id);
+    let admin_client = token::StellarAssetClient::new(env, &id);
+    (id, token, admin_client)
 }
 
-fn setup() -> (Env, Address, Address, Address, Address, Address, Address, SwapLiquidityContractClient<'static>) {
+#[allow(clippy::type_complexity)]
+fn setup() -> (
+    Env,
+    Address,
+    Address,
+    Address,
+    Address,
+    Address,
+    Address,
+    token::StellarAssetClient<'static>,
+    token::StellarAssetClient<'static>,
+    SwapLiquidityContractClient<'static>,
+) {
     let env = Env::default();
+    env.mock_all_auths();
     let owner = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
-    let token_a_id = register_token(&env, &owner, &Symbol::short("TokenA"), &Symbol::short("TKA"));
-    let token_b_id = register_token(&env, &owner, &Symbol::short("TokenB"), &Symbol::short("TKB"));
+    let (token_a_id, _, token_a_admin) = register_token(&env, &owner);
+    let (token_b_id, _, token_b_admin) = register_token(&env, &owner);
 
     let contract_id = env.register_contract(None, SwapLiquidityContract);
-    let lp_token_id = register_token(&env, &contract_id, &Symbol::short("Liquidity"), &Symbol::short("LP"));
+    let (lp_token_id, _, _) = register_token(&env, &contract_id);
 
     let client = SwapLiquidityContractClient::new(&env, &contract_id);
     client.initialize(&owner, &token_a_id, &token_b_id, &lp_token_id);
 
-    (env, owner, alice, bob, token_a_id, token_b_id, lp_token_id, client)
+    (
+        env,
+        owner,
+        alice,
+        bob,
+        token_a_id,
+        token_b_id,
+        lp_token_id,
+        token_a_admin,
+        token_b_admin,
+        client,
+    )
 }
 
 #[test]
 fn test_add_liquidity_initializes_pool() {
-    let (env, _owner, alice, _bob, token_a_id, token_b_id, _lp_token_id, client) = setup();
-    let token_a = token::Client::new(&env, &token_a_id);
-    let token_b = token::Client::new(&env, &token_b_id);
+    let (
+        env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
 
     env.mock_all_auths();
-    token_a.mint(&alice, &1000i128);
-    token_b.mint(&alice, &1000i128);
+    token_a_admin.mint(&alice, &1000i128);
+    token_b_admin.mint(&alice, &1000i128);
 
     client.add_liquidity(&alice, &200i128, &300i128);
 
@@ -50,29 +82,33 @@ fn test_add_liquidity_initializes_pool() {
 
 #[test]
 fn test_add_liquidity_mints_lp_shares() {
-    let (env, _owner, alice, _bob, _token_a_id, _token_b_id, lp_token_id, client) = setup();
+    let (
+        env, _owner, alice, _bob, _token_a_id, _token_b_id, lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
     let lp_token = token::Client::new(&env, &lp_token_id);
 
     env.mock_all_auths();
     assert_eq!(lp_token.balance(&alice), 0i128);
-    let token_a = token::Client::new(&env, &_token_a_id);
-    let token_b = token::Client::new(&env, &_token_b_id);
-    token_a.mint(&alice, &200i128);
-    token_b.mint(&alice, &200i128);
+    token_a_admin.mint(&alice, &200i128);
+    token_b_admin.mint(&alice, &200i128);
     client.add_liquidity(&alice, &200i128, &200i128);
     assert!(lp_token.balance(&alice) > 0);
 }
 
 #[test]
 fn test_remove_liquidity_returns_tokens() {
-    let (env, _owner, alice, _bob, token_a_id, token_b_id, lp_token_id, client) = setup();
+    let (
+        env, _owner, alice, _bob, token_a_id, token_b_id, lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
     let token_a = token::Client::new(&env, &token_a_id);
     let token_b = token::Client::new(&env, &token_b_id);
     let lp_token = token::Client::new(&env, &lp_token_id);
 
     env.mock_all_auths();
-    token_a.mint(&alice, &1000i128);
-    token_b.mint(&alice, &1000i128);
+    token_a_admin.mint(&alice, &1000i128);
+    token_b_admin.mint(&alice, &1000i128);
 
     client.add_liquidity(&alice, &200i128, &200i128);
     let shares = lp_token.balance(&alice);
@@ -85,13 +121,14 @@ fn test_remove_liquidity_returns_tokens() {
 
 #[test]
 fn test_pool_share_reflects_lp_holdings() {
-    let (env, _owner, alice, _bob, token_a_id, token_b_id, _lp_token_id, client) = setup();
-    let token_a = token::Client::new(&env, &token_a_id);
-    let token_b = token::Client::new(&env, &token_b_id);
+    let (
+        env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
 
     env.mock_all_auths();
-    token_a.mint(&alice, &500i128);
-    token_b.mint(&alice, &500i128);
+    token_a_admin.mint(&alice, &500i128);
+    token_b_admin.mint(&alice, &500i128);
 
     client.add_liquidity(&alice, &100i128, &100i128);
     let share = client.pool_share(&alice);
@@ -101,7 +138,7 @@ fn test_pool_share_reflects_lp_holdings() {
 #[test]
 #[should_panic(expected = "liquidity amounts must be positive")]
 fn test_add_liquidity_rejects_zero_amounts() {
-    let (env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, client) = setup();
+    let (env, _owner, alice, _bob, _, _, _, _, _, client) = setup();
     env.mock_all_auths();
     client.add_liquidity(&alice, &0i128, &100i128);
 }
@@ -109,38 +146,58 @@ fn test_add_liquidity_rejects_zero_amounts() {
 #[test]
 #[should_panic(expected = "not enough pool shares")]
 fn test_remove_liquidity_rejects_too_many_shares() {
-    let (env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, client) = setup();
+    let (env, _owner, alice, _bob, _, _, _, _, _, client) = setup();
     env.mock_all_auths();
     client.remove_liquidity(&alice, &1i128);
 }
 
 #[test]
 fn test_liquidity_events_are_emitted() {
-    let (env, _owner, alice, _bob, token_a_id, token_b_id, _lp_token_id, client) = setup();
-    let token_a = token::Client::new(&env, &token_a_id);
-    let token_b = token::Client::new(&env, &token_b_id);
+    let (
+        env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
 
     env.mock_all_auths();
-    token_a.mint(&alice, &200i128);
-    token_b.mint(&alice, &200i128);
+    token_a_admin.mint(&alice, &200i128);
+    token_b_admin.mint(&alice, &200i128);
     client.add_liquidity(&alice, &200i128, &200i128);
     assert!(!EventList::new(&env, env.events().all()).is_empty());
 }
 
 #[test]
 fn test_liquidity_shares_scale_with_pool_size() {
-    let (env, _owner, alice, bob, token_a_id, token_b_id, _lp_token_id, client) = setup();
-    let token_a = token::Client::new(&env, &token_a_id);
-    let token_b = token::Client::new(&env, &token_b_id);
+    let (
+        env, _owner, alice, bob, _token_a_id, _token_b_id, _lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
 
     env.mock_all_auths();
-    token_a.mint(&alice, &500i128);
-    token_b.mint(&alice, &500i128);
-    token_a.mint(&bob, &500i128);
-    token_b.mint(&bob, &500i128);
+    token_a_admin.mint(&alice, &500i128);
+    token_b_admin.mint(&alice, &500i128);
+    token_a_admin.mint(&bob, &500i128);
+    token_b_admin.mint(&bob, &500i128);
 
     client.add_liquidity(&alice, &100i128, &100i128);
     client.add_liquidity(&bob, &200i128, &200i128);
     let bob_share = client.pool_share(&bob);
     assert!(bob_share > 0);
+}
+
+#[test]
+#[should_panic(expected = "Error(Auth, InvalidAction)")]
+fn test_initialize_requires_owner_auth() {
+    let env = Env::default();
+    let owner = Address::generate(&env);
+
+    let (token_a_id, _, _) = register_token(&env, &owner);
+    let (token_b_id, _, _) = register_token(&env, &owner);
+
+    let contract_id = env.register_contract(None, SwapLiquidityContract);
+    let (lp_token_id, _, _) = register_token(&env, &contract_id);
+
+    let client = SwapLiquidityContractClient::new(&env, &contract_id);
+
+    // Do NOT mock auths — initialize must fail because owner.require_auth() is not satisfied
+    client.initialize(&owner, &token_a_id, &token_b_id, &lp_token_id);
 }

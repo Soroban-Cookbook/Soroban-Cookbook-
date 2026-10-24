@@ -93,6 +93,8 @@ const networkPassphrase = Networks.TESTNET; // Or custom string for Futurenet
 
 ## Supported Wallets
 
+> For **Hana**, **LOBSTR**, and **Ledger** (with runnable, tested adapter examples), plus a wallet comparison guide and Stellar Wallets Kit for multi-wallet support, see [Additional Wallet Support](./additional-wallets.md).
+
 ### Freighter
 
 - Overview: Freighter is the most commonly used browser extension for Stellar and Soroban development. It is a strong default choice for local development and Testnet testing.

@@ -7,12 +7,17 @@
 - [Setup Environment](./guides/getting-started.md)
 - [macOS Setup Guide](./guides/macos-setup.md)
 
+# Community
+
+- [Community Calls](./community-calls.md)
+
 # Guides
 
 - [Testing Guide](./guides/testing.md)
 - [Mobile Testing Guide](./guides/mobile-testing.md)
 - [Local Simulation](./guides/local-simulation.md)
 - [Deployment Guide](./guides/deployment.md)
+- [Deployment Best Practices](./docs/deployment-best-practices.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
 - [Project Templates](./docs/project-templates.md)
 - [Video Creation Tools](./guides/video-creation.md)
@@ -21,6 +26,7 @@
 # Playground
 
 - [Playground Infrastructure](./playground.md)
+- [Interactive Playground — Intermediate Examples](./examples/playground-intermediate.md)
 
 ## Interactive Tutorials
 
@@ -79,6 +85,7 @@
 - [03 Â· NFT Metadata Standards](./examples/nfts/03-nft-metadata-standards.md)
 - [04 Â· NFT Marketplace](./examples/nfts/04-nft-marketplace.md)
 - [NFT Patterns Reference](./docs/nft-patterns.md)
+- [NFT Best Practices](./docs/nft-best-practices.md)
 - [NFT Development Video Walkthrough](./docs/nft-development-video.md)
 
 ## Governance (11 examples)
@@ -124,6 +131,7 @@
 
 # API Reference
 
+- [Code Examples](./docs/code-examples.md)
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
 - [Code Review Checklist](./docs/review-checklist.md)
@@ -138,7 +146,6 @@
 - [Featured Projects](./../docs/featured-projects.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
-- [Documentation Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
 - [Glossary](./docs/glossary.md)
 - [Translation Infrastructure](./docs/translation-infrastructure.md)
@@ -154,10 +161,12 @@
 - [Site Search](./docs/search.md)
 
 # Community
+# Languages
+
+- [Language Support](./language-support.md)
 
 - [Community Guidelines](./community-guidelines.md)
 - [Quality Dashboard](./docs/quality-dashboard.md)
-- [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Grants Application Process](./docs/grants-process.md)
@@ -185,5 +194,12 @@
   - [ADR-003: Soroban SDK Version](./adr/003-soroban-sdk-version.md)
   - [ADR-004: Testing Framework](./adr/004-testing-framework.md)
   - [ADR-005: Documentation Platform](./adr/005-documentation-platform.md)
-  - [ADR Template](./adr/template.md)
 
+  - [ADR-002: Select Storage Tier by Lifetime](./adr/002-select-storage-tier.md)
+  - [ADR-003: Stable Storage Keys and TTL](./adr/003-stable-storage-keys-and-ttl.md)
+  - [ADR-004: Authenticate Before State Changes](./adr/004-authenticate-before-state-changes.md)
+  - [ADR-005: Least-Privilege Access Control](./adr/005-use-least-privilege-access-control.md)
+  - [ADR-006: Guard Contract Code Upgrades](./adr/006-guard-contract-upgrades.md)
+  - [ADR-007: Versioned State Migrations](./adr/007-version-state-migrations.md)
+ 8c99210 (Create Pattern Selection ADRs)
+  - [ADR Template](./adr/template.md)

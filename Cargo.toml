@@ -19,7 +19,7 @@ resolver = "2"
 # `templates/nft-marketplace-dapp` is a single package (not a workspace) whose
 # contract library lives at `contracts/marketplace/src/lib.rs`. It is listed
 # under `members` below so `cargo build --workspace` and `cargo test --workspace`
-# build it with the workspace `soroban-sdk` (28.0.0-rc.1), keeping it from
+# build it with the workspace `soroban-sdk` (29.0.0), keeping it from
 # rotting unnoticed.
 exclude = [
     "templates/dao-governance-dapp",
@@ -112,6 +112,7 @@ members = [
     "examples/intermediate/event-history",
     "examples/intermediate/ajo-factory",
     "examples/intermediate/ajo",
+    "examples/nfts/04-nft-marketplace",
     "examples/tokens/01-sep41-token",
     "examples/tokens/01-vesting-management",
     "examples/tokens/02-minting-strategies",

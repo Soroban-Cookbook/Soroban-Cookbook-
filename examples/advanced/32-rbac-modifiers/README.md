@@ -1,8 +1,14 @@
 # RBAC Modifiers
 
+<<<<<<< HEAD:examples/advanced/32-rbac-modifiers/README.md
 **Canonical RBAC Pattern** — Role-Based Access Control (RBAC) for Soroban smart contracts. This is the recommended starting point for learning RBAC patterns in Soroban. It demonstrates how to define roles, protect functions with composable role guards, and emit a consistent event model for every role change.
 
 > **Note:** This is the canonical RBAC example in the cookbook. Other access control examples build on or extend this pattern for specialized use cases. See [Related Examples](#related-examples) below for comparison.
+=======
+Related decision: [ADR-005: Least-Privilege Access Control](../../../docs/adr/005-use-least-privilege-access-control.md).
+
+Role-Based Access Control (RBAC) patterns for Soroban smart contracts. This example shows how to define roles, protect functions with composable role guards, and emit a consistent event model for every role change.
+>>>>>>> 8c99210 (Create Pattern Selection ADRs):examples/advanced/03-rbac-modifiers/README.md
 
 ## What You'll Learn
 
