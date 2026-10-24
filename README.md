@@ -214,6 +214,11 @@ Community health reports will be published quarterly using the [report template]
 ## Additional Resources
 If it is showing up, likely `typos` doesn't know about it yet.
 
+- [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
+- [Stellar Developer Portal](https://developers.stellar.org)
+- [Soroban Rust SDK](https://github.com/stellar/rs-soroban-sdk)
+- [Stellar Community Discord](https://discord.gg/stellardev)
+- [Social Media Analytics](./docs/social-media-analytics.md) — Quarterly reporting process
 `typos` maintains a list of known typo corrections to keep the false positive
 count low so it can safely run unassisted.
 

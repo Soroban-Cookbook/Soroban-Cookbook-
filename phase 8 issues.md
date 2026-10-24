@@ -100,6 +100,68 @@ Community and ecosystem initiatives — in-repo deliverables are tracked per iss
 - **Priority:** High
 - **Status:** ✅ Complete
 
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Monitor GitHub activity
+- **Acceptance Criteria:**
+  - Stars tracked
+  - Forks tracked
+  - Contributors counted
+  - Issue metrics
+  - PR metrics
+
+
+### Issue #428: Track Documentation Metrics
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Monitor documentation usage
+- **Acceptance Criteria:**
+  - Page views tracked
+  - Search queries analyzed
+  - Popular content identified
+  - User paths tracked
+  - Dashboard
+
+
+### Issue #429: Monitor Social Media
+
+
+- **Priority:** Medium
+- **Status:** In Progress
+- **GitHub issue:** [#931](https://github.com/my908-hue/Soroban-Cookbook-/issues/931)
+
+- **Current state:** A quarterly metrics guide and report template are available in [`docs/social-media-analytics.md`](./docs/social-media-analytics.md) and linked from the README and documentation index. No verified baseline or completed report exists yet.
+- **Remaining work:** Confirm official social profiles, arrange authorized analytics access, collect and publish the first report, then continue quarterly reporting.
+- **Implementation hints:** Publish reviewed reports to `docs/reports/social-media/YYYY-QN.md`; link reports from the README or documentation index.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
+- **Scope:** M
+- **Description:** Social media analytics
+- **Acceptance Criteria:**
+  - Followers tracked
+  - Engagement measured
+  - Mentions monitored
+  - Sentiment analysis
+  - Regular reports
+
+
+### Issue #430: Create Community Health Report
+
+
+- **Priority:** Medium
+- **Status:** Planned
+
+- **Current state:** No in-repo deliverables; operational/community work tracked for planning.
+- **Implementation hints:** Document outcomes in README or `CONTRIBUTING.md` when completed; link external resources.
+- **Verification:** Manual verification against acceptance criteria; update phase file when done.
 - **Current state:** Deliverables created in-repo (July 23, 2026).
 - **Implementation hints:** Outcomes documented in README and CONTRIBUTING.md; external resources linked.
 - **Verification:** All acceptance criteria met — see deliverables below.

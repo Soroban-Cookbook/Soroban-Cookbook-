@@ -19,19 +19,22 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | ADR | Title | Status |
 | --- | ----- | ------ |
 | [ADR-001](./001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted |
-<<<<<<< HEAD
+| [ADR-002](./002-workspace-structure.md) | Organize Contracts in a Cargo Workspace | Proposed |
+| [ADR-003](./003-testing-approach.md) | Test Contracts at Multiple Levels | Proposed |
+| [ADR-004](./004-ci-cd.md) | Validate Changes with GitHub Actions | Proposed |
+| [ADR-005](./005-documentation-publishing.md) | Publish Documentation with mdBook | Proposed |
 | [ADR-002](./002-rust-version.md) | Rust Version | Accepted |
 | [ADR-003](./003-soroban-sdk-version.md) | Soroban SDK Version | Accepted |
 | [ADR-004](./004-testing-framework.md) | Testing Framework | Accepted |
 | [ADR-005](./005-documentation-platform.md) | Documentation Platform | Accepted |
-=======
+
 | [ADR-002](./002-select-storage-tier.md) | Select Storage Tier by Lifetime | Proposed |
 | [ADR-003](./003-stable-storage-keys-and-ttl.md) | Keep Storage Keys Stable and Manage TTL Explicitly | Proposed |
 | [ADR-004](./004-authenticate-before-state-changes.md) | Authenticate Before Protected State Changes | Proposed |
 | [ADR-005](./005-use-least-privilege-access-control.md) | Use Least-Privilege Access Control | Proposed |
 | [ADR-006](./006-guard-contract-upgrades.md) | Guard Contract Code Upgrades | Proposed |
 | [ADR-007](./007-version-state-migrations.md) | Version and Migrate Persistent State Explicitly | Proposed |
->>>>>>> 8c99210 (Create Pattern Selection ADRs)
+ 8c99210 (Create Pattern Selection ADRs)
 
 ## Creating a New ADR
 
@@ -39,7 +42,7 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 2. Fill in all sections — context, decision, and consequences
 3. Set the status to `Proposed`
 4. Open a PR; once merged and agreed upon, update the status to `Accepted`
-5. Add the new ADR to the index table above and in [`docs/adr/README.md`](../../docs/adr/README.md)
+5. Add the new ADR to the index table above and in [`docs/adr/README.md`](../../../docs/adr/README.md)
 
 ## ADR Statuses
 
