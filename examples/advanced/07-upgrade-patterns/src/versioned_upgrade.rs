@@ -158,6 +158,7 @@ impl VersionedUpgradeContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(VersionedError::AlreadyInitialized);
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
         // Write v1-schema counter.

@@ -39,6 +39,8 @@ pub enum BuilderError {
     AlreadyValidated = 6,
     InsufficientBalance = 7,
     DuplicateOperation = 8,
+    Unauthorized = 9,
+    NotInitialized = 10,
 }
 
 #[contracttype]
@@ -52,6 +54,7 @@ pub struct BatchDraft {
 #[contracttype]
 #[derive(Clone)]
 enum DataKey {
+    Admin,
     NextBatchId,
     Batch(u32),
     Balance(Address),
@@ -63,16 +66,20 @@ pub struct BatchBuilderContract;
 #[contractimpl]
 impl BatchBuilderContract {
     /// Initialize batch-builder storage.
-    pub fn initialize(env: Env) {
-        if env.storage().instance().has(&DataKey::NextBatchId) {
-            return;
+    pub fn initialize(env: Env, admin: Address) {
+        if env.storage().instance().has(&DataKey::Admin) {
+            panic!("already initialized");
         }
+        admin.require_auth();
+        env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::NextBatchId, &1u32);
     }
 
     /// Start a new empty batch and return its identifier.
     pub fn begin_batch(env: Env) -> u32 {
-        Self::initialize(env.clone());
+        if !env.storage().instance().has(&DataKey::Admin) {
+            panic!("not initialized");
+        }
         let id: u32 = env
             .storage()
             .instance()
@@ -98,6 +105,7 @@ impl BatchBuilderContract {
         to: Address,
         amount: i128,
     ) -> Result<(), BuilderError> {
+        Self::require_admin(&env)?;
         Self::push_op(env, batch_id, BatchOp::Transfer(from, to, amount))
     }
 
@@ -108,6 +116,7 @@ impl BatchBuilderContract {
         account: Address,
         amount: i128,
     ) -> Result<(), BuilderError> {
+        Self::require_admin(&env)?;
         Self::push_op(env, batch_id, BatchOp::Mint(account, amount))
     }
 
@@ -118,6 +127,7 @@ impl BatchBuilderContract {
         account: Address,
         amount: i128,
     ) -> Result<(), BuilderError> {
+        Self::require_admin(&env)?;
         Self::push_op(env, batch_id, BatchOp::Burn(account, amount))
     }
 
@@ -160,6 +170,7 @@ impl BatchBuilderContract {
 
     /// Execute a validated batch and return the number of applied operations.
     pub fn execute_batch(env: Env, batch_id: u32) -> Result<u32, BuilderError> {
+        Self::require_admin(&env)?;
         let draft = Self::load_draft(&env, batch_id)?;
         if !draft.validated {
             return Err(BuilderError::NotValidated);
@@ -176,10 +187,12 @@ impl BatchBuilderContract {
     }
 
     /// Seed an account balance (used by tests and demos).
-    pub fn set_balance(env: Env, account: Address, amount: i128) {
+    pub fn set_balance(env: Env, account: Address, amount: i128) -> Result<(), BuilderError> {
+        Self::require_admin(&env)?;
         env.storage()
             .instance()
             .set(&DataKey::Balance(account), &amount);
+        Ok(())
     }
 
     /// Read an account balance.
@@ -188,6 +201,16 @@ impl BatchBuilderContract {
             .instance()
             .get(&DataKey::Balance(account))
             .unwrap_or(0)
+    }
+
+    fn require_admin(env: &Env) -> Result<(), BuilderError> {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(BuilderError::NotInitialized)?;
+        admin.require_auth();
+        Ok(())
     }
 
     fn push_op(env: Env, batch_id: u32, op: BatchOp) -> Result<(), BuilderError> {

@@ -53,6 +53,7 @@ impl VoteDelegationContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(DelegationError::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().extend_ttl(10000, 10000);
         Ok(())

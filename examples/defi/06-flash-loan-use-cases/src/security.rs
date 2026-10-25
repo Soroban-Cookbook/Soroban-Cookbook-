@@ -73,7 +73,7 @@ impl SecureReceiverContract {
         // Insert custom use-case logic here (arbitrage, liquidation, etc.)
         // ----------------------------------------------------------------
 
-        let repay = amount + fee;
+        let repay = amount.checked_add(fee).expect("repay overflow");
         let token_client = token::Client::new(&env, &token);
         let contract = env.current_contract_address();
 

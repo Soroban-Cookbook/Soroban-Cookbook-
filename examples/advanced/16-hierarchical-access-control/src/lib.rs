@@ -112,6 +112,7 @@ impl HierarchicalAccessControlContract {
         if env.storage().instance().has(&DataKey::Initialized) {
             panic!("Already initialized");
         }
+        initial_admin.require_auth();
 
         // Grant ADMIN to initial admin
         let mut admin_members: Vec<Address> = Vec::new(&env);

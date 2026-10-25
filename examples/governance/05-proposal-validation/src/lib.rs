@@ -2,7 +2,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Bytes, Env, Symbol, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Bytes, Env, Symbol,
+    Vec,
 };
 
 const MIN_LEAD_TIME: u64 = 10;
@@ -23,6 +24,7 @@ pub enum DataKey {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Proposal {
     pub id: u32,
+    pub creator: Address,
     pub topic: Symbol,
     pub starts_at: u64,
     pub ends_at: u64,
@@ -42,6 +44,7 @@ pub enum ProposalError {
     TopicConflict = 5,
     ProposalNotFound = 6,
     ProposalAlreadyClosed = 7,
+    Unauthorized = 8,
 }
 
 #[contract]
@@ -51,12 +54,14 @@ pub struct ProposalValidation;
 impl ProposalValidation {
     pub fn create_proposal(
         env: Env,
+        creator: Address,
         topic: Symbol,
         starts_at: u64,
         ends_at: u64,
         quorum_bps: u32,
         metadata_hash: Bytes,
     ) -> Result<u32, ProposalError> {
+        creator.require_auth();
         Self::validate_input(&env, starts_at, ends_at, quorum_bps, metadata_hash.clone())?;
         let topic_key = topic.clone();
         Self::validate_topic_conflicts(&env, topic_key.clone(), starts_at, ends_at)?;
@@ -65,6 +70,7 @@ impl ProposalValidation {
 
         let proposal = Proposal {
             id: proposal_id,
+            creator: creator.clone(),
             topic: topic_key.clone(),
             starts_at,
             ends_at,
@@ -105,9 +111,17 @@ impl ProposalValidation {
             .get(&DataKey::Proposal(proposal_id))
     }
 
-    pub fn close_proposal(env: Env, proposal_id: u32) -> Result<(), ProposalError> {
+    pub fn close_proposal(
+        env: Env,
+        caller: Address,
+        proposal_id: u32,
+    ) -> Result<(), ProposalError> {
         let mut proposal =
             Self::get_proposal(env.clone(), proposal_id).ok_or(ProposalError::ProposalNotFound)?;
+        caller.require_auth();
+        if caller != proposal.creator {
+            return Err(ProposalError::Unauthorized);
+        }
 
         if !proposal.active {
             return Err(ProposalError::ProposalAlreadyClosed);

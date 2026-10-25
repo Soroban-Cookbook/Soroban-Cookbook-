@@ -107,7 +107,8 @@ fn test_wrapper_and_vesting_cross_contract_flow() {
 
     underlying_admin.mint(&alice, &10_000);
     underlying_admin.mint(&bob, &2_000);
-    underlying_admin.mint(&vesting_admin, &5_000);
+    // create_schedule pulls each allocation from the admin, on top of the funding transfer.
+    underlying_admin.mint(&vesting_admin, &8_000);
 
     let wrapper_id = env.register_contract(None, token_wrapper::TokenWrapper);
     let wrapper = token_wrapper::TokenWrapperClient::new(&env, &wrapper_id);

@@ -25,6 +25,9 @@ pub struct ReentrancyGuardContract;
 #[contractimpl]
 impl ReentrancyGuardContract {
     pub fn init(env: Env) {
+        if env.storage().instance().has(&DataKey::Entered) {
+            panic!("already initialized");
+        }
         env.storage().instance().set(&DataKey::Entered, &false);
     }
 

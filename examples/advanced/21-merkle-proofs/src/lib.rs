@@ -113,9 +113,9 @@ pub enum DataKey {
     /// Monotonically increasing generation counter, bumped on every root
     /// update. Used to invalidate "claimed" records from a previous root.
     Generation,
-    /// Per-(generation, leaf index) claim marker. Only ever stores `true`;
-    /// presence == claimed. This keeps storage O(claims) instead of O(leaves).
-    Claimed(u32, u32),
+    /// Per-(generation, leaf index, claimer) claim marker. Only ever stores `true`.
+    /// The claimer is part of the key so one account cannot consume another's index.
+    Claimed(u32, u32, Address),
 }
 
 #[contracttype]
@@ -253,10 +253,12 @@ impl MerkleProofContract {
     /// the number of *leaves* in the tree.
     pub fn verify_and_claim(
         env: Env,
+        claimer: Address,
         leaf: BytesN<32>,
         index: u32,
         proof: Vec<BytesN<32>>,
     ) -> Result<(), MerkleError> {
+        claimer.require_auth();
         let root = read_root(&env)?;
         let leaf_count: u32 = env
             .storage()
@@ -275,7 +277,7 @@ impl MerkleProofContract {
             .instance()
             .get(&DataKey::Generation)
             .unwrap_or(0);
-        let claim_key = DataKey::Claimed(generation, index);
+        let claim_key = DataKey::Claimed(generation, index, claimer);
         if env.storage().persistent().has(&claim_key) {
             return Err(MerkleError::AlreadyClaimed);
         }
@@ -300,7 +302,7 @@ impl MerkleProofContract {
 
     /// Whether the leaf at `index` has already been claimed against the
     /// currently active root generation.
-    pub fn is_claimed(env: Env, index: u32) -> bool {
+    pub fn is_claimed(env: Env, claimer: Address, index: u32) -> bool {
         let generation: u32 = env
             .storage()
             .instance()
@@ -308,7 +310,7 @@ impl MerkleProofContract {
             .unwrap_or(0);
         env.storage()
             .persistent()
-            .has(&DataKey::Claimed(generation, index))
+            .has(&DataKey::Claimed(generation, index, claimer))
     }
 
     /// Hash a raw leaf payload using the same convention the off-chain

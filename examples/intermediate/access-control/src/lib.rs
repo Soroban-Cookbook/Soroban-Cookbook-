@@ -52,6 +52,7 @@ pub enum DataKey {
     ProposalCount,
     Proposal(u32),
     Signers,
+    Threshold,
 }
 
 #[contracttype]
@@ -130,6 +131,9 @@ impl AccessControl {
         if threshold == 0 || threshold > signers.len() {
             return Err(AccessControlError::InvalidThreshold);
         }
+        if timelock_delay < DEFAULT_MIN_DELAY || timelock_delay > DEFAULT_MAX_DELAY {
+            return Err(AccessControlError::Unauthorized);
+        }
 
         env.storage().instance().set(&DataKey::Initialized, &true);
         env.storage()
@@ -147,6 +151,9 @@ impl AccessControl {
         env.storage().instance().set(&DataKey::Paused, &false);
         env.storage().instance().set(&DataKey::ProposalCount, &0u32);
         env.storage().instance().set(&DataKey::Signers, &signers);
+        env.storage()
+            .instance()
+            .set(&DataKey::Threshold, &threshold);
 
         env.events().publish(
             (CONTRACT_NS, ACTION_ROLE_CHANGE, admin.clone()),
@@ -357,6 +364,15 @@ impl AccessControl {
             return Err(AccessControlError::TimelockActive);
         }
 
+        let signers: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::Signers)
+            .unwrap_or(Vec::new(&env));
+        if !signers.contains(&proposer) {
+            return Err(AccessControlError::NotASigner);
+        }
+
         let mut proposal_count: u32 = env
             .storage()
             .instance()
@@ -459,13 +475,12 @@ impl AccessControl {
             return Err(AccessControlError::ProposalNotReady);
         }
 
-        let signers: Vec<Address> = env
+        let threshold: u32 = env
             .storage()
             .instance()
-            .get(&DataKey::Signers)
-            .unwrap_or(Vec::new(&env));
-
-        if proposal.approvals.len() < 2 || proposal.approvals.len() < signers.len() / 2 + 1 {
+            .get(&DataKey::Threshold)
+            .unwrap_or(0);
+        if threshold == 0 || proposal.approvals.len() < threshold {
             return Err(AccessControlError::InsufficientApprovals);
         }
 

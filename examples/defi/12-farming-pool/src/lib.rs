@@ -37,10 +37,10 @@ pub struct FarmingPoolContract;
 impl FarmingPoolContract {
     /// Initialize the contract with an admin address.
     pub fn initialize(env: Env, admin: Address) {
-        admin.require_auth();
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("Already initialized");
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()
             .instance()
@@ -96,6 +96,11 @@ impl FarmingPoolContract {
         admin.require_auth();
         Self::check_admin(&env, &admin);
 
+        let pool = Self::get_pool(&env, pool_id);
+        if pool.total_staked > 0 {
+            panic!("pool has staked funds");
+        }
+
         let pools: Vec<u32> = env
             .storage()
             .instance()
@@ -150,6 +155,9 @@ impl FarmingPoolContract {
     ) {
         admin.require_auth();
         Self::check_admin(&env, &admin);
+        if to != admin {
+            panic!("recipient must be admin");
+        }
 
         // Transfer tokens out of the contract
         let client = soroban_sdk::token::Client::new(&env, &token);
@@ -165,27 +173,29 @@ impl FarmingPoolContract {
 
         Self::update_pool(&env, &mut pool);
 
-        if user_info.amount > 0 {
-            let pending = (user_info.amount * pool.acc_reward_per_share / 1_000_000_000_000)
-                - user_info.reward_debt;
-            if pending > 0 {
-                Self::safe_reward_transfer(&env, &pool.reward_token, &user, pending);
-            }
-        }
-
+        let pending = Self::pending_reward(&user_info, &pool);
         if amount > 0 {
-            let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
-            client.transfer(&user, env.current_contract_address(), &amount);
-            user_info.amount += amount;
-            pool.total_staked += amount;
+            user_info.amount = user_info.amount.checked_add(amount).expect("overflow");
+            pool.total_staked = pool.total_staked.checked_add(amount).expect("overflow");
         }
-
-        user_info.reward_debt = user_info.amount * pool.acc_reward_per_share / 1_000_000_000_000;
+        user_info.reward_debt = user_info
+            .amount
+            .checked_mul(pool.acc_reward_per_share)
+            .expect("overflow")
+            / 1_000_000_000_000;
 
         env.storage().instance().set(&DataKey::Pool(pool_id), &pool);
         env.storage()
             .persistent()
             .set(&DataKey::UserInfo(pool_id, user.clone()), &user_info);
+
+        if pending > 0 {
+            Self::safe_reward_transfer(&env, &pool.reward_token, &user, pending);
+        }
+        if amount > 0 {
+            let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
+            client.transfer(&user, env.current_contract_address(), &amount);
+        }
     }
 
     /// Withdraw staking tokens from a pool.
@@ -201,25 +211,29 @@ impl FarmingPoolContract {
 
         Self::update_pool(&env, &mut pool);
 
-        let pending = (user_info.amount * pool.acc_reward_per_share / 1_000_000_000_000)
-            - user_info.reward_debt;
-        if pending > 0 {
-            Self::safe_reward_transfer(&env, &pool.reward_token, &user, pending);
-        }
-
+        let pending = Self::pending_reward(&user_info, &pool);
         if amount > 0 {
-            user_info.amount -= amount;
-            pool.total_staked -= amount;
-            let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
-            client.transfer(&env.current_contract_address(), &user, &amount);
+            user_info.amount = user_info.amount.checked_sub(amount).expect("underflow");
+            pool.total_staked = pool.total_staked.checked_sub(amount).expect("underflow");
         }
-
-        user_info.reward_debt = user_info.amount * pool.acc_reward_per_share / 1_000_000_000_000;
+        user_info.reward_debt = user_info
+            .amount
+            .checked_mul(pool.acc_reward_per_share)
+            .expect("overflow")
+            / 1_000_000_000_000;
 
         env.storage().instance().set(&DataKey::Pool(pool_id), &pool);
         env.storage()
             .persistent()
             .set(&DataKey::UserInfo(pool_id, user.clone()), &user_info);
+
+        if pending > 0 {
+            Self::safe_reward_transfer(&env, &pool.reward_token, &user, pending);
+        }
+        if amount > 0 {
+            let client = soroban_sdk::token::Client::new(&env, &pool.staking_token);
+            client.transfer(&env.current_contract_address(), &user, &amount);
+        }
     }
 
     /// Helper to check if the caller is admin.
@@ -227,6 +241,19 @@ impl FarmingPoolContract {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         if admin != *caller {
             panic!("Unauthorized");
+        }
+    }
+
+    fn pending_reward(user_info: &UserInfo, pool: &PoolInfo) -> i128 {
+        let accrued = user_info
+            .amount
+            .checked_mul(pool.acc_reward_per_share)
+            .expect("overflow")
+            / 1_000_000_000_000;
+        if accrued > user_info.reward_debt {
+            accrued.checked_sub(user_info.reward_debt).expect("underflow")
+        } else {
+            0
         }
     }
 
@@ -262,10 +289,19 @@ impl FarmingPoolContract {
         }
 
         let ledger_count = (current_ledger - pool.last_reward_ledger) as i128;
-        let reward = ledger_count * pool.reward_rate;
+        let reward = ledger_count
+            .checked_mul(pool.reward_rate)
+            .expect("overflow");
 
         // Scale by 1e12 for precision
-        pool.acc_reward_per_share += reward * 1_000_000_000_000 / pool.total_staked;
+        let accrued = reward
+            .checked_mul(1_000_000_000_000)
+            .expect("overflow")
+            / pool.total_staked;
+        pool.acc_reward_per_share = pool
+            .acc_reward_per_share
+            .checked_add(accrued)
+            .expect("overflow");
         pool.last_reward_ledger = current_ledger;
     }
 

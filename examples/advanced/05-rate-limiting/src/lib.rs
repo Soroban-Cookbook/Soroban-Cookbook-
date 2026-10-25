@@ -108,6 +108,7 @@ impl RateLimiterContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(RateLimitError::AlreadyInitialized);
         }
+        admin.require_auth();
         validate_limit(&default_limit)?;
 
         env.storage().instance().set(&DataKey::Admin, &admin);

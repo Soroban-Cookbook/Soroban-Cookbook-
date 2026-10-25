@@ -148,12 +148,14 @@ fn test_flow_4_unauthorized_timelock_queueing() {
     let delay = 60;
 
     let env2 = Env::default();
+    env2.mock_all_auths();
     let operation_id = Bytes::from_slice(&env2, b"unauth_op");
     let multisig_id = env2.register_contract(None, MultiPartyAuth);
     let timelock_id = env2.register_contract(None, TimelockContract);
     let timelock_client2 = TimelockContractClient::new(&env2, &timelock_id);
 
     timelock_client2.initialize(&multisig_id);
+    env2.set_auths(&[]);
 
     let res = timelock_client2.try_queue(&operation_id, &delay);
     assert!(res.is_err(), "Expected queue to fail due to lack of auth");

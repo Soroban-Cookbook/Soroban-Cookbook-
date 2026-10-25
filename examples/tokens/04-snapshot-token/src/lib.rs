@@ -89,6 +89,8 @@ impl SnapshotToken {
             return Err(SnapshotTokenError::AlreadyInitialized);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Name, &name);
         env.storage().instance().set(&DataKey::Symbol, &symbol);
@@ -165,13 +167,13 @@ impl SnapshotToken {
         record_balance_snapshot(&env, &to, current_snapshot, to_balance);
 
         let new_from_balance = from_balance - amount;
-        let new_to_balance = to_balance
-            .checked_add(amount)
-            .ok_or(SnapshotTokenError::ArithmeticOverflow)?;
-
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &new_from_balance);
+
+        let new_to_balance = read_balance(&env, &to)
+            .checked_add(amount)
+            .ok_or(SnapshotTokenError::ArithmeticOverflow)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);

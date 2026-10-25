@@ -47,6 +47,8 @@ impl MintBurnToken {
             return Err(TokenError::InvalidAmount);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::TotalSupply, &0i128);
         env.storage()

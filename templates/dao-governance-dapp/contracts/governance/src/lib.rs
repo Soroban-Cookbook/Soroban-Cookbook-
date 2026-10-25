@@ -146,7 +146,8 @@ impl DAOGovernanceContract {
         Ok(proposal_id)
     }
 
-    /// Cast vote on a proposal (support: true = for, false = against)
+    /// Cast one vote on a proposal (support: true = for, false = against).
+    /// `weight` must be 1. Each address may vote once.
     pub fn vote(
         env: Env,
         voter: Address,
@@ -156,7 +157,7 @@ impl DAOGovernanceContract {
     ) -> Result<(), GovernanceError> {
         voter.require_auth();
 
-        if weight <= 0 {
+        if weight != 1 {
             return Err(GovernanceError::InvalidAmount);
         }
 
@@ -183,12 +184,12 @@ impl DAOGovernanceContract {
         if support {
             proposal.votes_for = proposal
                 .votes_for
-                .checked_add(weight)
+                .checked_add(1)
                 .ok_or(GovernanceError::ArithmeticOverflow)?;
         } else {
             proposal.votes_against = proposal
                 .votes_against
-                .checked_add(weight)
+                .checked_add(1)
                 .ok_or(GovernanceError::ArithmeticOverflow)?;
         }
 
@@ -236,6 +237,11 @@ impl DAOGovernanceContract {
             proposal.status = ProposalStatus::Defeated;
             env.storage().persistent().set(&prop_key, &proposal);
             return Err(GovernanceError::ProposalNotPassed);
+        }
+
+        // This contract does not custody tokens, so a payment amount cannot be executed.
+        if proposal.amount > 0 {
+            return Err(GovernanceError::InvalidAmount);
         }
 
         proposal.status = ProposalStatus::Executed;

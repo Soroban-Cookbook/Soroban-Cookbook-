@@ -487,6 +487,12 @@ impl TokenFacet {
     /// Mint `amount` tokens to `to`, authorised by `minter`.
     pub fn tf_mint(env: Env, minter: Address, to: Address, amount: i128) {
         minter.require_auth();
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .expect("not initialized");
+        assert!(minter == admin, "missing minter role");
         assert!(amount > 0, "amount must be positive");
 
         let bal: i128 = env

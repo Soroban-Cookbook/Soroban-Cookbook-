@@ -71,6 +71,7 @@ impl AggregatingConsumer {
         if env.storage().instance().has(&AggKey::Admin) {
             return Err(ConsumerError::AlreadyInitialized);
         }
+        admin.require_auth();
         if config.max_age == 0
             || config.min_responses == 0
             || config.min_price <= 0

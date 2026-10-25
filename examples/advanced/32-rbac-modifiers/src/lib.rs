@@ -117,8 +117,9 @@ impl RbacContract {
         {
             panic!("Already initialized");
         }
+        initial_admin.require_auth();
 
-        // Grant ADMIN without requiring auth (bootstrap).
+        // Grant ADMIN to the authenticated bootstrap admin.
         let mut members: Vec<Address> = Vec::new(&env);
         members.push_back(initial_admin.clone());
         env.storage()
