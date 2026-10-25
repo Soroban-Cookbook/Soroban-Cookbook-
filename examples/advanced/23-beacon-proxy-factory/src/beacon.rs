@@ -82,6 +82,7 @@ impl BeaconContract {
         if env.storage().persistent().has(&ADMIN_KEY) {
             panic!("Already initialized");
         }
+        admin.require_auth();
 
         env.storage().persistent().set(&ADMIN_KEY, &admin);
         env.storage().persistent().set(&IMPL_KEY, &implementation);

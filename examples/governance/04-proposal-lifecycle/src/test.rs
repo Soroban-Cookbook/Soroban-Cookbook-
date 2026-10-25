@@ -175,8 +175,8 @@ fn test_vote_success() {
     client.vote(&voter2, &proposal_id, &false, &30i128);
 
     let prop = client.get_proposal(&proposal_id);
-    assert_eq!(prop.votes_yes, 60);
-    assert_eq!(prop.votes_no, 30);
+    assert_eq!(prop.votes_yes, 1);
+    assert_eq!(prop.votes_no, 1);
 }
 
 #[test]
@@ -257,7 +257,7 @@ fn test_vote_ended() {
 fn test_execute_success() {
     let env = Env::default();
     let (admin, client, proposer, dummy) = setup_test_env(&env);
-    client.initialize(&admin, &100i128); // Quorum = 100
+    client.initialize(&admin, &2i128); // Quorum = 2, one vote per address
 
     let description = String::from_str(&env, "Test Proposal");
     let action_args = Vec::from_array(&env, [888u32.into_val(&env)]);
@@ -373,7 +373,7 @@ fn test_execute_failed_proposal() {
 fn test_execute_expired() {
     let env = Env::default();
     let (admin, client, proposer, dummy) = setup_test_env(&env);
-    client.initialize(&admin, &100i128);
+    client.initialize(&admin, &1i128);
 
     let description = String::from_str(&env, "Test Proposal");
     let action_args = Vec::from_array(&env, [42u32.into_val(&env)]);

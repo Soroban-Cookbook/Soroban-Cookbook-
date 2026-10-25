@@ -247,10 +247,12 @@ impl ProposalLifecycleContract {
             return Err(ProposalError::AlreadyVoted);
         }
 
+        // One vote per address. The caller-supplied weight is not voting power.
+        let _ = weight;
         if approve {
-            proposal.votes_yes += weight;
+            proposal.votes_yes += 1;
         } else {
-            proposal.votes_no += weight;
+            proposal.votes_no += 1;
         }
 
         env.storage().persistent().set(&vote_key, &true);
@@ -293,16 +295,15 @@ impl ProposalLifecycleContract {
             return Err(ProposalError::InvalidState);
         }
 
-        env.invoke_contract::<()>(
-            &proposal.target_contract,
-            &proposal.action,
-            proposal.action_args.clone(),
-        );
-
+        let target = proposal.target_contract.clone();
+        let action = proposal.action.clone();
+        let args = proposal.action_args.clone();
         proposal.state = ProposalState::Executed;
         env.storage()
             .persistent()
             .set(&DataKey::Proposal(proposal_id), &proposal);
+
+        env.invoke_contract::<()>(&target, &action, args);
 
         ProposalExecuted {
             proposal_id,

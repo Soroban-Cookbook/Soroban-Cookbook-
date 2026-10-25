@@ -89,7 +89,6 @@ impl GaslessRelayerContract {
 
     pub fn add_trusted_relayer(env: Env, relayer: Address) -> Result<(), RelayerError> {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
-        admin.require_auth();
         env.storage()
             .instance()
             .set(&DataKey::TrustedRelayer(relayer), &true);
@@ -118,6 +117,12 @@ impl GaslessRelayerContract {
     }
 
     pub fn fund(env: Env, owner: Address, amount: i128) -> Result<(), RelayerError> {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(RelayerError::NotInitialized)?;
+        admin.require_auth();
         owner.require_auth();
         if amount <= 0 {
             return Err(RelayerError::InvalidAmount);
@@ -128,9 +133,12 @@ impl GaslessRelayerContract {
             .instance()
             .get(&DataKey::Balance(owner.clone()))
             .unwrap_or(0);
+        let updated = current
+            .checked_add(amount)
+            .ok_or(RelayerError::InvalidAmount)?;
         env.storage()
             .instance()
-            .set(&DataKey::Balance(owner), &(current + amount));
+            .set(&DataKey::Balance(owner), &updated);
         Ok(())
     }
 
@@ -147,6 +155,7 @@ impl GaslessRelayerContract {
         if !Self::is_trusted_relayer(&env, &relayer) {
             return Err(RelayerError::InvalidRelayer);
         }
+        relayer.require_auth();
 
         if tx.amount <= 0 {
             return Err(RelayerError::InvalidAmount);

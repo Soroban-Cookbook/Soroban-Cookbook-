@@ -6,6 +6,7 @@ use soroban_sdk::{testutils::Address as _, Address, Env};
 
 fn setup() -> (Env, Address, StorageMigrationClient<'static>) {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let contract_id = env.register(StorageMigration, ());
     let client = StorageMigrationClient::new(&env, &contract_id);
@@ -84,4 +85,24 @@ fn test_cancel_migration_resets_state() {
     client.cancel_migration();
 
     assert!(matches!(client.migration_state(), MigrationState::None));
+}
+
+#[test]
+fn test_partial_v1_to_v2_resumes_without_zeroing() {
+    let (env, _admin, client) = setup();
+
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+    client.add_user(&alice, &150);
+    client.add_user(&bob, &250);
+
+    assert_eq!(client.migrate_v1_to_v2(&1), 1);
+    assert_eq!(client.profile(&alice).unwrap().balance, 150);
+
+    assert_eq!(client.migrate_v1_to_v2(&1), 1);
+    assert_eq!(client.profile(&alice).unwrap().balance, 150);
+    assert_eq!(client.profile(&bob).unwrap().balance, 250);
+    assert_eq!(client.get_version(), 2);
+    assert_eq!(client.legacy_balance(&alice), 0);
+    assert_eq!(client.legacy_balance(&bob), 0);
 }

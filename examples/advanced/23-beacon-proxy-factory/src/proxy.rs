@@ -45,6 +45,7 @@ impl ProxyContract {
         if env.storage().persistent().has(&BEACON_KEY) {
             panic!("Already initialized");
         }
+        admin.require_auth();
         env.storage().persistent().set(&ADMIN_KEY, &admin);
         env.storage().persistent().set(&BEACON_KEY, &beacon);
 

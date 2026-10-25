@@ -66,6 +66,7 @@ impl VestingContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(VestingError::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Token, &token);
         Ok(())
@@ -104,6 +105,17 @@ impl VestingContract {
         if total_allocation <= 0 || vesting_duration == 0 {
             return Err(VestingError::InvalidSchedule);
         }
+
+        let token_address: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Token)
+            .ok_or(VestingError::NotInitialized)?;
+        token::Client::new(&env, &token_address).transfer(
+            &admin,
+            &env.current_contract_address(),
+            &total_allocation,
+        );
 
         let schedule = VestingSchedule {
             beneficiary: beneficiary.clone(),

@@ -155,11 +155,29 @@ impl StakingPoolContract {
         let now = env.ledger().timestamp();
 
         let (net_amount, penalty, matured) = if now < stake.mature_ts {
-            let penalty = stake.amount * PENALTY_BPS / BASIS_POINTS_DENOMINATOR;
-            (stake.amount - penalty, penalty, false)
+            let penalty = stake
+                .amount
+                .checked_mul(PENALTY_BPS)
+                .expect("overflow")
+                .checked_div(BASIS_POINTS_DENOMINATOR)
+                .expect("overflow");
+            (
+                stake.amount.checked_sub(penalty).expect("underflow"),
+                penalty,
+                false,
+            )
         } else {
-            let bonus = stake.amount * stake.boost_bps / BASIS_POINTS_DENOMINATOR;
-            (stake.amount + bonus, 0, true)
+            let bonus = stake
+                .amount
+                .checked_mul(stake.boost_bps)
+                .expect("overflow")
+                .checked_div(BASIS_POINTS_DENOMINATOR)
+                .expect("overflow");
+            (
+                stake.amount.checked_add(bonus).expect("overflow"),
+                0,
+                true,
+            )
         };
 
         let contract = env.current_contract_address();

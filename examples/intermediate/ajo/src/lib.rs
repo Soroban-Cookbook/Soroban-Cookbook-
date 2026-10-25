@@ -36,6 +36,7 @@ impl Ajo {
         if env.storage().instance().has(&AjoDataKey::Creator) {
             return Err(AjoError::AlreadyInitialized);
         }
+        creator.require_auth();
 
         env.storage().instance().set(&AjoDataKey::Amount, &amount);
         env.storage()

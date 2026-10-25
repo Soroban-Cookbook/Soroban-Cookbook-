@@ -55,6 +55,10 @@ impl MultiPartyAuth {
             return Err(AuthError::InvalidThreshold);
         }
 
+        for signer in signers.iter() {
+            signer.require_auth();
+        }
+
         env.storage()
             .instance()
             .set(&DataKey::Threshold, &threshold);

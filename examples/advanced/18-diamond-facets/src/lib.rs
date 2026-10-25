@@ -118,6 +118,10 @@ impl TokenFacet {
     /// Mint `amount` tokens to `to`. Requires `minter` to have ROLE_MINTER or higher.
     pub fn mint(env: Env, minter: Address, to: Address, amount: i128) {
         minter.require_auth();
+        assert!(
+            AccessFacet::has_role(env.clone(), minter.clone(), ROLE_MINTER),
+            "missing minter role"
+        );
         assert!(amount > 0, "amount must be positive");
 
         let bal: i128 = env

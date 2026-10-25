@@ -213,7 +213,8 @@ fn test_amm_router_robustness_zero_reserves() {
 
     let router_id = env.register_contract(None, AMMRouter);
     let router = AMMRouterClient::new(&env, &router_id);
-    router.initialize();
+    let admin = Address::generate(&env);
+    router.initialize(&admin);
 
     // Add pool with 0 reserves
     router.add_pool(&RouterPool {

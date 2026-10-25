@@ -273,7 +273,8 @@ fn test_regression_registry_and_factory_invariants() {
     let factory = ajo_factory::AjoFactoryClient::new(&env, &factory_id);
 
     let wasm_hash = BytesN::from_array(&env, &[0xAAu8; 32]);
-    factory.initialize(&wasm_hash);
+    let factory_admin = Address::generate(&env);
+    factory.initialize(&factory_admin, &wasm_hash);
 
     // Invariant: Registering metadata makes contracts discoverable
     let contract_name = Symbol::new(&env, "regression_factory");

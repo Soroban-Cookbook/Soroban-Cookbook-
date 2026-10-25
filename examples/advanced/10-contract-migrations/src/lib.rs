@@ -97,10 +97,10 @@ pub struct ContractMigrations;
 #[contractimpl]
 impl ContractMigrations {
     pub fn initialize(env: Env, admin: Address) -> Result<(), MigrationError> {
-        admin.require_auth();
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(MigrationError::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Version, &VERSION_V1);
         env.storage()

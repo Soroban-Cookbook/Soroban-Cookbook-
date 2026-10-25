@@ -17,6 +17,14 @@ fn make_client(env: &Env) -> DelegationMarketplaceClient<'_> {
     DelegationMarketplaceClient::new(env, &contract_id)
 }
 
+fn credit(env: &Env, client: &DelegationMarketplaceClient, account: &Address, amount: i128) {
+    env.as_contract(&client.address, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(account.clone()), &amount);
+    });
+}
+
 // ---------------------------------------------------------------------------
 // Offer listing
 // ---------------------------------------------------------------------------
@@ -27,6 +35,7 @@ fn list_offer_stores_offer() {
     let client = make_client(&env);
     let delegator = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &10i128);
 
     let offer = client.get_offer(&delegator).unwrap();
@@ -41,6 +50,7 @@ fn list_offer_fails_when_offer_already_exists() {
     let client = make_client(&env);
     let delegator = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &10i128);
 
     let err = client
@@ -83,6 +93,7 @@ fn cancel_offer_removes_offer() {
     let client = make_client(&env);
     let delegator = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &10i128);
     client.cancel_offer(&delegator);
 
@@ -112,8 +123,9 @@ fn rent_voting_power_transfers_fee_and_records_delegation() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &5i128);
-    client.fund_account(&renter, &500i128);
+    credit(&env, &client, &renter, 500);
 
     client.rent_voting_power(&renter, &delegator, &10u64, &3600u64);
 
@@ -134,8 +146,9 @@ fn rent_reduces_offer_voting_power() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     client.rent_voting_power(&renter, &delegator, &30u64, &3600u64);
 
@@ -150,12 +163,14 @@ fn rent_removes_offer_when_all_power_rented() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 50);
     client.list_offer(&delegator, &50u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     client.rent_voting_power(&renter, &delegator, &50u64, &3600u64);
 
-    assert!(client.get_offer(&delegator).is_none());
+    let offer = client.get_offer(&delegator).unwrap();
+    assert_eq!(offer.voting_power, 0);
 }
 
 #[test]
@@ -164,8 +179,6 @@ fn rent_fails_when_offer_not_found() {
     let client = make_client(&env);
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
-
-    client.fund_account(&renter, &1000i128);
 
     let err = client
         .try_rent_voting_power(&renter, &delegator, &10u64, &3600u64)
@@ -180,8 +193,9 @@ fn rent_fails_when_insufficient_voting_power() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 5);
     client.list_offer(&delegator, &5u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     let err = client
         .try_rent_voting_power(&renter, &delegator, &10u64, &3600u64)
@@ -196,8 +210,9 @@ fn rent_fails_when_insufficient_balance() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &100i128);
-    client.fund_account(&renter, &50i128);
+    credit(&env, &client, &renter, 50);
 
     let err = client
         .try_rent_voting_power(&renter, &delegator, &1u64, &3600u64)
@@ -213,8 +228,9 @@ fn rent_fails_when_delegation_already_exists() {
     let renter = Address::generate(&env);
 
     // List with enough supply for two rentals
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     // First rental succeeds
     client.rent_voting_power(&renter, &delegator, &10u64, &3600u64);
@@ -238,8 +254,9 @@ fn expire_delegation_removes_record_and_returns_power() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     client.rent_voting_power(&renter, &delegator, &20u64, &3600u64);
 
@@ -262,8 +279,9 @@ fn expire_delegation_fails_before_expiry() {
     let delegator = Address::generate(&env);
     let renter = Address::generate(&env);
 
+    credit(&env, &client, &delegator, 100);
     client.list_offer(&delegator, &100u64, &1i128);
-    client.fund_account(&renter, &1000i128);
+    credit(&env, &client, &renter, 1000);
 
     client.rent_voting_power(&renter, &delegator, &10u64, &3600u64);
 
@@ -291,16 +309,17 @@ fn expire_delegation_fails_when_not_found() {
 // ---------------------------------------------------------------------------
 
 #[test]
-fn fund_account_and_get_balance() {
+fn fund_account_spends_existing_balance_and_does_not_mint() {
     let env = Env::default();
     let client = make_client(&env);
     let account = Address::generate(&env);
 
     assert_eq!(client.get_balance(&account), 0);
+    let missing = client.try_fund_account(&account, &1000i128).unwrap_err();
+    assert_eq!(missing, Ok(MarketplaceError::InsufficientBalance));
+    assert_eq!(client.get_balance(&account), 0);
 
-    client.fund_account(&account, &1000i128);
-    assert_eq!(client.get_balance(&account), 1000);
-
-    client.fund_account(&account, &500i128);
-    assert_eq!(client.get_balance(&account), 1500);
+    credit(&env, &client, &account, 1000);
+    client.fund_account(&account, &400i128);
+    assert_eq!(client.get_balance(&account), 600);
 }

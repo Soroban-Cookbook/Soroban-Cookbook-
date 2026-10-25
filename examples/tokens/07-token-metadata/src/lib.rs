@@ -110,6 +110,7 @@ impl TokenMetadataContract {
         }
         require_non_empty(&name)?;
         require_non_empty(&symbol)?;
+
         admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
@@ -261,13 +262,13 @@ impl TokenMetadataContract {
         if from_balance < amount {
             return Err(MetadataError::InsufficientBalance);
         }
-        let to_balance = read_balance(&env, &to)
-            .checked_add(amount)
-            .ok_or(MetadataError::ArithmeticOverflow)?;
 
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+        let to_balance = read_balance(&env, &to)
+            .checked_add(amount)
+            .ok_or(MetadataError::ArithmeticOverflow)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &to_balance);

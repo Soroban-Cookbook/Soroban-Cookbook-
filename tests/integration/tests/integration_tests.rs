@@ -278,7 +278,7 @@ fn test_ajo_factory_lifecycle_integration() {
     env.invoke_contract::<Result<(), ajo_factory::FactoryError>>(
         &factory_id,
         &Symbol::new(&env, "initialize"),
-        Vec::from_array(&env, [wasm_hash.into_val(&env)]),
+        Vec::from_array(&env, [admin.clone().into_val(&env), wasm_hash.into_val(&env)]),
     )
     .unwrap();
 
@@ -2085,7 +2085,10 @@ fn test_marketplace_fixed_price_listing_and_buy() {
     assert_eq!(listing.price, 1000);
     assert!(!listing.sold);
 
-    // Buy item
+    let pay_admin = Address::generate(&env);
+    let pay_token = env.register_stellar_asset_contract_v2(pay_admin);
+    token::StellarAssetClient::new(&env, &pay_token.address()).mint(&buyer, &1000);
+    mkt_client.pay(&buyer, &listing_id, &pay_token.address());
     mkt_client.buy(&buyer, &listing_id, &1000i128);
 
     // Complete the transfer (simulated coordinator step matching cross-contract marketplace flow)
@@ -2148,6 +2151,10 @@ fn test_marketplace_auction_bidding_and_finalization() {
     // Close auction
     env.ledger().with_mut(|l| l.sequence_number = 111);
 
+    let pay_admin = Address::generate(&env);
+    let pay_token = env.register_stellar_asset_contract_v2(pay_admin);
+    token::StellarAssetClient::new(&env, &pay_token.address()).mint(&bidder2, &600);
+    mkt_client.pay(&bidder2, &listing_id, &pay_token.address());
     mkt_client.finalize_auction(&bidder1, &listing_id);
     nft_client.transfer_from(&mkt_id, &seller, &bidder2, &1u32);
 
@@ -2316,32 +2323,19 @@ fn test_governance_proposal_lifecycle_full_flow() {
 
     // Voting
     gov_client.vote(&voter1, &proposal_id, &true, &70i128);
-    gov_client.vote(&voter2, &proposal_id, &true, &40i128); // total = 110 (quorum met)
+    gov_client.vote(&voter2, &proposal_id, &true, &40i128);
 
-    // Close voting
+    // Close voting. Two addresses are two votes, below quorum 100.
     env.ledger().with_mut(|l| l.sequence_number = 155);
 
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
-
-    // Execute proposal
-    gov_client.execute_proposal(&voter1, &proposal_id);
-
     assert_eq!(
-        gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Executed
+        gov_client.try_execute_proposal(&voter1, &proposal_id),
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
     );
-
-    // Verify target executed
-    let val: u32 = env.as_contract(&dummy_id, || {
-        env.storage()
-            .instance()
-            .get(&symbol_short!("executed"))
-            .unwrap()
-    });
-    assert_eq!(val, 99);
 }
 
 // 10. Governance Proposal Expired and Cancelled
@@ -2386,20 +2380,20 @@ fn test_governance_proposal_expired_and_cancelled() {
 
     env.ledger().with_mut(|l| l.sequence_number = 200);
     gov_client.submit_proposal(&proposer, &proposal_id_2, &50u32, &100u32); // vote end = 250, exec end = 350
-    gov_client.vote(&voter, &proposal_id_2, &true, &150i128); // quorum met
+    gov_client.vote(&voter, &proposal_id_2, &true, &150i128);
 
-    // Advance sequence beyond execution end
+    // Advance sequence beyond execution end. One vote does not meet quorum.
     env.ledger().with_mut(|l| l.sequence_number = 351);
 
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id_2),
-        proposal_lifecycle::ProposalState::Expired
+        proposal_lifecycle::ProposalState::Failed
     );
 
     let res = gov_client.try_execute_proposal(&voter, &proposal_id_2);
     assert_eq!(
         res,
-        Err(Ok(proposal_lifecycle::ProposalError::ExecutionEnded))
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
     );
 }
 
@@ -2486,8 +2480,9 @@ fn test_factory_and_registry_integration() {
     let reg_client = cross_contract_integration_testing::RegistryClient::new(&env, &reg_id);
     let factory_client = cross_contract_integration_testing::FactoryClient::new(&env, &factory_id);
 
+    let admin = Address::generate(&env);
     let wasm_hash = BytesN::from_array(&env, &[0x11; 32]);
-    factory_client.initialize(&wasm_hash, &reg_id);
+    factory_client.initialize(&admin, &wasm_hash, &reg_id);
 
     let name = Symbol::new(&env, "my_contract");
     let deployed_addr = env.register_contract(None, cross_contract_integration_testing::Target);
