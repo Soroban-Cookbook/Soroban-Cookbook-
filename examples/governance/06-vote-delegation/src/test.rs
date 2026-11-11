@@ -7,6 +7,8 @@ use soroban_sdk::{testutils::Address as _, Env};
 #[test]
 fn test_initialization() {
     let env = Env::default();
+    env.mock_all_auths();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let contract_id = env.register_contract(None, VoteDelegationContract);
@@ -26,6 +28,7 @@ fn test_initialization() {
 #[test]
 fn test_set_balance() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let user = Address::generate(&env);
 
@@ -44,6 +47,7 @@ fn test_set_balance() {
 #[test]
 fn test_basic_delegation() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -70,6 +74,7 @@ fn test_basic_delegation() {
 #[test]
 fn test_chain_delegation() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -99,6 +104,7 @@ fn test_chain_delegation() {
 #[test]
 fn test_cycle_detection_direct() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -126,6 +132,7 @@ fn test_cycle_detection_direct() {
 #[test]
 fn test_cycle_detection_indirect() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -156,6 +163,7 @@ fn test_cycle_detection_indirect() {
 #[test]
 fn test_self_delegation() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
 
@@ -178,6 +186,7 @@ fn test_self_delegation() {
 #[test]
 fn test_undelegate() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -205,6 +214,7 @@ fn test_undelegate() {
 #[test]
 fn test_max_depth_exceeded() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let contract_id = env.register_contract(None, VoteDelegationContract);

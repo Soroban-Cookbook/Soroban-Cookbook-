@@ -117,6 +117,7 @@ impl SnapshotTrigger {
 
     /// Event-based snapshot: always records a snapshot when called.
     pub fn record_value(env: Env, owner: Address, value: i128) {
+        owner.require_auth();
         let now = env.ledger().sequence();
         let ts = env.ledger().timestamp();
         let record = SnapshotRecord {
@@ -301,6 +302,7 @@ impl SnapshotTrigger {
             .instance()
             .get(&DataKey::Admin)
             .ok_or(SnapshotError::NotInitialized)?;
+        caller.require_auth();
         if caller != &admin {
             return Err(SnapshotError::Unauthorized);
         }

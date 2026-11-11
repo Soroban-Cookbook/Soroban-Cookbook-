@@ -71,6 +71,7 @@ impl EventHistory {
         if max_entries == 0 {
             return Err(HistoryError::InvalidCapacity);
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()

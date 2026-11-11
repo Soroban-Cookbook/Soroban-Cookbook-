@@ -26,6 +26,7 @@ impl RegistryContract {
         if already.is_some() {
             panic!("already initialized");
         }
+        owner.require_auth();
         env.storage()
             .instance()
             .set(&DataKey::Owner, &owner.clone());
@@ -55,7 +56,6 @@ impl RegistryContract {
             .instance()
             .get(&DataKey::Owner)
             .expect("not initialized");
-        owner.require_auth();
         env.storage().instance().remove(&DataKey::Whitelist(addr));
     }
 

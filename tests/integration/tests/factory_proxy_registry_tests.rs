@@ -31,7 +31,8 @@ fn test_factory_deploys_and_registry_discovers() {
     let factory = ajo_factory::AjoFactoryClient::new(&env, &factory_id);
 
     let wasm_hash = BytesN::from_array(&env, &[0xABu8; 32]);
-    factory.initialize(&wasm_hash);
+    let admin = Address::generate(&env);
+    factory.initialize(&admin, &wasm_hash);
 
     // Register the factory itself in the registry
     reg.register(
@@ -164,7 +165,7 @@ fn test_factory_registry_multisig_governance_lifecycle() {
 
     // Initialize factory
     let wasm_hash = BytesN::from_array(&env, &[0x11u8; 32]);
-    factory.initialize(&wasm_hash);
+    factory.initialize(&admin, &wasm_hash);
 
     // Initialize multi-sig (2-of-3)
     msig.initialize(
@@ -303,7 +304,7 @@ fn test_full_factory_proxy_registry_lifecycle() {
 
     // Initialize all
     let wasm_hash = BytesN::from_array(&env, &[0xAAu8; 32]);
-    factory.initialize(&wasm_hash);
+    factory.initialize(&admin, &wasm_hash);
     proxy_admin.try_initialize(&admin).unwrap().unwrap();
     ver_reg.initialize(&admin);
     msig.initialize(
@@ -397,7 +398,8 @@ fn test_registry_deregistration_and_factory_consistency() {
     let factory = ajo_factory::AjoFactoryClient::new(&env, &factory_id);
 
     let wasm_hash = BytesN::from_array(&env, &[0xFFu8; 32]);
-    factory.initialize(&wasm_hash);
+    let admin = Address::generate(&env);
+    factory.initialize(&admin, &wasm_hash);
 
     // Register factory and two templates
     reg.register(
@@ -498,7 +500,7 @@ fn test_multi_template_factory_with_version_tracking() {
     let factory = ajo_factory::AjoFactoryClient::new(&env, &factory_id);
 
     let wasm_hash = BytesN::from_array(&env, &[0x10u8; 32]);
-    factory.initialize(&wasm_hash);
+    factory.initialize(&admin, &wasm_hash);
 
     // Record factory v1
     let v1 = ver_reg.register(&factory_id, &wasm_hash, &symbol_short!("init"));

@@ -134,6 +134,7 @@ impl BatchTransferContract {
         if initial_supply <= 0 {
             return Err(BatchError::InvalidAmount);
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Initialized, &true);
         env.storage()

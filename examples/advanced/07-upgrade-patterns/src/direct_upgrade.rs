@@ -110,6 +110,7 @@ impl DirectUpgradeContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(UpgradeError::AlreadyInitialized);
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
 

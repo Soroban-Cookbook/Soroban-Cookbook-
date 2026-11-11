@@ -632,7 +632,7 @@ fn test_dao_treasury_proposal_lifecycle() {
     let voter = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    client.initialize(&admin, &100, &10, &20);
+    client.initialize(&admin, &1, &10, &20);
     client.deposit(&proposer, &1_000);
     assert_eq!(client.treasury_balance(), 1_000);
 
@@ -722,8 +722,8 @@ fn test_vesting_management_releases_tokens_over_time() {
 
     client.initialize(&admin, &Some(sac.address()));
 
-    // Fund the vesting contract so it can pay out.
-    asset.mint(&client.address, &1_000);
+    // Fund the admin, who transfers the schedule amount in during creation.
+    asset.mint(&admin, &1_000);
 
     // A cliff of 50 means nothing unlocks before that point.
     client.create_schedule(&admin, &beneficiary, &1_000, &0, &50, &100, &None);
@@ -762,6 +762,8 @@ fn test_vesting_management_validates_schedules() {
     let stranger = Address::generate(&env);
 
     client.initialize(&admin, &Some(sac.address()));
+    let asset = token::StellarAssetClient::new(&env, &sac.address());
+    asset.mint(&admin, &1_000);
 
     // A cliff longer than the vesting duration is invalid.
     assert_eq!(

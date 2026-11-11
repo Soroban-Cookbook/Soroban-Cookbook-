@@ -12,8 +12,9 @@
 //! `escrow`  | Two-party escrow      | `beneficiary`, `amount` |
 //!
 //! ## Access control
-//! Template registration is open (no admin required) but duplicate IDs are
-//! rejected.  Instance creation requires the creator to authorise.
+//! `initialize` authenticates the factory admin. Template registration
+//! requires that admin. Duplicate IDs are rejected. Instance creation
+//! requires the creator to authorise.
 
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
@@ -60,6 +61,7 @@ pub enum FactoryError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum FactoryDataKey {
     WasmHash,
+    Admin,
     DeployedAjos,
     /// Template metadata keyed by template ID symbol.
     Template(Symbol),
@@ -152,10 +154,16 @@ impl AjoFactory {
     /// Automatically registers the `ajo` template so existing callers that
     /// only use `create_ajo` continue to work without calling
     /// `register_template` first.
-    pub fn initialize(env: Env, wasm_hash: BytesN<32>) -> Result<(), FactoryError> {
+    pub fn initialize(
+        env: Env,
+        admin: Address,
+        wasm_hash: BytesN<32>,
+    ) -> Result<(), FactoryError> {
         if env.storage().instance().has(&FactoryDataKey::WasmHash) {
             return Err(FactoryError::AlreadyInitialized);
         }
+        admin.require_auth();
+        env.storage().instance().set(&FactoryDataKey::Admin, &admin);
         env.storage()
             .instance()
             .set(&FactoryDataKey::WasmHash, &wasm_hash);
@@ -194,13 +202,20 @@ impl AjoFactory {
     // Template registry
     // -----------------------------------------------------------------------
 
-    /// Register a new template.  Duplicate IDs are rejected.
+    /// Register a new template. Duplicate IDs are rejected. Only the factory admin.
     pub fn register_template(
         env: Env,
         template_id: Symbol,
         wasm_hash: BytesN<32>,
         version: Symbol,
     ) -> Result<(), FactoryError> {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&FactoryDataKey::Admin)
+            .ok_or(FactoryError::NotInitialized)?;
+        admin.require_auth();
+
         let key = FactoryDataKey::Template(template_id.clone());
         if env.storage().instance().has(&key) {
             return Err(FactoryError::TemplateAlreadyRegistered);

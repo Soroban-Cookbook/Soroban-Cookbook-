@@ -142,9 +142,11 @@ fn test_finalize_active_to_grace_after_deadline() {
     let (client, _admin) = setup(&env);
 
     let creator = Address::generate(&env);
+    let voter = Address::generate(&env);
     let pid = symbol_short!("fin1");
 
     client.create_proposal(&creator, &pid, &1u32);
+    client.vote(&voter, &pid, &true);
 
     // Past voting deadline, still within grace period.
     env.ledger().with_mut(|l| l.timestamp += 110);
@@ -164,9 +166,11 @@ fn test_finalize_grace_to_executable() {
     let (client, _admin) = setup(&env);
 
     let creator = Address::generate(&env);
+    let voter = Address::generate(&env);
     let pid = symbol_short!("fin2");
 
     client.create_proposal(&creator, &pid, &1u32);
+    client.vote(&voter, &pid, &true);
 
     // voting_period = 100s, grace_period = 50s → executable after 150s.
     env.ledger().with_mut(|l| l.timestamp += 160);
@@ -186,9 +190,11 @@ fn test_execute_before_grace_ends_fails() {
     let (client, admin) = setup(&env);
 
     let creator = Address::generate(&env);
+    let voter = Address::generate(&env);
     let pid = symbol_short!("early");
 
     client.create_proposal(&creator, &pid, &1u32);
+    client.vote(&voter, &pid, &true);
 
     // Past deadline but still in grace period.
     env.ledger().with_mut(|l| l.timestamp += 110);

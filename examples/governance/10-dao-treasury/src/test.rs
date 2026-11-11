@@ -185,7 +185,7 @@ fn test_vote_approve_success() {
     client.vote(&voter, &id, &true, &50i128);
 
     let prop = client.get_proposal(&id);
-    assert_eq!(prop.votes_yes, 50);
+    assert_eq!(prop.votes_yes, 1);
     assert_eq!(prop.votes_no, 0);
     assert!(client.has_voted(&id, &voter));
 }
@@ -203,7 +203,7 @@ fn test_vote_reject_success() {
 
     let prop = client.get_proposal(&id);
     assert_eq!(prop.votes_yes, 0);
-    assert_eq!(prop.votes_no, 30);
+    assert_eq!(prop.votes_no, 1);
 }
 
 #[test]
@@ -257,7 +257,7 @@ fn test_vote_zero_weight_fails() {
 
 #[test]
 fn test_proposal_passes_with_quorum() {
-    let ctx = Ctx::new(50, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let voter = Address::generate(&ctx.env);
@@ -310,7 +310,7 @@ fn test_proposal_fails_when_no_votes_outweigh_yes() {
 
 #[test]
 fn test_proposal_expires_after_exec_window() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let voter = Address::generate(&ctx.env);
@@ -331,7 +331,7 @@ fn test_proposal_expires_after_exec_window() {
 
 #[test]
 fn test_execute_transfer_proposal_success() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let executor = Address::generate(&ctx.env);
@@ -415,7 +415,7 @@ fn test_execute_fails_when_proposal_failed() {
 
 #[test]
 fn test_execute_fails_when_already_executed() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let executor = Address::generate(&ctx.env);
@@ -500,7 +500,7 @@ fn test_cancel_by_unauthorized_fails() {
 
 #[test]
 fn test_cancel_executed_proposal_fails() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let executor = Address::generate(&ctx.env);
@@ -542,7 +542,7 @@ fn test_actions_fail_without_initialization() {
 
 #[test]
 fn test_tied_votes_fail() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let voter_yes = Address::generate(&ctx.env);
@@ -565,7 +565,7 @@ fn test_tied_votes_fail() {
 
 #[test]
 fn test_multiple_voters_weighted_correctly() {
-    let ctx = Ctx::new(100, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let v1 = Address::generate(&ctx.env);
@@ -582,8 +582,8 @@ fn test_multiple_voters_weighted_correctly() {
     client.vote(&v3, &id, &true, &50i128);
 
     let prop = client.get_proposal(&id);
-    assert_eq!(prop.votes_yes, 110);
-    assert_eq!(prop.votes_no, 20);
+    assert_eq!(prop.votes_yes, 2);
+    assert_eq!(prop.votes_no, 1);
 
     ctx.advance(51);
     assert_eq!(client.proposal_state(&id), ProposalState::Passed);
@@ -595,7 +595,7 @@ fn test_multiple_voters_weighted_correctly() {
 
 #[test]
 fn test_treasury_balance_after_multiple_transfers() {
-    let ctx = Ctx::new(10, 50, 100);
+    let ctx = Ctx::new(1, 50, 100);
     let client = ctx.client();
     let proposer = Address::generate(&ctx.env);
     let voter = Address::generate(&ctx.env);

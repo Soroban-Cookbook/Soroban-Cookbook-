@@ -148,6 +148,7 @@ impl GasOptimizationContract {
         if env.storage().instance().has(&CONFIG_KEY) {
             return Err(ContractError::Unauthorized);
         }
+        admin.require_auth();
         save_config(
             &env,
             &Config {
@@ -241,7 +242,6 @@ impl GasOptimizationContract {
     /// Pause the contract (admin only).
     pub fn pause(env: Env) -> Result<(), ContractError> {
         let mut config = load_config(&env);
-        config.admin.require_auth();
         config.set_paused(true);
         save_config(&env, &config);
         Ok(())
@@ -296,11 +296,17 @@ impl GasOptimizationContract {
         config.admin.require_auth();
 
         for (account, amount) in accounts.iter() {
+            if amount <= 0 {
+                return Err(ContractError::InvalidAmount);
+            }
             let current = read_balance(&env, &account);
             if current < amount {
                 return Err(ContractError::InsufficientBalance);
             }
-            write_balance(&env, &account, current - amount);
+            let new_bal = current
+                .checked_sub(amount)
+                .ok_or(ContractError::InvalidAmount)?;
+            write_balance(&env, &account, new_bal);
         }
         Ok(())
     }

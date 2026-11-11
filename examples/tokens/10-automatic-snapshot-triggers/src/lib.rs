@@ -35,6 +35,7 @@ pub enum SnapshotError {
     NothingToPrune = 6,
     IndexOutOfBounds = 7,
     EmptyHistory = 8,
+    ArithmeticOverflow = 9,
 }
 
 const EVENT_NS: Symbol = symbol_short!("snapshot");
@@ -100,7 +101,8 @@ impl SnapshotTrigger {
     }
 
     /// Event-based snapshot: always records a snapshot when called.
-    pub fn record_value(env: Env, owner: Address, value: i128) {
+    pub fn record_value(env: Env, owner: Address, value: i128) -> Result<(), SnapshotError> {
+        owner.require_auth();
         let now = env.ledger().sequence();
         let ts = env.ledger().timestamp();
         let record = SnapshotRecord {
@@ -118,14 +120,17 @@ impl SnapshotTrigger {
             .persistent()
             .set(&DataKey::Snapshots(owner.clone()), &snapshots);
 
-        let mut total: u32 = env.storage().instance().get(&DataKey::TotalSnapshots).unwrap_or(0);
-        total += 1;
+        let total: u32 = env.storage().instance().get(&DataKey::TotalSnapshots).unwrap_or(0);
+        let total = total
+            .checked_add(1)
+            .ok_or(SnapshotError::ArithmeticOverflow)?;
         env.storage().instance().set(&DataKey::TotalSnapshots, &total);
 
         env.events().publish(
             (EVENT_NS, symbol_short!("record")),
             (owner, value, now),
         );
+        Ok(())
     }
 
     /// Time-based snapshot: only records if enough ledgers have elapsed.
@@ -146,7 +151,7 @@ impl SnapshotTrigger {
         env.storage().instance().set(&DataKey::LastSnapshot, &now);
 
         let value = Self::latest_value(&env, &owner);
-        Self::record_value(env, owner, value);
+        Self::record_value(env, owner, value)?;
         Ok(())
     }
 
@@ -254,6 +259,7 @@ impl SnapshotTrigger {
         if caller != &admin {
             return Err(SnapshotError::Unauthorized);
         }
+        caller.require_auth();
         Ok(())
     }
 }

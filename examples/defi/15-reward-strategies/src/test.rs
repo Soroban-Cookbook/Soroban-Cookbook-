@@ -1,8 +1,12 @@
 //! Unit tests for the reward distribution strategies contract.
 
 use super::*;
-use soroban_sdk::testutils::Address as _;
+use soroban_sdk::testutils::{Address as _, Ledger as _};
 use soroban_sdk::{Address, Env};
+
+fn at(env: &Env, timestamp: u64) {
+    env.ledger().with_mut(|li| li.timestamp = timestamp);
+}
 
 fn setup(env: &Env) -> (Address, RewardDistributorClient<'static>) {
     let contract_id = env.register_contract(None, RewardDistributor);
@@ -24,10 +28,14 @@ fn test_linear_distribution_releases_over_time() {
         .unwrap();
     client.try_register(&admin, &alice, &1).unwrap().unwrap();
 
+    at(&env, 0);
     assert_eq!(client.claimable(&alice, &0), 0);
+    at(&env, 50);
     assert_eq!(client.claimable(&alice, &50), 500);
+    at(&env, 100);
     assert_eq!(client.claimable(&alice, &100), 1000);
     // Capped at the pool total once the vesting window has fully elapsed.
+    at(&env, 500);
     assert_eq!(client.claimable(&alice, &500), 1000);
 }
 
@@ -54,14 +62,19 @@ fn test_exponential_decay_matches_formula() {
         .unwrap();
     client.try_register(&admin, &alice, &1).unwrap().unwrap();
 
+    at(&env, 0);
     assert_eq!(client.claimable(&alice, &0), 0);
     // 1 period: remaining = 1000 * 9000/10000 = 900 -> released = 100.
+    at(&env, 10);
     assert_eq!(client.claimable(&alice, &10), 100);
     // 2 periods: remaining = 1000 * (9000/10000)^2 = 810 -> released = 190.
+    at(&env, 20);
     assert_eq!(client.claimable(&alice, &20), 190);
 
     // Releases monotonically increase and never exceed the pool total.
+    at(&env, 50);
     let at_5_periods = client.claimable(&alice, &50);
+    at(&env, 200);
     let at_20_periods = client.claimable(&alice, &200);
     assert!(at_20_periods > at_5_periods);
     assert!(at_20_periods <= 1000);
@@ -105,6 +118,7 @@ fn test_claim_tracks_already_claimed_amount() {
         .unwrap();
     client.try_register(&admin, &alice, &1).unwrap().unwrap();
 
+    at(&env, 50);
     let claimed = client.try_claim(&alice, &50).unwrap().unwrap();
     assert_eq!(claimed, 500);
     assert_eq!(client.claimable(&alice, &50), 0);
@@ -116,6 +130,7 @@ fn test_claim_tracks_already_claimed_amount() {
     );
 
     // More unlocks by the end of the window.
+    at(&env, 100);
     let claimed_rest = client.try_claim(&alice, &100).unwrap().unwrap();
     assert_eq!(claimed_rest, 500);
 }

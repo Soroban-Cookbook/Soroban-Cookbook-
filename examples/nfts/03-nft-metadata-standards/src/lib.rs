@@ -48,7 +48,8 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, String, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Bytes, Env, String,
+    Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -411,6 +412,35 @@ impl NftMetadataContract {
         Ok(())
     }
 
+    /// Transfer `token_id` from its owner when `spender` is the owner or an approved operator.
+    pub fn transfer_from(
+        env: Env,
+        spender: Address,
+        from: Address,
+        to: Address,
+        token_id: u32,
+    ) -> Result<(), NftError> {
+        spender.require_auth();
+
+        let owner: Address = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Owner(token_id))
+            .ok_or(NftError::TokenNotFound)?;
+        if owner != from {
+            return Err(NftError::NotOwner);
+        }
+        Self::check_approved(&env, &spender, token_id)?;
+        Self::do_transfer(&env, &from, &to, token_id)?;
+
+        env.events().publish(
+            (symbol_short!("transfer"), symbol_short!("nft")),
+            (from, to, token_id),
+        );
+
+        Ok(())
+    }
+
     // ==================== APPROVALS ====================
 
     /// Approve `approved` to transfer `token_id` on behalf of the owner.
@@ -726,34 +756,26 @@ impl NftMetadataContract {
 ///
 /// Accepted prefixes: `ipfs://`, `https://`, `http://`, `data:`.
 fn is_valid_uri(_env: &Env, uri: &String) -> bool {
-    let len = uri.len() as usize;
-    if len == 0 {
+    let bytes = uri.to_bytes();
+    has_prefix(&bytes, b"ipfs://")
+        || has_prefix(&bytes, b"https://")
+        || has_prefix(&bytes, b"http://")
+        || has_prefix(&bytes, b"data:")
+}
+
+fn has_prefix(bytes: &Bytes, prefix: &[u8]) -> bool {
+    let prefix_len = prefix.len() as u32;
+    if bytes.len() < prefix_len {
         return false;
     }
-
-    // Copy up to 10 bytes to check the scheme prefix
-    let check_len = if len < 10 { len } else { 10 };
-    let mut buf = [0u8; 10];
-    uri.copy_into_slice(&mut buf[..check_len]);
-
-    // ipfs://  (7 bytes)
-    if check_len >= 7 && &buf[..7] == b"ipfs://" {
-        return true;
+    let mut i = 0u32;
+    while i < prefix_len {
+        if bytes.get(i) != Some(prefix[i as usize]) {
+            return false;
+        }
+        i += 1;
     }
-    // https:// (8 bytes)
-    if check_len >= 8 && &buf[..8] == b"https://" {
-        return true;
-    }
-    // http://  (7 bytes)
-    if check_len >= 7 && &buf[..7] == b"http://" {
-        return true;
-    }
-    // data:    (5 bytes)
-    if check_len >= 5 && &buf[..5] == b"data:" {
-        return true;
-    }
-
-    false
+    true
 }
 
 /// Returns `true` if `color` is exactly 6 ASCII hex characters.

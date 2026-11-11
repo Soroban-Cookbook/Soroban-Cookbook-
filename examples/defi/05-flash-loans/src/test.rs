@@ -68,6 +68,7 @@ fn setup_test(
     token::StellarAssetClient<'_>,
 ) {
     let admin = Address::generate(env);
+    env.mock_all_auths();
     let flash_loan_address = env.register(FlashLoanContract, ());
     let flash_loan_client = FlashLoanContractClient::new(env, &flash_loan_address);
     flash_loan_client.init(&admin, &50); // 0.5% fee
@@ -191,11 +192,20 @@ fn test_admin_set_fee() {
 #[should_panic]
 fn test_fail_non_admin_set_fee() {
     let env = Env::default();
-    // No mock_all_auths, or we can manually check auth
     let (_, _, _, flash_loan_client, _, _) = setup_test(&env);
+    // setup mocks every auth so init can require the admin. Drop that
+    // before set_fee so the stored admin is not authorized.
+    env.set_auths(&[]);
 
-    // This will fail because it's not the admin address calling it
     flash_loan_client.set_fee(&100);
+}
+
+#[test]
+#[should_panic(expected = "fee exceeds 100%")]
+fn test_fail_fee_above_100_percent() {
+    let env = Env::default();
+    let (_admin, _, _, flash_loan_client, _, _) = setup_test(&env);
+    flash_loan_client.set_fee(&10_001);
 }
 
 #[test]

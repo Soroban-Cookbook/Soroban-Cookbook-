@@ -73,6 +73,8 @@ impl TokenWrapper {
             return Err(WrapperError::AlreadyInitialized);
         }
 
+        underlying.require_auth();
+
         env.storage()
             .instance()
             .set(&DataKey::Underlying, &underlying);
@@ -195,13 +197,12 @@ impl TokenWrapper {
             return Err(WrapperError::InsufficientWrappedBalance);
         }
 
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
         let to_balance = read_balance(&env, &to)
             .checked_add(amount)
             .ok_or(WrapperError::ArithmeticOverflow)?;
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(from), &(from_balance - amount));
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to), &to_balance);

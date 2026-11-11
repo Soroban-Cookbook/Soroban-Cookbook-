@@ -102,9 +102,19 @@ fn test_emergency_withdraw_admin() {
     token_admin.mint(&client.address, &1000);
     assert_eq!(token.balance(&client.address), 1000);
 
-    let recipient = Address::generate(&env);
-    client.emergency_withdraw_admin(&admin, &token_id, &recipient, &1000);
+    client.emergency_withdraw_admin(&admin, &token_id, &admin, &1000);
 
     assert_eq!(token.balance(&client.address), 0);
-    assert_eq!(token.balance(&recipient), 1000);
+    assert_eq!(token.balance(&admin), 1000);
+}
+
+#[test]
+#[should_panic(expected = "recipient must be admin")]
+fn test_emergency_withdraw_rejects_other_recipient() {
+    let (env, client, admin) = setup_test();
+    let (token_id, _token, token_admin) = create_token(&env, &admin);
+
+    token_admin.mint(&client.address, &1000);
+    let recipient = Address::generate(&env);
+    client.emergency_withdraw_admin(&admin, &token_id, &recipient, &1000);
 }

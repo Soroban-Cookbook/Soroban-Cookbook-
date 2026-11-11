@@ -274,13 +274,23 @@ fn test_deposit_exceeds_balanced_allocation_cap() {
     let (env, admin, client) = setup();
     let user = Address::generate(&env);
 
-    // Switch to Balanced (80 % cap)
+    client.deposit(&user, &20);
     client.switch_strategy(&admin, &StrategyType::Balanced);
 
-    // First deposit: 100 tokens.  100 / 100 = 100 % > 80 % cap → blocked.
-    // The cap check is: amount * BPS_DENOM > new_total * max_allocation_bps
-    // 100 * 10_000 = 1_000_000 > 100 * 8_000 = 800_000 → panic
+    // 81 / 101 is above the 80% cap.
+    client.deposit(&user, &81);
+}
+
+#[test]
+fn test_balanced_accepts_opening_deposit() {
+    let (env, admin, client) = setup();
+    let user = Address::generate(&env);
+
+    client.switch_strategy(&admin, &StrategyType::Balanced);
     client.deposit(&user, &100);
+
+    assert_eq!(client.balance(&user), 100);
+    assert_eq!(client.total_deposits(), 100);
 }
 
 #[test]

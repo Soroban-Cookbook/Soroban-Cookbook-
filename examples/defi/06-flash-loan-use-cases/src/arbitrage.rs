@@ -38,6 +38,7 @@ pub enum DataKey {
     Pool1,
     Pool2,
     TokenB,
+    FlashLoan,
 }
 
 // ---------------------------------------------------------------------------
@@ -53,6 +54,7 @@ impl ArbitrageContract {
         if env.storage().instance().has(&DataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         env.storage().instance().set(&DataKey::Owner, &owner);
     }
 
@@ -73,6 +75,9 @@ impl ArbitrageContract {
         env.storage().temporary().set(&DataKey::Pool1, &pool1);
         env.storage().temporary().set(&DataKey::Pool2, &pool2);
         env.storage().temporary().set(&DataKey::TokenB, &token_b);
+        env.storage()
+            .temporary()
+            .set(&DataKey::FlashLoan, &flash_loan);
 
         FlashLoanClient::new(&env, &flash_loan).flash_loan(
             &env.current_contract_address(),
@@ -87,9 +92,17 @@ impl ArbitrageContract {
 
     /// Flash loan callback: perform the two-leg swap and approve repayment.
     ///
-    /// Security note: in production you would validate `initiator` against a
-    /// stored trusted provider address before proceeding.
+    /// `initiator` must be the flash-loan provider stored by `execute`.
     pub fn on_flash_loan(env: Env, initiator: Address, token: Address, amount: i128, fee: i128) {
+        let provider: Address = env
+            .storage()
+            .temporary()
+            .get(&DataKey::FlashLoan)
+            .expect("flash loan provider missing");
+        if initiator != provider {
+            panic!("unauthorized initiator");
+        }
+
         let pool1: Address = env.storage().temporary().get(&DataKey::Pool1).unwrap();
         let pool2: Address = env.storage().temporary().get(&DataKey::Pool2).unwrap();
         let token_b: Address = env.storage().temporary().get(&DataKey::TokenB).unwrap();
@@ -106,10 +119,11 @@ impl ArbitrageContract {
 
         // Leg 2: swap B → A on pool2
         token_b_client.approve(&contract, &pool2, &received_b, &next_seq);
-        AMMClient::new(&env, &pool2).swap(&token_b, &token, &received_b, &(amount + fee));
+        let repay = amount.checked_add(fee).expect("repay overflow");
+        AMMClient::new(&env, &pool2).swap(&token_b, &token, &received_b, &repay);
 
         // Approve exact repayment to flash loan provider
-        token_a_client.approve(&contract, &initiator, &(amount + fee), &next_seq);
+        token_a_client.approve(&contract, &initiator, &repay, &next_seq);
 
         // Remaining profit stays in this contract for the owner to withdraw
     }
@@ -118,6 +132,9 @@ impl ArbitrageContract {
     pub fn withdraw(env: Env, token: Address, to: Address) {
         let owner: Address = env.storage().instance().get(&DataKey::Owner).unwrap();
         owner.require_auth();
+        if to != owner {
+            panic!("recipient must be owner");
+        }
         let token_client = token::Client::new(&env, &token);
         let balance = token_client.balance(&env.current_contract_address());
         if balance > 0 {

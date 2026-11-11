@@ -489,10 +489,11 @@ fn test_merkle_proofs_verify_and_claim_leaves() {
     assert!(!client.verify(&other, &0, &proof));
 
     // Claiming is idempotent-protected.
-    client.verify_and_claim(&leaves[0], &0, &proof);
-    assert!(client.is_claimed(&0));
+    let claimer = Address::generate(&env);
+    client.verify_and_claim(&claimer, &leaves[0], &0, &proof);
+    assert!(client.is_claimed(&claimer, &0));
     assert_eq!(
-        client.try_verify_and_claim(&leaves[0], &0, &proof),
+        client.try_verify_and_claim(&claimer, &leaves[0], &0, &proof),
         Err(Ok(merkle_proofs::MerkleError::AlreadyClaimed))
     );
 
@@ -741,7 +742,8 @@ fn test_batch_builder_validates_and_executes_batches() {
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
-    client.initialize();
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
     client.set_balance(&alice, &1_000);
 
     let batch_id = client.begin_batch();
@@ -782,7 +784,8 @@ fn test_batch_builder_rejects_invalid_batches() {
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
-    client.initialize();
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
 
     // Executing without validating is rejected.
     let batch_id = client.begin_batch();

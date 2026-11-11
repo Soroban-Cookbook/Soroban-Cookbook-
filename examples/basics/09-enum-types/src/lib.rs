@@ -194,6 +194,7 @@ impl EnumContract {
         if env.storage().instance().has(&symbol_short!("state")) {
             return Err(ContractError::ContractAlreadyInitialized);
         }
+        admin.require_auth();
 
         // Set initial state
         env.storage()
@@ -234,8 +235,10 @@ impl EnumContract {
         user: Address,
         role: UserRole,
     ) -> Result<(), ContractError> {
+        admin.require_auth();
+
         // Validate admin role
-        let admin_role = Self::get_user_role(env.clone(), admin);
+        let admin_role = Self::get_user_role(env.clone(), admin.clone());
         if admin_role != UserRole::Owner && admin_role != UserRole::Admin {
             return Err(ContractError::InsufficientRole);
         }

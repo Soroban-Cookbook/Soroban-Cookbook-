@@ -54,45 +54,41 @@ fn test_configure_rejects_invalid_values() {
 
 #[test]
 fn test_auto_pause_after_threshold_failures() {
-    let (_env, _admin, client) = setup();
-    let caller = Address::generate(&_env);
-    client.fail(&caller);
-    client.fail(&caller);
-    client.fail(&caller);
+    let (_env, admin, client) = setup();
+    client.fail(&admin);
+    client.fail(&admin);
+    client.fail(&admin);
     assert_eq!(client.get_state(), CircuitState::Paused);
     assert_eq!(client.get_failure_count(), 3);
 }
 
 #[test]
 fn test_execute_is_blocked_when_paused() {
-    let (_env, _admin, client) = setup();
-    let caller = Address::generate(&_env);
-    client.fail(&caller);
-    client.fail(&caller);
-    client.fail(&caller);
-    let result = client.try_execute(&caller);
+    let (_env, admin, client) = setup();
+    client.fail(&admin);
+    client.fail(&admin);
+    client.fail(&admin);
+    let result = client.try_execute(&admin);
     assert_eq!(result, Err(Ok(CircuitError::CircuitPaused)));
 }
 
 #[test]
 fn test_recovery_window_reopens_circuit() {
-    let (env, _admin, client) = setup();
-    let caller = Address::generate(&env);
-    client.fail(&caller);
-    client.fail(&caller);
-    client.fail(&caller);
+    let (env, admin, client) = setup();
+    client.fail(&admin);
+    client.fail(&admin);
+    client.fail(&admin);
     env.ledger().with_mut(|l| l.timestamp += 101);
-    client.execute(&caller);
+    client.execute(&admin);
     assert_eq!(client.get_state(), CircuitState::Active);
     assert_eq!(client.get_failure_count(), 0);
 }
 
 #[test]
 fn test_success_resets_failure_count() {
-    let (_env, _admin, client) = setup();
-    let caller = Address::generate(&_env);
-    client.fail(&caller);
-    client.fail(&caller);
-    client.execute(&caller);
+    let (_env, admin, client) = setup();
+    client.fail(&admin);
+    client.fail(&admin);
+    client.execute(&admin);
     assert_eq!(client.get_failure_count(), 0);
 }

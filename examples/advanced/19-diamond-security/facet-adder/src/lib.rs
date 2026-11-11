@@ -29,6 +29,7 @@ impl FacetAdderContract {
         if env.storage().instance().has(&FacetKey::Diamond) {
             return Err(SecurityError::AlreadyInitialized);
         }
+        diamond.require_auth();
         env.storage().instance().set(&FacetKey::Diamond, &diamond);
         Ok(())
     }

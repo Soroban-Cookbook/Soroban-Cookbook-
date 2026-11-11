@@ -4,9 +4,17 @@
 use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, String};
 
 use crate::{
-    AccessFacet, AccessFacetClient, DiamondRouter, DiamondRouterClient, RegistryFacet,
+    AccessFacet, AccessFacetClient, DataKey, DiamondRouter, DiamondRouterClient, RegistryFacet,
     RegistryFacetClient, TokenFacet, TokenFacetClient, ROLE_ADMIN, ROLE_MINTER, ROLE_USER,
 };
+
+fn grant_minter(env: &Env, id: &Address, minter: &Address) {
+    env.as_contract(id, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Role(minter.clone()), &ROLE_MINTER);
+    });
+}
 
 // ---------------------------------------------------------------------------
 // TokenFacet tests
@@ -23,6 +31,7 @@ fn test_token_mint_and_balance() {
     let minter = Address::generate(&env);
     let recipient = Address::generate(&env);
 
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &recipient, &1000i128);
 
     assert_eq!(client.balance_of(&recipient), 1000);
@@ -41,6 +50,7 @@ fn test_token_transfer() {
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &alice, &500i128);
     client.transfer(&alice, &bob, &200i128);
 
@@ -61,6 +71,7 @@ fn test_token_transfer_insufficient_balance() {
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &alice, &100i128);
     client.transfer(&alice, &bob, &200i128); // should panic
 }
@@ -78,6 +89,7 @@ fn test_token_allowance_and_transfer_from() {
     let spender = Address::generate(&env);
     let recipient = Address::generate(&env);
 
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &owner, &1000i128);
     client.approve(&owner, &spender, &300i128);
     client.transfer_from(&spender, &owner, &recipient, &200i128);
@@ -98,7 +110,9 @@ fn test_token_multi_mint_total_supply() {
     let a = Address::generate(&env);
     let b = Address::generate(&env);
 
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &a, &400i128);
+    grant_minter(&env, &id, &minter);
     client.mint(&minter, &b, &600i128);
 
     assert_eq!(client.total_supply(), 1000);
@@ -161,9 +175,8 @@ fn test_access_storage_isolation_from_token() {
     access_client.initialize(&admin);
     access_client.grant_role(&admin, &minter, &ROLE_MINTER);
 
-    // Minting does NOT require AccessFacet state in this simple facet design
-    // (each facet is standalone). The test verifies that access state doesn't
-    // bleed into token state.
+    // Role storage on the access contract does not authorize the token contract.
+    grant_minter(&env, &token_id, &minter);
     token_client.mint(&minter, &admin, &500i128);
 
     // Token balance is independent of role storage.
@@ -339,6 +352,7 @@ fn test_router_mint_and_register_inter_facet() {
     let recipient = Address::generate(&env);
 
     router.register_facets(&admin, &token_id, &access_id, &registry_id);
+    grant_minter(&env, &token_id, &admin);
 
     // Single router call that touches two facets atomically.
     router.mint_and_register(

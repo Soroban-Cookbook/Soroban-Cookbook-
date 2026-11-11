@@ -7,6 +7,7 @@ use soroban_sdk::{symbol_short, Address, Env};
 
 fn setup() -> (Env, Address, EventHistoryClient<'static>) {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let contract_id = env.register(EventHistory, ());
     let client = EventHistoryClient::new(&env, &contract_id);

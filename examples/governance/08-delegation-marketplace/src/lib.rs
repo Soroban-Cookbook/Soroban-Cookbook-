@@ -151,6 +151,19 @@ impl DelegationMarketplace {
             return Err(MarketplaceError::OfferAlreadyExists);
         }
 
+        let balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(delegator.clone()))
+            .unwrap_or(0);
+        let needed = i128::from(voting_power);
+        if balance < needed {
+            return Err(MarketplaceError::InsufficientVotingPower);
+        }
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(delegator.clone()), &(balance - needed));
+
         let offer = DelegationOffer {
             delegator: delegator.clone(),
             voting_power,
@@ -171,10 +184,23 @@ impl DelegationMarketplace {
         delegator.require_auth();
 
         let key = DataKey::Offer(delegator.clone());
-        if !env.storage().persistent().has(&key) {
-            return Err(MarketplaceError::OfferNotFound);
-        }
+        let offer: DelegationOffer = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .ok_or(MarketplaceError::OfferNotFound)?;
 
+        let balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&DataKey::Balance(delegator.clone()))
+            .unwrap_or(0);
+        let restored = balance
+            .checked_add(i128::from(offer.voting_power))
+            .ok_or(MarketplaceError::InvalidAmount)?;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(delegator.clone()), &restored);
         env.storage().persistent().remove(&key);
 
         env.events().publish((NS, EVT_CANCEL, delegator), ());
@@ -257,13 +283,10 @@ impl DelegationMarketplace {
             &(delegator_balance + fee),
         );
 
-        // Reduce available voting power in offer
+        // Reduce available voting power in offer. Keep a zero balance so
+        // expiry can return rented units instead of dropping them.
         offer.voting_power -= units;
-        if offer.voting_power == 0 {
-            env.storage().persistent().remove(&offer_key);
-        } else {
-            env.storage().persistent().set(&offer_key, &offer);
-        }
+        env.storage().persistent().set(&offer_key, &offer);
 
         // Record delegation
         let expires_at = env.ledger().timestamp() + duration;
@@ -342,16 +365,24 @@ impl DelegationMarketplace {
     // Balance helpers (simplified token bookkeeping for tests)
     // -----------------------------------------------------------------------
 
-    /// Credit `amount` tokens to `account` (test helper / mint substitute).
-    pub fn fund_account(env: Env, account: Address, amount: i128) {
+    /// Spend `amount` of `account`'s existing balance. Does not mint.
+    pub fn fund_account(env: Env, account: Address, amount: i128) -> Result<(), MarketplaceError> {
+        account.require_auth();
+        if amount <= 0 {
+            return Err(MarketplaceError::InvalidAmount);
+        }
         let current: i128 = env
             .storage()
             .persistent()
             .get(&DataKey::Balance(account.clone()))
             .unwrap_or(0);
+        if current < amount {
+            return Err(MarketplaceError::InsufficientBalance);
+        }
         env.storage()
             .persistent()
-            .set(&DataKey::Balance(account), &(current + amount));
+            .set(&DataKey::Balance(account), &(current - amount));
+        Ok(())
     }
 
     /// Return the token balance for `account`.

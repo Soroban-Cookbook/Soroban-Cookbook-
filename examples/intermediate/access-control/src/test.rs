@@ -117,14 +117,27 @@ fn test_pause_and_unpause() {
 #[test]
 fn test_create_and_get_proposal() {
     let env = Env::default();
-    let (client, _) = setup_initialized(&env);
-    let proposer = Address::generate(&env);
-
+    let contract_id = env.register_contract(None, AccessControl);
+    let client = AccessControlClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let signer = Address::generate(&env);
+    let outsider = Address::generate(&env);
     env.mock_all_auths();
+    client.initialize(
+        &admin,
+        &2,
+        &Vec::from_array(&env, [signer.clone(), Address::generate(&env)]),
+        &100,
+    );
 
     env.ledger().set_timestamp(0);
 
-    let proposal_id = client.create_proposal(&proposer, &symbol_short!("transfer"));
+    assert_eq!(
+        client.try_create_proposal(&outsider, &symbol_short!("transfer")),
+        Err(Ok(AccessControlError::NotASigner))
+    );
+
+    let proposal_id = client.create_proposal(&signer, &symbol_short!("transfer"));
     assert_eq!(proposal_id, 1);
 
     env.ledger().set_timestamp(10);
@@ -153,20 +166,45 @@ fn test_paused_blocks_proposals() {
 #[test]
 fn test_proposal_execution_requires_approvals() {
     let env = Env::default();
-    let (client, _) = setup_initialized(&env);
-    let proposer = Address::generate(&env);
-
+    let contract_id = env.register_contract(None, AccessControl);
+    let client = AccessControlClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let signer = Address::generate(&env);
     env.mock_all_auths();
+    client.initialize(
+        &admin,
+        &2,
+        &Vec::from_array(&env, [signer.clone(), Address::generate(&env)]),
+        &100,
+    );
 
     env.ledger().set_timestamp(0);
 
-    let proposal_id = client.create_proposal(&proposer, &symbol_short!("upgrade"));
+    let proposal_id = client.create_proposal(&signer, &symbol_short!("upgrade"));
     env.ledger().set_timestamp(101);
 
     assert_eq!(
-        client.try_execute(&proposer, &proposal_id),
+        client.try_execute(&signer, &proposal_id),
         Err(Ok(AccessControlError::InsufficientApprovals))
     );
+}
+
+#[test]
+fn test_execute_honors_threshold_of_one() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, AccessControl);
+    let client = AccessControlClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    let signer = Address::generate(&env);
+    env.mock_all_auths();
+    client.initialize(&admin, &1, &Vec::from_array(&env, [signer.clone()]), &100);
+
+    env.ledger().set_timestamp(0);
+    let proposal_id = client.create_proposal(&signer, &symbol_short!("upgrade"));
+    client.approve(&signer, &proposal_id);
+    env.ledger().set_timestamp(100);
+
+    assert!(client.execute(&signer, &proposal_id));
 }
 
 #[test]

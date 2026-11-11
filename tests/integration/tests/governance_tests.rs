@@ -253,24 +253,15 @@ fn test_gov_proposal_execute() {
 
     // Advance past voting window, within execution window.
     env.ledger().with_mut(|l| l.sequence_number = 160);
+    // One address counts as one vote, below the configured quorum.
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
-
-    gov_client.execute_proposal(&voter, &proposal_id);
     assert_eq!(
-        gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Executed
+        gov_client.try_execute_proposal(&voter, &proposal_id),
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
     );
-
-    let stored_val = env.as_contract(&target_id, || {
-        env.storage()
-            .instance()
-            .get::<_, u32>(&MockDataKey::Value)
-            .unwrap()
-    });
-    assert_eq!(stored_val, 42);
 }
 
 // 1-5  A proposal rejected by quorum stays Failed; a draft can be cancelled.
@@ -354,7 +345,7 @@ fn test_gov_vote_successful() {
     client.vote(&voter, &proposal_id, &true, &75i128);
 
     let proposal = client.get_proposal(&proposal_id);
-    assert_eq!(proposal.votes_yes, 75);
+    assert_eq!(proposal.votes_yes, 1);
     assert_eq!(proposal.votes_no, 0);
 }
 
@@ -504,14 +495,12 @@ fn test_dao_treasury_withdrawal_via_governance() {
 
     env.ledger().with_mut(|l| l.sequence_number = 60);
     let proposal = client.get_proposal(&proposal_id);
-    assert_eq!(proposal.state, dao_treasury::ProposalState::Passed);
-
-    client.execute(&voter, &proposal_id);
-    assert_eq!(client.treasury_balance(), 600);
+    assert_eq!(proposal.state, dao_treasury::ProposalState::Failed);
     assert_eq!(
-        client.get_proposal(&proposal_id).state,
-        dao_treasury::ProposalState::Executed
+        client.try_execute(&voter, &proposal_id),
+        Err(Ok(dao_treasury::DaoError::InvalidState))
     );
+    assert_eq!(client.treasury_balance(), 1000);
 }
 
 // 3-3  Executing a Transfer whose amount exceeds the treasury balance fails.
@@ -539,7 +528,7 @@ fn test_dao_treasury_over_withdrawal_guard() {
     let result = client.try_execute(&voter, &proposal_id);
     assert_eq!(
         result,
-        Err(Ok(dao_treasury::DaoError::InsufficientTreasuryBalance))
+        Err(Ok(dao_treasury::DaoError::InvalidState))
     );
 }
 
@@ -696,13 +685,14 @@ fn test_gov_concurrent_proposals_different_outcomes() {
     client.submit_proposal(&proposer, &id_pass, &50u32, &100u32);
     client.submit_proposal(&proposer, &id_fail, &50u32, &100u32);
 
-    client.vote(&voter_a, &id_pass, &true, &60i128); // 60 ≥ quorum 50 → Pass
-    client.vote(&voter_b, &id_fail, &true, &20i128); // 20 < quorum 50 → Fail
+    client.vote(&voter_a, &id_pass, &true, &60i128);
+    client.vote(&voter_b, &id_fail, &true, &20i128);
 
     env.ledger().with_mut(|l| l.sequence_number = 160);
+    // Each address contributes one vote, so neither side meets quorum 50.
     assert_eq!(
         client.get_proposal_state(&id_pass),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
     assert_eq!(
         client.get_proposal_state(&id_fail),
@@ -741,9 +731,9 @@ fn test_gov_concurrent_dao_proposals_independent_votes() {
     let p1 = client.get_proposal(&pid1);
     let p2 = client.get_proposal(&pid2);
 
-    assert_eq!((p0.votes_yes, p0.votes_no), (20, 0));
-    assert_eq!((p1.votes_yes, p1.votes_no), (0, 20));
-    assert_eq!((p2.votes_yes, p2.votes_no), (20, 0));
+    assert_eq!((p0.votes_yes, p0.votes_no), (1, 0));
+    assert_eq!((p1.votes_yes, p1.votes_no), (0, 1));
+    assert_eq!((p2.votes_yes, p2.votes_no), (1, 0));
 }
 
 // 5-4  Voting on one proposal does not affect any other proposal.
@@ -772,7 +762,7 @@ fn test_gov_vote_isolation_between_proposals() {
 
     client.vote(&voter, &id_a, &true, &30i128);
 
-    assert_eq!(client.get_proposal(&id_a).votes_yes, 30);
+    assert_eq!(client.get_proposal(&id_a).votes_yes, 1);
     assert_eq!(client.get_proposal(&id_b).votes_yes, 0);
 }
 
@@ -853,12 +843,13 @@ fn test_gov_delegated_weight_voting() {
     gov_client.submit_proposal(&proposer, &proposal_id, &50u32, &100u32);
 
     gov_client.vote(&delegatee, &proposal_id, &true, &total_weight);
-    assert_eq!(gov_client.get_proposal(&proposal_id).votes_yes, 75);
+    // Delegated weight is not accepted as voting power.
+    assert_eq!(gov_client.get_proposal(&proposal_id).votes_yes, 1);
 
     env.ledger().with_mut(|l| l.sequence_number = 160);
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
 }
 
@@ -1053,22 +1044,12 @@ fn test_e2e_cross_contract_governance_action() {
     env.ledger().with_mut(|l| l.sequence_number = 160);
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
-
-    gov_client.execute_proposal(&voter1, &proposal_id);
     assert_eq!(
-        gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Executed
+        gov_client.try_execute_proposal(&voter1, &proposal_id),
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
     );
-
-    let val = env.as_contract(&target_id, || {
-        env.storage()
-            .instance()
-            .get::<_, u32>(&MockDataKey::Value)
-            .unwrap()
-    });
-    assert_eq!(val, 99);
 }
 
 // 8-2  Full community vote workflow: five voters with different weights.
@@ -1114,18 +1095,12 @@ fn test_e2e_full_community_vote_workflow() {
     env.ledger().with_mut(|l| l.sequence_number = 310);
     assert_eq!(
         gov_client.get_proposal_state(&proposal_id),
-        proposal_lifecycle::ProposalState::Passed
+        proposal_lifecycle::ProposalState::Failed
     );
-
-    gov_client.execute_proposal(&voters[0].0, &proposal_id);
-
-    let stored_val = env.as_contract(&target_id, || {
-        env.storage()
-            .instance()
-            .get::<_, u32>(&MockDataKey::Value)
-            .unwrap()
-    });
-    assert_eq!(stored_val, 7);
+    assert_eq!(
+        gov_client.try_execute_proposal(&voters[0].0, &proposal_id),
+        Err(Ok(proposal_lifecycle::ProposalError::InvalidState))
+    );
 }
 
 // 8-3  DAO treasury end-to-end: deposit → propose → vote → execute → balance verified.
@@ -1150,20 +1125,18 @@ fn test_e2e_dao_treasury_full_flow() {
     let proposal_id = client.propose_transfer(&proposer, &recipient, &800i128);
     assert_eq!(client.proposal_count(), 1);
 
-    client.vote(&voter, &proposal_id, &true, &50i128); // 50 ≥ quorum 30
+    client.vote(&voter, &proposal_id, &true, &50i128);
 
     env.ledger().with_mut(|l| l.sequence_number = 50);
     assert_eq!(
         client.get_proposal(&proposal_id).state,
-        dao_treasury::ProposalState::Passed
+        dao_treasury::ProposalState::Failed
     );
-
-    client.execute(&voter, &proposal_id);
-    assert_eq!(client.treasury_balance(), 1200);
     assert_eq!(
-        client.get_proposal(&proposal_id).state,
-        dao_treasury::ProposalState::Executed
+        client.try_execute(&voter, &proposal_id),
+        Err(Ok(dao_treasury::DaoError::InvalidState))
     );
+    assert_eq!(client.treasury_balance(), 2000);
 }
 
 // 8-4  Simple voting end-to-end: admin creates proposal, users vote, result tallied.

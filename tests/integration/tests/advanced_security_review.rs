@@ -12,12 +12,15 @@ use soroban_sdk::{
 #[test]
 fn test_atomic_batch_rollback_security_invariant() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, batch_operations::BatchOperations);
     let client = batch_operations::BatchOperationsClient::new(&env, &contract_id);
 
+    let admin = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
+    client.initialize(&admin);
     client.try_set_balance(&alice, &100).unwrap().unwrap();
     client.try_set_balance(&bob, &0).unwrap().unwrap();
 
@@ -62,13 +65,16 @@ fn test_timelock_replay_protection_security_invariant() {
 #[test]
 fn test_governance_topic_conflict_detection_security_invariant() {
     let env = Env::default();
+    env.mock_all_auths();
     env.ledger().with_mut(|l| l.timestamp = 2_000);
 
     let contract_id = env.register_contract(None, proposal_validation::ProposalValidation);
     let client = proposal_validation::ProposalValidationClient::new(&env, &contract_id);
 
+    let creator = Address::generate(&env);
     let topic = soroban_sdk::Symbol::new(&env, "bridge");
     let first = client.create_proposal(
+        &creator,
         &topic,
         &2_020,
         &2_120,
@@ -79,6 +85,7 @@ fn test_governance_topic_conflict_detection_security_invariant() {
     assert_eq!(first, 1);
 
     let conflict = client.try_create_proposal(
+        &creator,
         &topic,
         &2_100,
         &2_200,

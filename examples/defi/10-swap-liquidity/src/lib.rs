@@ -129,14 +129,14 @@ impl SwapLiquidityContract {
         let reserve_b = this.reserve_b(&env);
         let total_shares = this.total_shares(&env);
 
-        let contract_addr = this.contract_address(&env);
-        token::Client::new(&env, &token_a).transfer(&provider, &contract_addr, &amount_a);
-        token::Client::new(&env, &token_b).transfer(&provider, &contract_addr, &amount_b);
-
-        let minted_shares = if total_shares == 0 {
-            amount_a
-                .checked_mul(amount_b)
-                .expect("overflow in initial shares")
+        let (take_a, take_b, minted_shares) = if total_shares == 0 {
+            (
+                amount_a,
+                amount_b,
+                amount_a
+                    .checked_mul(amount_b)
+                    .expect("overflow in initial shares"),
+            )
         } else {
             let share_a = amount_a
                 .checked_mul(total_shares)
@@ -148,28 +148,47 @@ impl SwapLiquidityContract {
                 .unwrap()
                 .checked_div(reserve_b)
                 .unwrap();
-            cmp::min(share_a, share_b)
+            let minted = cmp::min(share_a, share_b);
+            let take_a = minted
+                .checked_mul(reserve_a)
+                .unwrap()
+                .checked_div(total_shares)
+                .unwrap();
+            let take_b = minted
+                .checked_mul(reserve_b)
+                .unwrap()
+                .checked_div(total_shares)
+                .unwrap();
+            (take_a, take_b, minted)
         };
 
         assert!(minted_shares > 0, "insufficient liquidity added");
-        token::StellarAssetClient::new(&env, &lp_token).mint(&provider, &minted_shares);
+        assert!(take_a > 0 && take_b > 0, "insufficient liquidity added");
 
+        let new_reserve_a = reserve_a.checked_add(take_a).expect("overflow");
+        let new_reserve_b = reserve_b.checked_add(take_b).expect("overflow");
+        let new_shares = total_shares.checked_add(minted_shares).expect("overflow");
         env.storage()
             .instance()
-            .set(&DataKey::ReserveA, &(reserve_a + amount_a));
+            .set(&DataKey::ReserveA, &new_reserve_a);
         env.storage()
             .instance()
-            .set(&DataKey::ReserveB, &(reserve_b + amount_b));
+            .set(&DataKey::ReserveB, &new_reserve_b);
         env.storage()
             .instance()
-            .set(&DataKey::TotalShares, &(total_shares + minted_shares));
+            .set(&DataKey::TotalShares, &new_shares);
+
+        let contract_addr = this.contract_address(&env);
+        token::Client::new(&env, &token_a).transfer(&provider, &contract_addr, &take_a);
+        token::Client::new(&env, &token_b).transfer(&provider, &contract_addr, &take_b);
+        token::StellarAssetClient::new(&env, &lp_token).mint(&provider, &minted_shares);
 
         env.events().publish(
             (EVENT_NS, EVENT_ADD),
             LiquidityEventData {
                 provider,
-                amount_a,
-                amount_b,
+                amount_a: take_a,
+                amount_b: take_b,
                 shares: minted_shares,
             },
         );
@@ -197,21 +216,23 @@ impl SwapLiquidityContract {
             .unwrap()
             .checked_div(total_shares)
             .unwrap();
-        let contract_addr = this.contract_address(&env);
+        let new_reserve_a = reserve_a.checked_sub(amount_a).expect("underflow");
+        let new_reserve_b = reserve_b.checked_sub(amount_b).expect("underflow");
+        let new_shares = total_shares.checked_sub(shares).expect("underflow");
+        env.storage()
+            .instance()
+            .set(&DataKey::ReserveA, &new_reserve_a);
+        env.storage()
+            .instance()
+            .set(&DataKey::ReserveB, &new_reserve_b);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalShares, &new_shares);
 
+        let contract_addr = this.contract_address(&env);
         token::Client::new(&env, &lp_token).burn(&provider, &shares);
         token::Client::new(&env, &token_a).transfer(&contract_addr, &provider, &amount_a);
         token::Client::new(&env, &token_b).transfer(&contract_addr, &provider, &amount_b);
-
-        env.storage()
-            .instance()
-            .set(&DataKey::ReserveA, &(reserve_a - amount_a));
-        env.storage()
-            .instance()
-            .set(&DataKey::ReserveB, &(reserve_b - amount_b));
-        env.storage()
-            .instance()
-            .set(&DataKey::TotalShares, &(total_shares - shares));
 
         env.events().publish(
             (EVENT_NS, EVENT_REMOVE),

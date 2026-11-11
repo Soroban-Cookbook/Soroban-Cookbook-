@@ -287,6 +287,8 @@ impl StateChannelContract {
         challenger.require_auth();
 
         let mut channel = Self::load_channel(&env, channel_id)?;
+        channel.party_a.require_auth();
+        channel.party_b.require_auth();
 
         // Only Open or Disputed channels can be challenged.
         if channel.status == ChannelStatus::Closed {

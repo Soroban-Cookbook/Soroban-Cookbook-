@@ -82,10 +82,10 @@ impl BeaconContract {
     /// * `implementation` - address of the initial implementation contract
     /// * `label` - human-readable tag for version 1 (e.g. `Symbol::new(&env, "v1")`)
     pub fn init(env: Env, admin: Address, implementation: Address, label: Symbol) {
-        admin.require_auth();
         if env.storage().persistent().has(&ADMIN_KEY) {
             panic!("Already initialized");
         }
+        admin.require_auth();
 
         env.storage().persistent().set(&ADMIN_KEY, &admin);
         env.storage().persistent().set(&IMPL_KEY, &implementation);

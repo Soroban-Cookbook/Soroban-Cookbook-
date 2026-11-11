@@ -2,6 +2,9 @@
 #![allow(deprecated)]
 
 use super::*;
+
+const ADMIN_FUNDING: i128 = 10_000_000;
+
 use soroban_sdk::{
     testutils::{Address as _, Ledger, MockAuth, MockAuthInvoke},
     token, Address, Env, IntoVal,
@@ -25,7 +28,9 @@ fn setup_test(
     let contract_id = env.register(VestingContract, ());
     let client = VestingContractClient::new(env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin, &Some(token_address.clone()));
+    token_client.mint(&admin, &ADMIN_FUNDING);
 
     (client, admin, token_address, token_client)
 }
@@ -287,9 +292,10 @@ fn test_revoke_schedule_mid_vesting() {
     // Revoke schedule
     client.revoke(&admin, &beneficiary);
 
-    // Unvested 600 should be returned to admin
+    // Unvested 600 is returned. The schedule was funded from the admin, so
+    // the balance is the opening funding minus the 400 still vested.
     let admin_bal = token::Client::new(&env, &token_address).balance(&admin);
-    assert_eq!(admin_bal, 600);
+    assert_eq!(admin_bal, ADMIN_FUNDING - 400);
 
     // Schedule should be marked as revoked
     let schedule = client.get_schedule(&beneficiary).unwrap();
@@ -331,9 +337,9 @@ fn test_revoke_before_cliff() {
     env.ledger().with_mut(|li| li.timestamp = 30);
     client.revoke(&admin, &beneficiary);
 
-    // All 1000 tokens should be returned to admin
+    // The full allocation is unvested and returned to the admin.
     let admin_bal = token::Client::new(&env, &token_address).balance(&admin);
-    assert_eq!(admin_bal, 1000);
+    assert_eq!(admin_bal, ADMIN_FUNDING);
 
     // Beneficiary has 0 claimable tokens
     env.ledger().with_mut(|li| li.timestamp = 80);
@@ -345,7 +351,7 @@ fn test_revoke_before_cliff() {
 #[test]
 fn test_transfer_admin() {
     let env = Env::default();
-    let (client, admin, _, _) = setup_test(&env);
+    let (client, admin, _, token_client) = setup_test(&env);
     let new_admin = Address::generate(&env);
 
     env.mock_all_auths();
@@ -358,7 +364,8 @@ fn test_transfer_admin() {
     let result = client.try_create_schedule(&admin, &beneficiary, &1000, &0, &0, &100, &None);
     assert_eq!(result.err(), Some(Ok(VestingError::Unauthorized)));
 
-    // New admin can create a schedule
+    // New admin can create a schedule once they fund it.
+    token_client.mint(&new_admin, &1000);
     client.create_schedule(&new_admin, &beneficiary, &1000, &0, &0, &100, &None);
     assert!(client.get_schedule(&beneficiary).is_some());
 }

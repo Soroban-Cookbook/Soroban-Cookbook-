@@ -130,6 +130,8 @@ impl Sep41Extensions {
             return Err(ExtError::InvalidAmount);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Initialized, &true);
         write_balance(&env, &admin, initial_supply);
 
@@ -293,12 +295,12 @@ impl Sep41Extensions {
         if from_bal < amount {
             return Err(ExtError::InsufficientBalance);
         }
+
+        write_balance(&env, &from, from_bal - amount);
         let to_bal = read_balance(&env, &to);
         let new_to = to_bal
             .checked_add(amount)
             .ok_or(ExtError::ArithmeticOverflow)?;
-
-        write_balance(&env, &from, from_bal - amount);
         write_balance(&env, &to, new_to);
 
         env.events()
@@ -360,13 +362,13 @@ impl Sep41Extensions {
         if owner_bal < amount {
             return Err(ExtError::InsufficientBalance);
         }
+
+        write_allowance(&env, &owner, &spender, allowance - amount);
+        write_balance(&env, &owner, owner_bal - amount);
         let to_bal = read_balance(&env, &to);
         let new_to = to_bal
             .checked_add(amount)
             .ok_or(ExtError::ArithmeticOverflow)?;
-
-        write_allowance(&env, &owner, &spender, allowance - amount);
-        write_balance(&env, &owner, owner_bal - amount);
         write_balance(&env, &to, new_to);
 
         env.events()

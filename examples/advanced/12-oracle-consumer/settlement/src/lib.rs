@@ -87,6 +87,7 @@ impl SettlementConsumer {
         if env.storage().instance().has(&SettleKey::Admin) {
             return Err(ConsumerError::AlreadyInitialized);
         }
+        admin.require_auth();
         if config.max_age == 0
             || config.max_deviation_bps <= 0
             || config.min_price <= 0

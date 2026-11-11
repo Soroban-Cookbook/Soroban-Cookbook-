@@ -6,30 +6,33 @@ use soroban_sdk::{Address, Env, Vec};
 #[test]
 fn test_initialize() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    client.initialize();
+    client.initialize(&Address::generate(&env));
 }
 
 #[test]
 #[should_panic(expected = "already initialized")]
 fn test_initialize_twice() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
-    client.initialize();
-    client.initialize();
+    client.initialize(&Address::generate(&env));
+    client.initialize(&Address::generate(&env));
 }
 
 #[test]
 fn test_add_pool() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(AMMRouter, ());
     let client = AMMRouterClient::new(&env, &contract_id);
     let token_a = Address::generate(&env);
     let token_b = Address::generate(&env);
 
-    client.initialize();
+    client.initialize(&Address::generate(&env));
     client.add_pool(&Pool {
         token_a: token_a.clone(),
         token_b: token_b.clone(),
@@ -52,7 +55,7 @@ fn test_single_hop_swap() {
     let token_a = Address::generate(&env);
     let token_b = Address::generate(&env);
 
-    client.initialize();
+    client.initialize(&Address::generate(&env));
     client.add_pool(&Pool {
         token_a: token_a.clone(),
         token_b: token_b.clone(),
@@ -88,7 +91,7 @@ fn test_multi_hop_swap() {
     let token_b = Address::generate(&env);
     let token_c = Address::generate(&env);
 
-    client.initialize();
+    client.initialize(&Address::generate(&env));
     client.add_pool(&Pool {
         token_a: token_a.clone(),
         token_b: token_b.clone(),
@@ -132,7 +135,7 @@ fn test_deadline_exceeded() {
     let token_a = Address::generate(&env);
     let token_b = Address::generate(&env);
 
-    client.initialize();
+    client.initialize(&Address::generate(&env));
     client.add_pool(&Pool {
         token_a: token_a.clone(),
         token_b: token_b.clone(),
@@ -166,7 +169,7 @@ fn test_slippage_control() {
     let token_a = Address::generate(&env);
     let token_b = Address::generate(&env);
 
-    client.initialize();
+    client.initialize(&Address::generate(&env));
     client.add_pool(&Pool {
         token_a: token_a.clone(),
         token_b: token_b.clone(),

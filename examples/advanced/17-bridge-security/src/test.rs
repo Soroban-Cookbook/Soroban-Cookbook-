@@ -217,7 +217,7 @@ fn fraud_proof_marks_transfer_as_fraudulent() {
     let transfer_id = submit_default_transfer(&f, 300);
 
     f.client
-        .submit_fraud_proof(&f.reviewer, &transfer_id, &proof(&f.env, b"fraud-proof"));
+        .submit_fraud_proof(&f.admin, &transfer_id, &proof(&f.env, b"fraud-proof"));
 
     assert_eq!(
         f.client.get_transfer(&transfer_id).status,
@@ -245,7 +245,7 @@ fn finalized_transfer_cannot_be_resolved_again() {
     );
     assert_eq!(
         f.client
-            .try_submit_fraud_proof(&f.reviewer, &transfer_id, &proof(&f.env, b"late-proof")),
+            .try_submit_fraud_proof(&f.admin, &transfer_id, &proof(&f.env, b"late-proof")),
         Err(Ok(BridgeError::TransferAlreadyResolved))
     );
 }

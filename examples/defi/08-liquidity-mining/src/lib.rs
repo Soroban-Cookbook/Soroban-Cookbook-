@@ -137,6 +137,9 @@ impl LiquidityMining {
         if reward_rate <= 0 || reward_rate > MAX_REWARD_RATE {
             panic!("Invalid reward rate");
         }
+        if lp_token == reward_token {
+            panic!("Reward token must differ from stake token");
+        }
 
         let pool = PoolInfo {
             lp_token,
@@ -214,11 +217,6 @@ impl LiquidityMining {
         let pending = Self::calc_pending(&pool, &info);
         info.pending_rewards = info.pending_rewards.checked_add(pending).expect("Overflow");
 
-        // Pull LP tokens from user
-        let lp_client = token::Client::new(&env, &pool.lp_token);
-        lp_client.transfer(&user, env.current_contract_address(), &amount);
-
-        // Update state
         info.staked = info.staked.checked_add(amount).expect("Overflow");
         info.reward_debt = info
             .staked
@@ -230,6 +228,9 @@ impl LiquidityMining {
 
         Self::save_pool(&env, pool_id, &pool);
         Self::save_user(&env, pool_id, &user, &info);
+
+        let lp_client = token::Client::new(&env, &pool.lp_token);
+        lp_client.transfer(&user, env.current_contract_address(), &amount);
 
         env.events()
             .publish((Symbol::new(&env, "staked"),), (pool_id, user, amount));
@@ -270,12 +271,11 @@ impl LiquidityMining {
 
         pool.total_staked = pool.total_staked.checked_sub(amount).expect("Underflow");
 
-        // Return LP tokens to user
-        let lp_client = token::Client::new(&env, &pool.lp_token);
-        lp_client.transfer(&env.current_contract_address(), &user, &amount);
-
         Self::save_pool(&env, pool_id, &pool);
         Self::save_user(&env, pool_id, &user, &info);
+
+        let lp_client = token::Client::new(&env, &pool.lp_token);
+        lp_client.transfer(&env.current_contract_address(), &user, &amount);
 
         env.events()
             .publish((Symbol::new(&env, "unstaked"),), (pool_id, user, amount));
@@ -299,7 +299,7 @@ impl LiquidityMining {
             panic!("Nothing to harvest");
         }
 
-        // Reset pending state
+        // Reset pending state before the token call.
         info.pending_rewards = 0;
         info.reward_debt = info
             .staked
@@ -307,12 +307,11 @@ impl LiquidityMining {
             .expect("Overflow")
             / PRECISION;
 
-        // Transfer reward tokens to user
-        let reward_client = token::Client::new(&env, &pool.reward_token);
-        reward_client.transfer(&env.current_contract_address(), &user, &total_claimable);
-
         Self::save_pool(&env, pool_id, &pool);
         Self::save_user(&env, pool_id, &user, &info);
+
+        let reward_client = token::Client::new(&env, &pool.reward_token);
+        reward_client.transfer(&env.current_contract_address(), &user, &total_claimable);
 
         env.events().publish(
             (Symbol::new(&env, "harvested"),),

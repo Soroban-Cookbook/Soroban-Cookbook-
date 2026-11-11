@@ -83,6 +83,7 @@ impl DataAggregationOracleContract {
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("Already initialized");
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Paused, &false);
     }
@@ -136,6 +137,7 @@ impl DataAggregationOracleContract {
     /// Submit data from a source
     pub fn submit_data(env: Env, source: Address, value: i128) {
         Self::require_not_paused(&env);
+        source.require_auth();
         Self::require_authorized(&env, &source);
 
         env.storage()
@@ -279,6 +281,7 @@ impl DataAggregationOracleContract {
         if stored != *admin {
             panic!("Unauthorized");
         }
+        admin.require_auth();
     }
 
     fn require_not_paused(env: &Env) {

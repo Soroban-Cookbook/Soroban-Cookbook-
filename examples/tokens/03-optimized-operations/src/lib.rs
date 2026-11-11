@@ -179,6 +179,8 @@ impl OptimizedTokenOps {
             return Err(OptimizedError::InvalidAmount);
         }
 
+        underlying.require_auth();
+
         env.storage()
             .instance()
             .set(&OptimizedDataKey::Underlying, &underlying);
@@ -286,12 +288,11 @@ impl OptimizedTokenOps {
             return Err(OptimizedError::InsufficientBalance);
         }
 
+        balances.set(from.clone(), from_balance - amount);
         let to_balance = balances.get(to.clone()).unwrap_or(0);
         let new_to_balance = to_balance
             .checked_add(amount)
             .ok_or(OptimizedError::ArithmeticOverflow)?;
-
-        balances.set(from, from_balance - amount);
         balances.set(to, new_to_balance);
 
         env.storage()
