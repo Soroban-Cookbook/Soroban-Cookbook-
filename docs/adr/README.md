@@ -19,6 +19,10 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | ADR | Title | Status |
 | --- | ----- | ------ |
 | [ADR-001](./001-record-architecture-decisions.md) | Record Architecture Decisions | Accepted |
+| [ADR-002](../../book/src/adr/002-workspace-structure.md) | Organize Contracts in a Cargo Workspace | Proposed |
+| [ADR-003](../../book/src/adr/003-testing-approach.md) | Test Contracts at Multiple Levels | Proposed |
+| [ADR-004](../../book/src/adr/004-ci-cd.md) | Validate Changes with GitHub Actions | Proposed |
+| [ADR-005](../../book/src/adr/005-documentation-publishing.md) | Publish Documentation with mdBook | Proposed |
 | [ADR-002](./002-select-storage-tier.md) | Select Storage Tier by Lifetime | Proposed |
 | [ADR-003](./003-stable-storage-keys-and-ttl.md) | Keep Storage Keys Stable and Manage TTL Explicitly | Proposed |
 | [ADR-004](./004-authenticate-before-state-changes.md) | Authenticate Before Protected State Changes | Proposed |
@@ -28,11 +32,11 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 
 ## Creating a New ADR
 
-1. Copy [`template.md`](./template.md) to a new file named `NNN-short-title.md` (e.g. `002-workspace-structure.md`)
+1. Copy [`template.md`](./template.md) to a new file named `NNN-short-title.md` (e.g. `006-new-decision.md`)
 2. Fill in all sections — context, decision, and consequences
 3. Set the status to `Proposed`
 4. Open a PR; once merged and agreed upon, update the status to `Accepted`
-5. Add the new ADR to the index table above
+5. Add the new ADR to the index tables in this file and [`book/src/adr/README.md`](../../book/src/adr/README.md)
 
 ## ADR Statuses
 
