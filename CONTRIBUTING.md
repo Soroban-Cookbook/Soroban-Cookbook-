@@ -192,6 +192,7 @@ The Soroban Cookbook has a structured process for community members to propose a
 - [Workshop Materials](#workshop-materials)
 - [Ways to Contribute](#-ways-to-contribute)
 - [Development Environment Setup](#️-development-environment-setup)
+- [Local Development](#️-local-development)
 - [Code Style Guidelines](#-code-style-guidelines)
 - [Project Structure](#️-project-structure)
 - [Pull Request Process](#-pull-request-process)
@@ -339,6 +340,24 @@ conventions we reuse.
 **Want to host or propose a topic?** Open an issue describing the topic and
 which cookbook pages it relates to, or volunteer as moderator in the Discussion
 thread.
+
+## 🛠️ Local Development
+
+A root `Makefile` wraps the same commands CI runs, so you don't need to know
+about `scripts/ci-workspace.sh` (it skips the crates listed in
+`scripts/ci-exclude-packages.txt`, exactly like CI):
+
+```bash
+make help    # list targets
+make test    # workspace tests
+make lint    # cargo fmt --check + clippy -D warnings
+make build   # release build for wasm32v1-none (adds the target if missing)
+make book    # build the mdBook into book/book-output (needs: cargo install mdbook --locked)
+make clean   # cargo clean + remove book/book-output
+```
+
+Run `make lint test` before opening a PR. To work on a single example, `cd`
+into it and use `cargo test` as shown below.
 
 ## 🧪 Testing Requirements
 
