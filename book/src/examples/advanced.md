@@ -160,6 +160,16 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
+### [44-off-chain-signatures](../examples/advanced/44-off-chain-signatures/)
+**Off-chain signature verification** for non-Stellar keys ([guide](./off-chain-signatures.md)).
+
+**Key Concepts:**
+- `ed25519_verify` over a SHA-256 digest
+- Ethereum signatures via `secp256k1_recover` + address comparison
+- Domain separators and nonces against replay
+
+---
+
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
 ## âš ï¸ Warning
