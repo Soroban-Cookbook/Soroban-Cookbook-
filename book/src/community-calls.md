@@ -10,6 +10,6 @@ lists calls by date and topic. Its Markdown records are searchable by topic,
 presenter, and action item using GitHub repository search.
 
 For the schedule and participation details, see
-[Monthly Community Call Governance](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/GOVERNANCE/README.md).
+[Governance](./governance/README.md).
 The [follow-up process](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/GOVERNANCE/monthly-call-followup-process.md)
 explains how recordings and notes are published after each call.

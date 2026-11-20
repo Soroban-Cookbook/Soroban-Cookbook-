@@ -173,6 +173,7 @@ The weekly GitHub metrics track repository stars and forks, contributor activity
 | Resource | Description |
 |---|---|
 | [Monthly Community Call Calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics) | Recurring first-Tuesday call at 16:00 UTC, with calendar reminders |
+| [Governance](./GOVERNANCE/README.md) | How community calls are run and how to take part or propose changes |
 | [Community Call Archive](./GOVERNANCE/notes/README.md) | Searchable notes, recordings, transcripts, and follow-up actions |
 | [Project Showcase](./SHOWCASE.md) | 10+ real production Stellar/Soroban projects built with the cookbook, with case studies and tracking |
 | [Ecosystem Partnerships](./docs/ecosystem-partnerships.md) | Partner projects, active collaborations, joint content, and the reciprocal cross-promotion model |

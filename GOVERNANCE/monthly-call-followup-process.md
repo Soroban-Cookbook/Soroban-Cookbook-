@@ -51,7 +51,7 @@ Copy and complete this template for every call:
 
 - The [Community Call Archive](./notes/README.md) is the canonical index. Store notes, transcripts, and captions as Markdown or text files under `GOVERNANCE/notes/`; link to large assets rather than committing them.
 - Store video recordings on the project's approved media host, not in Git. Add a stable video URL to both the call's archive record and the index, and verify access before publishing.
-- The archive index is linked from the repository's community documentation and the mdBook [Community Calls page](../book/src/community-calls.md).
+- The archive index is linked from the repository's community documentation and the mdBook [Community Calls page](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/book/src/community-calls.md).
 - Keep published media links valid. If a recording must move, update its archive record and the index together.
 
 ## Feedback Loop
