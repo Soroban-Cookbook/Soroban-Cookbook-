@@ -34,6 +34,12 @@ Dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE)
 - [Contribute](CONTRIBUTING.md)
 - [CHANGELOG](CHANGELOG.md)
 
+### Local Development
+
+Run `make help` from the repository root for the common tasks (`make test`,
+`make lint`, `make build`, `make book`, `make clean`). See
+[CONTRIBUTING.md → Local Development](CONTRIBUTING.md#️-local-development).
+
 ## Install
 
 [Download](https://github.com/crate-ci/typos/releases) a pre-built binary
