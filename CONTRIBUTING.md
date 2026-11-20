@@ -232,6 +232,24 @@ milestones are recorded there only after verification.
 
 ---
 
+## 🏆 Recognition System
+
+Your name is added to the "Everyone Who Has Contributed" list in
+[CONTRIBUTORS.md](./CONTRIBUTORS.md) and to the book's
+[Contributors](./book/src/contributors.md) page automatically, usually within
+minutes of your PR merging to `main` (and always within 24 hours). The
+[Contributors workflow](./.github/workflows/contributors.yml) builds both lists
+from Git history with `scripts/generate-contributors.sh`, so commit with an
+email linked to your GitHub account (or your GitHub noreply address) to get a
+profile link. To regenerate locally:
+
+```bash
+./scripts/generate-contributors.sh CONTRIBUTORS.md   # updates only the marked section
+./scripts/generate-contributors.sh                   # rewrites book/src/contributors.md
+```
+
+Tiers and awards are covered in the [recognition system](./docs/recognition-system.md).
+
 ## 📊 Community Metrics
 
 The Soroban Cookbook tracks community health transparently so contributors can see
