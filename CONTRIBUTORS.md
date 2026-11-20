@@ -28,6 +28,17 @@ This file is the source of truth for the [recognition system](./docs/recognition
 
 ---
 
+## Everyone Who Has Contributed
+
+Generated from Git history by `scripts/generate-contributors.sh` after every
+merge to `main` (see `.github/workflows/contributors.yml`). Do not edit
+between the markers; changes are overwritten.
+
+<!-- contributors:start -->
+<!-- contributors:end -->
+
+---
+
 ## Hall of Fame
 
 Annual Soroban Cookbook Award recipients (at most 3 per year):
