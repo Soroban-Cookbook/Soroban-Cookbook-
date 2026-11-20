@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -209,7 +210,7 @@ codegen-units = 1
 lto = true
 </code></pre>
 <h2 id="basic-contract-structure"><a class="header" href="#basic-contract-structure">Basic Contract Structure</a></h2>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 <span class="boring">fn main() {
 </span>use soroban_sdk::{contract, contractimpl, Env};
@@ -227,7 +228,7 @@ impl MyContract {
 <hr>
 <h2 id="common-types-and-conversions"><a class="header" href="#common-types-and-conversions">Common Types and Conversions</a></h2>
 <h3 id="primitive-types"><a class="header" href="#primitive-types">Primitive Types</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let a: u32  = 100;
 let b: u64  = 1_000_000;
@@ -235,7 +236,7 @@ let c: i128 = -500;
 let d: bool = true;
 <span class="boring">}</span></code></pre>
 <h3 id="soroban-specific-types"><a class="header" href="#soroban-specific-types">Soroban-Specific Types</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::{symbol_short, Address, Bytes, BytesN, Map, String, Symbol, Vec};
 
@@ -264,7 +265,7 @@ m.set(symbol_short!("key"), 42u64);
 let val = m.get(symbol_short!("key")).unwrap();
 <span class="boring">}</span></code></pre>
 <h3 id="type-conversions"><a class="header" href="#type-conversions">Type Conversions</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// u32 &lt;-&gt; u64
 let x: u64 = 42u32 as u64;
@@ -282,7 +283,7 @@ let back_to_string = addr.to_string();
 let fixed: BytesN&lt;4&gt; = BytesN::from_array(&amp;env, &amp;[1, 2, 3, 4]);
 <span class="boring">}</span></code></pre>
 <h3 id="math-use-checked-ops-to-avoid-panics"><a class="header" href="#math-use-checked-ops-to-avoid-panics">Math (use checked ops to avoid panics)</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let sum  = a.checked_add(b).expect("overflow");
 let diff = a.checked_sub(b).expect("underflow");
@@ -297,7 +298,7 @@ let clamped = a.saturating_add(u64::MAX);
 <p>Soroban has three storage tiers with different TTL (time-to-live) behaviors.</p>
 <h3 id="persistent-storage"><a class="header" href="#persistent-storage">Persistent Storage</a></h3>
 <p>Use for long-lived data (balances, ownership records).</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Write
 env.storage().persistent().set(&amp;DataKey::Balance(addr.clone()), &amp;amount);
@@ -318,7 +319,7 @@ env.storage().persistent().extend_ttl(&amp;DataKey::Balance(addr.clone()), 100, 
 <span class="boring">}</span></code></pre>
 <h3 id="instance-storage"><a class="header" href="#instance-storage">Instance Storage</a></h3>
 <p>Use for contract-level config (admin, settings). TTL is tied to the contract instance.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.storage().instance().set(&amp;symbol_short!("admin"), &amp;admin_addr);
 
@@ -331,7 +332,7 @@ env.storage().instance().extend_ttl(100, 500);
 <span class="boring">}</span></code></pre>
 <h3 id="temporary-storage"><a class="header" href="#temporary-storage">Temporary Storage</a></h3>
 <p>Use for short-lived data (nonces, session state). Automatically archived after TTL.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.storage().temporary().set(&amp;symbol_short!("nonce"), &amp;nonce_val);
 
@@ -342,7 +343,7 @@ let nonce: u64 = env.storage().temporary()
 env.storage().temporary().extend_ttl(&amp;symbol_short!("nonce"), 50, 100);
 <span class="boring">}</span></code></pre>
 <h3 id="common-storage-key-pattern"><a class="header" href="#common-storage-key-pattern">Common Storage Key Pattern</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -354,7 +355,7 @@ pub enum DataKey {
 <hr>
 <h2 id="authentication-patterns"><a class="header" href="#authentication-patterns">Authentication Patterns</a></h2>
 <h3 id="require-auth-from-an-address"><a class="header" href="#require-auth-from-an-address">Require Auth from an Address</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Caller must sign the transaction authorizing this call
 pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
@@ -363,7 +364,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="require-auth-with-specific-arguments"><a class="header" href="#require-auth-with-specific-arguments">Require Auth with Specific Arguments</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::IntoVal;
 
@@ -373,7 +374,7 @@ pub fn approve(env: Env, owner: Address, spender: Address, amount: i128) {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="admin-only-functions"><a class="header" href="#admin-only-functions">Admin-Only Functions</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn require_admin(env: &amp;Env) -&gt; Address {
     let admin: Address = env.storage().instance()
@@ -389,7 +390,7 @@ pub fn set_fee(env: Env, new_fee: u32) {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="initialization-guard"><a class="header" href="#initialization-guard">Initialization Guard</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn initialize(env: Env, admin: Address) {
     if env.storage().instance().has(&amp;symbol_short!("init")) {
@@ -400,7 +401,7 @@ pub fn set_fee(env: Env, new_fee: u32) {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="testing-auth"><a class="header" href="#testing-auth">Testing Auth</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_admin_only() {
@@ -418,7 +419,7 @@ fn test_admin_only() {
 <hr>
 <h2 id="event-patterns"><a class="header" href="#event-patterns">Event Patterns</a></h2>
 <h3 id="emit-a-simple-event"><a class="header" href="#emit-a-simple-event">Emit a Simple Event</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// topic tuple + data value
 env.events().publish(
@@ -427,7 +428,7 @@ env.events().publish(
 );
 <span class="boring">}</span></code></pre>
 <h3 id="emit-with-multiple-topics"><a class="header" href="#emit-with-multiple-topics">Emit with Multiple Topics</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Up to 4 topics; topics are indexed for filtering
 env.events().publish(
@@ -436,7 +437,7 @@ env.events().publish(
 );
 <span class="boring">}</span></code></pre>
 <h3 id="structured-event-data"><a class="header" href="#structured-event-data">Structured Event Data</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub struct TransferEvent {
@@ -451,7 +452,7 @@ env.events().publish(
 );
 <span class="boring">}</span></code></pre>
 <h3 id="reading-events-in-tests"><a class="header" href="#reading-events-in-tests">Reading Events in Tests</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::{symbol_short, Symbol, TryFromVal};
 
@@ -485,7 +486,7 @@ fn test_events() {
 <hr>
 <h2 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h2>
 <h3 id="define-contract-errors"><a class="header" href="#define-contract-errors">Define Contract Errors</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -499,7 +500,7 @@ pub enum Error {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="return-results"><a class="header" href="#return-results">Return Results</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn transfer(env: Env, from: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
     if amount &lt;= 0 {
@@ -515,7 +516,7 @@ pub enum Error {
 <span class="boring">}</span></code></pre>
 <hr>
 <h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[cfg(test)]
 mod test {
@@ -542,7 +543,7 @@ mod test {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="manipulate-ledger-time-in-tests"><a class="header" href="#manipulate-ledger-time-in-tests">Manipulate Ledger Time in Tests</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.ledger().with_mut(|li| {
     li.timestamp = 1_700_000_000;
@@ -573,7 +574,7 @@ stellar contract invoke \
 </code></pre>
 <hr>
 <h2 id="useful-macros"><a class="header" href="#useful-macros">Useful Macros</a></h2>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>symbol_short!("short")          // Symbol ≤ 9 chars
 Symbol::new(&amp;env, "long_name")  // Symbol any length
@@ -595,7 +596,7 @@ map![&amp;env, (k1, v1), (k2, v2)] // Map
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../examples/tokens/09-optimized-token-ops.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/code-examples.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
@@ -609,7 +610,7 @@ map![&amp;env, (k1, v1), (k2, v2)] // Map
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../examples/tokens/09-optimized-token-ops.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/code-examples.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
@@ -642,6 +643,8 @@ map![&amp;env, (k1, v1), (k2, v2)] // Map
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

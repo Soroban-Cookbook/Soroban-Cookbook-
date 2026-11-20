@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -209,7 +210,7 @@ rustup target list --installed   # verify
 <h3 id="errore0277-the-trait-bound--is-not-satisfied-on-a-contract-type"><a class="header" href="#errore0277-the-trait-bound--is-not-satisfied-on-a-contract-type"><code>error[E0277]: the trait bound ... is not satisfied</code> on a contract type</a></h3>
 <p><strong>Cause:</strong> A type used in a contract function signature or storage does not implement the required Soroban traits (<code>IntoVal</code>, <code>TryFromVal</code>, etc.).</p>
 <p><strong>Solution:</strong> Annotate the type with <code>#[contracttype]</code>:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::contracttype;
 
@@ -256,13 +257,13 @@ rustflags = ["-C", "target-feature=+multivalue"]
 <h3 id="called-optionunwrap-on-a-none-value-in-a-test"><a class="header" href="#called-optionunwrap-on-a-none-value-in-a-test"><code>called 'Option::unwrap()' on a 'None' value</code> in a test</a></h3>
 <p><strong>Cause:</strong> A storage key was never written before being read, or the wrong key was used.</p>
 <p><strong>Solution:</strong> Ensure the contract is initialized before calling read methods:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>client.initialize(&amp;admin);   // write state first
 let val = client.get_value(); // then read
 <span class="boring">}</span></code></pre>
 <p>Use <code>has()</code> to guard optional reads:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>if env.storage().instance().has(&amp;key) {
     let val: MyType = env.storage().instance().get(&amp;key).unwrap();
@@ -272,13 +273,13 @@ let val = client.get_value(); // then read
 <h3 id="hosterror-errorauth-invalidaction-in-tests"><a class="header" href="#hosterror-errorauth-invalidaction-in-tests"><code>HostError: Error(Auth, InvalidAction)</code> in tests</a></h3>
 <p><strong>Cause:</strong> An <code>Address::require_auth()</code> call was not satisfied. The test did not mock authorization.</p>
 <p><strong>Solution:</strong> Add <code>env.mock_all_auths()</code> before invoking the client:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let env = Env::default();
 env.mock_all_auths();
 <span class="boring">}</span></code></pre>
 <p>To assert that specific auth was required:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::testutils::AuthorizedFunction;
 
@@ -289,7 +290,7 @@ assert!(!auths.is_empty());
 <h3 id="hosterror-errorwasmvm--or-unreachable-panic-in-tests"><a class="header" href="#hosterror-errorwasmvm--or-unreachable-panic-in-tests"><code>HostError: Error(WasmVm, ...)</code> or <code>unreachable</code> panic in tests</a></h3>
 <p><strong>Cause:</strong> A <code>panic!</code> inside the contract was triggered (e.g., overflow, out-of-bounds, explicit guard).</p>
 <p><strong>Solution:</strong> Use <code>#[should_panic]</code> for expected panics, or return <code>Result&lt;_, ContractError&gt;</code> instead of panicking:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 #[should_panic(expected = "overflow")]
@@ -298,7 +299,7 @@ fn test_overflow() {
 }
 <span class="boring">}</span></code></pre>
 <p>For production contracts, prefer returning errors over panicking:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn safe_transfer(env: Env, amount: i128) -&gt; Result&lt;(), Error&gt; {
     if amount &lt;= 0 {
@@ -410,24 +411,24 @@ stellar contract invoke --network mainnet ...
 <h2 id="solutions-and-workarounds"><a class="header" href="#solutions-and-workarounds">Solutions and Workarounds</a></h2>
 <h3 id="workaround-no-println-in-contracts"><a class="header" href="#workaround-no-println-in-contracts">Workaround: No <code>println!</code> in contracts</a></h3>
 <p>Soroban contracts run in a <code>no_std</code> environment. Use <code>env.logs()</code> for debug output during testing:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.logs().print();   // in tests, prints all log entries
 <span class="boring">}</span></code></pre>
 <p>In the contract:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Not available in production; only visible in test environments
 <span class="boring">}</span></code></pre>
 <p>For production debugging, emit events instead:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.events().publish((symbol_short!("debug"),), value);
 <span class="boring">}</span></code></pre>
 <hr>
 <h3 id="workaround-no-hashmap-or-btreemap-from-std"><a class="header" href="#workaround-no-hashmap-or-btreemap-from-std">Workaround: No <code>HashMap</code> or <code>BTreeMap</code> from <code>std</code></a></h3>
 <p>Use Soroban’s <code>Map&lt;K, V&gt;</code> instead:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::Map;
 
@@ -437,7 +438,7 @@ map.set(soroban_sdk::symbol_short!("key"), 42);
 <hr>
 <h3 id="workaround-no-vec-from-std"><a class="header" href="#workaround-no-vec-from-std">Workaround: No <code>Vec</code> from <code>std</code></a></h3>
 <p>Use Soroban’s <code>Vec&lt;T&gt;</code>:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::{vec, Vec};
 
@@ -446,7 +447,7 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
 <hr>
 <h3 id="workaround-simulating-time-in-tests"><a class="header" href="#workaround-simulating-time-in-tests">Workaround: Simulating time in tests</a></h3>
 <p>Soroban’s test environment does not advance time automatically. Set the ledger timestamp manually:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.ledger().with_mut(|li| {
     li.timestamp = 1_700_000_000;
@@ -456,7 +457,7 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
 <hr>
 <h3 id="workaround-testing-ttl--storage-expiry"><a class="header" href="#workaround-testing-ttl--storage-expiry">Workaround: Testing TTL / storage expiry</a></h3>
 <p>Advance the ledger sequence to simulate TTL expiry:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.ledger().with_mut(|li| {
     li.sequence += 10_000; // advance past the TTL
@@ -524,6 +525,8 @@ let v: Vec&lt;i128&gt; = vec![&amp;env, 1, 2, 3];
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

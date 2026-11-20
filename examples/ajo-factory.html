@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -192,7 +193,7 @@
 <h2 id="-key-patterns"><a class="header" href="#-key-patterns">🧠 Key Patterns</a></h2>
 <h3 id="1-the-deployment-salt"><a class="header" href="#1-the-deployment-salt">1. The Deployment Salt</a></h3>
 <p>Address derivation in Soroban is deterministic. To ensure each <code>Ajo</code> has its own address, the factory must provide a unique salt.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Combine creator address and counter to generate a unique salt
 let salt = env.crypto().sha256(&amp;(&amp;creator, ajos.len()).into_val(&amp;env));
@@ -204,14 +205,14 @@ let deployed_address = env
 <span class="boring">}</span></code></pre>
 <h3 id="2-initialization--re-entrancy-protection"><a class="header" href="#2-initialization--re-entrancy-protection">2. Initialization &amp; Re-entrancy Protection</a></h3>
 <p>Since Soroban contracts are immutable once deployed, they use an <code>initialize</code> function. The factory contract <strong>must</strong> call this immediately to prevent anyone else from taking control of the instance.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Call initialize immediately after deployment
 let ajo_client = AjoClient::new(&amp;env, &amp;deployed_address);
 ajo_client.initialize(&amp;amount, &amp;max_members, &amp;creator);
 <span class="boring">}</span></code></pre>
 <p>The <code>Ajo</code> contract itself should guard against multiple initializations:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>if env.storage().instance().has(&amp;AjoDataKey::Creator) {
     panic!("Already initialized");
@@ -219,7 +220,7 @@ ajo_client.initialize(&amp;amount, &amp;max_members, &amp;creator);
 <span class="boring">}</span></code></pre>
 <h2 id="-usage-example"><a class="header" href="#-usage-example">🛠️ Usage Example</a></h2>
 <h3 id="ajo-factory-logic"><a class="header" href="#ajo-factory-logic">Ajo Factory Logic</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn create_ajo(env: Env, amount: i128, max_members: u32, creator: Address) -&gt; Address {
     creator.require_auth();
@@ -248,7 +249,7 @@ ajo_client.initialize(&amp;amount, &amp;max_members, &amp;creator);
 </ul>
 <h2 id="-testing"><a class="header" href="#-testing">🧪 Testing</a></h2>
 <p>The factory pattern is best tested by simulating the Wasm upload in your unit tests:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_factory() {
@@ -309,6 +310,8 @@ fn test_factory() {
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

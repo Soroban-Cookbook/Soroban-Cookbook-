@@ -1,0 +1,702 @@
+<!DOCTYPE HTML>
+<html lang="en" class="rust sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Interactive Playground — Intermediate Examples - Soroban Cookbook</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A comprehensive guide to building smart contracts on Stellar with Soroban">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-e96d0476.css">
+        <link rel="stylesheet" href="../css/chrome-d279d366.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "rust";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-8daf4f14.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Soroban Cookbook</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/src/examples/playground-intermediate.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="interactive-playground--intermediate-examples"><a class="header" href="#interactive-playground--intermediate-examples">Interactive Playground — Intermediate Examples</a></h1>
+<p>Run, edit, and explore the <strong>intermediate</strong> Soroban examples locally. Every
+snippet on this page is a trimmed version of a real crate in
+<code>examples/intermediate/</code>, and every snippet is covered by the integration
+suite (<code>cargo test -p integration-tests</code>), so what you read here is what the
+repository actually runs.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>You will learn</th><th>Examples</th></tr>
+</thead>
+<tbody>
+<tr><td>Token flows</td><td><a href="#1-token-examples">Token examples</a></td></tr>
+<tr><td>Cross-contract calls</td><td><a href="#2-cross-contract-examples">Cross-contract examples</a></td></tr>
+<tr><td>Access control</td><td><a href="#3-access-control-examples">Access control examples</a></td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="how-to-use-this-playground"><a class="header" href="#how-to-use-this-playground">How to Use This Playground</a></h2>
+<h3 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h3>
+<pre><code class="language-bash"># 1. Install Rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
+# 2. Add the Wasm target
+rustup target add wasm32-unknown-unknown
+
+# 3. Clone the cookbook
+git clone https://github.com/Soroban-Cookbook/Soroban-Cookbook-.git
+cd Soroban-Cookbook-
+</code></pre>
+<h3 id="run-any-example"><a class="header" href="#run-any-example">Run Any Example</a></h3>
+<pre><code class="language-bash"># Pattern: cd examples/intermediate/&lt;example-name&gt;
+cd examples/intermediate/02-role-based-access-control
+
+# Run the example's own tests
+cargo test
+
+# Run the cross-example integration suite
+cargo test -p integration-tests
+</code></pre>
+<h3 id="edit-and-experiment"><a class="header" href="#edit-and-experiment">Edit and Experiment</a></h3>
+<p>Each intermediate example is an isolated crate. Open its <code>src/lib.rs</code>, make a
+change, and re-run <code>cargo test</code> — the example’s own unit tests plus the
+cross-contract integration tests catch regressions immediately.</p>
+<hr>
+<h2 id="1-token-examples"><a class="header" href="#1-token-examples">1. Token Examples</a></h2>
+<h3 id="11-sep-41-token--the-base-layer"><a class="header" href="#11-sep-41-token--the-base-layer">1.1 SEP-41 token — the base layer</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/01-sep41-token"><code>examples/tokens/01-sep41-token</code></a>
+<strong>Book page:</strong> <a href="./tokens.html">Token Examples →</a></p>
+</blockquote>
+<p>A fungible token implements the SEP-41 interface: <code>balance</code>, <code>transfer</code>,
+<code>allowance</code>, <code>approve</code>, <code>transfer_from</code>, <code>burn</code> and <code>burn_from</code>.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span>#![no_std]
+
+<span class="boring">fn main() {
+</span>use soroban_sdk::{contract, contractimpl, contracttype, Address, Env};
+
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Balance(Address),
+    Allowance(Address, Address),
+}
+
+#[contract]
+pub struct TokenContract;
+
+#[contractimpl]
+impl TokenContract {
+    /// Moves `amount` from `from` to `to`.
+    pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
+        // The owner of the funds must sign for the transfer.
+        from.require_auth();
+
+        let mut from_balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&amp;DataKey::Balance(from.clone()))
+            .unwrap_or(0);
+        let to_balance: i128 = env
+            .storage()
+            .persistent()
+            .get(&amp;DataKey::Balance(to.clone()))
+            .unwrap_or(0);
+
+        from_balance -= amount;
+        let to_balance = to_balance.checked_add(amount).unwrap();
+
+        env.storage()
+            .persistent()
+            .set(&amp;DataKey::Balance(from), &amp;from_balance);
+        env.storage()
+            .persistent()
+            .set(&amp;DataKey::Balance(to), &amp;to_balance);
+    }
+
+    pub fn balance(env: Env, user: Address) -&gt; i128 {
+        env.storage()
+            .persistent()
+            .get(&amp;DataKey::Balance(user))
+            .unwrap_or(0)
+    }
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/tokens/01-sep41-token
+cargo test
+</code></pre>
+<p><strong>What to edit:</strong> remove <code>from.require_auth()</code> and re-run the tests — the
+contract no longer enforces ownership of the funds.</p>
+<h3 id="12-allowance-pattern--spending-someone-elses-balance"><a class="header" href="#12-allowance-pattern--spending-someone-elses-balance">1.2 Allowance pattern — “spending” someone else’s balance</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/05-allowance-pattern"><code>examples/tokens/05-allowance-pattern</code></a>
+<strong>Book page:</strong> <a href="./tokens.html">Token Examples →</a></p>
+</blockquote>
+<p>An allowance lets a <em>spender</em> move funds on behalf of an <em>owner</em>, with an
+expiry ledger so stale approvals die automatically.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// The owner approves `spender` to move up to `amount`.
+pub fn approve(
+    env: Env,
+    owner: Address,
+    spender: Address,
+    amount: i128,
+    expiration_ledger: u32,
+) -&gt; Result&lt;(), AllowanceError&gt; {
+    owner.require_auth();
+    if amount &lt; 0 {
+        return Err(AllowanceError::InvalidAmount);
+    }
+    if expiration_ledger &lt; env.ledger().sequence() {
+        return Err(AllowanceError::InvalidExpiration);
+    }
+    env.storage().persistent().set(
+        &amp;DataKey::Allowance(owner, spender),
+        &amp;AllowanceValue { amount, expiration_ledger },
+    );
+    Ok(())
+}
+
+/// The spender moves `amount` out of the owner's balance.
+pub fn transfer_from(
+    env: Env,
+    spender: Address,
+    owner: Address,
+    to: Address,
+    amount: i128,
+) -&gt; Result&lt;(), AllowanceError&gt; {
+    spender.require_auth();
+
+    let allowance = read_allowance(&amp;env, &amp;owner, &amp;spender);
+    // An expired allowance is worth nothing.
+    if allowance.amount == 0
+        || (allowance.expiration_ledger &lt; env.ledger().sequence())
+    {
+        return Err(AllowanceError::InsufficientAllowance);
+    }
+    if allowance.amount &lt; amount {
+        return Err(AllowanceError::InsufficientAllowance);
+    }
+    // ... move the funds and decrement the allowance
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/tokens/05-allowance-pattern
+cargo test
+</code></pre>
+<p><strong>What to edit:</strong> drop the expiry check in <code>read_allowance</code> and see the
+“expired allowance” integration test fail — approvals must expire.</p>
+<h3 id="13-token-wrapper--composing-two-tokens"><a class="header" href="#13-token-wrapper--composing-two-tokens">1.3 Token wrapper — composing two tokens</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/06-token-wrapper"><code>examples/tokens/06-token-wrapper</code></a>
+<strong>Book page:</strong> <a href="./tokens.html">Token Examples →</a></p>
+</blockquote>
+<p>A wrapper contract holds an underlying token and exposes it under a new
+address — the classic building block for vault shares and receipt tokens.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Wrap `amount` of the underlying token into wrapper shares.
+pub fn deposit(env: Env, user: Address, amount: i128) -&gt; Result&lt;i128, TokenWrapperError&gt; {
+    user.require_auth();
+
+    // Pull the underlying tokens into this contract first ...
+    self::TokenClient::new(&amp;env, &amp;underlying).transfer(
+        &amp;user,
+        &amp;env.current_contract_address(),
+        &amp;amount,
+    );
+
+    // ... then credit the wrapper shares.
+    let shares = deposit_internal(&amp;env, &amp;user, amount);
+    Ok(shares)
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/tokens/06-token-wrapper
+cargo test
+</code></pre>
+<hr>
+<h2 id="2-cross-contract-examples"><a class="header" href="#2-cross-contract-examples">2. Cross-Contract Examples</a></h2>
+<h3 id="21-ajo-factory--deploying-contracts-from-a-contract"><a class="header" href="#21-ajo-factory--deploying-contracts-from-a-contract">2.1 Ajo factory — deploying contracts from a contract</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory"><code>examples/intermediate/ajo-factory</code></a>
+<strong>Book page:</strong> <a href="./ajo-factory.html">Ajo Factory →</a></p>
+</blockquote>
+<p>A factory stores a Wasm hash and derives a unique address per deployment, so
+every instance is isolated but reproducible.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Deploy a new instance of the template contract.
+pub fn deploy(env: Env, salt: BytesN&lt;32&gt;) -&gt; Result&lt;Address, FactoryError&gt; {
+    let wasm_hash: BytesN&lt;32&gt; = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::TemplateWasm)
+        .ok_or(FactoryError::NotInitialized)?;
+
+    // `with_current_contract` derives a deterministic address from the salt.
+    let address = env
+        .deployer()
+        .with_current_contract(salt)
+        .deploy(wasm_hash);
+
+    env.storage()
+        .instance()
+        .set(&amp;DataKey::DeployedAjo(address.clone()), &amp;true);
+    Ok(address)
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/intermediate/ajo-factory
+cargo test
+</code></pre>
+<h3 id="22-contract-registry--one-address-to-rule-them-all"><a class="header" href="#22-contract-registry--one-address-to-rule-them-all">2.2 Contract registry — one address to rule them all</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/contract-registry"><code>examples/advanced/contract-registry</code></a>
+<strong>Book page:</strong> <a href="./advanced.html">Advanced Examples →</a></p>
+</blockquote>
+<p>A registry maps a human-friendly name to a contract address and lets callers
+reach other contracts through a single entry point.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Register `implementation` under `name`.
+pub fn register(env: Env, name: Symbol, implementation: Address) -&gt; Result&lt;(), RegistryError&gt; {
+    admin(&amp;env)?.require_auth();
+    env.storage().persistent().set(&amp;DataKey::Contract(name), &amp;implementation);
+    Ok(())
+}
+
+/// Forward a call to the contract registered under `name`.
+pub fn call(env: Env, name: Symbol, fn_name: Symbol, args: Vec&lt;Val&gt;) -&gt; Result&lt;Val, RegistryError&gt; {
+    let target: Address = env
+        .storage()
+        .persistent()
+        .get(&amp;DataKey::Contract(name))
+        .ok_or(RegistryError::NotFound)?;
+    Ok(env.invoke_contract::&lt;Val&gt;(&amp;target, &amp;fn_name, args))
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/advanced/contract-registry
+cargo test
+</code></pre>
+<h3 id="23-oracle-pattern--reading-external-data"><a class="header" href="#23-oracle-pattern--reading-external-data">2.3 Oracle pattern — reading external data</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/03-oracle-pattern"><code>examples/advanced/03-oracle-pattern</code></a>
+<strong>Book page:</strong> <a href="./oracle-pattern.html">Oracle Pattern →</a></p>
+</blockquote>
+<p>Contracts cannot fetch prices on their own; an oracle contract is updated by
+privileged sources and read by everyone else.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Publish a new price.  Only trusted oracles may do this.
+pub fn update_price(env: Env, oracle: Address, asset: Symbol, price: i128) -&gt; Result&lt;(), OracleError&gt; {
+    if !env.storage().persistent().has(&amp;DataKey::Oracle(oracle.clone())) {
+        return Err(OracleError::Unauthorized);
+    }
+    oracle.require_auth();
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Price(asset.clone(), price), &amp;price);
+    Ok(())
+}
+
+/// Read the last published price.
+pub fn get_price(env: Env, asset: Symbol) -&gt; Result&lt;i128, OracleError&gt; {
+    env.storage()
+        .persistent()
+        .get(&amp;DataKey::Price(asset))
+        .ok_or(OracleError::NotFound)
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/advanced/03-oracle-pattern
+cargo test
+</code></pre>
+<hr>
+<h2 id="3-access-control-examples"><a class="header" href="#3-access-control-examples">3. Access Control Examples</a></h2>
+<h3 id="31-role-based-access-control"><a class="header" href="#31-role-based-access-control">3.1 Role-based access control</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/02-role-based-access-control"><code>examples/intermediate/02-role-based-access-control</code></a>
+<strong>Book page:</strong> <a href="./intermediate.html">Intermediate Examples →</a></p>
+</blockquote>
+<p>Roles are stored per address. Every guarded function checks the role of the
+caller before it touches state.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum Role {
+    Admin = 0,
+    Moderator = 1,
+    User = 2,
+}
+
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Role(Address, Role),
+    Admin,
+}
+
+/// True when `account` holds `role`.
+pub fn has_role(env: &amp;Env, account: &amp;Address, role: Role) -&gt; bool {
+    env.storage().persistent().has(&amp;DataKey::Role(account.clone(), role))
+}
+
+/// Guard used by the privileged entry points.
+fn require_role(env: &amp;Env, account: &amp;Address, role: Role) {
+    assert!(has_role(env, account, role), "unauthorized");
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/intermediate/02-role-based-access-control
+cargo test
+</code></pre>
+<h3 id="32-hierarchical-access-control--roles-that-inherit"><a class="header" href="#32-hierarchical-access-control--roles-that-inherit">3.2 Hierarchical access control — roles that inherit</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/16-hierarchical-access-control"><code>examples/advanced/16-hierarchical-access-control</code></a>
+<strong>Book page:</strong> <a href="./advanced.html">Advanced Examples →</a></p>
+</blockquote>
+<p><code>ADMIN &gt; MANAGER &gt; OPERATOR</code>: a higher role inherits the permissions of all
+lower roles, so an admin never has to be granted permissions one by one.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub const ROLE_ADMIN: Symbol = symbol_short!("ADMIN");
+pub const ROLE_MANAGER: Symbol = symbol_short!("MANAGER");
+pub const ROLE_OPERATOR: Symbol = symbol_short!("OPERATOR");
+pub const PERM_MANAGE_ROLES: Symbol = symbol_short!("MNG_ROLES");
+pub const PERM_USE_RESOURCES: Symbol = symbol_short!("USE_RES");
+
+/// Grant `role` to `account`.  Only callers that may manage `role` succeed.
+pub fn grant_role(env: Env, caller: Address, role: Symbol, account: Address) {
+    caller.require_auth();
+    require_permission(&amp;env, &amp;caller, PERM_MANAGE_ROLES);
+    assert!(can_manage_role(&amp;env, &amp;caller, &amp;role), "Caller cannot manage target role");
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::RoleMembers(role), &amp;account);
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/advanced/16-hierarchical-access-control
+cargo test
+</code></pre>
+<h3 id="33-pause--unpause--the-emergency-brake"><a class="header" href="#33-pause--unpause--the-emergency-brake">3.3 Pause / unpause — the emergency brake</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/03-pause-unpause"><code>examples/intermediate/03-pause-unpause</code></a>
+<strong>Book page:</strong> <a href="./pause-unpause.html">Pause / Unpause →</a></p>
+</blockquote>
+<p>A single flag halts every state-changing entry point while reads keep
+working.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Reject the call when the contract is paused.
+fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), ContractError&gt; {
+    let paused: bool = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::Paused)
+        .unwrap_or(false);
+    if paused {
+        Err(ContractError::ContractPaused)
+    } else {
+        Ok(())
+    }
+}
+
+/// Emergency switch used by the admin.
+pub fn pause(env: Env, admin: Address) -&gt; Result&lt;(), ContractError&gt; {
+    read_admin(&amp;env)?.require_auth();
+    env.storage().instance().set(&amp;DataKey::Paused, &amp;true);
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Try it:</strong></p>
+<pre><code class="language-bash">cd examples/intermediate/03-pause-unpause
+cargo test
+</code></pre>
+<hr>
+<h2 id="4-instructions-and-guides"><a class="header" href="#4-instructions-and-guides">4. Instructions and Guides</a></h2>
+<p>Work through the intermediate material in this order:</p>
+<ol>
+<li><a href="../guides/playground-tutorial-01-hello-world.html">Playground Tutorial 1 — Hello World</a></li>
+<li><a href="../guides/playground-tutorial-02-storage.html">Playground Tutorial 2 — Contract Storage</a></li>
+<li><a href="../guides/playground-tutorial-03-error-handling.html">Playground Tutorial 3 — Error Handling</a></li>
+<li><a href="../guides/playground-tutorial-04-authentication.html">Playground Tutorial 4 — Authentication</a></li>
+<li><a href="../guides/playground-tutorial-05-multi-contract.html">Playground Tutorial 5 — Multi-Contract Interactions</a></li>
+<li><a href="../guides/testing.html">Testing Guide</a> — mocking auth, time travel, event assertions</li>
+<li><a href="../guides/contract-development.html">Contract Development Guide</a> — project layout and conventions</li>
+<li><a href="../guides/deployment.html">Deployment Guide</a> — ship a contract to testnet</li>
+<li><a href="../guides/security-checklist.html">Security Checklist</a> — review your own contract</li>
+<li><a href="../docs/common-patterns.html">Common Patterns</a> and
+<a href="../docs/cross-contract-patterns.html">Factory, Proxy, and Registry Patterns</a></li>
+</ol>
+<p>Reference material:</p>
+<ul>
+<li><a href="../docs/code-examples.html">Code Examples (all topics)</a> — one tested snippet per topic</li>
+<li><a href="../docs/token-security-checklist.html">Token Security Checklist</a></li>
+<li><a href="../docs/best-practices.html">Best Practices</a></li>
+<li><a href="../docs/common-pitfalls.html">Common Pitfalls</a></li>
+</ul>
+<hr>
+<h2 id="5-running-everything-at-once"><a class="header" href="#5-running-everything-at-once">5. Running Everything at Once</a></h2>
+<pre><code class="language-bash"># The intermediate examples' own tests
+for dir in examples/intermediate/*/; do
+    echo "Testing $dir..."
+    (cd "$dir" &amp;&amp; cargo test) || exit 1
+done
+
+# The cross-contract integration suite that covers the intermediate examples
+cargo test -p integration-tests
+</code></pre>
+<p>Building the Wasm artifacts:</p>
+<pre><code class="language-bash">for dir in examples/intermediate/*/; do
+    cargo build --manifest-path "$dir/Cargo.toml" \
+                --target wasm32-unknown-unknown --release
+done
+</code></pre>
+<p>On Windows (PowerShell):</p>
+<pre><code class="language-powershell">Get-ChildItem examples\intermediate -Directory | ForEach-Object {
+    cargo build --manifest-path "$($_.FullName)\Cargo.toml" `
+                --target wasm32-unknown-unknown --release
+}
+</code></pre>
+<hr>
+<h2 id="6-next-steps"><a class="header" href="#6-next-steps">6. Next Steps</a></h2>
+<ul>
+<li><a href="./advanced.html">Advanced Examples →</a> — proxies, oracles, batch calls</li>
+<li><a href="./defi.html">Use-Case Examples →</a> — DeFi, NFTs, governance, tokens</li>
+<li><a href="../docs/testing-best-practices.html">Testing Best Practices →</a></li>
+<li><a href="../playground.html">Playground Infrastructure →</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../playground.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../guides/playground-tutorial-01-hello-world.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../playground.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../guides/playground-tutorial-01-hello-world.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

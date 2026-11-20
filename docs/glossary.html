@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -198,7 +199,7 @@
 <h2 id="b"><a class="header" href="#b">B</a></h2>
 <h3 id="bytes--bytesn"><a class="header" href="#bytes--bytesn">Bytes / BytesN</a></h3>
 <p>Soroban SDK types for handling byte arrays. <code>Bytes</code> is dynamic-length, while <code>BytesN&lt;N&gt;</code> is fixed-length.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let data: Bytes = Bytes::from_slice(&amp;env, &amp;[1, 2, 3]);
 let hash: BytesN&lt;32&gt; = BytesN::from_array(&amp;env, &amp;[0u8; 32]);
@@ -214,7 +215,7 @@ let hash: BytesN&lt;32&gt; = BytesN::from_array(&amp;env, &amp;[0u8; 32]);
 <p>A unique identifier for a deployed contract. Used to invoke contract functions and interact with the contract.</p>
 <h3 id="contractimpl"><a class="header" href="#contractimpl">contractimpl</a></h3>
 <p>Rust macro that marks an implementation block as containing contract functions that can be invoked externally.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contractimpl]
 impl MyContract {
@@ -223,7 +224,7 @@ impl MyContract {
 <span class="boring">}</span></code></pre>
 <h3 id="contracttype"><a class="header" href="#contracttype">contracttype</a></h3>
 <p>Rust macro that marks a struct or enum as a contract type that can be stored or passed between contracts.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub struct MyData {
@@ -240,7 +241,7 @@ pub struct MyData {
 <h2 id="e"><a class="header" href="#e">E</a></h2>
 <h3 id="env"><a class="header" href="#env">Env</a></h3>
 <p>The Soroban environment object that provides access to host functions, storage, events, and other contract capabilities.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn my_function(env: Env) {
     // Access environment features
@@ -248,7 +249,7 @@ pub struct MyData {
 <span class="boring">}</span></code></pre>
 <h3 id="events"><a class="header" href="#events">Events</a></h3>
 <p>Notifications emitted by contracts to log important state changes or actions. Events can be queried off-chain.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.events().publish((symbol_short!("transfer"),), (from, to, amount));
 <span class="boring">}</span></code></pre>
@@ -296,7 +297,7 @@ pub struct MyData {
 <p><strong>See also:</strong> <a href="#testnet">Testnet</a></p>
 <h3 id="map"><a class="header" href="#map">Map</a></h3>
 <p>A Soroban SDK type for key-value storage. Similar to HashMap but optimized for the Soroban environment.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let mut map: Map&lt;Address, u64&gt; = Map::new(&amp;env);
 map.set(address, 100);
@@ -313,7 +314,7 @@ map.set(address, 100);
 <p><strong>See also:</strong> <a href="#instance-storage">Instance Storage</a>, <a href="#temporary-storage">Temporary Storage</a>, <a href="#ttl--time-to-live">TTL / Time To Live</a></p>
 <h3 id="publish"><a class="header" href="#publish">Publish</a></h3>
 <p>Function to emit events from a contract.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.events().publish((symbol_short!("event"),), (data,));
 <span class="boring">}</span></code></pre>
@@ -321,7 +322,7 @@ map.set(address, 100);
 <h2 id="r"><a class="header" href="#r">R</a></h2>
 <h3 id="require_auth"><a class="header" href="#require_auth">require_auth</a></h3>
 <p>A Soroban function that verifies an address has authorized the current operation. Causes transaction to fail if authorization is missing.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>user.require_auth();
 <span class="boring">}</span></code></pre>
@@ -355,7 +356,7 @@ soroban contract invoke
 <p><strong>See also:</strong> <a href="#lumens--xlm">Lumens / XLM</a></p>
 <h3 id="symbol"><a class="header" href="#symbol">Symbol</a></h3>
 <p>A Soroban type for short string identifiers, optimized for use as storage keys or event topics.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let key = symbol_short!("balance");
 let long_key = Symbol::new(&amp;env, "longer_identifier");
@@ -381,7 +382,7 @@ let long_key = Symbol::new(&amp;env, "longer_identifier");
 <h2 id="u"><a class="header" href="#u">U</a></h2>
 <h3 id="unit-test"><a class="header" href="#unit-test">Unit Test</a></h3>
 <p>Tests that verify individual contract functions in isolation. Soroban provides test utilities for writing comprehensive tests.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_my_function() {
@@ -394,7 +395,7 @@ fn test_my_function() {
 <p>The base value type in Soroban. Most Soroban types can be converted to/from <code>Val</code>.</p>
 <h3 id="vec"><a class="header" href="#vec">Vec</a></h3>
 <p>A Soroban SDK type for dynamic arrays. Similar to Rust’s <code>Vec</code> but optimized for Soroban.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>let mut vec: Vec&lt;u64&gt; = Vec::new(&amp;env);
 vec.push_back(42);
@@ -478,6 +479,8 @@ vec.push_back(42);
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

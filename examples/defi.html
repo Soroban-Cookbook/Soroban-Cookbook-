@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -207,7 +208,7 @@
 <li>Allocation caps per strategy in basis points</li>
 </ul>
 <p><strong>Quick Code:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Switch to a higher-yield strategy
 client.switch_strategy(&amp;admin, &amp;StrategyType::Balanced);
@@ -241,11 +242,13 @@ let yield_amount = client.estimate_yield(&amp;10_000, &amp;365);
 <li>Performance fees</li>
 <li>Emergency withdrawal</li>
 </ul>
+<h2 id="playground-use-cases"><a class="header" href="#playground-use-cases">Playground Use Cases</a></h2>
+<p>The <a href="../playground-use-cases.html">Playground Use Cases</a> page walks through complete, runnable DeFi scenarios — swaps, liquidity provision, and yield vaults — that you can try in the playground and then reproduce locally.</p>
+<p>Run any DeFi example interactively from the repository:</p>
+<pre><code class="language-bash">cd examples/defi/01-simple-swap &amp;&amp; cargo test
+</code></pre>
+<p>Swap in the example name for the one you want to explore (for example <code>examples/defi/vault-strategies</code>), then follow the matching playground use case to see the same flow step by step.</p>
 <h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
-<ul>
-<li><a href="../basics.html">Basics</a>, <a href="../tokens.html">Tokens</a></li>
-</ul>
-<h2 id="prerequisites-1"><a class="header" href="#prerequisites-1">Prerequisites</a></h2>
 <ul>
 <li><a href="../basics.html">Basics</a>, <a href="../tokens.html">Tokens</a></li>
 </ul>
@@ -307,6 +310,8 @@ let yield_amount = client.estimate_yield(&amp;10_000, &amp;365);
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

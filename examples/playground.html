@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -220,7 +221,7 @@ then run <code>cargo test</code> again — the test suite will catch regressions
 <p>The simplest possible Soroban contract. It receives a name and returns a
 greeting vector. A great starting point for understanding how contracts are
 structured.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 
 <span class="boring">fn main() {
@@ -257,7 +258,7 @@ re-run the tests — watch one assertion fail and learn how to fix it.</p>
 </blockquote>
 <p>Soroban has three storage tiers with different lifetimes and costs. This
 example covers all three in one contract.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 
 <span class="boring">fn main() {
@@ -338,7 +339,7 @@ that the TTL-related tests fail — this demonstrates why TTL management matters
 <p>Soroban contracts return typed errors via Rust’s <code>Result</code>. Using
 <code>#[contracterror]</code> assigns each variant a stable integer code that clients
 can match on.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 
 <span class="boring">fn main() {
@@ -414,7 +415,7 @@ a function that triggers it when two numbers would exceed <code>u64::MAX</code>.
 </blockquote>
 <p><code>require_auth()</code> is Soroban’s core security primitive. Every state-mutating
 function that touches user funds should call it on the relevant address.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 
 <span class="boring">fn main() {
@@ -505,7 +506,7 @@ The contract will no longer enforce ownership — a critical security hole.</p>
 </blockquote>
 <p>Events are how Soroban contracts communicate state changes to off-chain
 consumers. Topics are indexed; the data payload is decoded after filtering.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span>#![no_std]
 
 <span class="boring">fn main() {
@@ -576,7 +577,7 @@ value alongside the new value so off-chain consumers can detect the delta.</p>
 cargo test
 </code></pre>
 <p>Key pattern — use <code>?</code> to propagate errors up the call stack without boilerplate:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn complex_operation(env: Env, amount: u64) -&gt; Result&lt;u64, ContractError&gt; {
     validate_amount(amount)?;          // returns Err early if invalid
@@ -594,7 +595,7 @@ cargo test
 </code></pre>
 <p>Auth context lets a contract verify authorization for specific arguments,
 not just the bare caller identity:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Only authorizes this call if the user signed off on EXACTLY these args.
 user.require_auth_for_args((&amp;user, &amp;amount).into_val(&amp;env));
@@ -608,7 +609,7 @@ user.require_auth_for_args((&amp;user, &amp;amount).into_val(&amp;env));
 cargo test
 </code></pre>
 <p>Core validation helpers:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Checked arithmetic prevents silent overflow
 let result = a.checked_add(b).ok_or(ContractError::Overflow)?;
@@ -627,7 +628,7 @@ if amount == 0 || amount &gt; MAX_AMOUNT {
 cargo test
 </code></pre>
 <p>Converting between Rust types and Soroban <code>Val</code>:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Convert a Rust type into a Val for storage or events
 let val: Val = my_struct.into_val(&amp;env);
@@ -644,7 +645,7 @@ let my_struct = MyStruct::try_from_val(&amp;env, &amp;val)?;
 cargo test
 </code></pre>
 <p>Quick reference:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::{Address, Bytes, BytesN, Map, Symbol, Vec};
 
@@ -670,7 +671,7 @@ let hash: BytesN&lt;32&gt; = env.crypto().sha256(&amp;data);
 cargo test
 </code></pre>
 <p>Use <code>#[contracttype]</code> enums as storage keys or contract state:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 #[derive(Clone, Copy, PartialEq)]
@@ -698,7 +699,7 @@ cargo test
 </code></pre>
 <p>Structs annotated with <code>#[contracttype]</code> can be stored directly and used as
 complex storage keys:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 #[derive(Clone)]
@@ -724,7 +725,7 @@ cargo test
 </code></pre>
 <p>Soroban contracts compile with <code>overflow-checks = true</code> in release builds,
 so overflows panic rather than wrap. Use checked arithmetic for explicit handling:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Panics on overflow in debug; use checked_ for explicit Result
 let safe = value.checked_mul(factor).ok_or(ContractError::Overflow)?;
@@ -741,7 +742,7 @@ pub fn transfer(_env: Env, amount: i128) { /* ... */ }
 cargo test
 </code></pre>
 <p>Soroban <code>String</code> is a host object — no <code>format!</code> or concatenation available:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>use soroban_sdk::String;
 
@@ -759,7 +760,7 @@ let sym = symbol_short!("hello");  // more gas-efficient than String
 <pre><code class="language-bash">cd examples/basics/13-collection-types
 cargo test
 </code></pre>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Vec — ordered, integer-indexed
 let mut v: Vec&lt;u64&gt; = Vec::new(&amp;env);
@@ -781,7 +782,7 @@ let val = m.get(user).unwrap_or(0);
 cargo test
 </code></pre>
 <p>Designing events that off-chain indexers can query efficiently:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Slot ordering matters for filter efficiency
 env.events().publish(
@@ -863,16 +864,111 @@ soroban contract invoke \
 → You likely forgot <code>env.mock_all_auths()</code> before calling an auth-protected function.</p>
 <p><strong><code>extend_ttl</code> panics in tests</strong>
 → This is expected when ledger sequence is 0. Wrap ledger setup with:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.ledger().with_mut(|li| { li.sequence_number = 100; li.timestamp = 1_000_000; });
 <span class="boring">}</span></code></pre>
 <p><strong>Wasm binary is too large</strong>
 → Check <code>Cargo.toml</code> for <code>opt-level = "z"</code>, <code>lto = true</code>, and <code>strip = "symbols"</code> in <code>[profile.release]</code>.</p>
 <hr>
+<h2 id="use-case-examples"><a class="header" href="#use-case-examples">Use-Case Examples</a></h2>
+<p>The basic examples above teach individual Soroban primitives. The use-case
+examples below combine those primitives into realistic contracts you can run,
+edit, and deploy. Each section links to the example directory in the repo and
+to the matching book page.</p>
+<h3 id="defi--simple-swap"><a class="header" href="#defi--simple-swap">DeFi — Simple Swap</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/simple-swap"><code>examples/defi/simple-swap</code></a>
+<strong>Book page:</strong> <a href="./defi.html">DeFi Examples →</a></p>
+</blockquote>
+<p>A constant-product (x·y = k) liquidity pool with <code>deposit</code>, <code>swap</code>, and
+<code>withdraw</code> entry points. It demonstrates token transfers between contracts,
+slippage checks, and LP-share accounting.</p>
+<pre><code class="language-bash">cd examples/defi/simple-swap
+cargo test
+</code></pre>
+<p><strong>What to try:</strong></p>
+<ul>
+<li>Change the fee constant (e.g. from 30 bps to 100 bps) and re-run the swap
+tests to see how output amounts shift.</li>
+<li>Add a <code>get_price</code> view function that returns the current reserve ratio.</li>
+<li>Write a test that performs two swaps in a row and asserts the invariant
+<code>reserve_a * reserve_b</code> never decreases (minus fees).</li>
+</ul>
+<h3 id="nft--basic-nft"><a class="header" href="#nft--basic-nft">NFT — Basic NFT</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nft/basic-nft"><code>examples/nft/basic-nft</code></a>
+<strong>Book page:</strong> <a href="./nft.html">NFT Examples →</a></p>
+</blockquote>
+<p>A minimal non-fungible token implementing <code>mint</code>, <code>owner_of</code>, <code>transfer</code>, and
+<code>approve</code>, with per-token metadata stored under persistent keys.</p>
+<pre><code class="language-bash">cd examples/nft/basic-nft
+cargo test
+</code></pre>
+<p><strong>What to try:</strong></p>
+<ul>
+<li>Add a <code>burn</code> function that requires the owner’s auth and removes the token
+from storage.</li>
+<li>Emit a <code>transfer</code> event with <code>(from, to, token_id)</code> topics and assert on it
+in a test using <code>env.events().all()</code>.</li>
+<li>Add a max-supply cap and a test that minting past the cap returns an error.</li>
+</ul>
+<h3 id="governance--simple-voting"><a class="header" href="#governance--simple-voting">Governance — Simple Voting</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/simple-voting"><code>examples/governance/simple-voting</code></a>
+<strong>Book page:</strong> <a href="./governance.html">Governance Examples →</a></p>
+</blockquote>
+<p>An on-chain proposal-and-vote contract: create a proposal with a deadline,
+cast weighted votes, and finalize the result once voting closes.</p>
+<pre><code class="language-bash">cd examples/governance/simple-voting
+cargo test
+</code></pre>
+<p><strong>What to try:</strong></p>
+<ul>
+<li>Add a <code>quorum</code> check so a proposal only passes if total votes exceed a
+threshold.</li>
+<li>Prevent double-voting by keying votes on <code>(proposal_id, voter)</code>.</li>
+<li>Use <code>env.ledger().set_timestamp(...)</code> in a test to advance past the deadline
+and assert that late votes are rejected.</li>
+</ul>
+<h3 id="token--sep-41-token"><a class="header" href="#token--sep-41-token">Token — SEP-41 Token</a></h3>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/sep41-token"><code>examples/tokens/sep41-token</code></a>
+<strong>Book page:</strong> <a href="./tokens.html">Token Examples →</a></p>
+</blockquote>
+<p>A fungible token implementing the SEP-41 interface: <code>allowance</code>, <code>approve</code>,
+<code>balance</code>, <code>transfer</code>, <code>transfer_from</code>, <code>burn</code>, and <code>burn_from</code>, plus
+<code>decimals</code>, <code>name</code>, and <code>symbol</code> metadata.</p>
+<pre><code class="language-bash">cd examples/tokens/sep41-token
+cargo test
+</code></pre>
+<p><strong>What to try:</strong></p>
+<ul>
+<li>Add a <code>mint</code> function gated on an admin address stored in instance storage.</li>
+<li>Write a test for the approve → <code>transfer_from</code> → allowance-decrement flow.</li>
+<li>Verify that <code>transfer</code> without <code>from.require_auth()</code> fails the auth tests.</li>
+</ul>
+<h3 id="running-all-use-case-examples"><a class="header" href="#running-all-use-case-examples">Running All Use-Case Examples</a></h3>
+<pre><code class="language-bash"># From the workspace root
+cargo test -p soroban-simple-swap-example \
+           -p soroban-basic-nft-example \
+           -p soroban-simple-voting-example \
+           -p soroban-sep41-token-example
+</code></pre>
+<p>Or build every use-case Wasm artifact:</p>
+<pre><code class="language-bash">for dir in examples/defi/*/ examples/nft/*/ examples/governance/*/ examples/tokens/*/; do
+    echo "Building $dir..."
+    cargo build --manifest-path "$dir/Cargo.toml" \
+                --target wasm32-unknown-unknown \
+                --release
+done
+</code></pre>
+<hr>
 <h2 id="next-steps"><a class="header" href="#next-steps">Next Steps</a></h2>
 <ul>
 <li><a href="./intermediate.html">Intermediate Examples →</a> — tokens, multi-sig, pause/unpause</li>
+<li><a href="./playground-intermediate.html">Interactive Playground — Intermediate Examples →</a> — hands-on token, cross-contract and access-control walkthroughs</li>
+<li><a href="../docs/code-examples.html">Code Examples →</a> — tested snippet for every topic</li>
 <li><a href="./advanced.html">Advanced Examples →</a> — cross-contract calls, oracle patterns, upgradeable proxies</li>
 <li><a href="../guides/testing.html">Testing Guide →</a> — mocking auth, time manipulation, event assertions</li>
 <li><a href="../docs/best-practices.html">Best Practices →</a> — production-ready patterns</li>
@@ -930,6 +1026,8 @@ soroban contract invoke \
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

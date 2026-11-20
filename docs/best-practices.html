@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -185,7 +186,7 @@
 <h2 id="-security-best-practices"><a class="header" href="#-security-best-practices">🔒 Security Best Practices</a></h2>
 <h3 id="1-always-use-authorization-checks"><a class="header" href="#1-always-use-authorization-checks">1. Always Use Authorization Checks</a></h3>
 <p>✅ <strong>DO:</strong> Always verify authorization before state changes</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn transfer(env: Env, from: Address, to: Address, amount: u64) {
     // Verify the sender has authorized this action
@@ -202,7 +203,7 @@
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Skip authorization checks</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn transfer(env: Env, from: Address, to: Address, amount: u64) {
     // DANGER: No authorization check!
@@ -213,7 +214,7 @@
 <span class="boring">}</span></code></pre>
 <h3 id="2-validate-all-inputs"><a class="header" href="#2-validate-all-inputs">2. Validate All Inputs</a></h3>
 <p>✅ <strong>DO:</strong> Validate inputs before processing</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_limit(env: Env, admin: Address, limit: u64) {
     admin.require_auth();
@@ -231,7 +232,7 @@
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Trust inputs blindly</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_limit(env: Env, admin: Address, limit: u64) {
     admin.require_auth();
@@ -241,7 +242,7 @@
 <span class="boring">}</span></code></pre>
 <h3 id="3-use-safe-arithmetic"><a class="header" href="#3-use-safe-arithmetic">3. Use Safe Arithmetic</a></h3>
 <p>✅ <strong>DO:</strong> Use checked arithmetic to prevent overflows</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn add_balance(env: Env, user: Address, amount: u64) {
     let current = read_balance(&amp;env, &amp;user);
@@ -254,7 +255,7 @@
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Use unchecked arithmetic</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn add_balance(env: Env, user: Address, amount: u64) {
     let current = read_balance(&amp;env, &amp;user);
@@ -264,7 +265,7 @@
 <span class="boring">}</span></code></pre>
 <h3 id="4-protect-admin-functions"><a class="header" href="#4-protect-admin-functions">4. Protect Admin Functions</a></h3>
 <p>✅ <strong>DO:</strong> Restrict sensitive functions to authorized admins</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>const ADMIN_KEY: Symbol = symbol_short!("admin");
 
@@ -286,7 +287,7 @@ pub fn set_config(env: Env, config: Config) {
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Leave admin functions unprotected</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_config(env: Env, config: Config) {
     // DANGER: Anyone can change config!
@@ -295,7 +296,7 @@ pub fn set_config(env: Env, config: Config) {
 <span class="boring">}</span></code></pre>
 <h3 id="5-handle-errors-properly"><a class="header" href="#5-handle-errors-properly">5. Handle Errors Properly</a></h3>
 <p>✅ <strong>DO:</strong> Use custom error types for clarity</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -324,7 +325,7 @@ pub fn withdraw(env: Env, user: Address, amount: u64) -&gt; Result&lt;(), Error&
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Use generic panics without context</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn withdraw(env: Env, user: Address, amount: u64) {
     user.require_auth();
@@ -337,7 +338,7 @@ pub fn withdraw(env: Env, user: Address, amount: u64) -&gt; Result&lt;(), Error&
 <h2 id="-resource-optimization-best-practices"><a class="header" href="#-resource-optimization-best-practices">⚡ Resource Optimization Best Practices</a></h2>
 <h3 id="1-choose-the-right-storage-type"><a class="header" href="#1-choose-the-right-storage-type">1. Choose the Right Storage Type</a></h3>
 <p>✅ <strong>DO:</strong> Use appropriate storage for data lifetime</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Persistent: Critical data that must survive
 pub fn set_admin(env: Env, admin: Address) {
@@ -356,7 +357,7 @@ pub fn create_lock(env: Env, user: Address) {
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Use persistent storage for everything</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// INEFFICIENT: Using expensive persistent storage for temporary data
 pub fn create_lock(env: Env, user: Address) {
@@ -366,7 +367,7 @@ pub fn create_lock(env: Env, user: Address) {
 <span class="boring">}</span></code></pre>
 <h3 id="2-minimize-storage-operations"><a class="header" href="#2-minimize-storage-operations">2. Minimize Storage Operations</a></h3>
 <p>✅ <strong>DO:</strong> Batch reads and writes</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn batch_transfer(env: Env, from: Address, transfers: Vec&lt;(Address, u64)&gt;) {
     from.require_auth();
@@ -389,7 +390,7 @@ pub fn create_lock(env: Env, user: Address) {
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Make redundant storage calls</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn batch_transfer(env: Env, from: Address, transfers: Vec&lt;(Address, u64)&gt;) {
     from.require_auth();
@@ -406,7 +407,7 @@ pub fn create_lock(env: Env, user: Address) {
 <span class="boring">}</span></code></pre>
 <h3 id="3-use-efficient-data-structures"><a class="header" href="#3-use-efficient-data-structures">3. Use Efficient Data Structures</a></h3>
 <p>✅ <strong>DO:</strong> Use appropriate collection types</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Use Map for key-value lookups
 let mut balances: Map&lt;Address, u64&gt; = Map::new(&amp;env);
@@ -417,7 +418,7 @@ let mut users: Vec&lt;Address&gt; = Vec::new(&amp;env);
 users.push_back(user);
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Use inefficient structures</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// INEFFICIENT: Storing list as separate keys
 for i in 0..count {
@@ -462,7 +463,7 @@ stat -c "%n %s bytes" target/wasm32-unknown-unknown/release/hello_world.opt.wasm
 <h2 id="-testing-best-practices"><a class="header" href="#-testing-best-practices">🧪 Testing Best Practices</a></h2>
 <h3 id="1-comprehensive-test-coverage"><a class="header" href="#1-comprehensive-test-coverage">1. Comprehensive Test Coverage</a></h3>
 <p>✅ <strong>DO:</strong> Test happy paths and edge cases</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_transfer_success() {
@@ -506,7 +507,7 @@ fn test_transfer_to_self() {
 <span class="boring">}</span></code></pre>
 <h3 id="2-use-test-utilities"><a class="header" href="#2-use-test-utilities">2. Use Test Utilities</a></h3>
 <p>✅ <strong>DO:</strong> Leverage Soroban test utilities</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_with_auth() {
@@ -538,7 +539,7 @@ fn test_with_auth() {
 <span class="boring">}</span></code></pre>
 <h3 id="3-test-integration-scenarios"><a class="header" href="#3-test-integration-scenarios">3. Test Integration Scenarios</a></h3>
 <p>✅ <strong>DO:</strong> Test cross-contract interactions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[test]
 fn test_token_with_vault() {
@@ -568,7 +569,7 @@ fn test_token_with_vault() {
 <h2 id="-code-organization-best-practices"><a class="header" href="#-code-organization-best-practices">📝 Code Organization Best Practices</a></h2>
 <h3 id="1-structure-your-code"><a class="header" href="#1-structure-your-code">1. Structure Your Code</a></h3>
 <p>✅ <strong>DO:</strong> Organize code into logical modules</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// lib.rs
 mod storage;
@@ -595,7 +596,7 @@ impl TokenContract {
 <span class="boring">}</span></code></pre>
 <h3 id="2-use-meaningful-names"><a class="header" href="#2-use-meaningful-names">2. Use Meaningful Names</a></h3>
 <p>✅ <strong>DO:</strong> Use clear, descriptive names</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn calculate_interest_rate(
     total_borrowed: u64,
@@ -606,7 +607,7 @@ impl TokenContract {
 }
 <span class="boring">}</span></code></pre>
 <p>❌ <strong>DON’T:</strong> Use cryptic abbreviations</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn calc_ir(tb: u64, ts: u64, br: u64) -&gt; u64 {
     // Hard to understand
@@ -614,7 +615,7 @@ impl TokenContract {
 <span class="boring">}</span></code></pre>
 <h3 id="3-document-public-functions"><a class="header" href="#3-document-public-functions">3. Document Public Functions</a></h3>
 <p>✅ <strong>DO:</strong> Add doc comments to public functions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>/// Transfers tokens from one account to another.
 ///
@@ -642,7 +643,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 <span class="boring">}</span></code></pre>
 <h3 id="4-keep-functions-focused"><a class="header" href="#4-keep-functions-focused">4. Keep Functions Focused</a></h3>
 <p>✅ <strong>DO:</strong> Write small, single-purpose functions</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn validate_transfer(from: &amp;Address, amount: i128) {
     from.require_auth();
@@ -676,7 +677,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 </ul>
 <h3 id="2-comment-complex-logic"><a class="header" href="#2-comment-complex-logic">2. Comment Complex Logic</a></h3>
 <p>✅ <strong>DO:</strong> Explain non-obvious code</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn calculate_reward(env: &amp;Env, user: &amp;Address) -&gt; u64 {
     let stake_amount = read_stake(env, user);
@@ -695,7 +696,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 <span class="boring">}</span></code></pre>
 <h3 id="3-include-usage-examples"><a class="header" href="#3-include-usage-examples">3. Include Usage Examples</a></h3>
 <p>Add examples in tests or documentation:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>/// # Example
 ///
@@ -714,7 +715,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) {
 <h2 id="-upgrade--migration-best-practices"><a class="header" href="#-upgrade--migration-best-practices">🔄 Upgrade &amp; Migration Best Practices</a></h2>
 <h3 id="1-version-your-storage-keys"><a class="header" href="#1-version-your-storage-keys">1. Version Your Storage Keys</a></h3>
 <p>✅ <strong>DO:</strong> Include version in storage keys for upgradability</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>const VERSION: u32 = 1;
 
@@ -724,7 +725,7 @@ fn get_balance_key(user: &amp;Address) -&gt; (Symbol, u32, Address) {
 <span class="boring">}</span></code></pre>
 <h3 id="2-plan-for-initialization"><a class="header" href="#2-plan-for-initialization">2. Plan for Initialization</a></h3>
 <p>✅ <strong>DO:</strong> Use initialization pattern</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn initialize(env: Env, admin: Address, config: Config) {
     if has_admin(&amp;env) {
@@ -766,7 +767,7 @@ fn has_admin(env: &amp;Env) -&gt; bool {
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/testing-best-practices.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/review-checklist.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -780,7 +781,7 @@ fn has_admin(env: &amp;Env) -&gt; bool {
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/testing-best-practices.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/review-checklist.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -809,6 +810,8 @@ fn has_admin(env: &amp;Env) -&gt; bool {
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

@@ -1,0 +1,30 @@
+#menu-bar .language-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0 0.5em;
+}
+
+#menu-bar .language-selector select {
+    max-width: 9rem;
+    height: 2rem;
+    padding: 0 0.35rem;
+    border: 1px solid var(--quote-border, currentColor);
+    border-radius: 3px;
+    background: var(--bg, Canvas);
+    color: var(--fg, CanvasText);
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+#menu-bar .language-selector select:focus-visible {
+    outline: 2px solid var(--links, currentColor);
+    outline-offset: 2px;
+}
+
+#menu-bar .language-fallback-status {
+    color: var(--fg, CanvasText);
+    font-size: 0.7rem;
+    white-space: nowrap;
+}

@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -224,7 +225,7 @@
 <hr>
 <h2 id="core-ownership-pattern"><a class="header" href="#core-ownership-pattern">Core Ownership Pattern</a></h2>
 <p>Every token is identified by a <code>token_id</code> (typically <code>u32</code>) and its ownership is a single <code>Address</code> value in <code>Persistent</code> storage:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -242,7 +243,7 @@ pub fn owner_of(env: Env, token_id: u32) -&gt; Result&lt;Address, NftError&gt; {
 <span class="boring">}</span></code></pre>
 <p><strong>Why <code>Persistent</code>?</strong> Owner records must survive ledger entry expiry. Soroban’s <code>Temporary</code> and <code>Instance</code> tiers have shorter TTLs and are unsuitable for long-lived ownership claims. See <a href="./storage-types.html">docs/storage-types.md</a>.</p>
 <p><strong>TTL extension</strong>: Every write to a <code>Persistent</code> owner record should extend its TTL:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>env.storage().persistent().set(&amp;DataKey::Owner(token_id), &amp;to);
 env.storage().persistent().extend_ttl(
@@ -259,7 +260,7 @@ env.storage().persistent().extend_ttl(
 <li><strong>Per-owner enumeration</strong> — iterate all tokens held by a specific address</li>
 </ol>
 <h3 id="global-enumeration"><a class="header" href="#global-enumeration">Global Enumeration</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>DataKey::TotalSupply          // u32 — stored in Instance
 DataKey::TokenByIndex(index)  // index → token_id in Persistent
@@ -267,7 +268,7 @@ DataKey::TokenByIndex(index)  // index → token_id in Persistent
 <p>On mint, append the new <code>token_id</code> at <code>TokenByIndex(total_supply)</code> and increment <code>TotalSupply</code>.</p>
 <h3 id="per-owner-enumeration-swap-remove"><a class="header" href="#per-owner-enumeration-swap-remove">Per-Owner Enumeration (Swap-Remove)</a></h3>
 <p>The per-owner list uses a <strong>swap-remove</strong> strategy to stay dense without gaps:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>DataKey::Balance(owner)              // owner → count in Persistent
 DataKey::OwnedToken(owner, index)    // (owner, index) → token_id
@@ -287,7 +288,7 @@ DataKey::OwnerTokenIndex(token_id)   // token_id → its current index in owner'
 <p>Soroban NFTs support two approval modes:</p>
 <h3 id="single-token-approval"><a class="header" href="#single-token-approval">Single-Token Approval</a></h3>
 <p>Grants a specific address the right to transfer one specific token:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn approve(
     env: Env,
@@ -308,7 +309,7 @@ DataKey::OwnerTokenIndex(token_id)   // token_id → its current index in owner'
 <p><strong>Important</strong>: The approval is cleared automatically on every transfer — do not carry approvals across ownership changes.</p>
 <h3 id="operator-approval"><a class="header" href="#operator-approval">Operator Approval</a></h3>
 <p>Grants a specific address the right to transfer <em>all</em> tokens owned by the granting address:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_approval_for_all(
     env: Env,
@@ -326,7 +327,7 @@ DataKey::OwnerTokenIndex(token_id)   // token_id → its current index in owner'
 }
 <span class="boring">}</span></code></pre>
 <h3 id="approval-check-order-in-transfer_from"><a class="header" href="#approval-check-order-in-transfer_from">Approval Check Order in <code>transfer_from</code></a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn check_approved(env, spender, owner, token_id) -&gt; Result&lt;(), NftError&gt; {
     if spender == owner { return Ok(()); }
@@ -344,7 +345,7 @@ DataKey::OwnerTokenIndex(token_id)   // token_id → its current index in owner'
 <span class="boring">}</span></code></pre>
 <h3 id="approval-expiry-advanced"><a class="header" href="#approval-expiry-advanced">Approval Expiry (Advanced)</a></h3>
 <p><code>03-nft-metadata-standards</code> adds an <code>expiration_ledger</code> to approvals. Expired approvals are treated as non-existent:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub struct ApprovalData {
@@ -363,7 +364,7 @@ if env.ledger().sequence() &gt; data.expiration_ledger {
 <h3 id="strategy-1-off-chain-uri-only-lightweight"><a class="header" href="#strategy-1-off-chain-uri-only-lightweight">Strategy 1: Off-Chain URI Only (Lightweight)</a></h3>
 <p>Store nothing on-chain beyond ownership. Return a <code>base_uri/{token_id}</code> string that points to a JSON file hosted on IPFS or a CDN.</p>
 <p><strong>Best for</strong>: Large collections where on-chain storage cost matters most.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn token_uri(env: Env, token_id: u64) -&gt; String {
     let base: String = env.storage().instance().get(&amp;DataKey::BaseUri).unwrap();
@@ -375,7 +376,7 @@ if env.ledger().sequence() &gt; data.expiration_ledger {
 <h3 id="strategy-2-full-on-chain-metadata"><a class="header" href="#strategy-2-full-on-chain-metadata">Strategy 2: Full On-Chain Metadata</a></h3>
 <p>Store a <code>TokenMetadata</code> struct directly in <code>Persistent</code> storage for each token. The data is immutable unless the admin explicitly updates it.</p>
 <p><strong>Best for</strong>: Small collections, dynamic NFTs, or when verifiability is paramount.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub struct TokenMetadata {
@@ -393,7 +394,7 @@ env.storage().persistent().set(&amp;DataKey::Metadata(token_id), &amp;metadata);
 <p><strong>Trade-off</strong>: Higher per-token storage cost; the <code>Persistent</code> entry TTL must be managed.</p>
 <h3 id="strategy-3-hybrid-base-uri--per-token-override"><a class="header" href="#strategy-3-hybrid-base-uri--per-token-override">Strategy 3: Hybrid (Base URI + Per-Token Override)</a></h3>
 <p>A base URI covers the entire collection; individual tokens can override with a specific URI:</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn token_uri(env: Env, token_id: u64) -&gt; String {
     // 1. Per-token URI wins if set
@@ -548,7 +549,7 @@ transfer seller_nets  → listing.seller
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/nft-development-video.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/nft-best-practices.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -562,7 +563,7 @@ transfer seller_nets  → listing.seller
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/nft-development-video.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/nft-best-practices.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -591,6 +592,8 @@ transfer seller_nets  → listing.seller
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

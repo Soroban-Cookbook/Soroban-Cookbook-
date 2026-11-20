@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -230,7 +231,7 @@ management and lower-level WASM and storage upgrade techniques:</p>
 <li>Emergency overrides</li>
 </ul>
 <p><strong>Quick Code:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>if env.ledger().timestamp() &lt; unlock_time {
     return Err(Error::TimeLocked);
@@ -247,7 +248,7 @@ management and lower-level WASM and storage upgrade techniques:</p>
 <li>Updater rotation by admin</li>
 </ul>
 <p><strong>Quick Code:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Submit data (authorized updater only)
 client.submit(&amp;updater, &amp;42_i128);
@@ -328,6 +329,15 @@ let value = client.get_value_strict(); // errors if stale
 <li>Timestamp and freshness validation</li>
 </ul>
 <hr>
+<h3 id="44-off-chain-signatures"><a class="header" href="#44-off-chain-signatures"><a href="../examples/advanced/44-off-chain-signatures/">44-off-chain-signatures</a></a></h3>
+<p><strong>Off-chain signature verification</strong> for non-Stellar keys (<a href="./off-chain-signatures.html">guide</a>).</p>
+<p><strong>Key Concepts:</strong></p>
+<ul>
+<li><code>ed25519_verify</code> over a SHA-256 digest</li>
+<li>Ethereum signatures via <code>secp256k1_recover</code> + address comparison</li>
+<li>Domain separators and nonces against replay</li>
+</ul>
+<hr>
 <p><strong>[More coming…]</strong> Factories, bonding curves, merkle proofs.</p>
 <h2 id="âš-ï-warning"><a class="header" href="#âš-ï-warning">âš ï¸ Warning</a></h2>
 <p>Advanced patterns increase complexity - audit thoroughly!</p>
@@ -388,6 +398,8 @@ let value = client.get_value_strict(); // errors if stale
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

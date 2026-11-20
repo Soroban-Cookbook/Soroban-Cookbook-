@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../../toc-4ff7a94e.js"></script>
+        <script src="../../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -197,7 +198,7 @@
 <p><strong>Reentrancy:</strong> This wrapper cross-contract-calls the underlying token on <code>wrap</code>, <code>unwrap</code>, and <code>backing</code>-style reads. The companion example crate uses a reentrancy guard (<code>DataKey::Entered</code>) on state-changing entry points. Without a guard, a malicious or hook-bearing underlying token could call back mid-operation and mint unbacked wrapped shares. Reentrancy in Soroban is limited to the same transaction/invocation stack; a cross-contract call cannot outlive the caller’s execution frame, but shared-state re-entry within that frame is still possible and must be blocked explicitly.</p>
 <p><strong>Storage TTL / Data Expiry:</strong> Per-user wrapped balances are stored in <strong>persistent</strong> storage, which has a per-key TTL. High-traffic wrappers must explicitly <code>extend_ttl</code> on balance writes (or via a periodic maintenance call) or user balances and the <code>TotalSupply</code> (instance storage) can expire, breaking the peg. Instance entries (total supply, underlying token address) are tied to the contract instance’s TTL and will be reset if the instance expires and is restored; critical accounting must live in persistent storage.</p>
 </blockquote>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Deposit 1000 underlying → receive 1000 wrapped
 client.deposit(&amp;user, &amp;1_000_i128);
@@ -265,6 +266,8 @@ cargo test
         <script src="../../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../../theme/analytics-2354a5fb.js"></script>
+        <script src="../../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

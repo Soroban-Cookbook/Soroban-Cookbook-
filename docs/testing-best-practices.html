@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -204,12 +205,197 @@
 <li><strong>Target &gt;90% coverage:</strong> Utilize <code>cargo tarpaulin</code> to measure test coverage.</li>
 <li><strong>Cover all branches:</strong> Ensure that conditional branches are evaluated for both truthy and falsy states.</li>
 </ul>
+<hr>
+<h2 id="worked-examples"><a class="header" href="#worked-examples">Worked Examples</a></h2>
+<p>Every snippet below is copied from a test that runs in this repository.</p>
+<h3 id="1-set-up-the-environment-and-the-contract"><a class="header" href="#1-set-up-the-environment-and-the-contract">1. Set up the environment and the contract</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{testutils::Address as _, Address, Env};
+
+#[test]
+fn deposit_increases_balance() {
+    let env = Env::default();
+    // Accept every require_auth() in the test.
+    env.mock_all_auths();
+
+    // Register the contract natively - no Wasm build required.
+    let id = env.register_contract(None, TokenContract);
+    let client = TokenContractClient::new(&amp;env, &amp;id);
+    let alice = Address::generate(&amp;env);
+    let bob = Address::generate(&amp;env);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="2-assert-on-typed-errors-not-panics"><a class="header" href="#2-assert-on-typed-errors-not-panics">2. Assert on typed errors, not panics</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// A contract error is matched exactly.
+assert_eq!(
+    client.try_transfer(&amp;alice, &amp;bob, &amp;10_000),
+    Err(Ok(TokenError::InsufficientBalance))
+);
+
+// A missing authorization surfaces as a host error.
+assert!(client.try_transfer(&amp;alice, &amp;bob, &amp;10).is_err());
+<span class="boring">}</span></code></pre>
+<h3 id="3-travel-through-time"><a class="header" href="#3-travel-through-time">3. Travel through time</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Timelocks, vesting and rate limits are all ledger-time driven.
+env.ledger().with_mut(|l| l.timestamp += 70);
+env.ledger().with_mut(|l| l.sequence_number = 200);
+
+// Or set an absolute value.
+env.ledger().set_timestamp(1_000);
+<span class="boring">}</span></code></pre>
+<h3 id="4-assert-on-events"><a class="header" href="#4-assert-on-events">4. Assert on events</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let events = env.events().all();
+let (_, topics, data) = events.last().unwrap();
+
+// Topics are indexed; the payload carries the details.
+assert_eq!(topics.get(0).unwrap(), symbol_short!("token").into_val(&amp;env));
+<span class="boring">}</span></code></pre>
+<h3 id="5-test-the-cross-contract-workflow"><a class="header" href="#5-test-the-cross-contract-workflow">5. Test the cross-contract workflow</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Register both contracts and let them talk to each other.
+let amm_id = env.register_contract(None, ConstantProductAmm);
+let token_id = env.register_stellar_asset_contract_v2(issuer);
+let amm = ConstantProductAmmClient::new(&amp;env, &amp;amm_id);
+
+amm.initialize(&amp;token_id.address(), &amp;token_y.address());
+let lp = amm.add_liquidity(&amp;alice, &amp;1_000, &amp;1_000);
+assert_eq!(lp, 1_000);
+<span class="boring">}</span></code></pre>
+<h3 id="6-measure-coverage"><a class="header" href="#6-measure-coverage">6. Measure coverage</a></h3>
+<pre><code class="language-bash"># Whole-workspace coverage report (HTML + XML + LCOV).
+cargo tarpaulin --out Html
+
+# Only the integration suite.
+cargo tarpaulin -p integration-tests --out Html
+</code></pre>
+<p>The CI workflow <code>.github/workflows/test.yml</code> runs the coverage job and fails
+the build when line coverage drops below 90%.</p>
+<h3 id="7-fuzz-an-invariant"><a class="header" href="#7-fuzz-an-invariant">7. Fuzz an invariant</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use proptest::prelude::*;
+
+proptest! {
+    #[test]
+    fn transfer_never_creates_money(
+        balance in 0i128..1_000_000,
+        amount in 0i128..1_000_000,
+    ) {
+        let env = Env::default();
+        env.mock_all_auths();
+        let id = env.register_contract(None, TokenContract);
+        let client = TokenContractClient::new(&amp;env, &amp;id);
+        let alice = Address::generate(&amp;env);
+        let bob = Address::generate(&amp;env);
+
+        client.initialize(&amp;alice, &amp;balance);
+        let _ = client.try_transfer(&amp;alice, &amp;bob, &amp;amount);
+
+        prop_assert!(client.total_supply() == balance);
+    }
+}
+<span class="boring">}</span></code></pre>
+<hr>
+<h2 id="frontend--typescript-testing"><a class="header" href="#frontend--typescript-testing">Frontend / TypeScript Testing</a></h2>
+<p>Contract unit tests in Rust catch logic bugs, but your users interact with the contract through a JavaScript/TypeScript frontend. Testing the bindings layer — generated clients, argument encoding, wallet flows, and error surfacing — closes the gap between “the contract is correct” and “the app works”.</p>
+<h3 id="generate-typescript-clients-from-the-contract-spec"><a class="header" href="#generate-typescript-clients-from-the-contract-spec">Generate TypeScript clients from the contract spec</a></h3>
+<p>Generate a typed client directly from your built contract with <code>soroban-spec-typescript</code> (exposed through the Stellar CLI):</p>
+<pre><code class="language-bash"># Build the contract, then generate bindings from its embedded spec.
+cargo build --target wasm32-unknown-unknown --release -p authorized-token
+
+# Uses the `soroban-spec-typescript` crate under the hood.
+stellar contract bindings ts \
+  --wasm ./target/wasm32-unknown-unknown/release/authorized_token.wasm \
+  --output-dir ./webapp/src/contracts/authorized-token \
+  --network-passphrase "Test SDF Network ; September 2015"
+</code></pre>
+<p>The generator emits a client class per contract (e.g., <code>AuthorizedTokenClient</code>) with typed methods, <code>ScVal</code> conversion helpers, and event type definitions. Commit the generated output (or generate it in CI from the released wasm) so frontend tests always match the deployed contract interface. When the contract changes, regenerate — a stale client is the most common source of “works in Rust tests, fails in the frontend” bugs.</p>
+<h3 id="jest--vitest-contract-invocation-tests"><a class="header" href="#jest--vitest-contract-invocation-tests">Jest / Vitest contract invocation tests</a></h3>
+<p>Test the generated client the same way you test any other async API layer:</p>
+<pre><code class="language-ts">import { describe, it, expect, beforeAll } from "vitest";
+import { Networks } from "@stellar/stellar-sdk";
+import { AuthorizedTokenClient } from "./contracts/authorized-token";
+import { mockRpc, TESTNET_FIXTURES } from "./test/mock-rpc";
+
+describe("AuthorizedTokenClient", () =&gt; {
+  const client = new AuthorizedTokenClient({
+    contractId: "CABROAD_EXAMPLE_CONTRACT_ID",
+    rpcUrl: "https://soroban-testnet.stellar.org",
+    networkPassphrase: Networks.TESTNET,
+  });
+
+  beforeAll(() =&gt; mockRpc(TESTNET_FIXTURES));
+
+  it("reports accounts as authorized by default", async () =&gt; {
+    const result = await client.authorized({ address: "GALEXAMPLE…" });
+    expect(result.result).toBe(true);
+  });
+
+  it("surfaces a frozen account as a NotAuthorized error", async () =&gt; {
+    await expect(
+      client.transfer({
+        from: "GFROZEN_EXAMPLE…",
+        to: "GBOB_EXAMPLE…",
+        amount: 100n,
+      })
+    ).rejects.toThrow(/NotAuthorized/);
+  });
+});
+</code></pre>
+<p>Assert on contract errors by their <strong>contract error name or code</strong>, not by generic messages — the generated client maps <code>#[contracterror]</code> enums to typed values, so a compliance rejection (<code>NotAuthorized</code>) should be distinguishable from an insufficient-balance failure in your UI tests.</p>
+<blockquote>
+<p>For a real example to bind against, see the <a href="../examples/tokens/11-authorized-token.html">Authorized Token example</a> (<code>examples/tokens/11-authorized-token</code>), whose <code>set_authorized</code> / <code>authorized</code> interface is used above, or the <a href="../examples/tokens/01-sep41-token.html">SEP-41 Token example</a> for the base interface.</p>
+</blockquote>
+<h3 id="mocking-the-rpc-layer"><a class="header" href="#mocking-the-rpc-layer">Mocking the RPC layer</a></h3>
+<p>Frontend tests must not depend on a live network. Mock at the JSON-RPC boundary so the real SDK networking code is exercised:</p>
+<pre><code class="language-ts">// test/mock-rpc.ts — stub fetch and serve canned JSON-RPC responses
+export function mockRpc(fixtures: Record&lt;string, unknown&gt;) {
+  const realFetch = globalThis.fetch;
+  beforeAll(() =&gt; {
+    globalThis.fetch = async (input: RequestInfo | URL) =&gt; {
+      const body = JSON.parse(String(input instanceof Request ? input.body : ""));
+      const response = fixtures[body.method] ?? { jsonrpc: "2.0", id: body.id };
+      return new Response(JSON.stringify(response), {
+        headers: { "content-type": "application/json" },
+      });
+    };
+  });
+  afterAll(() =&gt; {
+    globalThis.fetch = realFetch;
+  });
+}
+</code></pre>
+<p>Fixture entries to provide: <code>getAccount</code>, <code>simulateTransaction</code>, <code>sendTransaction</code>, <code>getTransaction</code>, and <code>getEvents</code>. Keep fixtures as checked-in JSON so a contract-side change shows up as a diff in review. Alternatives: mock the <code>rpc.Server</code> class in a module-level <code>vi.mock("@stellar/stellar-sdk")</code>, or run a standalone Soroban RPC mock server — the boundary should stay at the RPC protocol either way, so tests still validate XDR encoding.</p>
+<h3 id="what-to-cover"><a class="header" href="#what-to-cover">What to cover</a></h3>
+<ul>
+<li><strong>Happy paths</strong> of every entry point your UI calls, decoded from real fixture responses.</li>
+<li><strong>Error surfacing</strong>: contract error enums, <code>require_auth</code> failures, and expired transactions produce distinct UI states — test each.</li>
+<li><strong>Event handling</strong>: feed <code>getEvents</code> fixtures into your indexer/store and assert UI reactions (e.g., an <code>authorize</code> event unfreezes the user’s UI).</li>
+<li><strong>Wallet flows</strong>: mock <code>@stellar/freighter-api</code> at its module boundary (connection granted, denied, wrong network) — see the <a href="./wallet-integration.html">Wallet Integration Guide</a>.</li>
+</ul>
+<hr>
+<h2 id="related-pages"><a class="header" href="#related-pages">Related Pages</a></h2>
+<ul>
+<li><a href="../guides/testing.html">Testing Guide →</a></li>
+<li><a href="./code-examples.html">Code Examples →</a></li>
+<li><a href="./testing-pitfalls.html">Testing Pitfalls →</a></li>
+<li><a href="./wallet-integration.html">Wallet Integration Guide →</a></li>
+<li><a href="../examples/playground-intermediate.html">Interactive Playground — Intermediate Examples →</a></li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../docs/best-practices.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../docs/review-checklist.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
@@ -223,7 +409,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../docs/best-practices.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../docs/review-checklist.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
@@ -256,6 +442,8 @@
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

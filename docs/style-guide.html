@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -180,112 +181,144 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="soroban-cookbook-style-guide"><a class="header" href="#soroban-cookbook-style-guide">Soroban Cookbook Style Guide</a></h1>
-<p>This guide outlines the coding standards and best practices for the Soroban Cookbook. Adhering to these guidelines ensures consistency, readability, and high quality across all examples.</p>
-<h2 id="1-naming-conventions"><a class="header" href="#1-naming-conventions">1. Naming Conventions</a></h2>
-<p>Follow standard <a href="https://rust-lang.github.io/api-guidelines/naming.html">Rust naming conventions</a> with Soroban-specific refinements:</p>
-<h3 id="contracts-and-types"><a class="header" href="#contracts-and-types">Contracts and Types</a></h3>
+                        <h1 id="documentation-style-guide"><a class="header" href="#documentation-style-guide">Documentation Style Guide</a></h1>
+<p>This guide defines the standards for writing and maintaining documentation in this project. Following these guidelines keeps our documentation consistent, accurate, and approachable for all readers.</p>
+<h2 id="writing-standards"><a class="header" href="#writing-standards">Writing Standards</a></h2>
+<h3 id="tone-and-voice"><a class="header" href="#tone-and-voice">Tone and Voice</a></h3>
 <ul>
-<li><strong>Contract Structs</strong>: <code>PascalCase</code> (e.g., <code>HelloContract</code>, <code>LiquidityPool</code>).</li>
-<li><strong>Custom Types/Enums</strong>: <code>PascalCase</code> (e.g., <code>DataKey</code>, <code>ContractError</code>).</li>
-<li><strong>Traits</strong>: <code>PascalCase</code> (e.g., <code>VestingInterface</code>).</li>
+<li>Write in a <strong>clear, direct, and friendly</strong> tone.</li>
+<li>Prefer the <strong>active voice</strong>: “The compiler checks the type” rather than “The type is checked by the compiler.”</li>
+<li>Address the reader as <strong>“you”</strong>. Refer to the project as <strong>“we”</strong> when describing team decisions or conventions.</li>
+<li>Keep sentences short. Aim for one idea per sentence.</li>
+<li>Avoid jargon unless it is defined on first use. Link to a glossary entry or explain inline.</li>
 </ul>
-<h3 id="functions-and-variables"><a class="header" href="#functions-and-variables">Functions and Variables</a></h3>
+<h3 id="terminology"><a class="header" href="#terminology">Terminology</a></h3>
+<p>Use the following terms consistently throughout the documentation:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Preferred term</th><th>Avoid</th></tr>
+</thead>
+<tbody>
+<tr><td>function</td><td>method (unless referring to a trait method)</td></tr>
+<tr><td>crate</td><td>package, library</td></tr>
+<tr><td>command</td><td>instruction</td></tr>
+<tr><td>configuration</td><td>config (in prose)</td></tr>
+<tr><td>directory</td><td>folder</td></tr>
+</tbody>
+</table>
+</div>
 <ul>
-<li><strong>Contract Functions</strong>: <code>snake_case</code> (e.g., <code>get_balance</code>, <code>initialize</code>).</li>
-<li><strong>Internal Variables</strong>: <code>snake_case</code> (e.g., <code>user_address</code>, <code>token_amount</code>).</li>
-<li><strong>Constants</strong>: <code>SCREAMING_SNAKE_CASE</code> (e.g., <code>MAX_SUPPLY</code>).</li>
+<li>Capitalize product names exactly as the project does.</li>
+<li>Use code formatting for identifiers, file names, commands, and literal values (for example, <code>Cargo.toml</code>, <code>cargo build</code>).</li>
+<li>Spell out acronyms on first use, for example, “Application Programming Interface (API)”.</li>
 </ul>
-<h3 id="events-and-symbols"><a class="header" href="#events-and-symbols">Events and Symbols</a></h3>
+<h3 id="inclusive-language"><a class="header" href="#inclusive-language">Inclusive Language</a></h3>
 <ul>
-<li><strong>Event Tags</strong>: <code>snake_case</code> (e.g., <code>transfer</code>, <code>mint</code>). Usually defined using <code>symbol_short!</code>.</li>
-<li><strong>Storage Keys</strong>: Descriptive names using <code>Symbol</code> or <code>DataKey</code> enums.</li>
+<li>Use gender-neutral language. Prefer “they” over “he/she”.</li>
+<li>Avoid idioms, slang, and culture-specific references that may not translate well.</li>
+<li>Use “allowlist”/“denylist” instead of “whitelist”/“blacklist”.</li>
+<li>Avoid ableist terms such as “crazy”, “insane”, or “dummy” when describing code or behavior. Prefer “unexpected”, “placeholder”, or “stub”.</li>
+<li>Refer to people by their roles rather than descriptors where possible.</li>
 </ul>
-<hr>
-<h2 id="2-documentation-standards"><a class="header" href="#2-documentation-standards">2. Documentation Standards</a></h2>
-<p>Documentation is critical for a cookbook. Every example must be self-explanatory.</p>
-<h3 id="module-level-documentation-"><a class="header" href="#module-level-documentation-">Module-Level Documentation (<code>//!</code>)</a></h3>
-<p>Every <code>lib.rs</code> must start with module-level docs:</p>
+<h2 id="code-example-standards"><a class="header" href="#code-example-standards">Code Example Standards</a></h2>
+<h3 id="complete-and-runnable"><a class="header" href="#complete-and-runnable">Complete and Runnable</a></h3>
 <ul>
-<li><strong>Title</strong>: Clear name of the example.</li>
-<li><strong>Description</strong>: What the contract does and why it matters.</li>
-<li><strong>Key Concepts</strong>: List of Soroban features demonstrated (e.g., “Instance Storage”, “Custom Errors”).</li>
-<li><strong>Design Decisions</strong>: Explanation of <em>why</em> specific patterns were used (e.g., “Using <code>Persistent</code> storage for user balances to prevent expiration”).</li>
+<li>Every code example should be <strong>complete enough to compile and run</strong> unless it is explicitly marked as a fragment.</li>
+<li>Include necessary imports, <code>fn main()</code>, and any required setup.</li>
+<li>If an example is intentionally partial, indicate this with a comment such as <code>// ...</code> and explain what is omitted.</li>
 </ul>
-<h3 id="function-level-documentation-"><a class="header" href="#function-level-documentation-">Function-Level Documentation (<code>///</code>)</a></h3>
-<p>Public contract functions must include:</p>
+<pre class="playground"><code class="language-rust edition2021">use std::collections::HashMap;
+
+fn main() {
+    let mut counts: HashMap&lt;&amp;str, u32&gt; = HashMap::new();
+    for word in ["apple", "banana", "apple"] {
+        *counts.entry(word).or_insert(0) += 1;
+    }
+    println!("{counts:?}");
+}</code></pre>
+<h3 id="no_std-compatibility"><a class="header" href="#no_std-compatibility"><code>no_std</code> Compatibility</a></h3>
 <ul>
-<li><strong>Summary</strong>: A single line describing the action.</li>
-<li><strong>Arguments</strong>: Detailed list of parameters.</li>
-<li><strong>Returns</strong>: Explanation of the return value.</li>
-<li><strong>Errors</strong>: List of possible <code>contracterror</code> variants the function might return.</li>
-<li><strong>Example</strong>: A short snippet or description of how to call the function.</li>
+<li>When an example is intended for <code>no_std</code> environments, state this explicitly and avoid the standard library.</li>
+<li>Use <code>#![no_std]</code> at the crate root and document any required <code>extern crate alloc;</code> usage.</li>
 </ul>
-<h3 id="example-readmemd-structure"><a class="header" href="#example-readmemd-structure">Example <code>README.md</code> Structure</a></h3>
-<p>Every example folder must contain a <code>README.md</code> with:</p>
-<ol>
-<li><strong>Overview</strong>: Brief description.</li>
-<li><strong>Key Soroban Patterns</strong>: Technical highlights.</li>
-<li><strong>Usage</strong>: Step-by-step commands to build and test.</li>
-<li><strong>Code Deep Dive</strong>: Explanation of the most important logic blocks.</li>
-</ol>
-<hr>
-<h2 id="3-testing-standards"><a class="header" href="#3-testing-standards">3. Testing Standards</a></h2>
-<p>High-quality examples require robust testing.</p>
-<h3 id="structure"><a class="header" href="#structure">Structure</a></h3>
-<ul>
-<li><strong>Unit Tests</strong>: Place in a dedicated <code>src/test.rs</code> file.</li>
-<li><strong>Integration Tests</strong>: Place in the workspace <code>tests/</code> directory if they involve multiple contracts.</li>
-<li><strong>Separation</strong>: Use <code>#[cfg(test)] mod test;</code> in <code>lib.rs</code> to keep the testing logic separate from implementation.</li>
-</ul>
-<h3 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h3>
-<ul>
-<li><strong>Naming</strong>: Use descriptive test names: <code>test_transfer_insufficient_funds_fails</code>.</li>
-<li><strong>Coverage</strong>: Aim for 100% path coverage for business logic.</li>
-<li><strong>Mocking Auth</strong>: Always use <code>env.mock_all_auths()</code> for testing authorization-protected functions.</li>
-<li><strong>Assertions</strong>: Use <code>assert_eq!</code>, <code>assert!</code>, and <code>expect_err</code> to verify state and failures.</li>
-</ul>
-<hr>
-<h2 id="4-clippy-and-lints"><a class="header" href="#4-clippy-and-lints">4. Clippy and Lints</a></h2>
-<p>Clean code is enforced through Clippy and standard Rust lints.</p>
-<h3 id="mandatory-directives"><a class="header" href="#mandatory-directives">Mandatory Directives</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
-</span>#![no_std] // All contracts must be no_std
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span>#![no_std]
+
 <span class="boring">fn main() {
-</span><span class="boring">}</span></code></pre>
-<h3 id="recommended-lints"><a class="header" href="#recommended-lints">Recommended Lints</a></h3>
-<p>In CI, we run:</p>
-<pre><code class="language-bash">cargo clippy --workspace --all-targets --all-features -- -D warnings
-</code></pre>
-<h3 id="developer-flow"><a class="header" href="#developer-flow">Developer Flow</a></h3>
-<ol>
-<li>Run <code>cargo fmt</code> before every commit.</li>
-<li>Ensure <code>cargo clippy</code> has zero warnings.</li>
-<li>Use <code>cargo fix</code> for automated improvements where possible.</li>
-</ol>
-<hr>
-<h2 id="5-soroban-specifics"><a class="header" href="#5-soroban-specifics">5. Soroban Specifics</a></h2>
+</span>pub fn add(a: u32, b: u32) -&gt; u32 {
+    a + b
+}
+<span class="boring">}</span></code></pre>
 <h3 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h3>
 <ul>
-<li>Use <code>#[contracterror]</code> for all user-facing errors.</li>
-<li>Prefer <code>Result&lt;T, ContractError&gt;</code> return types over <code>panic!</code>.</li>
-<li>Assign explicit error codes (e.g., <code>InvalidAmount = 1</code>).</li>
+<li>Demonstrate idiomatic error handling. Prefer <code>Result</code> and the <code>?</code> operator over <code>unwrap()</code> or <code>expect()</code> in examples unless the example specifically illustrates panics.</li>
+<li>When <code>unwrap()</code> is used for brevity, add a comment explaining that real code should handle the error.</li>
 </ul>
-<h3 id="storage-optimization"><a class="header" href="#storage-optimization">Storage Optimization</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use std::fs;
+
+fn read_config(path: &amp;str) -&gt; Result&lt;String, std::io::Error&gt; {
+    let contents = fs::read_to_string(path)?;
+    Ok(contents)
+}
+<span class="boring">}</span></code></pre>
+<h3 id="comments"><a class="header" href="#comments">Comments</a></h3>
 <ul>
-<li><strong>Instance</strong>: Use for configuration and contract metadata.</li>
-<li><strong>Persistent</strong>: Use for user data and balances.</li>
-<li><strong>Temporary</strong>: Use for short-lived state like nonces or temporary locks.</li>
-<li><strong>TTL</strong>: Always consider the Time-To-Live for storage and include bump logic where necessary.</li>
+<li>Use comments to explain <strong>why</strong>, not <strong>what</strong>. The code itself should make the “what” clear.</li>
+<li>Keep comments up to date with the code they describe.</li>
+<li>Use <code>//</code> for inline comments and <code>///</code> for documentation comments on public items.</li>
 </ul>
-<h3 id="best-practices-1"><a class="header" href="#best-practices-1">Best Practices</a></h3>
+<h2 id="formatting-guidelines"><a class="header" href="#formatting-guidelines">Formatting Guidelines</a></h2>
+<h3 id="headings"><a class="header" href="#headings">Headings</a></h3>
 <ul>
-<li><strong>Type Safety</strong>: Use custom enums for storage keys (<code>DataKey</code>) rather than raw symbols.</li>
-<li><strong>Events</strong>: Emit events for all significant state changes.</li>
-<li><strong>Validation</strong>: Validate all inputs at the entry point of the function.</li>
+<li>Use <strong>sentence case</strong> for headings: “Getting started”, not “Getting Started”.</li>
+<li>Do not skip heading levels. A document should start with a single <code>#</code> title, followed by <code>##</code> sections, then <code>###</code> subsections.</li>
+<li>Keep headings short and descriptive.</li>
 </ul>
-<h3 id="best-practices-reference"><a class="header" href="#best-practices-reference">Best Practices Reference</a></h3>
-<p>For security-specific patterns and performance optimization, refer to the <a href="./best-practices.html">Best Practices Guide</a>. The Style Guide and Best Practices Guide together form the full standard for Soroban Cookbook contributions.</p>
+<h3 id="lists"><a class="header" href="#lists">Lists</a></h3>
+<ul>
+<li>Use <code>-</code> for unordered lists and <code>1.</code> for ordered lists.</li>
+<li>Keep list items parallel in structure.</li>
+<li>End list items with a period only when they are complete sentences.</li>
+</ul>
+<h3 id="code-fences"><a class="header" href="#code-fences">Code Fences</a></h3>
+<ul>
+<li>Always specify a language tag on fenced code blocks so syntax highlighting works correctly.</li>
+</ul>
+<pre><code class="language-markdown">```rust
+fn main() {
+    println!("Hello, world!");
+}
+```
+</code></pre>
+<ul>
+<li>Use <code>text</code> for plain output or non-code content.</li>
+<li>Keep lines within code blocks reasonably short to avoid horizontal scrolling.</li>
+</ul>
+<h3 id="links"><a class="header" href="#links">Links</a></h3>
+<ul>
+<li>Use descriptive link text. Prefer “<a href="configuration.html">the configuration guide</a>” over “<a href="configuration.html">click here</a>”.</li>
+<li>Use relative links for pages within the book so they work in all deployment targets.</li>
+<li>Verify that links resolve before submitting changes.</li>
+</ul>
+<h2 id="tool-recommendations"><a class="header" href="#tool-recommendations">Tool Recommendations</a></h2>
+<p>The following tools help maintain consistent, high-quality documentation:</p>
+<ul>
+<li><strong>mdBook</strong> — builds this documentation site. Run <code>mdbook build</code> in the <code>book/</code> directory to verify changes compile without errors, and <code>mdbook serve</code> for a live preview.</li>
+<li><strong>rustfmt</strong> — formats Rust code examples consistently. Run <code>cargo fmt</code> before committing.</li>
+<li><strong>typos</strong> — catches spelling mistakes in prose and code. Run <code>typos</code> across the repository.</li>
+<li><strong>markdownlint</strong> — enforces Markdown formatting rules such as heading structure and list style. Run <code>markdownlint 'book/src/**/*.md'</code>.</li>
+</ul>
+<h3 id="pre-submission-checklist"><a class="header" href="#pre-submission-checklist">Pre-submission Checklist</a></h3>
+<p>Before opening a pull request that changes documentation:</p>
+<ol>
+<li>Run <code>cd book &amp;&amp; mdbook build</code> and confirm it succeeds without warnings.</li>
+<li>Run <code>typos</code> and fix any reported issues.</li>
+<li>Run <code>markdownlint</code> on changed files.</li>
+<li>Confirm all code examples compile and all links resolve.</li>
+</ol>
 
                     </main>
 
@@ -338,6 +371,8 @@
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

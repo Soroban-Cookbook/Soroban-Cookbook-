@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-4ff7a94e.js"></script>
+        <script src="toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -216,6 +217,33 @@ cargo test --workspace
 <p>Cross-example integration and security tests live in <code>tests/integration</code>
 and <code>tests/security</code>, and are included as workspace members so
 <code>cargo test --workspace</code> runs them alongside the individual examples.</p>
+<h2 id="use-case-examples"><a class="header" href="#use-case-examples">Use-Case Examples</a></h2>
+<p>Beyond the basics, the playground ships complete use-case contracts grouped by
+domain. Each category is a set of workspace members under <code>examples/</code>, so you
+can build, test, and experiment with any of them directly.</p>
+<h3 id="defi-examplesdefi"><a class="header" href="#defi-examplesdefi">DeFi (<code>examples/defi/</code>)</a></h3>
+<p>Lending, liquidity, and market primitives — e.g. a token swap pool, a simple
+lending market, and a staking rewards contract.</p>
+<pre><code class="language-bash">cargo test --workspace --manifest-path examples/defi/Cargo.toml
+</code></pre>
+<h3 id="nfts-examplesnfts"><a class="header" href="#nfts-examplesnfts">NFTs (<code>examples/nfts/</code>)</a></h3>
+<p>NFT minting, metadata, and marketplace flows — e.g. a collectible with
+royalties and a fixed-price marketplace.</p>
+<pre><code class="language-bash">cargo test --workspace --manifest-path examples/nfts/Cargo.toml
+</code></pre>
+<h3 id="governance-examplesgovernance"><a class="header" href="#governance-examplesgovernance">Governance (<code>examples/governance/</code>)</a></h3>
+<p>On-chain decision making — e.g. proposal creation, token-weighted voting, and
+timelocked execution.</p>
+<pre><code class="language-bash">cargo test --workspace --manifest-path examples/governance/Cargo.toml
+</code></pre>
+<h3 id="tokens-examplestokens"><a class="header" href="#tokens-examplestokens">Tokens (<code>examples/tokens/</code>)</a></h3>
+<p>Fungible token patterns — e.g. a standard token, a wrapped asset, and a
+vesting token.</p>
+<pre><code class="language-bash">cargo test --workspace --manifest-path examples/tokens/Cargo.toml
+</code></pre>
+<p>To build every use-case example at once:</p>
+<pre><code class="language-bash">cargo build --workspace --target wasm32-unknown-unknown --release
+</code></pre>
 <h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
 <ul>
 <li><a href="./examples/playground.html">Interactive Playground — Basic Examples</a> walks
@@ -234,7 +262,7 @@ manipulation, and event assertions when writing your own tests.</li>
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="examples-index.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="examples/playground-intermediate.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -248,7 +276,7 @@ manipulation, and event assertions when writing your own tests.</li>
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="examples-index.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="examples/playground-intermediate.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -277,6 +305,8 @@ manipulation, and event assertions when writing your own tests.</li>
         <script src="book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="theme/analytics-2354a5fb.js"></script>
+        <script src="src/theme/language-selector-f7cc599e.js"></script>
 
 
 

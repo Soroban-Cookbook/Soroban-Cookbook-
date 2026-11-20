@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -229,7 +230,7 @@ ledger close and the next protocol upgrade rotation.</li>
 <hr>
 <h2 id="2-authorization-pitfalls"><a class="header" href="#2-authorization-pitfalls">2. Authorization pitfalls</a></h2>
 <h3 id="21-missing-require_auth-on-a-state-changing-function"><a class="header" href="#21-missing-require_auth-on-a-state-changing-function">2.1 Missing <code>require_auth()</code> on a state-changing function</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: anyone can pass another user's address
 pub fn withdraw(env: Env, user: Address, amount: i128) {
@@ -238,7 +239,7 @@ pub fn withdraw(env: Env, user: Address, amount: i128) {
     set_balance(&amp;env, &amp;user, balance);
 }
 <span class="boring">}</span></code></pre>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED
 pub fn withdraw(env: Env, user: Address, amount: i128) {
@@ -258,7 +259,7 @@ signature covers only part of the operation.</p>
 <p><code>require_auth()</code> on an address that is a <em>contract</em> means that contract’s
 <code>__check_auth</code> must approve. If that contract’s implementation is an open proxy
 or has a permissive fallback, your authorization is effectively public.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: authorization delegated to an arbitrary caller-supplied address
 pub fn sweep(env: Env, caller: Address, to: Address, amount: i128) {
@@ -266,7 +267,7 @@ pub fn sweep(env: Env, caller: Address, to: Address, amount: i128) {
     token_client.transfer(&amp;caller, &amp;to, &amp;amount);
 }
 <span class="boring">}</span></code></pre>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED: an authorized admin is stored in instance storage and may not be changed
 // without a timelock
@@ -289,7 +290,7 @@ load it inside the function, and require auth on the loaded value. Never
 authorize a caller-supplied address for an operation the caller should not be
 able to route.</p>
 <h3 id="23-auth-inside-a-loop-or-only-on-the-happy-path"><a class="header" href="#23-auth-inside-a-loop-or-only-on-the-happy-path">2.3 Auth inside a loop, or only on the happy path</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: early returns and `continue` skip authorization for later items
 pub fn settle(env: Env, claims: Vec&lt;(Address, i128)&gt;) {
@@ -307,7 +308,7 @@ branching or looping, for every address the function can act on behalf of.</p>
 <p><code>require_auth()</code> demands that the <strong>whole</strong> <code>Address</code> payload of the invocation
 be authorized. <code>require_auth_for_args(...)</code> authorizes only the listed values,
 which is correct for a function with a non-signing <code>caller</code> parameter.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: requires the user to sign the admin address too, which is impossible
 pub fn transfer_from_admin(env: Env, user: Address, admin: Address, amount: i128) {
@@ -331,7 +332,7 @@ deliberately; do not mix them implicitly.</p>
 <h3 id="31-trusting-the-callee-to-enforce-your-invariants"><a class="header" href="#31-trusting-the-callee-to-enforce-your-invariants">3.1 Trusting the callee to enforce <em>your</em> invariants</a></h3>
 <p>A token contract that does not revert on a zero-amount transfer will happily
 return <code>Ok</code>. If your accounting assumes failure, it silently drifts.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: assumes a failed transfer reverts
 pub fn deposit(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
@@ -340,7 +341,7 @@ pub fn deposit(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error&
     Ok(())
 }
 <span class="boring">}</span></code></pre>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED: observe the balance delta, do not trust the return value alone
 pub fn deposit(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
@@ -367,7 +368,7 @@ an observed balance change. Never assume <code>amount</code> arrived.</p>
 <h3 id="32-unchecked-try_-results"><a class="header" href="#32-unchecked-try_-results">3.2 Unchecked <code>try_</code> results</a></h3>
 <p><code>try_invoke_contract</code> and <code>try_transfer</code> return <code>Result</code> instead of trapping.
 Swallowing it converts a failure into an inconsistent success.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE
 let _ = token_client.try_transfer(&amp;from, &amp;to, &amp;amount);
@@ -393,7 +394,7 @@ invocation starts from a fresh frame in the same transaction, and it also does
 not stop read-only reentrancy, where <code>B</code> calls a view function on <code>A</code> while <code>A</code>
 is mid-update and observes half-updated state.</p>
 <h3 id="41-the-vulnerable-shape"><a class="header" href="#41-the-vulnerable-shape">4.1 The vulnerable shape</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: state is read *after* an external call
 pub fn withdraw(env: Env, user: Address, amount: i128) {
@@ -403,7 +404,7 @@ pub fn withdraw(env: Env, user: Address, amount: i128) {
 }
 <span class="boring">}</span></code></pre>
 <h3 id="42-fix-1-checks-effects-interactions"><a class="header" href="#42-fix-1-checks-effects-interactions">4.2 Fix 1: checks-effects-interactions</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED: write state first, interact last
 pub fn withdraw(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error&gt; {
@@ -425,7 +426,7 @@ pub fn withdraw(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Error
 }
 <span class="boring">}</span></code></pre>
 <h3 id="43-fix-2-an-explicit-reentrancy-guard"><a class="header" href="#43-fix-2-an-explicit-reentrancy-guard">4.3 Fix 2: an explicit reentrancy guard</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn set_entered(env: &amp;Env, entered: bool) {
     let key = DataKey::Entered;
@@ -457,7 +458,7 @@ the next transaction.</p>
 <h3 id="44-read-only-reentrancy"><a class="header" href="#44-read-only-reentrancy">4.4 Read-only reentrancy</a></h3>
 <p>If <code>get_*</code> functions read several keys and a callee can call them mid-update,
 the callee sees inconsistent state and can price against it.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED: a read guard makes views refuse to answer mid-update
 pub fn get_position(env: Env, user: Address) -&gt; Result&lt;(i128, i128), Error&gt; {
@@ -481,7 +482,7 @@ defenses.</p>
 <hr>
 <h2 id="5-math-overflow-and-precision-pitfalls"><a class="header" href="#5-math-overflow-and-precision-pitfalls">5. Math, overflow, and precision pitfalls</a></h2>
 <h3 id="51-unchecked-arithmetic-in-release-builds"><a class="header" href="#51-unchecked-arithmetic-in-release-builds">5.1 Unchecked arithmetic in release builds</a></h3>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: wraps or traps depending on the profile
 pub fn accrue(env: Env, user: Address) {
@@ -489,7 +490,7 @@ pub fn accrue(env: Env, user: Address) {
     set_balance(&amp;env, &amp;user, balance * 2);
 }
 <span class="boring">}</span></code></pre>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED
 pub fn accrue(env: Env, user: Address) -&gt; Result&lt;(), Error&gt; {
@@ -506,7 +507,7 @@ lint gate, or enable <code>clippy::indexing_slicing</code> and
 <h3 id="52-integer-division-truncation"><a class="header" href="#52-integer-division-truncation">5.2 Integer division truncation</a></h3>
 <p><code>(a + b) / 2</code> rounds toward zero and silently favours one side. In share math and
 fee distribution this creates a rounding gap that accumulates.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE: the remainder is lost
 let half = (a + b) / 2;
@@ -526,7 +527,7 @@ review, and use <code>TryFrom</code>/<code>TryInto</code> where a conversion is 
 <h2 id="6-panics-traps-and-lost-error-information"><a class="header" href="#6-panics-traps-and-lost-error-information">6. Panics, traps, and lost error information</a></h2>
 <p>A Soroban panic aborts the entire transaction and consumes all gas, so a stray
 <code>unwrap()</code> is a denial-of-service bug for that user, not just a crash.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// VULNERABLE
 let balance = get_balance(&amp;env, &amp;user).unwrap(); // panics when the key is absent
@@ -562,7 +563,7 @@ external entry point, and reserve panics for genuine invariants.</p>
 </tbody>
 </table>
 </div>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// FIXED: persistent with a bounded extension, checked on both write and read
 pub fn set_balance(env: &amp;Env, user: &amp;Address, amount: i128) {
@@ -691,7 +692,7 @@ must show balances intact.</li>
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../docs/common-pitfalls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../docs/storage-pitfalls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -705,7 +706,7 @@ must show balances intact.</li>
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../docs/common-pitfalls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../docs/storage-pitfalls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>
@@ -734,6 +735,8 @@ must show balances intact.</li>
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

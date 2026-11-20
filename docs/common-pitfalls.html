@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -190,7 +191,7 @@
 <li><strong>Consequence:</strong> Anyone can call the contract function and input another user’s address, allowing them to unauthorizedly spend funds or manipulate state.</li>
 <li><strong>How to avoid/fix:</strong> Always invoke <code>.require_auth()</code> on the <code>Address</code> parameter representing the signer.</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Anyone can call this function and pass another user's address
 pub fn withdraw(env: Env, user: Address, amount: i128) {
@@ -215,7 +216,7 @@ pub fn withdraw(env: Env, user: Address, amount: i128) {
 <li><strong>Consequence:</strong> In release builds, overflow checks might wrap around silently (if they are disabled in the profile), leading to exploit vectors such as minting massive numbers of tokens. Even if checks are enabled, standard operators panic without providing a clear error code, making error handling impossible.</li>
 <li><strong>How to avoid/fix:</strong> Use checked arithmetic methods (<code>checked_add</code>, <code>checked_sub</code>, <code>checked_mul</code>, <code>checked_div</code>) and return custom, descriptive contract errors.</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Standard operator can cause panics or wrap-around exploits
 pub fn add_interest(balance: u64, rate: u64) -&gt; u64 {
@@ -241,7 +242,7 @@ pub fn add_interest(balance: u64, rate: u64) -&gt; Result&lt;u64, Error&gt; {
 <li><strong>Consequence:</strong> The Soroban VM enforces a strict 32-character limit on symbols. Calling <code>Symbol::new(&amp;env, "...")</code> with a string longer than 32 characters will result in a runtime panic.</li>
 <li><strong>How to avoid/fix:</strong> Keep symbols short and descriptive. For symbols of 9 characters or less, use <code>symbol_short!</code> which is stored more efficiently.</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Panics at runtime (44 characters)
 let key = Symbol::new(&amp;env, "user_registration_timestamp_for_active_pool");
@@ -259,7 +260,7 @@ let key = symbol_short!("reg_time");
 <li><strong>Consequence:</strong> The contract execution proceeds assuming the operation succeeded, even if it failed silently or returned an error payload, causing state inconsistency.</li>
 <li><strong>How to avoid/fix:</strong> Always handle results using Rust’s <code>?</code> operator or explicitly match on them. Note that SEP-41 token operations panic on failure, but custom token logic or cross-contract invocations might return <code>Result</code>.</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Ignored return value could cause transaction to proceed unexpectedly
 let result = token_client.try_transfer(&amp;from, &amp;to, &amp;amount);
@@ -279,7 +280,7 @@ token_client.try_transfer(&amp;from, &amp;to, &amp;amount)
 <li><strong>Consequence:</strong> Every time the collection is read or written, the entire collection must be deserialized and serialized. As the number of users grows, the transaction CPU and memory gas usage increases linearly. Eventually, transactions will exceed the ledger limits, permanently bricking the contract and locking user funds.</li>
 <li><strong>How to avoid/fix:</strong> Store user-specific data under separate, unique keys. Use a type-safe <code>#[contracttype]</code> enum to represent storage key variants.</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Storing a growing list of users in a single vector under one key
 pub fn register_user(env: Env, user: Address) {
@@ -320,7 +321,7 @@ pub fn register_user(env: Env, user: Address) {
 </ol>
 </li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -347,7 +348,7 @@ pub fn get_balance_and_bump(env: Env, user: Address) -&gt; i128 {
 <li><strong>Consequence:</strong> The external contract could intercept control and call back into this contract (reenter) before the local state is updated, leading to double-withdrawals.</li>
 <li><strong>How to avoid/fix:</strong> Follow the <strong>Checks-Effects-Interactions</strong> pattern: perform validation checks first, write and persist local state changes next (effects), and invoke external contract calls last (interactions).</li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Draining external tokens before updating internal state
 pub fn claim_rewards(env: Env, user: Address) {
@@ -390,7 +391,7 @@ pub fn claim_rewards(env: Env, user: Address) {
 </ol>
 </li>
 <li><strong>Code Example:</strong>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// ❌ BAD: Signature payload contains only action data, vulnerable to replays
 pub fn execute_custom_auth(env: Env, public_key: BytesN&lt;32&gt;, signature: BytesN&lt;64&gt;, action_data: Bytes) {
@@ -423,7 +424,7 @@ pub fn execute_custom_auth(
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="../docs/security-pitfalls.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="../../docs/featured-projects.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
@@ -437,7 +438,7 @@ pub fn execute_custom_auth(
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="../docs/security-pitfalls.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="../../docs/featured-projects.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
@@ -470,6 +471,8 @@ pub fn execute_custom_auth(
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

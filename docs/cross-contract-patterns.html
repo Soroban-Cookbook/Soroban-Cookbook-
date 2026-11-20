@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -218,6 +219,33 @@ systems where users create many instances of the same template.</p>
     Child--&gt;&gt;Factory: ok
     Factory--&gt;&gt;User: child address
 </code></pre>
+<h3 id="factory-code"><a class="header" href="#factory-code">Factory Code</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Deploy a child contract from the stored template hash and initialize it
+/// in the same transaction.
+pub fn create(env: Env, creator: Address, salt: BytesN&lt;32&gt;, config: u32) -&gt; Result&lt;Address, FactoryError&gt; {
+    creator.require_auth();
+
+    let wasm_hash: BytesN&lt;32&gt; = env
+        .storage()
+        .instance()
+        .get(&amp;DataKey::TemplateWasm)
+        .ok_or(FactoryError::NotInitialized)?;
+
+    // Deterministic address: same creator + same salt =&gt; same child.
+    let address = env.deployer().with_current_contract(salt).deploy(wasm_hash);
+
+    // Initialize immediately - never leave the child uninitialized.
+    ChildClient::new(&amp;env, &amp;address).initialize(&amp;creator, &amp;config);
+
+    env.storage().instance().set(&amp;DataKey::Deployed(address.clone()), &amp;true);
+    Ok(address)
+}
+<span class="boring">}</span></code></pre>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory"><code>examples/intermediate/ajo-factory</code></a></p>
+</blockquote>
 <h3 id="factory-checklist"><a class="header" href="#factory-checklist">Factory Checklist</a></h3>
 <ul>
 <li>Store the child Wasm hash in instance storage and protect updates with admin
@@ -256,6 +284,36 @@ routing, migration, or adapter contracts rather than EVM-style delegatecall.</p>
     Implementation--&gt;&gt;Proxy: result
     Proxy--&gt;&gt;User: result
 </code></pre>
+<h3 id="proxy-code"><a class="header" href="#proxy-code">Proxy Code</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Forward a call to the implementation registered for this module.
+pub fn perform_action(env: Env, caller: Address, args: Vec&lt;Val&gt;) -&gt; Result&lt;Val, ProxyError&gt; {
+    caller.require_auth();
+
+    let implementation: Address = env
+        .storage()
+        .persistent()
+        .get(&amp;DataKey::Implementation(MODULE))
+        .ok_or(ProxyError::NotRegistered)?;
+
+    // The downstream contract performs its own authorization checks.
+    Ok(env.invoke_contract::&lt;Val&gt;(&amp;implementation, &amp;symbol_short!("perform_action"), args))
+}
+
+/// Swap the implementation, guarded by the stored admin and a timelock.
+pub fn upgrade(env: Env, new_implementation: Address) -&gt; Result&lt;(), ProxyError&gt; {
+    read_admin(&amp;env)?.require_auth();
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Implementation(MODULE), &amp;new_implementation);
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<blockquote>
+<p><strong>Examples:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/04-upgradeable-proxy"><code>examples/advanced/04-upgradeable-proxy</code></a>,
+<a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/37-beacon-management"><code>examples/advanced/37-beacon-management</code></a></p>
+</blockquote>
 <h3 id="proxy-variants"><a class="header" href="#proxy-variants">Proxy Variants</a></h3>
 <ul>
 <li><em>Router proxy:</em> forwards specific calls to registered modules.</li>
@@ -304,6 +362,32 @@ routers, vaults, and cross-contract apps.</p>
     Registry--&gt;&gt;App: address and metadata
     App-&gt;&gt;Target: call using returned address
 </code></pre>
+<h3 id="registry-code"><a class="header" href="#registry-code">Registry Code</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>/// Register a contract address under a typed key.
+pub fn register(env: Env, key: Symbol, implementation: Address) -&gt; Result&lt;(), RegistryError&gt; {
+    read_admin(&amp;env)?.require_auth();
+    if env.storage().persistent().has(&amp;DataKey::Contract(key.clone())) {
+        return Err(RegistryError::AlreadyRegistered);
+    }
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Contract(key.clone()), &amp;implementation);
+    Ok(())
+}
+
+/// Look up a registered address and metadata.
+pub fn get(env: Env, key: Symbol) -&gt; Result&lt;Address, RegistryError&gt; {
+    env.storage()
+        .persistent()
+        .get(&amp;DataKey::Contract(key))
+        .ok_or(RegistryError::NotFound)
+}
+<span class="boring">}</span></code></pre>
+<blockquote>
+<p><strong>Example:</strong> <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/contract-registry"><code>examples/advanced/contract-registry</code></a></p>
+</blockquote>
 <h3 id="registry-design-tips"><a class="header" href="#registry-design-tips">Registry Design Tips</a></h3>
 <ul>
 <li>Use typed keys instead of raw strings where possible.</li>
@@ -416,6 +500,8 @@ blocks such as initialization guards, stored-admin checks, typed storage keys,
 and events.</li>
 <li><a href="./best-practices.html"><code>docs/best-practices</code></a> covers security and storage
 recommendations that apply to multi-contract systems.</li>
+<li><a href="./code-examples.html"><code>docs/code-examples</code></a> is the index of tested snippets for
+every topic in the cookbook.</li>
 </ul>
 
                     </main>
@@ -469,6 +555,8 @@ recommendations that apply to multi-contract systems.</li>
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 

@@ -1,0 +1,656 @@
+<!DOCTYPE HTML>
+<html lang="en" class="rust sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Storage Pitfalls - Soroban Cookbook</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A comprehensive guide to building smart contracts on Stellar with Soroban">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-e96d0476.css">
+        <link rel="stylesheet" href="../css/chrome-d279d366.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "rust";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-8daf4f14.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Soroban Cookbook</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/src/docs/storage-pitfalls.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="storage-pitfalls-in-soroban-contracts"><a class="header" href="#storage-pitfalls-in-soroban-contracts">Storage Pitfalls in Soroban Contracts</a></h1>
+<p>Soroban has no <code>mapping</code> and no <code>storage</code> keyword. Every byte a contract keeps
+lives in one of <strong>three</strong> storage namespaces with <strong>three different lifetimes</strong>
+and <strong>three different costs</strong>. Almost every storage bug in a Soroban contract is
+one of three things: the wrong namespace, the wrong key, or the wrong time to
+live (TTL) handling.</p>
+<p>This page lists the mistakes that ship, the symptom each one produces, and the
+fix. Use it together with <a href="../examples/storage-patterns.html">Storage Patterns</a>,
+<a href="./common-pitfalls.html">Common Pitfalls</a>, and
+<a href="./security-pitfalls.html">Security Pitfalls</a>.</p>
+<hr>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-the-three-storage-types">The three storage types</a></li>
+<li><a href="#2-choosing-the-right-type">Choosing the right type</a></li>
+<li><a href="#3-storage-type-confusion">Storage type confusion</a></li>
+<li><a href="#4-key-design-and-key-collisions">Key design and key collisions</a></li>
+<li><a href="#5-ttl-rent-and-liveness">TTL, rent, and liveness</a></li>
+<li><a href="#6-bugs-that-only-appear-at-expiration">Bugs that only appear at expiration</a></li>
+<li><a href="#7-migration-problems">Migration problems</a></li>
+<li><a href="#8-cost-and-performance-traps">Cost and performance traps</a></li>
+<li><a href="#9-best-practices">Best practices</a></li>
+<li><a href="#10-review-checklist">Review checklist</a></li>
+</ol>
+<hr>
+<h2 id="1-the-three-storage-types"><a class="header" href="#1-the-three-storage-types">1. The three storage types</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th></th><th>Persistent</th><th>Instance</th><th>Temporary</th></tr>
+</thead>
+<tbody>
+<tr><td>Namespace</td><td><code>env.storage().persistent()</code></td><td><code>env.storage().instance()</code></td><td><code>env.storage().temporary()</code></td></tr>
+<tr><td>Lifetime</td><td>Until the entry’s TTL expires</td><td>Until the contract instance’s TTL expires</td><td>Minutes; restored at ledger close</td></tr>
+<tr><td>TTL granularity</td><td>Per key</td><td>Shared across all instance entries</td><td>Per key, short</td></tr>
+<tr><td>Intended use</td><td>User balances, positions, allowances</td><td>Contract configuration</td><td>Locks, caches, nonces</td></tr>
+<tr><td>Relative rent</td><td>Highest</td><td>Medium</td><td>Lowest</td></tr>
+<tr><td>Survives contract upgrade</td><td>Yes</td><td>Yes (instance survives a WASM update)</td><td>No</td></tr>
+</tbody>
+</table>
+</div>
+<p>Key facts that cause most of the bugs below:</p>
+<ul>
+<li><strong>Persistent</strong> entries each carry their own TTL. When a persistent entry
+expires, the contract is <em>restored</em> on the next invocation that touches it, and
+the entry has to pay the rent again.</li>
+<li><strong>Instance</strong> entries share a single TTL per key that is linked to the contract
+instance. Instance storage is <em>also</em> the account of the contract itself, so
+bumping the contract instance TTL and bumping an instance entry are separate
+operations.</li>
+<li><strong>Temporary</strong> entries are cheap precisely because they are short lived. They
+are restored during ledger close, they have a hard minimum TTL enforced by the
+protocol, and they are always cheaper per byte than persistent entries.</li>
+</ul>
+<hr>
+<h2 id="2-choosing-the-right-type"><a class="header" href="#2-choosing-the-right-type">2. Choosing the right type</a></h2>
+<pre><code>Does the value need to survive beyond a few ledgers?
+├── yes → Does it belong to one user / position?
+│         ├── yes → persistent, one entry per key, bump TTL on read and write
+│         └── no  → instance (contract-wide config), keep it small
+└── no  → temporary (reentrancy guard, per-transaction nonce, scratch value)
+</code></pre>
+<p>Rules of thumb:</p>
+<ul>
+<li>Balances, allowances, positions, votes, and metadata URIs: <strong>persistent</strong>.</li>
+<li>Admin address, fee basis points, oracle address, pause flag, token address:
+<strong>instance</strong>.</li>
+<li>Reentrancy guard flag, “already used” nonces, transient computation results:
+<strong>temporary</strong>.</li>
+</ul>
+<hr>
+<h2 id="3-storage-type-confusion"><a class="header" href="#3-storage-type-confusion">3. Storage type confusion</a></h2>
+<h3 id="31-balances-in-temporary-storage"><a class="header" href="#31-balances-in-temporary-storage">3.1 Balances in temporary storage</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BROKEN: the balance disappears at ledger close / when the entry expires
+pub fn deposit(env: Env, user: Address, amount: i128) {
+    let key = DataKey::Balance(user.clone());
+    env.storage().temporary().set(&amp;key, &amp;amount);
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Symptom:</strong> deposits succeed, then reads return zero. Users lose funds; the
+integration tests pass because they never advance a ledger.</p>
+<p><strong>Fix:</strong> use persistent storage and bump the TTL.</p>
+<h3 id="32-configuration-in-persistent-storage"><a class="header" href="#32-configuration-in-persistent-storage">3.2 Configuration in persistent storage</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// WORKS, but pays persistent rent for a value read on every call
+pub fn set_admin(env: Env, admin: Address) {
+    env.storage().persistent().set(&amp;DataKey::Admin, &amp;admin);
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> instance storage. The admin is contract-wide state, so it belongs in the
+instance namespace and is loaded with the rest of the instance configuration.</p>
+<h3 id="33-instance-storage-used-as-a-database"><a class="header" href="#33-instance-storage-used-as-a-database">3.3 Instance storage used as a database</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BROKEN: a map grows inside the instance namespace
+env.storage().instance().set(&amp;DataKey::Users, &amp;users_vec);
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> one persistent entry per user.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env.storage().persistent().set(&amp;DataKey::User(user.clone()), &amp;user_record);
+<span class="boring">}</span></code></pre>
+<p>Instance storage is intended for configuration that is <em>small and bounded</em>.
+Growing it increases the cost of every invocation and eventually makes the
+contract unusable.</p>
+<h3 id="34-persistent-storage-used-as-a-cache"><a class="header" href="#34-persistent-storage-used-as-a-cache">3.4 Persistent storage used as a cache</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// EXPENSIVE: persistent rent for data that is only needed right now
+let key = DataKey::Price(feed.clone());
+env.storage().persistent().set(&amp;key, &amp;price);
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> keep the cache in temporary storage, or keep it in memory for the
+duration of the call. Persistent storage should hold state you cannot recompute.</p>
+<h3 id="35-same-key-name-in-two-namespaces"><a class="header" href="#35-same-key-name-in-two-namespaces">3.5 Same key name in two namespaces</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env.storage().persistent().set(&amp;symbol_short!("config"), &amp;config);
+env.storage().instance().set(&amp;symbol_short!("config"), &amp;other_config);
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> never rely on the <em>name</em> to disambiguate. Use a <code>DataKey</code> enum whose
+variants are explicit, and never reuse one variant for two different concepts.</p>
+<h3 id="36-reading-from-the-wrong-namespace-after-an-upgrade"><a class="header" href="#36-reading-from-the-wrong-namespace-after-an-upgrade">3.6 Reading from the wrong namespace after an upgrade</a></h3>
+<p>An upgrade that moves a value from one namespace to another looks fine in tests
+(fresh state) and fails in production (existing state).</p>
+<p><strong>Fix:</strong> when a release changes namespaces, ship a migration that reads from the
+old namespace and writes to the new one, and gate it behind a version marker.</p>
+<hr>
+<h2 id="4-key-design-and-key-collisions"><a class="header" href="#4-key-design-and-key-collisions">4. Key design and key collisions</a></h2>
+<h3 id="41-ad-hoc-keys-instead-of-an-enum"><a class="header" href="#41-ad-hoc-keys-instead-of-an-enum">4.1 Ad-hoc keys instead of an enum</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// FRAGILE: two features can both decide that "fee" is a good key name
+env.storage().instance().set(&amp;Symbol::new(&amp;env, "fee"), &amp;fee);
+env.storage().instance().set(&amp;Symbol::new(&amp;env, "fee"), &amp;admin);
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> one <code>#[contracttype]</code> enum per contract.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Balance(Address),
+    Allowance(Address, Address),
+    Admin,
+    FeeBps,
+    Config,
+}
+<span class="boring">}</span></code></pre>
+<h3 id="42-composite-keys-that-flatten-into-each-other"><a class="header" href="#42-composite-keys-that-flatten-into-each-other">4.2 Composite keys that flatten into each other</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// COLLISION: ("alice", "bob") can be produced by ("ali", "cebob")
+env.storage().persistent().set(&amp;(a.clone(), b.clone()), &amp;value);
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> make the tuple shape unambiguous, or use distinct <code>DataKey</code> variants
+such as <code>Allowance(Address, Address)</code> and <code>Position(Address, Symbol)</code>. The types
+must match at every call site, which is what prevents the mix-up.</p>
+<h3 id="43-key-length-limits"><a class="header" href="#43-key-length-limits">4.3 Key length limits</a></h3>
+<p><code>symbol_short!</code> panics above 9 characters and <code>Symbol::new</code> panics above 32.
+Long descriptive key strings panic at runtime, which means the whole
+transaction fails.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// PANICS: longer than 32 characters
+let key = Symbol::new(&amp;env, "user_registration_timestamp_for_active_pool");
+<span class="boring">}</span></code></pre>
+<p><strong>Fix:</strong> short symbols for <code>symbol_short!</code>, an enum for anything structured.</p>
+<h3 id="44-keys-that-expose-implementation-details"><a class="header" href="#44-keys-that-expose-implementation-details">4.4 Keys that expose implementation details</a></h3>
+<p>A key that embeds a value that can change (<code>Balance</code> keyed by a mutable
+address alias, or <code>Config</code> keyed by a version number that is bumped) breaks every
+reader that cached the old key.</p>
+<p><strong>Fix:</strong> keys are permanent identities. If the meaning changes, introduce a new
+key and migrate.</p>
+<h3 id="45-confusing-the-contract-instance-with-instance-entries"><a class="header" href="#45-confusing-the-contract-instance-with-instance-entries">4.5 Confusing the contract instance with instance <em>entries</em></a></h3>
+<p>The contract instance (the account that holds the WASM and the instance entries)
+has its own WasmHash and its own TTL, managed with the contract instance API. It
+is easy to write <code>env.storage().instance()</code> code that accidentally assumes
+contract-instance semantics, for example expecting it to be restored the same
+way.</p>
+<p><strong>Fix:</strong> be explicit about which one you mean: <em>instance entries</em>
+(<code>env.storage().instance()</code>), or <em>the contract instance</em> (the WasmHash and its
+lifetime).</p>
+<hr>
+<h2 id="5-ttl-rent-and-liveness"><a class="header" href="#5-ttl-rent-and-liveness">5. TTL, rent, and liveness</a></h2>
+<p>Soroban storage is rented. An entry’s life is its TTL, expressed in ledgers.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const LEDGER_THRESHOLD: u32 = 5_184_000; // ~6 months
+const LEDGER_BUMP: u32 = 1_209_600;      // ~2 months
+<span class="boring">}</span></code></pre>
+<p>Typical patterns:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// Bump on write
+env.storage().persistent().set(&amp;key, &amp;value);
+env.storage().persistent().extend_ttl(&amp;key, LEDGER_THRESHOLD, LEDGER_BUMP);
+
+// Bump on read, so active users never expire
+let value = env.storage().persistent().get(&amp;key);
+env.storage().persistent().extend_ttl(&amp;key, LEDGER_THRESHOLD, LEDGER_BUMP);
+<span class="boring">}</span></code></pre>
+<p>Pitfalls:</p>
+<ul>
+<li><strong>Only bumping on write.</strong> A user who deposits once and only withdraws months
+later loses their entry to expiration. Bump on read paths that matter.</li>
+<li><strong>Zero threshold.</strong> <code>extend_ttl(&amp;key, 0, 0)</code> only restores an already-expired
+entry and is charged the restoration fee. Use a real threshold.</li>
+<li><strong>Unbounded threshold.</strong> An enormous threshold can be unaffordable; rent is
+charged for the entire extension.</li>
+<li><strong>Forgetting temporary storage needs no bump.</strong> Temporary entries have a
+protocol-enforced minimum TTL. Adding manual bump logic there is noise at
+best.</li>
+<li><strong>Instance TTL is extended with the instance.</strong> When the contract instance is
+restored or its lifetime is extended, its instance entries come along; do not
+assume every instance entry has an independent TTL.</li>
+</ul>
+<hr>
+<h2 id="6-bugs-that-only-appear-at-expiration"><a class="header" href="#6-bugs-that-only-appear-at-expiration">6. Bugs that only appear at expiration</a></h2>
+<p>This is the classic Soroban storage bug class: the code is correct until a TTL
+runs out.</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>// BUG: an expired entry is indistinguishable from "never existed"
+let balance = env.storage().persistent().get(&amp;key).unwrap_or(0);
+<span class="boring">}</span></code></pre>
+<p>If the entry expired and was restored as empty, <code>unwrap_or(0)</code> silently turns a
+user’s balance into zero. The same pattern turns a “not yet set” admin into a
+“no admin” contract, and a nonce into a reusable one.</p>
+<p><strong>Fixes:</strong></p>
+<ul>
+<li>
+<p>For balances, decide explicitly whether “missing” means zero (a new user) or
+“corrupt state” (an expired entry), and return a contract error for the latter.</p>
+</li>
+<li>
+<p>Test expiration. The SDK lets you advance the ledger sequence in tests so you
+can exercise the expired-entry path deliberately:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let seq = env.ledger().sequence();
+env.ledger().with_mut(|li| li.sequence = seq + 10_000);
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p>Restore the contract before reading: <code>env.storage().persistent().extend_ttl</code>
+on an expired entry charges the restoration fee, which is why it is not free.</p>
+</li>
+</ul>
+<hr>
+<h2 id="7-migration-problems"><a class="header" href="#7-migration-problems">7. Migration problems</a></h2>
+<p>Storage migrations are the highest-risk change a Soroban contract can make,
+because the ledger state is long lived and the contract code is short lived.</p>
+<h3 id="71-the-rules"><a class="header" href="#71-the-rules">7.1 The rules</a></h3>
+<ol>
+<li><strong>Additive by default.</strong> New keys are safe. Renaming, retyping, or removing a
+key is not.</li>
+<li><strong>Never reinterpret an existing key.</strong> If the meaning of a value changes,
+introduce a new key and a migration step; do not write a new type over the old
+value.</li>
+<li><strong>Version everything.</strong> Store a version number in instance storage, and make
+<code>migrate()</code> idempotent: it should check the current version and do nothing if
+the contract is already migrated.</li>
+<li><strong>Test the upgrade path, not just the fresh path.</strong> Write a test that writes
+state with the old layout, runs the migration, and asserts the new layout
+reads the migrated values.</li>
+</ol>
+<h3 id="72-a-version-marker-and-idempotent-migration"><a class="header" href="#72-a-version-marker-and-idempotent-migration">7.2 A version marker and idempotent migration</a></h3>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const VERSION: u32 = 2;
+
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Version,
+    Config,
+    Balance(Address),
+}
+
+fn version(env: &amp;Env) -&gt; u32 {
+    env.storage().instance().get(&amp;DataKey::Version).unwrap_or(1)
+}
+
+pub fn migrate(env: Env) -&gt; Result&lt;(), Error&gt; {
+    admin(&amp;env).require_auth();
+
+    match version(&amp;env) {
+        1 =&gt; migrate_v1_to_v2(&amp;env),
+        VERSION =&gt; return Ok(()), // already migrated: stay idempotent
+        v =&gt; return Err(Error::UnsupportedVersion),
+    }
+
+    env.storage().instance().set(&amp;DataKey::Version, &amp;VERSION);
+    Ok(())
+}
+
+fn migrate_v1_to_v2(env: &amp;Env) {
+    // Move the config from the old flat key to the new namespaced key.
+    if let Some(old) = env.storage().persistent().get(&amp;Symbol::new(env, "config")) {
+        env.storage().persistent().remove(&amp;Symbol::new(env, "config"));
+        env.storage().instance().set(&amp;DataKey::Config, &amp;old);
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="73-upgrades-versus-migrations"><a class="header" href="#73-upgrades-versus-migrations">7.3 Upgrades versus migrations</a></h3>
+<p>Updating the contract WASM keeps the storage as it is. That is why:</p>
+<ul>
+<li><code>init</code> must not be re-runnable on an upgraded contract. Use a separate
+<code>initialize</code> entry point guarded by a “already initialized” check.</li>
+<li><code>migrate</code> must be callable by an authorized (ideally timelocked) admin only.</li>
+<li>Layout validation before deploying a new WASM is worth automating. See
+<code>examples/advanced/09-storage-layout-validator</code> (schema compatibility rules)
+and <code>examples/advanced/10-contract-migrations</code> for runnable patterns.</li>
+</ul>
+<hr>
+<h2 id="8-cost-and-performance-traps"><a class="header" href="#8-cost-and-performance-traps">8. Cost and performance traps</a></h2>
+<ul>
+<li><strong>One entry per user, not one entry for all users.</strong> Each <code>persistent()</code> read
+is billed per entry touched.</li>
+<li><strong>Avoid <code>extend_ttl</code> in hot loops.</strong> Bumping TTL for 100 users in one call is
+100 billed extensions. Bump on the entries that are actually being used.</li>
+<li><strong>Instance storage is loaded as a unit.</strong> A large instance entry slows down
+every call, including <code>read-only</code> calls.</li>
+<li><strong>Temporary storage for scratch space.</strong> Intermediate values that never need to
+persist belong in temporary storage or in ordinary Rust memory.</li>
+<li><strong>Prefer <code>has()</code> before <code>get()</code>.</strong> <code>has</code> is cheaper than a full read and makes
+the intent explicit.</li>
+<li><strong>Measure.</strong> The repo includes gas benchmarks under <code>gas-benchmarks/</code> and a
+storage-focused example at <code>examples/advanced/09-storage-optimization</code>.</li>
+</ul>
+<hr>
+<h2 id="9-best-practices"><a class="header" href="#9-best-practices">9. Best practices</a></h2>
+<ol>
+<li>
+<p><strong>One <code>DataKey</code> enum per contract.</strong> No ad-hoc <code>Symbol</code> or <code>String</code> keys.</p>
+</li>
+<li>
+<p><strong>One helper per stored concept</strong>, so TTL handling lives in exactly one place:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn set_balance(env: &amp;Env, user: &amp;Address, amount: i128) {
+    let key = DataKey::Balance(user.clone());
+    env.storage().persistent().set(&amp;key, &amp;amount);
+    env.storage().persistent().extend_ttl(&amp;key, LEDGER_THRESHOLD, LEDGER_BUMP);
+}
+
+fn get_balance(env: &amp;Env, user: &amp;Address) -&gt; i128 {
+    let key = DataKey::Balance(user.clone());
+    let value = env.storage().persistent().get(&amp;key).unwrap_or(0);
+    env.storage().persistent().extend_ttl(&amp;key, LEDGER_THRESHOLD, LEDGER_BUMP);
+    value
+}
+<span class="boring">}</span></code></pre>
+</li>
+<li>
+<p><strong>Persistent for durable user state, instance for small bounded config,
+temporary for locks and scratch values.</strong></p>
+</li>
+<li>
+<p><strong>Bump TTL on both write and read</strong>, with a documented threshold and bump.</p>
+</li>
+<li>
+<p><strong>Make <code>migrate</code> idempotent</strong> and version-gated; never reinterpret a key.</p>
+</li>
+<li>
+<p><strong>Treat expiration as a test case.</strong> Advance the ledger sequence in tests and
+assert the behavior you expect.</p>
+</li>
+<li>
+<p><strong>Prefer <code>Option</code>/<code>Result</code> over <code>unwrap()</code></strong> so a missing entry is a handled
+branch rather than a panic that reverts the whole transaction.</p>
+</li>
+<li>
+<p><strong>Keep instance storage small.</strong> Move anything that grows into persistent
+entries.</p>
+</li>
+<li>
+<p><strong>Document each key</strong> with a comment describing its type, lifetime, and
+meaning. Storage keys are the contract’s real schema.</p>
+</li>
+<li>
+<p><strong>Audit the layout before every upgrade</strong>, not just the code diff.</p>
+</li>
+</ol>
+<hr>
+<h2 id="10-review-checklist"><a class="header" href="#10-review-checklist">10. Review checklist</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Every key comes from a <code>DataKey</code> enum; no inline symbols or strings</li>
+<li><input disabled="" type="checkbox"> Balances and positions are persistent, not temporary</li>
+<li><input disabled="" type="checkbox"> Instance storage holds only small, bounded configuration</li>
+<li><input disabled="" type="checkbox"> Temporary storage holds only locks, nonces, and scratch values</li>
+<li><input disabled="" type="checkbox"> TTL is extended on write <strong>and</strong> on the read paths that matter</li>
+<li><input disabled="" type="checkbox"> <code>extend_ttl</code> uses a non-zero, affordable threshold</li>
+<li><input disabled="" type="checkbox"> Missing entries are handled deliberately, not <code>unwrap()</code>-ed</li>
+<li><input disabled="" type="checkbox"> An expiration test exists (ledger sequence advanced past the TTL)</li>
+<li><input disabled="" type="checkbox"> Key tuples cannot collide with each other</li>
+<li><input disabled="" type="checkbox"> <code>migrate</code> is idempotent, version-gated, and admin-authorized</li>
+<li><input disabled="" type="checkbox"> The upgrade test starts from state written by the previous version</li>
+<li><input disabled="" type="checkbox"> No key is renamed, retyped, or repurposed without a migration step</li>
+</ul>
+<hr>
+<h2 id="related"><a class="header" href="#related">Related</a></h2>
+<ul>
+<li><a href="../examples/storage-patterns.html">Storage Patterns</a></li>
+<li><a href="./security-pitfalls.html">Security Pitfalls</a></li>
+<li><a href="./common-pitfalls.html">Common Pitfalls</a></li>
+<li><a href="./testing-pitfalls.html">Testing Pitfalls</a></li>
+<li><a href="./cross-contract-patterns.html">Factory, Proxy, and Registry Patterns</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../docs/security-pitfalls.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../../docs/ecosystem-partnerships.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../docs/security-pitfalls.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../../docs/ecosystem-partnerships.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

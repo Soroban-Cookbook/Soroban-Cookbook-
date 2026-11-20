@@ -28,6 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -35,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-1f80b024.js";
+            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-4ff7a94e.js"></script>
+        <script src="../toc-8daf4f14.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -195,7 +196,7 @@
 <h3 id="11-missing-authorization-checks"><a class="header" href="#11-missing-authorization-checks">1.1 Missing Authorization Checks</a></h3>
 <p>The most critical vulnerability: calling a state-changing function without verifying the caller is allowed to perform it.</p>
 <p><strong>Vulnerable:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn withdraw(env: Env, user: Address, amount: i128) {
     // No require_auth() — anyone can drain any account!
@@ -204,7 +205,7 @@
 }
 <span class="boring">}</span></code></pre>
 <p><strong>Secure:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn withdraw(env: Env, user: Address, amount: i128) {
     user.require_auth(); // Caller must be `user`
@@ -222,7 +223,7 @@
 <h3 id="12-integer-overflow--underflow"><a class="header" href="#12-integer-overflow--underflow">1.2 Integer Overflow / Underflow</a></h3>
 <p>Rust’s release profile enables <code>overflow-checks = true</code> in this workspace (see root <code>Cargo.toml</code>). However, intermediate calculations can still produce logically-wrong results if you rely on wrapping semantics. Always use <strong>checked arithmetic</strong> for financial values.</p>
 <p><strong>Vulnerable:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn add_reward(env: Env, user: Address, amount: i128) {
     let current = read_balance(&amp;env, &amp;user);
@@ -231,7 +232,7 @@
 }
 <span class="boring">}</span></code></pre>
 <p><strong>Secure:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -254,7 +255,7 @@ pub fn add_reward(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Tok
 <h3 id="13-re-initialization-attacks"><a class="header" href="#13-re-initialization-attacks">1.3 Re-Initialization Attacks</a></h3>
 <p>A contract that can be initialized more than once lets an attacker overwrite the admin or reset state.</p>
 <p><strong>Vulnerable:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn initialize(env: Env, admin: Address) {
     // No guard — callable multiple times!
@@ -262,7 +263,7 @@ pub fn add_reward(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Tok
 }
 <span class="boring">}</span></code></pre>
 <p><strong>Secure:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn initialize(env: Env, admin: Address) {
     if env.storage().instance().has(&amp;DataKey::Admin) {
@@ -275,7 +276,7 @@ pub fn add_reward(env: Env, user: Address, amount: i128) -&gt; Result&lt;(), Tok
 <h3 id="14-unchecked-cross-contract-return-values"><a class="header" href="#14-unchecked-cross-contract-return-values">1.4 Unchecked Cross-Contract Return Values</a></h3>
 <p>When calling another contract, a non-<code>Result</code> return type causes a panic on error. This is usually fine, but if you’re passing unchecked external input into a sub-call, the caller can craft arguments that trigger panics in unexpected places.</p>
 <p><strong>Pattern to avoid:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// If `token_address` is attacker-controlled, they can pass a contract
 // that panics or misbehaves.
@@ -286,13 +287,13 @@ TokenClient::new(&amp;env, &amp;token_address).transfer(&amp;from, &amp;to, &amp
 <h3 id="15-storage-key-collisions"><a class="header" href="#15-storage-key-collisions">1.5 Storage Key Collisions</a></h3>
 <p>Using short, generic keys increases the risk of collisions between different data items, especially after contract upgrades.</p>
 <p><strong>Vulnerable:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Both "bal" keys might clash if multiple features share the same namespace.
 env.storage().persistent().set(&amp;symbol_short!("bal"), &amp;amount);
 <span class="boring">}</span></code></pre>
 <p><strong>Secure:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -308,7 +309,7 @@ env.storage().persistent().set(&amp;DataKey::Balance(user.clone()), &amp;amount)
 <h3 id="16-improper-access-control-on-admin-functions"><a class="header" href="#16-improper-access-control-on-admin-functions">1.6 Improper Access Control on Admin Functions</a></h3>
 <p>Admin operations that don’t verify the caller is the stored admin allow privilege escalation.</p>
 <p><strong>Vulnerable:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_rate(env: Env, caller: Address, new_rate: u32) {
     caller.require_auth();
@@ -317,7 +318,7 @@ env.storage().persistent().set(&amp;DataKey::Balance(user.clone()), &amp;amount)
 }
 <span class="boring">}</span></code></pre>
 <p><strong>Secure:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn set_rate(env: Env, caller: Address, new_rate: u32) -&gt; Result&lt;(), Error&gt; {
     caller.require_auth();
@@ -337,7 +338,7 @@ env.storage().persistent().set(&amp;DataKey::Balance(user.clone()), &amp;amount)
 <h3 id="17-timestamp-dependence"><a class="header" href="#17-timestamp-dependence">1.7 Timestamp Dependence</a></h3>
 <p><code>env.ledger().timestamp()</code> returns the ledger close time, which validators can influence by a small amount. Do <strong>not</strong> use timestamps for high-precision timing or as a source of randomness.</p>
 <p><strong>Avoid:</strong></p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Validators can slightly shift this to force a particular outcome
 let won = env.ledger().timestamp() % 2 == 0;
@@ -347,7 +348,7 @@ let won = env.ledger().timestamp() % 2 == 0;
 <h2 id="2-secure-patterns"><a class="header" href="#2-secure-patterns">2. Secure Patterns</a></h2>
 <h3 id="21-checks-effects-interactions"><a class="header" href="#21-checks-effects-interactions">2.1 Checks-Effects-Interactions</a></h3>
 <p>Perform all authorization and state checks first, update storage next, and make external calls last. This is the Soroban equivalent of the Ethereum CEI pattern.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>pub fn flash_withdraw(
     env: Env,
@@ -374,7 +375,7 @@ let won = env.ledger().timestamp() % 2 == 0;
 <hr>
 <h3 id="22-principle-of-least-privilege"><a class="header" href="#22-principle-of-least-privilege">2.2 Principle of Least Privilege</a></h3>
 <p>Grant only the minimum access required. Prefer function-level authorization over blanket admin powers.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum Role {
@@ -411,7 +412,7 @@ pub fn pause(env: Env, pauser: Address) -&gt; Result&lt;(), Error&gt; {
 <hr>
 <h3 id="23-emergency-pause"><a class="header" href="#23-emergency-pause">2.3 Emergency Pause</a></h3>
 <p>Critical contracts should support a pause mechanism so an admin can halt operations while a vulnerability is investigated.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -449,7 +450,7 @@ pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -&gt; Result
 <hr>
 <h3 id="24-input-validation-at-boundaries"><a class="header" href="#24-input-validation-at-boundaries">2.4 Input Validation at Boundaries</a></h3>
 <p>Validate inputs as early as possible, ideally in a dedicated validation helper.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>fn validate_amount(amount: i128) -&gt; Result&lt;(), Error&gt; {
     if amount &lt;= 0 {
@@ -484,7 +485,7 @@ pub fn transfer(
 <hr>
 <h3 id="25-event-driven-auditability"><a class="header" href="#25-event-driven-auditability">2.5 Event-Driven Auditability</a></h3>
 <p>Every significant state change should emit an event. Events are the primary mechanism for off-chain monitoring and incident detection.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>const NS: Symbol = symbol_short!("token");
 const EV_XFER: Symbol = symbol_short!("transfer");
@@ -514,7 +515,7 @@ fn emit_admin_changed(env: &amp;Env, old: Address, new: Address) {
 <hr>
 <h3 id="26-safe-admin-transfer-two-step"><a class="header" href="#26-safe-admin-transfer-two-step">2.6 Safe Admin Transfer (Two-Step)</a></h3>
 <p>A one-step admin transfer can lock the contract forever if the wrong address is supplied. Use a two-step pattern.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracttype]
 pub enum DataKey {
@@ -603,7 +604,7 @@ pub fn accept_admin(env: Env, new_admin: Address) -&gt; Result&lt;(), Error&gt; 
 <h2 id="4-real-world-examples"><a class="header" href="#4-real-world-examples">4. Real-World Examples</a></h2>
 <h3 id="example-a-secure-token-transfer"><a class="header" href="#example-a-secure-token-transfer">Example A: Secure Token Transfer</a></h3>
 <p>The following combines authorization, checked arithmetic, input validation, and event emission in a single function — the pattern used in <code>examples/tokens/01-sep41-token</code>.</p>
-<pre class="playground"><code class="language-rust"><span class="boring">#![allow(unused)]
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>#[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -736,6 +737,8 @@ pub fn transfer(
         <script src="../book-609e4cb8.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
 
 
 
