@@ -44,13 +44,15 @@ Before you integrate wallets into a Soroban app, make sure your development envi
 For a JavaScript or TypeScript frontend, you will typically need:
 
 ```bash
-npm install @stellar/stellar-sdk
+npm install @stellar/stellar-sdk@^12.0.0
 ```
+
+> **Note:** The standalone `soroban-client` package is deprecated. All Soroban RPC functionality (`rpc.Server`, simulation, contract invocation) is now part of `@stellar/stellar-sdk` v12 and later. If an older guide tells you to `npm install soroban-client`, use the unified SDK instead.
 
 If you are using Freighter-style browser APIs, install the wallet SDK that matches your target wallet:
 
 ```bash
-npm install @stellar/freighter-api
+npm install @stellar/freighter-api@^4.0.0
 ```
 
 ### Environment setup
@@ -146,16 +148,16 @@ The examples below are intentionally simple and follow the same mental model acr
 ### Connecting a wallet
 
 ```ts
-import { requestAccess, getAddress } from "@stellar/freighter-api";
+import { requestAccess } from "@stellar/freighter-api";
 
+// Freighter v4+ resolves `requestAccess` to an object with the granted
+// address and an optional error field.
 async function connectWallet() {
-  const allowed = await requestAccess();
-  if (!allowed) {
-    throw new Error("Wallet access denied by the user");
+  const access = await requestAccess();
+  if (access.error || !access.address) {
+    throw new Error(`Wallet access denied: ${access.error ?? "no address returned"}`);
   }
-
-  const address = await getAddress();
-  return address;
+  return access.address;
 }
 ```
 
@@ -178,7 +180,11 @@ async function getConnectionStatus() {
 import { signTransaction } from "@stellar/freighter-api";
 
 async function signSorobanTx(xdr: string) {
-  const signedXdr = await signTransaction(xdr, { network: "TESTNET" });
+  // Freighter v4+ keys signing options on `networkPassphrase` (or `network`).
+  // Prefer the explicit passphrase.
+  const signedXdr = await signTransaction(xdr, {
+    networkPassphrase: Networks.TESTNET
+  });
   return signedXdr;
 }
 ```
@@ -186,10 +192,13 @@ async function signSorobanTx(xdr: string) {
 ### Submitting a transaction
 
 ```ts
-import { Server, TransactionBuilder, Networks } from "@stellar/stellar-sdk";
+import { rpc, TransactionBuilder, Networks } from "@stellar/stellar-sdk";
 
 async function submitTransaction(signedXdr: string) {
-  const server = new Server("https://soroban-testnet.stellar.org");
+  // In SDK v12+, the Soroban RPC client lives under the `rpc` namespace.
+  // The root-level `Server` export (and the separate `soroban-client`
+  // package) are deprecated.
+  const server = new rpc.Server("https://soroban-testnet.stellar.org");
   const tx = TransactionBuilder.fromXDR(signedXdr, Networks.TESTNET);
   const result = await server.sendTransaction(tx);
   return result;
@@ -235,38 +244,45 @@ The following example demonstrates a complete flow: connecting the wallet, build
 ```ts
 import {
   requestAccess,
-  getAddress,
   signTransaction
 } from "@stellar/freighter-api";
 import {
-  Server,
+  rpc,
   TransactionBuilder,
   Networks,
-  Address,
-  Contract
+  Contract,
+  nativeToScVal,
+  Address as SdkAddress
 } from "@stellar/stellar-sdk";
 
-async function runExampleWorkflow(contractId: string, method: string, args: any[]) {
+async function runExampleWorkflow(contractId: string, method: string, args: unknown[]) {
   try {
     // 1. Connect Wallet
-    const allowed = await requestAccess();
-    if (!allowed) throw new Error("Wallet access denied");
-    const userAddress = await getAddress();
+    const access = await requestAccess();
+    if (access.error || !access.address) throw new Error("Wallet access denied");
+    const userAddress = access.address;
 
-    // 2. Initialize Server and Network
-    const server = new Server("https://soroban-testnet.stellar.org");
+    // 2. Initialize Server and Network (SDK v12+ uses the `rpc` namespace)
+    const server = new rpc.Server("https://soroban-testnet.stellar.org");
     const networkPassphrase = Networks.TESTNET;
 
     // 3. Fetch Account Details
     const account = await server.getAccount(userAddress);
 
-    // 4. Build Contract Invocation
+    // 4. Convert arguments to Soroban values and build the invocation.
+    // Contract methods accept ScVal arguments, so convert plain JS values
+    // with nativeToScVal (or build Address/ScInt objects directly).
+    const scArgs = args.map((arg) =>
+      typeof arg === "string" && arg.startsWith("G")
+        ? new SdkAddress(arg).toScVal()
+        : nativeToScVal(arg)
+    );
     const contract = new Contract(contractId);
     let tx = new TransactionBuilder(account, {
       fee: "100", // Placeholder fee, will be updated during preparation
       networkPassphrase,
     })
-    .addOperation(contract.call(method, ...args))
+    .addOperation(contract.call(method, ...scArgs))
     .setTimeout(30)
     .build();
 
@@ -275,8 +291,10 @@ async function runExampleWorkflow(contractId: string, method: string, args: any[
     tx = await server.prepareTransaction(tx);
 
     // 6. Sign Transaction
+    // Freighter v4+ accepts either `networkPassphrase` or `network`; prefer
+    // the passphrase so there is no ambiguity about which network is used.
     const signedXdr = await signTransaction(tx.toXDR(), {
-      network: "TESTNET"
+      networkPassphrase: Networks.TESTNET
     });
 
     // 7. Submit Transaction
@@ -397,6 +415,7 @@ If you are building a frontend test suite, mock the wallet provider interface in
 - [Stellar Developer Documentation](https://developers.stellar.org/)
 - [Soroban Documentation](https://developers.stellar.org/docs/smart-contracts)
 - [Soroban Rust SDK](https://docs.rs/soroban-sdk/)
+- [Stellar JavaScript SDK (@stellar/stellar-sdk)](https://www.npmjs.com/package/@stellar/stellar-sdk)
 - [Freighter Documentation](https://www.freighter.app/)
 - [xBull Wallet Documentation](https://xbull.app/)
 - [Albedo Documentation](https://albedo.link/)

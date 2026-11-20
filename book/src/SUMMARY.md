@@ -112,7 +112,7 @@
 - [11 · Automatic Snapshot Triggers](./examples/governance/11-automatic-snapshot-triggers.md)
 
 
-## Tokens (9 examples)
+## Tokens (10 examples)
 - [Overview](./examples/tokens.md)
 - [Token Security Checklist](./docs/token-security-checklist.md)
 - [01 Â· SEP-41 Token](./examples/tokens/01-sep41-token.md)
@@ -124,6 +124,7 @@
 - [07 Â· Token Metadata](./examples/tokens/07-token-metadata.md)
 - [08 Â· Multi-Token Balance Manager](./examples/tokens/08-multi-token-balance-manager.md)
 - [09 Â· Optimized Token Ops](./examples/tokens/09-optimized-token-ops.md)
+- [11 · Authorized Token](./examples/tokens/11-authorized-token.md)
 
 # Analytics
 

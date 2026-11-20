@@ -180,6 +180,7 @@ members = [
     "examples/defi/05-flash-loans",
     "examples/defi/06-flash-loan-use-cases",
     "examples/tokens/10-automatic-snapshot-triggers",
+    "examples/tokens/11-authorized-token",
 ]
 
 [workspace.package]

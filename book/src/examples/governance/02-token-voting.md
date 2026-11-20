@@ -14,3 +14,4 @@ cargo test
 
 - [Governance Overview](../governance.md)
 - [01 · Simple Voting](./01-simple-voting.md)
+- [Frontend / TypeScript Testing](../../docs/testing-best-practices.md#frontend--typescript-testing) — generate token-voting TypeScript bindings and mock the RPC layer in Jest/Vitest

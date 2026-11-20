@@ -39,4 +39,8 @@ Swap in `02-token-voting`, `06-vote-delegation`, or `09-timelock-governance` to 
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)
 
+## Testing
+
+Building a frontend or TypeScript bindings for these governance contracts? See the [Frontend / TypeScript Testing](../docs/testing-best-practices.md#frontend--typescript-testing) section for `soroban-spec-typescript` client generation, Jest/Vitest tests, and RPC mocking.
+
 ## Next: [Tokens](../tokens.md)
