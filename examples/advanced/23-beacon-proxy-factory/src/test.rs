@@ -9,7 +9,7 @@
 //! | 2 | `test_proxy_binds_to_beacon` | Deployed proxy resolves implementation via shared beacon |
 //! | 3 | `test_proxy_delegates_arithmetic` | Proxy delegates `add`/`sub` correctly |
 //! | 4 | `test_deploy_multiple_proxies_shared_beacon` | Multiple proxies all share the same beacon |
-//! | 5 | `test_upgrade_beacon_propagates_to_all_proxies` | `upgrade` updates every proxy atomically (O(1)) |
+//! | 5 | `test_upgrade_beacon_propagates_to_all_proxies` | An executed upgrade updates every proxy atomically (O(1)) |
 //! | 6 | `test_mul_available_after_upgrade` | v2's `mul` accessible through all proxies after upgrade |
 //! | 7 | `test_upgrade_beacon_unauthorized` | Non-admin cannot upgrade the beacon |
 //! | 8 | `test_beacon_double_init_panics` | Second beacon `init` is rejected |
@@ -25,13 +25,26 @@
 //! | 18 | `test_v1_functions_work_with_multiple_proxies` | All proxies delegate v1 functions correctly |
 //! | 19 | `test_upgrade_then_rollback_via_upgrade` | Upgrade + rollback-via-upgrade increments version correctly |
 //! | 20 | `test_proxy_set_beacon_unauthorized` | Only proxy admin can call `set_beacon` |
+//! | 21 | `test_staged_upgrade_not_active_until_executed` | Staging does not change the live implementation |
+//! | 22 | `test_execute_upgrade_before_timelock_panics` | Execution is blocked until the timelock expires |
+//! | 23 | `test_stage_then_cancel_upgrade` | A staged upgrade can be cancelled and never applies |
+//! | 24 | `test_execute_without_staged_upgrade_panics` | Nothing to execute after cancel |
+//! | 25 | `test_stage_twice_panics` | Only one upgrade can be staged at a time |
+//! | 26 | `test_custom_upgrade_delay` | Timelock delay is configurable |
+//! | 27 | `test_set_delay_while_staged_panics` | Delay cannot change while an upgrade is pending |
+//! | 28 | `test_cancel_upgrade_unauthorized` | Non-admin cannot cancel a staged upgrade |
 
 #![cfg(test)]
 
 extern crate std;
 
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env};
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, Ledger},
+    Address, Env, Symbol,
+};
 
+use crate::beacon::DEFAULT_UPGRADE_DELAY;
 use crate::{
     BeaconContract, BeaconContractClient, BeaconProxyFactory, BeaconProxyFactoryClient, ImplV1,
     ImplV2, ProxyContract, ProxyContractClient,
@@ -82,6 +95,23 @@ fn make_proxy<'a>(env: &'a Env, admin: &Address, beacon: &Address) -> ProxyContr
     let client = ProxyContractClient::new(env, &addr);
     client.init(admin, beacon);
     client
+}
+
+/// Advance the ledger timestamp by `seconds`.
+fn advance_time(env: &Env, seconds: u64) {
+    env.ledger().with_mut(|l| l.timestamp += seconds);
+}
+
+/// Stage an upgrade, wait out the timelock, and execute it.
+fn stage_and_execute(
+    env: &Env,
+    beacon: &BeaconContractClient,
+    new_implementation: &Address,
+    label: &Symbol,
+) {
+    beacon.stage_upgrade(new_implementation, label);
+    advance_time(env, beacon.get_upgrade_delay());
+    beacon.execute_upgrade();
 }
 
 // ---------------------------------------------------------------------------
@@ -159,8 +189,8 @@ fn test_upgrade_beacon_propagates_to_all_proxies() {
         assert_eq!(p.get_implementation(), f.impl_v1_addr);
     }
 
-    // Single beacon upgrade — O(1) regardless of proxy count.
-    beacon.upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    // Single beacon upgrade (stage + execute) — O(1) regardless of proxy count.
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
 
     // All 5 proxies now see v2 with no per-proxy write.
     for p in &proxies {
@@ -179,7 +209,7 @@ fn test_mul_available_after_upgrade() {
     let proxy_a = make_proxy(&f.env, &f.admin, &f.beacon_addr);
     let proxy_b = make_proxy(&f.env, &f.admin, &f.beacon_addr);
 
-    beacon.upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
 
     assert_eq!(proxy_a.mul(&6_i128, &7_i128), 42_i128);
     assert_eq!(proxy_b.mul(&3_i128, &3_i128), 9_i128);
@@ -201,9 +231,9 @@ fn test_upgrade_beacon_unauthorized() {
     env.mock_all_auths();
     BeaconContractClient::new(&env, &beacon_addr).init(&admin, &impl_v1_addr, &symbol_short!("v1"));
 
-    // Strip all auths — upgrade should fail.
+    // Strip all auths — staging an upgrade should fail.
     env.set_auths(&[]);
-    BeaconContractClient::new(&env, &beacon_addr).upgrade(&impl_v2_addr, &symbol_short!("v2"));
+    BeaconContractClient::new(&env, &beacon_addr).stage_upgrade(&impl_v2_addr, &symbol_short!("v2"));
 }
 
 // ---------------------------------------------------------------------------
@@ -312,7 +342,7 @@ fn test_beacon_version_history() {
     let f = make_fixture();
     let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
 
-    beacon.upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
 
     let v1_entry = beacon.get_version_entry(&1u32);
     let v2_entry = beacon.get_version_entry(&2u32);
@@ -385,7 +415,7 @@ fn test_single_upgrade_updates_n_proxies() {
     }
 
     // One upgrade call.
-    beacon.upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
 
     // Version counter is 2 — only a single state-write to the beacon.
     assert_eq!(beacon.get_version(), 2u32);
@@ -434,12 +464,12 @@ fn test_upgrade_then_rollback_via_upgrade() {
     let proxy = make_proxy(&f.env, &f.admin, &f.beacon_addr);
 
     // Upgrade v1 → v2.
-    beacon.upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
     assert_eq!(proxy.get_implementation(), f.impl_v2_addr);
     assert_eq!(beacon.get_version(), 2u32);
 
     // Rollback by upgrading back to v1 (version 3).
-    beacon.upgrade(&f.impl_v1_addr, &symbol_short!("v1b"));
+    stage_and_execute(&f.env, &beacon, &f.impl_v1_addr, &symbol_short!("v1b"));
     assert_eq!(proxy.get_implementation(), f.impl_v1_addr);
     assert_eq!(beacon.get_version(), 3u32);
 }
@@ -481,4 +511,146 @@ fn test_factory_rejects_oversized_batch() {
     let factory_addr = env.register(BeaconProxyFactory, ());
     BeaconProxyFactoryClient::new(&env, &factory_addr)
         .batch_deploy(&Address::generate(&env), &11u32);
+}
+
+// ---------------------------------------------------------------------------
+// Test 21 — A staged upgrade does not change the live implementation
+// ---------------------------------------------------------------------------
+#[test]
+fn test_staged_upgrade_not_active_until_executed() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+    let proxy = make_proxy(&f.env, &f.admin, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+
+    let pending = beacon.get_pending_upgrade().unwrap();
+    assert_eq!(pending.implementation, f.impl_v2_addr);
+    assert_eq!(
+        pending.execute_after,
+        f.env.ledger().timestamp() + DEFAULT_UPGRADE_DELAY
+    );
+
+    // Still on v1 while the upgrade is only staged.
+    assert_eq!(proxy.get_implementation(), f.impl_v1_addr);
+    assert_eq!(beacon.get_version(), 1u32);
+
+    advance_time(&f.env, DEFAULT_UPGRADE_DELAY);
+    beacon.execute_upgrade();
+
+    assert_eq!(proxy.get_implementation(), f.impl_v2_addr);
+    assert_eq!(beacon.get_version(), 2u32);
+    assert_eq!(beacon.get_pending_upgrade(), None);
+}
+
+// ---------------------------------------------------------------------------
+// Test 22 — Executing before the timelock expires panics
+// ---------------------------------------------------------------------------
+#[test]
+#[should_panic(expected = "Upgrade timelock not expired")]
+fn test_execute_upgrade_before_timelock_panics() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    advance_time(&f.env, DEFAULT_UPGRADE_DELAY - 1);
+    beacon.execute_upgrade();
+}
+
+// ---------------------------------------------------------------------------
+// Test 23 — Stage then cancel: the upgrade never applies
+// ---------------------------------------------------------------------------
+#[test]
+fn test_stage_then_cancel_upgrade() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+    let proxy = make_proxy(&f.env, &f.admin, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    beacon.cancel_upgrade();
+
+    assert_eq!(beacon.get_pending_upgrade(), None);
+
+    advance_time(&f.env, DEFAULT_UPGRADE_DELAY);
+    assert_eq!(proxy.get_implementation(), f.impl_v1_addr);
+    assert_eq!(beacon.get_version(), 1u32);
+
+    // A new upgrade can be staged after cancelling.
+    stage_and_execute(&f.env, &beacon, &f.impl_v2_addr, &symbol_short!("v2"));
+    assert_eq!(proxy.get_implementation(), f.impl_v2_addr);
+}
+
+// ---------------------------------------------------------------------------
+// Test 24 — Executing after a cancel panics
+// ---------------------------------------------------------------------------
+#[test]
+#[should_panic(expected = "No upgrade staged")]
+fn test_execute_without_staged_upgrade_panics() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    beacon.cancel_upgrade();
+    advance_time(&f.env, DEFAULT_UPGRADE_DELAY);
+    beacon.execute_upgrade();
+}
+
+// ---------------------------------------------------------------------------
+// Test 25 — Only one upgrade can be staged at a time
+// ---------------------------------------------------------------------------
+#[test]
+#[should_panic(expected = "Upgrade already staged")]
+fn test_stage_twice_panics() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    beacon.stage_upgrade(&f.impl_v1_addr, &symbol_short!("v1b"));
+}
+
+// ---------------------------------------------------------------------------
+// Test 26 — The timelock delay is configurable
+// ---------------------------------------------------------------------------
+#[test]
+fn test_custom_upgrade_delay() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    assert_eq!(beacon.get_upgrade_delay(), DEFAULT_UPGRADE_DELAY);
+    beacon.set_upgrade_delay(&3_600u64);
+    assert_eq!(beacon.get_upgrade_delay(), 3_600u64);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    advance_time(&f.env, 3_600);
+    beacon.execute_upgrade();
+
+    assert_eq!(beacon.get_implementation(), f.impl_v2_addr);
+}
+
+// ---------------------------------------------------------------------------
+// Test 27 — The delay cannot change while an upgrade is staged
+// ---------------------------------------------------------------------------
+#[test]
+#[should_panic(expected = "Upgrade already staged")]
+fn test_set_delay_while_staged_panics() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+    beacon.set_upgrade_delay(&0u64);
+}
+
+// ---------------------------------------------------------------------------
+// Test 28 — Non-admin cannot cancel a staged upgrade
+// ---------------------------------------------------------------------------
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn test_cancel_upgrade_unauthorized() {
+    let f = make_fixture();
+    let beacon = BeaconContractClient::new(&f.env, &f.beacon_addr);
+
+    beacon.stage_upgrade(&f.impl_v2_addr, &symbol_short!("v2"));
+
+    f.env.set_auths(&[]);
+    beacon.cancel_upgrade();
 }

@@ -51,11 +51,20 @@ proxy.add(1, 2)
 
 ### Batch upgrades (O(1) cost)
 
-Upgrading the beacon propagates to every proxy simultaneously:
+Upgrading the beacon propagates to every proxy simultaneously. Upgrades use a
+two-step commitment with a timelock (24 hours by default, configurable with
+`set_beacon_upgrade_delay`), so a wrong implementation address can be caught and
+cancelled before it reaches every proxy:
 
 ```rust
-// One call atomically upgrades all N deployed proxies.
-factory.upgrade_beacon(&new_implementation, &label);
+// Step 1: stage the upgrade — proxies keep using the current implementation.
+factory.stage_beacon_upgrade(&new_implementation, &label);
+
+// Optional: abort during the timelock window.
+// factory.cancel_beacon_upgrade();
+
+// Step 2: after the delay, one call atomically upgrades all N deployed proxies.
+factory.execute_beacon_upgrade();
 ```
 
 Compare this with a per-proxy upgrade pattern which would require O(N) transactions.
@@ -152,6 +161,14 @@ cargo test -p beacon-proxy-factory
 | 18 | `test_v1_functions_work_with_multiple_proxies` | Deploy multiple proxies |
 | 19 | `test_upgrade_then_rollback_via_upgrade` | Batch upgrades / rollback |
 | 20 | `test_proxy_set_beacon_unauthorized` | Security |
+| 21 | `test_staged_upgrade_not_active_until_executed` | Two-step upgrade (commit-execute) |
+| 22 | `test_execute_upgrade_before_timelock_panics` | Upgrade timelock |
+| 23 | `test_stage_then_cancel_upgrade` | Two-step upgrade (commit-cancel) |
+| 24 | `test_execute_without_staged_upgrade_panics` | Guard rails |
+| 25 | `test_stage_twice_panics` | Guard rails |
+| 26 | `test_custom_upgrade_delay` | Configurable timelock |
+| 27 | `test_set_delay_while_staged_panics` | Upgrade timelock |
+| 28 | `test_cancel_upgrade_unauthorized` | Security |
 
 ## Related examples
 

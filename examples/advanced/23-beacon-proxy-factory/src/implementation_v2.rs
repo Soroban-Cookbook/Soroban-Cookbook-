@@ -3,7 +3,7 @@
 //!
 //! Extends v1 with multiplication (`mul`) and a `reset` function that clears the
 //! counter. Used to demonstrate **upgrade propagation** through the factory:
-//! after calling `BeaconProxyFactory::upgrade_beacon`, all factory-deployed proxies
+//! after calling `BeaconProxyFactory::execute_beacon_upgrade`, all factory-deployed proxies
 //! immediately gain access to `mul` and `reset` without any per-proxy state change.
 //!
 //! ## Storage
