@@ -125,6 +125,7 @@ A progression from basic oracle producers through aggregation to consumer patter
 - [`38-diamond-pattern`](./38-diamond-pattern/) — **Canonical diamond pattern** (EIP-2535) with full diamond-cut and diamond-loupe introspection
 - [`39-batch-operations`](./39-batch-operations/) — Batch call interface with atomic rollback
 - [`43-payment-channels`](./43-payment-channels/) — Specialized payment channels for two-party transactions (See [State Channels learning path](#state-channels--payment-channels))
+- [`44-off-chain-signatures`](./44-off-chain-signatures/) — Verify ed25519 and Ethereum (secp256k1) signatures from non-Stellar keys, with domain separation and nonce-based replay protection
 - [`09-fuzz-testing`](./09-fuzz-testing/) — Fuzzable claimable-balance contract with property tests and cargo-fuzz targets
 - [`09-storage-optimization`](./09-storage-optimization/) — Packed storage, lazy loading, and batch operations
 - [`10-contract-migrations`](./10-contract-migrations/) — Batched v1→v2 storage migration with dual-read and version gates
