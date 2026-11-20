@@ -40,6 +40,7 @@ pub enum TokenError {
     InvalidAmount = 5,
     ArithmeticOverflow = 6,
     AllowanceExceeded = 7,
+    InvalidTransfer = 8,
 }
 
 const EVENT_NAMESPACE: Symbol = symbol_short!("events");
@@ -86,6 +87,7 @@ impl Sep41Token {
     /// Transfer tokens from one account to another.
     pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -> Result<(), TokenError> {
         from.require_auth();
+        require_distinct(&from, &to)?;
         ensure_initialized(&env)?;
         require_positive(amount)?;
 
@@ -141,6 +143,7 @@ impl Sep41Token {
         amount: i128,
     ) -> Result<(), TokenError> {
         spender.require_auth();
+        require_distinct(&owner, &to)?;
         require_positive(amount)?;
         ensure_initialized(&env)?;
 
@@ -277,6 +280,15 @@ fn publish_approval(env: &Env, owner: Address, spender: Address, amount: i128) {
         (EVENT_NAMESPACE, EVENT_APPROVE, owner, spender),
         ApprovalEventData { amount },
     );
+}
+
+/// Reject self-transfers, which would move no tokens (and, for
+/// `transfer_from`, burn allowance without any net movement).
+fn require_distinct(from: &Address, to: &Address) -> Result<(), TokenError> {
+    if from == to {
+        return Err(TokenError::InvalidTransfer);
+    }
+    Ok(())
 }
 
 fn require_positive(amount: i128) -> Result<(), TokenError> {
