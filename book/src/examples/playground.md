@@ -5,6 +5,72 @@ a self-contained Rust crate you can clone, modify, and test in minutes.
 
 ---
 
+## Try It Online (No Local Setup)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Soroban-Cookbook/Soroban-Cookbook-?quickstart=1)
+
+The button opens the cookbook in a GitHub Codespace, a full VS Code editor and
+terminal in your browser with Rust preinstalled. The repository is already
+checked out, so the Hello World example is ready at
+`examples/basics/01-hello-world`. A free GitHub account is required.
+
+**1. Run the Hello World example**
+
+In the Codespace terminal:
+
+```bash
+cd examples/basics/01-hello-world
+cargo test
+```
+
+**2. Modify it**
+
+Open `examples/basics/01-hello-world/src/lib.rs`, change
+`symbol_short!("Hello")` to `symbol_short!("Hola")`, and run `cargo test`
+again. Update the expected value in the tests until they pass.
+
+**3. Redeploy it to testnet**
+
+```bash
+# One-time setup inside the Codespace
+cargo install --locked soroban-cli
+soroban keys generate alice --network testnet
+soroban keys fund alice --network testnet
+
+# Build and deploy your modified contract
+cargo build --target wasm32-unknown-unknown --release
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm ../../../target/wasm32-unknown-unknown/release/hello_world.wasm \
+  --source alice \
+  --network testnet)
+
+# Call it
+soroban contract invoke --id $CONTRACT_ID --source alice --network testnet \
+  -- hello --to World
+```
+
+Every time you edit `src/lib.rs`, repeat the build and deploy commands to get
+a new contract ID running your latest code.
+
+**4. Invoke it from the browser**
+
+Paste the contract ID into [Stellar Lab](https://lab.stellar.org) (select
+**Testnet**) to inspect the contract and call `hello` from a web form.
+
+### On a phone or tablet
+
+Codespaces runs in mobile browsers, but editing and using the terminal on a
+small screen is awkward. On mobile you can instead:
+
+- Read the contract source on GitHub:
+  [`examples/basics/01-hello-world/src/lib.rs`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/basics/01-hello-world/src/lib.rs)
+- Use [Stellar Lab](https://lab.stellar.org), which works in mobile browsers,
+  to call a deployed contract by its contract ID.
+- Follow the [Hello World tutorial](../guides/playground-tutorial-01-hello-world.md)
+  and run the examples later on a desktop.
+
+---
+
 ## How to Use This Playground
 
 ### Prerequisites
