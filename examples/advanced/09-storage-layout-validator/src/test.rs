@@ -13,7 +13,11 @@ fn setup() -> (Env, StorageLayoutValidatorClient<'static>) {
 
 fn field(env: &Env, key: Symbol, field_type: FieldType) -> FieldDef {
     let _ = env;
-    FieldDef { key, field_type }
+    FieldDef { key, field_type, required: true }
+}
+
+fn optional_field(key: Symbol, field_type: FieldType) -> FieldDef {
+    FieldDef { key, field_type, required: false }
 }
 
 fn layout(env: &Env, version: u32, fields: Vec<FieldDef>) -> StorageLayout {
@@ -192,6 +196,55 @@ fn test_malformed_next_layout() {
     assert_eq!(
         client.try_validate(&current, &next),
         Err(Ok(LayoutError::MalformedLayout))
+    );
+}
+
+#[test]
+fn test_expected_schema_version_detects_migration_mismatch() {
+    let (env, client) = setup();
+    let current = layout(&env, 2, Vec::new(&env));
+    let next = layout(&env, 3, Vec::new(&env));
+
+    assert_eq!(
+        client.try_validate_layout(&1, &current, &next),
+        Err(Ok(LayoutError::SchemaVersionMismatch))
+    );
+}
+
+#[test]
+fn test_missing_required_key_is_typed_error_and_optional_key_can_be_removed() {
+    let (env, client) = setup();
+    let current = layout(
+        &env,
+        1,
+        Vec::from_array(
+            &env,
+            [
+                field(&env, symbol_short!("needed"), FieldType::U32),
+                optional_field(symbol_short!("legacy"), FieldType::Symbol),
+            ],
+        ),
+    );
+    let next = layout(&env, 2, Vec::new(&env));
+
+    assert_eq!(
+        client.try_validate_layout(&1, &current, &next),
+        Err(Ok(LayoutError::MissingRequiredKey))
+    );
+
+    let optional_only = layout(
+        &env,
+        1,
+        Vec::from_array(&env, [optional_field(symbol_short!("legacy"), FieldType::Symbol)]),
+    );
+    let report = client
+        .try_validate_layout(&1, &optional_only, &next)
+        .unwrap()
+        .unwrap();
+    assert!(!report.compatible);
+    assert_eq!(
+        step_op(&report.steps, symbol_short!("legacy")),
+        Some(MigrationOp::Remove)
     );
 }
 

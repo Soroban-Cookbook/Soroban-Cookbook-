@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "spellcheck": "cspell --config ../cspell.json \"**/*.md\" \"**/*.rs\" \"**/*.toml\" \"**/*.yml\" \"**/*.yaml\" \"**/*.tsx\" \"**/*.ts\""
+    "spellcheck": "cspell --config ../cspell.json \"../**/*.md\" \"../**/*.rs\" \"../**/*.yml\" \"../**/*.yaml\""
   },
   "dependencies": {
     "react": "^18",

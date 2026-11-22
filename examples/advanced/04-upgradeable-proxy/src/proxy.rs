@@ -1,8 +1,17 @@
+//! Upgrade safety invariant: every WASM version must check the same persistent
+//! `initialized` storage key before initializing. Renaming this key in a new
+//! implementation makes the contract appear uninitialized and can let an
+//! attacker replace the admin. Keep the literal key stable across upgrades.
+
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Address, Env, IntoVal, Symbol};
 
 const ADMIN_KEY: Symbol = symbol_short!("admin");
 const IMPLEMENTATION_KEY: Symbol = symbol_short!("impl");
 const COUNTER_KEY: Symbol = symbol_short!("counter");
+
+fn initialized_key(env: &Env) -> Symbol {
+    Symbol::new(env, "initialized")
+}
 
 #[contract]
 pub struct ProxyContract;
@@ -10,10 +19,14 @@ pub struct ProxyContract;
 #[contractimpl]
 impl ProxyContract {
     pub fn init(env: Env, admin: Address, implementation: Address) {
-        if env.storage().persistent().has(&ADMIN_KEY) {
+        // This literal is a cross-version storage invariant. Do not replace it
+        // with a version-specific enum variant or rename it during upgrades.
+        let initialized = initialized_key(&env);
+        if env.storage().persistent().has(&initialized) {
             panic!("Already initialized");
         }
         admin.require_auth();
+        env.storage().persistent().set(&initialized, &true);
         env.storage().persistent().set(&ADMIN_KEY, &admin);
         env.storage()
             .persistent()

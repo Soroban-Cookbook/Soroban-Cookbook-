@@ -115,6 +115,41 @@ fn test_factory_cannot_be_reinitialized() {
 }
 
 #[test]
+fn test_deployment_fee_collection_and_admin_withdrawal() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let admin = Address::generate(&env);
+    let payer = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    let token_id = env
+        .register_stellar_asset_contract_v2(admin.clone())
+        .address();
+    let token_admin = soroban_sdk::token::StellarAssetClient::new(&env, &token_id);
+    let token = soroban_sdk::token::Client::new(&env, &token_id);
+    let factory_id = env.register(AjoFactory, ());
+    let factory = AjoFactoryClient::new(&env, &factory_id);
+    let fee = 25i128;
+    factory.initialize_with_fee(
+        &admin,
+        &BytesN::from_array(&env, &[9u8; 32]),
+        &token_id,
+        &fee,
+    );
+
+    token_admin.mint(&payer, &100);
+    token.approve(&payer, &factory_id, &fee, &(env.ledger().sequence() + 100));
+
+    // Run the same internal collection routine used by both deployment paths.
+    env.as_contract(&factory_id, || AjoFactory::collect_fee(&env, &payer).unwrap());
+    assert_eq!(token.balance(&payer), 75);
+    assert_eq!(token.balance(&factory_id), fee);
+
+    factory.withdraw_fees(&recipient, &fee);
+    assert_eq!(token.balance(&factory_id), 0);
+    assert_eq!(token.balance(&recipient), fee);
+}
+
+#[test]
 fn test_template_registration_rejects_duplicates() {
     let f = setup();
     let result = f

@@ -20,6 +20,8 @@ pub enum FieldType {
 pub struct FieldDef {
     pub key: Symbol,
     pub field_type: FieldType,
+    /// Whether removing this field makes a migration invalid.
+    pub required: bool,
 }
 
 /// A versioned storage-layout schema declared in code.
@@ -68,6 +70,10 @@ pub struct ValidationReport {
 pub enum LayoutError {
     /// Layout version is zero (or otherwise unusable).
     MalformedLayout = 1,
+    /// The current schema does not match the caller's expected version.
+    SchemaVersionMismatch = 2,
+    /// A required field from the current schema is absent in the next schema.
+    MissingRequiredKey = 3,
 }
 
 #[contract]
@@ -148,6 +154,31 @@ impl StorageLayoutValidator {
             collisions: Vec::new(&env),
             steps,
         })
+    }
+
+    /// Validate a migration against an explicitly expected current version.
+    /// Required fields may not disappear; optional fields can be removed.
+    pub fn validate_layout(
+        env: Env,
+        expected_version: u32,
+        current: StorageLayout,
+        next: StorageLayout,
+    ) -> Result<ValidationReport, LayoutError> {
+        if current.version != expected_version {
+            return Err(LayoutError::SchemaVersionMismatch);
+        }
+        if current.version == 0 || next.version == 0 {
+            return Err(LayoutError::MalformedLayout);
+        }
+
+        let missing_required = current.fields.iter().any(|field| {
+            field.required && find_field_type(&next.fields, &field.key).is_none()
+        });
+        if missing_required {
+            return Err(LayoutError::MissingRequiredKey);
+        }
+
+        Self::validate(env, current, next)
     }
 
     /// Return each duplicated field key exactly once, in first-seen order.
