@@ -32,6 +32,11 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 | [ADR-006](./006-guard-contract-upgrades.md) | Guard Contract Code Upgrades | Proposed |
 | [ADR-007](./007-version-state-migrations.md) | Version and Migrate Persistent State Explicitly | Proposed |
 >>>>>>> 8c99210 (Create Pattern Selection ADRs)
+| [ADR-008](./008-mdbook-documentation-platform.md) | Use mdBook for Documentation | Accepted |
+| [ADR-009](./009-workspace-structure-and-ci-exclusion.md) | Workspace Structure and CI Exclusion Mechanism | Accepted |
+| [ADR-010](./010-sdk-version-migration-strategy.md) | Soroban SDK Version Migration Strategy | Accepted |
+| [ADR-011](./011-code-coverage-toolchain.md) | Code Coverage Toolchain (tarpaulin + Codecov) | Accepted |
+| [ADR-012](./012-example-naming-convention.md) | Example Naming Convention (Numeric Prefixes) | Accepted |
 
 ## Creating a New ADR
 
