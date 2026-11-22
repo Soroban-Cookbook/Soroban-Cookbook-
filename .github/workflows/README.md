@@ -9,11 +9,32 @@ operations for the Soroban Cookbook.
 |---|---|---|---|
 | Test & Lint | `test.yml` | `push`, `pull_request` | Rust fmt, Clippy, tests, WASM build |
 | Security Audit | `security-audit.yml` | Schedule (weekly) | `cargo audit` for known CVEs |
-| Deploy Docs | `deploy-docs.yml` | Push to `main` | mdBook → GitHub Pages |
+| Deploy Docs | `deploy-docs.yml` | Push to `main` | Internal link check, then mdBook → GitHub Pages |
+| Docs Quality | `docs-quality.yml` | `push`/`pull_request` on docs paths, weekly | Internal links (blocking), external links (warning only), mdBook build |
 | Dependabot Auto-merge | `dependabot-auto-merge.yml` | Dependabot PRs | Auto-merge patch updates |
 | Fuzz | `fuzz.yml` | Schedule | Fuzz testing of contract inputs |
 | **Community Metrics** | `community-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect engagement/health data |
 | **Documentation Metrics** | `documentation-metrics.yml` | Schedule (weekly, Mon 09:00 UTC) | Collect page views, search queries, user paths |
+
+## Docs Quality Workflow
+
+`docs-quality.yml` keeps links in the book from rotting:
+
+- **Internal links** are checked by `scripts/check_book_links.py`. Any relative
+  link to a missing file, or a `SUMMARY.md` entry pointing at a missing
+  chapter, fails the job. Run it locally before pushing:
+
+  ```bash
+  python3 scripts/check_book_links.py --baseline book/linkcheck-baseline.txt
+  ```
+
+  `book/linkcheck-baseline.txt` lists older broken links that are still being
+  cleaned up. They show as warnings. Remove entries as you fix them; do not add
+  new ones.
+- **External links** are checked with [lychee](https://github.com/lycheeverse/lychee).
+  Failures only produce a warning so an outside outage never blocks CI or
+  deployment.
+- **Book build** runs `mdbook build` on the pull request.
 
 ## Community Metrics Workflow
 
