@@ -11,7 +11,7 @@
 //! This example focuses purely on the allowance lifecycle:
 //!
 //! * [`approve`](AllowancePattern::approve) — grant a spender an allowance that
-//!   is valid up to and including an `expiration_ledger`.
+//!   is valid up to and including an `expiration_timestamp`.
 //! * [`transfer_from`](AllowancePattern::transfer_from) — let the spender draw
 //!   down the allowance, moving tokens out of the owner's balance.
 //! * [`allowance`](AllowancePattern::allowance) — query the *spendable*
@@ -22,9 +22,10 @@
 //!
 //! A bare `(owner, spender) -> amount` mapping never forgets. A forgotten,
 //! still-live approval is a classic source of token drains. Following the
-//! Soroban/SEP-41 convention, every allowance carries an `expiration_ledger`;
-//! once the ledger sequence passes it, the allowance is treated as `0` even if
-//! a stale amount is still in storage.
+//! SEP-41 convention, expiry is a Unix timestamp in seconds (not a ledger
+//! sequence number): every allowance carries an `expiration_timestamp`, and
+//! once `env.ledger().timestamp()` passes it the allowance is treated as `0`
+//! even if a stale amount is still in storage.
 //!
 //! ## Edge cases handled
 //!
@@ -34,7 +35,7 @@
 //! * Expired allowances are spendable as `0` without needing a clean-up call.
 //! * `transfer_from` checks the allowance *and* the owner's balance, and uses
 //!   checked arithmetic on the recipient's balance.
-//! * Spending preserves the original expiration ledger of the allowance.
+//! * Spending preserves the original expiration timestamp of the allowance.
 
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, Address, Env,
@@ -52,13 +53,13 @@ pub enum DataKey {
     Allowance(Address, Address),
 }
 
-/// An allowance entry: how much `spender` may move, and the last ledger at
-/// which that permission is valid.
+/// An allowance entry: how much `spender` may move, and the Unix timestamp
+/// (seconds since epoch, per SEP-41) through which that permission is valid.
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct AllowanceValue {
     pub amount: i128,
-    pub expiration_ledger: u32,
+    pub expiration_timestamp: u64,
 }
 
 /// Event emitted by [`AllowancePattern::approve`] and [`AllowancePattern::revoke`].
@@ -68,7 +69,7 @@ pub struct ApproveEvent {
     pub owner: Address,
     pub spender: Address,
     pub amount: i128,
-    pub expiration_ledger: u32,
+    pub expiration_timestamp: u64,
 }
 
 /// Event emitted by [`AllowancePattern::transfer_from`].
@@ -91,7 +92,7 @@ pub enum AllowanceError {
     NotInitialized = 2,
     /// A negative (or, where required, non-positive) amount was supplied.
     InvalidAmount = 3,
-    /// A non-zero allowance was given an already-expired expiration ledger.
+    /// A non-zero allowance was given an already-expired expiration timestamp.
     InvalidExpiration = 4,
     /// `transfer_from` requested more than the spendable allowance.
     InsufficientAllowance = 5,
@@ -134,8 +135,10 @@ impl AllowancePattern {
     }
 
     /// Approve `spender` to move up to `amount` of `owner`'s tokens, valid
-    /// through `expiration_ledger`.
+    /// through `expiration_timestamp`.
     ///
+    /// Expiry follows the SEP-41 convention: a Unix timestamp in seconds,
+    /// compared against `env.ledger().timestamp()` (never the ledger sequence).
     /// Passing `amount == 0` clears the allowance (equivalent to
     /// [`revoke`](Self::revoke)). A non-zero allowance whose expiration is
     /// already in the past is rejected with [`AllowanceError::InvalidExpiration`].
@@ -144,7 +147,7 @@ impl AllowancePattern {
         owner: Address,
         spender: Address,
         amount: i128,
-        expiration_ledger: u32,
+        expiration_timestamp: u64,
     ) -> Result<(), AllowanceError> {
         owner.require_auth();
         ensure_initialized(&env)?;
@@ -154,12 +157,12 @@ impl AllowancePattern {
         }
         // A live allowance must not already be expired, otherwise it would be
         // unusable and only waste storage.
-        if amount > 0 && expiration_ledger < env.ledger().sequence() {
+        if amount > 0 && expiration_timestamp < env.ledger().timestamp() {
             return Err(AllowanceError::InvalidExpiration);
         }
 
-        write_allowance(&env, &owner, &spender, amount, expiration_ledger);
-        publish_approve(&env, owner, spender, amount, expiration_ledger);
+        write_allowance(&env, &owner, &spender, amount, expiration_timestamp);
+        publish_approve(&env, owner, spender, amount, expiration_timestamp);
 
         Ok(())
     }
@@ -205,7 +208,7 @@ impl AllowancePattern {
                 &owner,
                 &spender,
                 spendable - amount,
-                allowance.expiration_ledger,
+                allowance.expiration_timestamp,
             );
             publish_transfer(&env, owner, to, amount);
             return Ok(());
@@ -216,13 +219,13 @@ impl AllowancePattern {
             .checked_add(amount)
             .ok_or(AllowanceError::ArithmeticOverflow)?;
 
-        // Spend the allowance, keeping its original expiration ledger.
+        // Spend the allowance, keeping its original expiration timestamp.
         write_allowance(
             &env,
             &owner,
             &spender,
             spendable - amount,
-            allowance.expiration_ledger,
+            allowance.expiration_timestamp,
         );
         env.storage()
             .persistent()
@@ -242,7 +245,7 @@ impl AllowancePattern {
         effective_allowance(&env, &allowance)
     }
 
-    /// Return the raw allowance entry (amount and expiration ledger), without
+    /// Return the raw allowance entry (amount and expiration timestamp), without
     /// applying the expiration rule. Useful for inspection and tooling.
     pub fn allowance_details(env: Env, owner: Address, spender: Address) -> AllowanceValue {
         read_allowance(&env, &owner, &spender)
@@ -262,9 +265,10 @@ impl AllowancePattern {
     }
 }
 
-/// Collapse a stored allowance to its spendable amount, honoring expiration.
+/// Collapse a stored allowance to its spendable amount, honoring the SEP-41
+/// timestamp expiry.
 fn effective_allowance(env: &Env, allowance: &AllowanceValue) -> i128 {
-    if allowance.amount > 0 && allowance.expiration_ledger < env.ledger().sequence() {
+    if allowance.amount > 0 && allowance.expiration_timestamp < env.ledger().timestamp() {
         0
     } else {
         allowance.amount
@@ -277,7 +281,7 @@ fn read_allowance(env: &Env, owner: &Address, spender: &Address) -> AllowanceVal
         .get(&DataKey::Allowance(owner.clone(), spender.clone()))
         .unwrap_or(AllowanceValue {
             amount: 0,
-            expiration_ledger: 0,
+            expiration_timestamp: 0,
         })
 }
 
@@ -286,13 +290,13 @@ fn write_allowance(
     owner: &Address,
     spender: &Address,
     amount: i128,
-    expiration_ledger: u32,
+    expiration_timestamp: u64,
 ) {
     env.storage().persistent().set(
         &DataKey::Allowance(owner.clone(), spender.clone()),
         &AllowanceValue {
             amount,
-            expiration_ledger,
+            expiration_timestamp,
         },
     );
 }
@@ -324,13 +328,13 @@ fn publish_approve(
     owner: Address,
     spender: Address,
     amount: i128,
-    expiration_ledger: u32,
+    expiration_timestamp: u64,
 ) {
     ApproveEvent {
         owner,
         spender,
         amount,
-        expiration_ledger,
+        expiration_timestamp,
     }
     .publish(env);
 }

@@ -190,3 +190,33 @@ fn test_slippage_control() {
         &(env.ledger().timestamp() + 100),
     );
 }
+
+#[test]
+fn test_pool_count_beyond_640() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(AMMRouter, ());
+    let client = AMMRouterClient::new(&env, &contract_id);
+    client.initialize(&Address::generate(&env));
+
+    // 650 pools: a monolithic Map would exceed Soroban's 64 KiB per-entry
+    // limit around ~640 pools; individual persistent entries scale fine.
+    let base = Address::generate(&env);
+    let mut tokens: Vec<Address> = Vec::new(&env);
+    for _ in 0..650 {
+        tokens.push_back(Address::generate(&env));
+    }
+    for token in tokens.iter() {
+        client.add_pool(&Pool {
+            token_a: base.clone(),
+            token_b: token,
+            reserve_a: 1000,
+            reserve_b: 1000,
+        });
+    }
+
+    assert!(client.get_pool(&base, &tokens.get(0).unwrap()).is_some());
+    assert!(client.get_pool(&base, &tokens.get(324).unwrap()).is_some());
+    assert!(client.get_pool(&base, &tokens.get(649).unwrap()).is_some());
+    assert!(client.get_pool(&base, &Address::generate(&env)).is_none());
+}

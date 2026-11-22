@@ -456,3 +456,53 @@ fn test_non_admin_cannot_pause() {
     client.initialize(&admin, &collateral_token, &loan_token, &80, &85, &10, &50);
     client.set_emergency_pause(&attacker, &true);
 }
+
+#[test]
+fn test_per_token_ltv_configuration() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register(LendingContract, ());
+    let client = LendingContractClient::new(&env, &contract_id);
+    let (collateral_token, loan_token) = setup_tokens(&env, &contract_id);
+    let user = Address::generate(&env);
+    mint(&env, &collateral_token, &user, USER_FUNDS);
+
+    let admin = Address::generate(&env);
+    client.initialize(&admin, &collateral_token, &loan_token, &80, &85, &10, &50);
+
+    // Stablecoin-like collateral: 90% LTV, above the 80% default.
+    client.set_collateral_config(
+        &admin,
+        &collateral_token,
+        &CollateralConfig {
+            ltv_bps: 9_000,
+            liquidation_threshold_bps: 9_500,
+        },
+    );
+    client.deposit_collateral(&user, &1000);
+    client.borrow(&user, &850);
+    assert_eq!(client.get_position(&user).debt, 850);
+    assert_eq!(
+        client.get_collateral_config(&collateral_token),
+        CollateralConfig {
+            ltv_bps: 9_000,
+            liquidation_threshold_bps: 9_500,
+        }
+    );
+
+    // Long-tail collateral: 50% LTV caps fresh borrowing tightly.
+    client.set_collateral_config(
+        &admin,
+        &collateral_token,
+        &CollateralConfig {
+            ltv_bps: 5_000,
+            liquidation_threshold_bps: 6_000,
+        },
+    );
+    let user2 = Address::generate(&env);
+    mint(&env, &collateral_token, &user2, USER_FUNDS);
+    client.deposit_collateral(&user2, &1000);
+    assert!(client.try_borrow(&user2, &600).is_err());
+    client.borrow(&user2, &500);
+    assert_eq!(client.get_position(&user2).debt, 500);
+}
