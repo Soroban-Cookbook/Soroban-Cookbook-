@@ -37,6 +37,9 @@ jobs:
           - advanced_claimable_balance
           - advanced_timelock
           - advanced_multi_party_auth
+          - token_transfer
+          - amm_math
+          - merkle_verifier
     steps:
       - uses: actions/checkout@v7
 
@@ -47,6 +50,13 @@ jobs:
 
       - name: Install cargo-fuzz
         run: cargo install cargo-fuzz
+
+      - name: Replay committed regression seeds
+        if: matrix.target == 'token_transfer' || matrix.target == 'amm_math' || matrix.target == 'merkle_verifier'
+        run: |
+          for seed in tests/fuzz/corpus/${{ matrix.target }}/*; do
+            cargo +nightly fuzz run --fuzz-dir tests/fuzz ${{ matrix.target }} "$seed" -- -runs=1
+          done
 
       - name: Run ${{ matrix.target }} for 30 seconds
         run: |

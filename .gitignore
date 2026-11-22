@@ -37,7 +37,6 @@ coverage/
 *.profraw
 test_snapshots/
 tests/fuzz/artifacts/
-tests/fuzz/corpus/
 
 # Node / webapp
 webapp/node_modules/

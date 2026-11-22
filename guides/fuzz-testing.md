@@ -27,13 +27,20 @@ From the repository root, run a fuzz target (for example `example_fuzz`):
 cargo +nightly fuzz run --fuzz-dir tests/fuzz example_fuzz
 ```
 
-Advanced-example targets:
+Additional contract targets:
 
 ```bash
 cargo +nightly fuzz run --fuzz-dir tests/fuzz advanced_claimable_balance
 cargo +nightly fuzz run --fuzz-dir tests/fuzz advanced_timelock
 cargo +nightly fuzz run --fuzz-dir tests/fuzz advanced_multi_party_auth
+cargo +nightly fuzz run --fuzz-dir tests/fuzz token_transfer
+cargo +nightly fuzz run --fuzz-dir tests/fuzz amm_math
+cargo +nightly fuzz run --fuzz-dir tests/fuzz merkle_verifier
 ```
+
+Committed seeds live under `tests/fuzz/corpus/<target>/` and are replayed in CI
+before the time-limited fuzz run. When a failure is fixed, add the reproducing
+input to that target's corpus so later runs continue to check it.
 
 Property tests for the claimable-balance example (no nightly required):
 

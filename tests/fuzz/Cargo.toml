@@ -24,6 +24,15 @@ path = "../../examples/advanced/02-timelock"
 [dependencies.multi-party-auth]
 path = "../../examples/advanced/01-multi-party-auth"
 
+[dependencies.sep41-token]
+path = "../../examples/tokens/01-sep41-token"
+
+[dependencies.constant-product-amm]
+path = "../../examples/defi/02-constant-product-amm"
+
+[dependencies.merkle-proofs]
+path = "../../examples/advanced/21-merkle-proofs"
+
 [[bin]]
 name = "example_fuzz"
 path = "fuzz_targets/example_fuzz.rs"
@@ -45,5 +54,23 @@ doc = false
 [[bin]]
 name = "advanced_multi_party_auth"
 path = "fuzz_targets/advanced_multi_party_auth.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "token_transfer"
+path = "fuzz_targets/token_transfer.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "amm_math"
+path = "fuzz_targets/amm_math.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "merkle_verifier"
+path = "fuzz_targets/merkle_verifier.rs"
 test = false
 doc = false

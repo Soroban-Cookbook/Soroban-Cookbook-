@@ -26,13 +26,13 @@ The split matters: property tests are the ones that gate merges, because they ne
 | `tests/integration/tests/access_control_fuzz.rs` | 24 | adversarial | `authentication`, `role-based-access-control`, `rbac-modifiers`, `pause-unpause`, `registry-access-controls`, `proxy-admin`, `multi-sig-patterns`, `timelock`, `multi-party-auth` |
 | `tests/integration/tests/defi_fuzz_tests.rs` | 32 (29 properties + 3 regression) | property + boundary | `constant-product-amm`, `lending-pool`, `collateralized-lending` |
 | `examples/advanced/09-fuzz-testing` | 5 (4 unit + 1 property) | property | `fuzz-testing` (claimable balance) |
-| `tests/fuzz/fuzz_targets/` | 4 targets | coverage-guided | `hello-world`, `fuzz-testing`, `timelock`, `multi-party-auth` |
+| `tests/fuzz/fuzz_targets/` | 7 targets | coverage-guided | `hello-world`, `fuzz-testing`, `timelock`, `multi-party-auth`, `sep41-token`, `constant-product-amm`, `merkle-proofs` |
 
 **Generated cases per CI run.** `proptest` defaults to 256 cases per property, and the claimable-balance property pins 64:
 
 - `defi_fuzz_tests.rs` — 29 properties × 256 = **7,424 generated cases**
 - `09-fuzz-testing` — 1 property × 64 = **64 generated cases**
-- 4 libFuzzer targets × 30 s = **~2 minutes of coverage-guided exploration**
+- 7 libFuzzer targets × 30 s = **~3.5 minutes of coverage-guided exploration**
 
 Deterministic tests (14 + 24 + 3 + 4 = **45**) run the same inputs every time and are the regression floor.
 
@@ -47,9 +47,9 @@ Deterministic tests (14 + 24 + 3 + 4 = **45**) run the same inputs every time an
 | Deterministic tests (boundary + adversarial + regression) | 45 |
 | `proptest` properties | 30 |
 | Generated cases per CI run | 7,488 |
-| libFuzzer targets | 4 |
-| Coverage-guided exploration per CI run | ~2 min |
-| Contract crates reached by the fuzz layer | 18 |
+| libFuzzer targets | 7 |
+| Coverage-guided exploration per CI run | ~3.5 min |
+| Contract crates reached by the fuzz layer | 21 |
 
 `proptest` defaults to 256 cases per property; the claimable-balance property pins 64. So 29 × 256 + 64 = 7,488 generated cases every run, on top of the 45 fixed inputs that form the regression floor.
 
@@ -79,7 +79,7 @@ Whole-workspace line coverage is a separate, working pipeline: the `coverage` jo
 
 ### Entry-point coverage
 
-Because line coverage was unavailable, reach is reported as entry points: which contract functions the fuzz layer actually calls. The four libFuzzer targets are enumerated exactly below — their surfaces are small enough to read off the source.
+Because line coverage was unavailable, reach is reported as entry points: which contract functions the fuzz layer actually calls. The seven libFuzzer targets are enumerated exactly below — their surfaces are small enough to read off the source.
 
 An equivalent per-contract table for the 16 crates driven by the integration suites was attempted and is **not** included: deriving it needs call-site type resolution (clients arrive through tuple-returning helpers, struct fixtures, and `env.invoke_contract` name dispatch), and three successive heuristics produced three different answers — 58%, 31%, and 39% overall. None was trustworthy enough to publish. Doing this properly means either fixing the tarpaulin invocation or generating the table from `cargo`'s own analysis rather than from regexes.
 
@@ -89,11 +89,14 @@ An equivalent per-contract table for the 16 crates driven by the integration sui
 | `advanced_claimable_balance` | `fuzz-testing` | `deposit`, `claim` | Init flag and balance entry are a valid pair; contract token balance non-negative; claimable amount equals tokens held; remaining ≤ original deposit |
 | `advanced_timelock` | `timelock` | `queue`, `cancel`, `execute` | Reachable states only; a queued operation implies the delay was within bounds |
 | `advanced_multi_party_auth` | `multi-party-auth` | `encode_auth_vec`, `decode_auth_vec`, `validate_auth_vec`, `auth_vec_len`, `auth_vec_contains` | Encode/decode round-trips; length agrees with the decoded vector; membership holds |
+| `token_transfer` | `sep41-token` | `initialize`, `transfer`, `balance`, `total_supply` | Successful transfers conserve supply; invalid amounts, insufficient funds, and self-transfers leave balances unchanged |
+| `amm_math` | `constant-product-amm` | `initialize`, `add_liquidity`, `swap`, `reserves` | Successful swaps update reserves consistently and do not decrease the product; rejected swaps leave reserves unchanged |
+| `merkle_verifier` | `merkle-proofs` | `initialize`, `set_root`, `verify`, `verify_and_claim`, `is_claimed` | Valid and mutated proofs yield expected results; bounds are enforced; successful claims cannot be replayed |
 
 ### Known gaps
 
-- **No fuzzing of the token, NFT, or governance categories.** Property tests stop at DeFi; access-control coverage is adversarial unit tests, not generated input.
-- **No stateful sequence fuzzing.** Every target drives one or two calls. Multi-step sequences — deposit, partial claim, re-deposit, claim — are only covered by the deterministic tests.
+- **No fuzzing of NFT or governance categories.** Token transfer and AMM math have coverage-guided targets; property tests stop at DeFi, and access-control coverage is adversarial unit tests rather than generated input.
+- **No arbitrary operation-sequence fuzzing.** Targets exercise fixed short scenarios. Multi-step sequences — deposit, partial claim, re-deposit, claim — are only covered by deterministic tests.
 - **30 seconds per target is a smoke test, not a campaign.** It is enough to catch a regression that fails immediately; it is not enough to find a deep bug. A longer scheduled run is the obvious next step.
 - **No trustworthy line-coverage number for this layer.** See F-4; reach is reported as entry points instead.
 - **Cross-contract fuzzing is shallow.** `defi_fuzz_tests.rs` composes AMM and lending contracts with a test token, but the oracle, bridge, and proxy examples are not driven by generated input.
@@ -141,7 +144,7 @@ Recorded in the same regressions file.
 
 The property suites were in a weaker position than they looked. `test.yml` runs `cargo test -p integration-tests` on every PR, so the three integration fuzz suites did execute — but inside a job named "Test Suite", with nothing identifying them as the fuzzing layer or reporting them separately. The `fuzz-testing` example's property test was weaker still: it ran only on pushes to `main`, through the workspace fallback step, or on a PR that happened to touch that example's directory.
 
-**Fixed:** `fuzz.yml` now runs all four targets as a matrix, and a stable-toolchain `property-tests` job runs the property and boundary suites by name on every PR — including `cargo test -p fuzz-testing`, which no PR-triggered job reliably covered before. The overlap with "Test Suite" is deliberate: it makes the fuzzing layer a named, independently readable signal. See §4.
+**Fixed:** `fuzz.yml` now runs all seven targets as a matrix, and a stable-toolchain `property-tests` job runs the property and boundary suites by name on every PR — including `cargo test -p fuzz-testing`, which no PR-triggered job reliably covered before. The overlap with "Test Suite" is deliberate: it makes the fuzzing layer a named, independently readable signal. See §4.
 
 ### F-4 — Fuzz-layer line coverage is not measurable with the current tooling
 
@@ -173,9 +176,10 @@ cargo test -p integration-tests \
   --test defi_fuzz_tests
 ```
 
-**`fuzz`** — nightly toolchain, one matrix leg per target, `fail-fast: false` so one failing target does not hide the others:
+**`fuzz`** — nightly toolchain, one matrix leg per target, `fail-fast: false` so one failing target does not hide the others. The token, AMM, and Merkle targets replay committed seed inputs before the 30-second campaign:
 
 ```bash
+cargo +nightly fuzz run --fuzz-dir tests/fuzz <target> <seed-file> -- -runs=1
 cargo +nightly fuzz run --fuzz-dir tests/fuzz <target> -- -max_total_time=30
 ```
 
