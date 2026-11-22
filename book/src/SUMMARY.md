@@ -42,7 +42,7 @@
 - [All Examples Index](./examples-index.md)
 
 ## Basics
-- [01 · Hello World (canonical intro)](../examples/basics/01-hello-world/README.md)
+- [01 · Hello World (canonical intro)](./examples/basics/01-hello-world.md)
 - [Overview & listing](./examples/basics.md)
 - [Interactive Playground](./examples/playground.md)
 - [Storage Patterns](./examples/storage-patterns.md)
@@ -58,9 +58,9 @@
 - [Multi-party auth](./examples/advanced.md)
 - [Oracle Pattern](./examples/oracle-pattern.md)
 - [Off-chain Signatures](./examples/off-chain-signatures.md)
-- [Diamond Pattern (canonical)](./examples/advanced/38-diamond-pattern/README.md)
-- [Diamond Security (security-focused)](./examples/advanced/19-diamond-security/README.md)
-- [Diamond Facets (router orchestration)](./examples/advanced/18-diamond-facets/README.md)
+- [Diamond Pattern (canonical)](./examples/advanced/38-diamond-pattern.md)
+- [Diamond Security (security-focused)](./examples/advanced/19-diamond-security.md)
+- [Diamond Facets (router orchestration)](./examples/advanced/18-diamond-facets.md)
 
 # Use Cases
 
@@ -145,8 +145,8 @@
 - [DeFi Security Checklist](./docs/defi-security-checklist.md)
 - [Security Pitfalls](./docs/security-pitfalls.md)
 - [Storage Pitfalls](./docs/storage-pitfalls.md)
-- [Ecosystem Partnerships](./../docs/ecosystem-partnerships.md)
-- [Featured Projects](./../docs/featured-projects.md)
+- [Ecosystem Partnerships](./docs/ecosystem-partnerships.md)
+- [Featured Projects](./docs/featured-projects.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)

@@ -57,20 +57,20 @@ Core Soroban concepts, one at a time.
 
 | Example | Concepts |
 | --- | --- |
-| [01-hello-world](../examples/basics/01-hello-world/) | Contract struct, `#[contract]` / `#[contractimpl]`, unit tests |
-| [02-storage-patterns](../examples/basics/02-storage-patterns/) | `persistent`, `instance`, `temporary` storage, TTL |
-| [03-authentication](../examples/basics/03-authentication/) | `require_auth()`, admin roles, balances |
-| [03-custom-errors](../examples/basics/03-custom-errors/) | `#[contracterror]`, error codes |
-| [04-events](../examples/basics/04-events/) | `env.events().publish()`, topic design |
-| [05-error-handling](../examples/basics/05-error-handling/) | Error enums, validation, propagation |
-| [06-validation-patterns](../examples/basics/06-validation-patterns/) | Precondition checks, overflow-safe arithmetic |
-| [07-type-conversions](../examples/basics/07-type-conversions/) | `TryFromVal`, `IntoVal`, safe narrowing |
-| [08-soroban-types](../examples/basics/08-soroban-types/) | `Address`, `Symbol`, `Bytes`, `Map`, `Vec` |
-| [09-enum-types](../examples/basics/09-enum-types/) | `#[contracttype]` enums, role dispatch |
-| [10-custom-structs](../examples/basics/10-custom-structs/) | `#[contracttype]` structs, nested types |
-| [11-primitive-types](../examples/basics/11-primitive-types/) | `u32`, `u64`, `i128`, arithmetic safety |
-| [12-data-types](../examples/basics/12-data-types/) | Full type system reference |
-| [13-collection-types](../examples/basics/13-collection-types/) | `Vec`, `Map` collection patterns |
+| [01-hello-world](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world) | Contract struct, `#[contract]` / `#[contractimpl]`, unit tests |
+| [02-storage-patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns) | `persistent`, `instance`, `temporary` storage, TTL |
+| [03-authentication](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication) | `require_auth()`, admin roles, balances |
+| [03-custom-errors](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-custom-errors) | `#[contracterror]`, error codes |
+| [04-events](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events) | `env.events().publish()`, topic design |
+| [05-error-handling](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-error-handling) | Error enums, validation, propagation |
+| [06-validation-patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/06-validation-patterns) | Precondition checks, overflow-safe arithmetic |
+| [07-type-conversions](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/07-type-conversions) | `TryFromVal`, `IntoVal`, safe narrowing |
+| [08-soroban-types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/08-soroban-types) | `Address`, `Symbol`, `Bytes`, `Map`, `Vec` |
+| [09-enum-types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/09-enum-types) | `#[contracttype]` enums, role dispatch |
+| [10-custom-structs](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/10-custom-structs) | `#[contracttype]` structs, nested types |
+| [11-primitive-types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/11-primitive-types) | `u32`, `u64`, `i128`, arithmetic safety |
+| [12-data-types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/12-data-types) | Full type system reference |
+| [13-collection-types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/13-collection-types) | `Vec`, `Map` collection patterns |
 
 ### Intermediate
 
@@ -86,8 +86,8 @@ Complex systems for experienced developers.
 
 | Example | Concepts |
 | --- | --- |
-| [01-multi-party-auth](../examples/advanced/01-multi-party-auth/) | Threshold signatures, multi-party authorization |
-| [02-timelock](../examples/advanced/02-timelock/) | Time-delayed execution, queue/cancel/execute |
+| [01-multi-party-auth](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/01-multi-party-auth) | Threshold signatures, multi-party authorization |
+| [02-timelock](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/02-timelock) | Time-delayed execution, queue/cancel/execute |
 
 ## Examples by Use Case
 

@@ -7,16 +7,16 @@ Complex protocols & optimizations for production systems.
 Follow these examples in order, from a single implementation pointer to fleet
 management and lower-level WASM and storage upgrade techniques:
 
-1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
-2. [Proxy Admin Controls](../examples/advanced/31-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
-3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
-4. [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
-5. [Beacon Management](../examples/advanced/37-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
-6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
+1. [Upgradeable Proxy](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/04-upgradeable-proxy) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
+2. [Proxy Admin Controls](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/31-proxy-admin) — timelock, cancellation, and pause controls; no call forwarding or beacon.
+3. [Beacon Proxy](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/02-beacon-proxy) — multiple proxies can share one implementation through a beacon; no fleet factory.
+4. [Beacon Proxy Factory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/23-beacon-proxy-factory) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+5. [Beacon Management](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/37-beacon-management) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
+6. [Upgrade Patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/07-upgrade-patterns) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
 
 ## ðŸ“‹ Examples
 
-### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
+### [01-multi-party-auth](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/01-multi-party-auth)
 **Advanced multi-party authorization** beyond simple multisig.
 
 **Key Concepts:**
@@ -26,12 +26,12 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [02-timelock](../examples/advanced/02-timelock/)
+### [02-timelock](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/02-timelock)
 **Delayed execution** for governance & security.
 
 ---
 
-### [34-state-channel-disputes](../examples/advanced/34-state-channel-disputes/)
+### [34-state-channel-disputes](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/34-state-channel-disputes)
 **State channel dispute resolution** with challenge submission, response mechanics, timeout handling, and fraud proofs.
 
 **Key Concepts:**
@@ -41,7 +41,7 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [30-permit-pattern](../examples/advanced/30-permit-pattern/)
+### [30-permit-pattern](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/30-permit-pattern)
 **Permit-based approvals** with signature-backed authorization and deadline enforcement.
 
 **Key Concepts:**
@@ -63,7 +63,7 @@ if env.ledger().timestamp() < unlock_time {
 
 ---
 
-### [03-oracle-pattern](../examples/advanced/03-oracle-pattern/)
+### [03-oracle-pattern](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/03-oracle-pattern)
 **Single-source oracle** with authorized submission and freshness validation.
 
 **Key Concepts:**
@@ -82,7 +82,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [38-diamond-pattern](../examples/advanced/38-diamond-pattern/) â­ Canonical
+### [38-diamond-pattern](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/38-diamond-pattern) â­ Canonical
 **Diamond Pattern (EIP-2535)** â€” Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
 
 **Key Concepts:**
@@ -92,7 +92,7 @@ let value = client.get_value_strict(); // errors if stale
 - Fallback dispatch mechanism via loupe introspection
 - Complete diamond-loupe API for on-chain discovery
 
-### [19-diamond-security](../examples/advanced/19-diamond-security/)
+### [19-diamond-security](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/19-diamond-security)
 **Secure Multi-Facet Proxy (Diamond)** with access controls, upgrade safety, and isolated namespaced storage.
 
 **Key Concepts:**
@@ -110,7 +110,7 @@ let value = client.get_value_strict(); // errors if stale
 - Facet interface patterns with typed clients
 - Storage isolation with distinct DataKey prefixes per facet
 
-### [11-version-registry](../examples/advanced/11-version-registry/)
+### [11-version-registry](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/11-version-registry)
 **Contract version tracking** with history and rollback support.
 
 **Key Concepts:**
@@ -120,7 +120,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [39-batch-operations](../examples/advanced/39-batch-operations/)
+### [39-batch-operations](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/39-batch-operations)
 **Batch operations** with atomic and partial execution.
 
 **Key Concepts:**
@@ -130,7 +130,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [09-storage-optimization](../examples/advanced/09-storage-optimization/)
+### [09-storage-optimization](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/09-storage-optimization)
 **Storage optimization** patterns for efficient contracts.
 
 **Key Concepts:**
@@ -140,7 +140,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [14-bridge-validators](../examples/advanced/14-bridge-validators/)
+### [14-bridge-validators](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/14-bridge-validators)
 **Bridge validator registry** with multi-signature threshold verification for cross-chain bridges.
 
 **Key Concepts:**
@@ -150,7 +150,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [15-oracle-integration](../examples/advanced/15-oracle-integration/)
+### [15-oracle-integration](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/15-oracle-integration)
 **Asynchronous oracle request/response** pattern with secure callbacks and data validation.
 
 **Key Concepts:**
@@ -160,7 +160,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [44-off-chain-signatures](../examples/advanced/44-off-chain-signatures/)
+### [44-off-chain-signatures](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/44-off-chain-signatures)
 **Off-chain signature verification** for non-Stellar keys ([guide](./off-chain-signatures.md)).
 
 **Key Concepts:**
@@ -176,6 +176,6 @@ let value = client.get_value_strict(); // errors if stale
 Advanced patterns increase complexity - audit thoroughly!
 
 ## Prerequisites
-- [Basics](../basics.md), [Intermediate](../intermediate.md)
+- [Basics](./basics.md), [Intermediate](./intermediate.md)
 
-## Next: [DeFi](../defi.md)
+## Next: [DeFi](./defi.md)

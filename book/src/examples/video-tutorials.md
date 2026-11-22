@@ -10,12 +10,12 @@ Each video is between **10 to 15 minutes**, focuses on one example, walks throug
 
 | # | Video Title | Target Example | Duration | Walkthrough Link |
 |---|-------------|----------------|----------|------------------|
-| 1 | [Soroban Basics #1: Hello World](./01-hello-world/) | [01-hello-world](file:///workspaces/Soroban-Cookbook-/examples/basics/01-hello-world) | 11:30 | [Watch Walkthrough](https://www.youtube.com/watch?v=hello-world-walkthrough) |
-| 2 | [Soroban Basics #2: Storage Layers & TTL](./02-storage-patterns/) | [02-storage-patterns](file:///workspaces/Soroban-Cookbook-/examples/basics/02-storage-patterns) | 13:15 | [Watch Walkthrough](https://www.youtube.com/watch?v=storage-patterns-walkthrough) |
-| 3 | [Soroban Basics #3: Authentication & authorize](./03-authentication/) | [03-authentication](file:///workspaces/Soroban-Cookbook-/examples/basics/03-authentication) | 14:45 | [Watch Walkthrough](https://www.youtube.com/watch?v=authentication-walkthrough) |
-| 4 | [Soroban Basics #4: Custom Errors & enums](./03-custom-errors/) | [03-custom-errors](file:///workspaces/Soroban-Cookbook-/examples/basics/03-custom-errors) | 10:20 | [Watch Walkthrough](https://www.youtube.com/watch?v=custom-errors-walkthrough) |
-| 5 | [Soroban Basics #5: Events & Indexing](./04-events/) | [04-events](file:///workspaces/Soroban-Cookbook-/examples/basics/04-events) | 12:05 | [Watch Walkthrough](https://www.youtube.com/watch?v=events-walkthrough) |
-| 6 | [Soroban Basics #6: Auth Context & call chains](./05-auth-context/) | [05-auth-context](file:///workspaces/Soroban-Cookbook-/examples/basics/05-auth-context) | 12:50 | [Watch Walkthrough](https://www.youtube.com/watch?v=auth-context-walkthrough) |
+| 1 | [Soroban Basics #1: Hello World](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world) | [01-hello-world](file:///workspaces/Soroban-Cookbook-/examples/basics/01-hello-world) | 11:30 | [Watch Walkthrough](https://www.youtube.com/watch?v=hello-world-walkthrough) |
+| 2 | [Soroban Basics #2: Storage Layers & TTL](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns) | [02-storage-patterns](file:///workspaces/Soroban-Cookbook-/examples/basics/02-storage-patterns) | 13:15 | [Watch Walkthrough](https://www.youtube.com/watch?v=storage-patterns-walkthrough) |
+| 3 | [Soroban Basics #3: Authentication & authorize](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication) | [03-authentication](file:///workspaces/Soroban-Cookbook-/examples/basics/03-authentication) | 14:45 | [Watch Walkthrough](https://www.youtube.com/watch?v=authentication-walkthrough) |
+| 4 | [Soroban Basics #4: Custom Errors & enums](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-custom-errors) | [03-custom-errors](file:///workspaces/Soroban-Cookbook-/examples/basics/03-custom-errors) | 10:20 | [Watch Walkthrough](https://www.youtube.com/watch?v=custom-errors-walkthrough) |
+| 5 | [Soroban Basics #5: Events & Indexing](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events) | [04-events](file:///workspaces/Soroban-Cookbook-/examples/basics/04-events) | 12:05 | [Watch Walkthrough](https://www.youtube.com/watch?v=events-walkthrough) |
+| 6 | [Soroban Basics #6: Auth Context & call chains](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-auth-context) | [05-auth-context](file:///workspaces/Soroban-Cookbook-/examples/basics/05-auth-context) | 12:50 | [Watch Walkthrough](https://www.youtube.com/watch?v=auth-context-walkthrough) |
 
 ---
 

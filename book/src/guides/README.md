@@ -15,7 +15,7 @@ every snippet is covered by the repository test-suites.
 | [Deployment Guide](./deployment.md) | Deploy to testnet and mainnet |
 | [Ethereum to Soroban](./ethereum-to-soroban.md) | Translate Solidity habits to Soroban |
 | [Solana to Soroban](./solana-to-soroban.md) | Map accounts, PDAs, Anchor and CPI to Soroban |
-| [Project Templates](./docs/project-templates.md) | Start from a template project |
+| [Project Templates](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/project-templates.md) | Start from a template project |
 | [Security Checklist](./security-checklist.md) | Review a contract before shipping |
 | [Video Creation Tools](./video-creation.md) | Record the walkthrough videos |
 

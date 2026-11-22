@@ -196,7 +196,7 @@ deciding to process the event, it belongs in data.
 
 ## 🔬 Examples
 
-**[04-events](../examples/basics/04-events/)** — canonical structured event patterns
+**[04-events](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events)** — canonical structured event patterns
 - 4-topic transfers, config updates, admin actions, audit trails
 - Custom `#[contracttype]` payloads
 - `cargo test -p soroban-events-example`
