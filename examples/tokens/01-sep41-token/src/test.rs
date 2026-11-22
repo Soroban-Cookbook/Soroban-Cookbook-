@@ -255,3 +255,106 @@ fn uninitialized_contract_returns_not_initialized_for_metadata() {
     assert_eq!(token.try_decimals(), Err(Ok(TokenError::NotInitialized)));
     assert_eq!(token.try_admin(), Err(Ok(TokenError::NotInitialized)));
 }
+
+// ---------------------------------------------------------------------------
+// Negative Authentication Tests
+// These tests verify that authorization is required for sensitive operations.
+// They disable mock_all_auths() to ensure require_auth() checks are enforced.
+// ---------------------------------------------------------------------------
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_missing_auth() {
+    let env = Env::default();
+    // Do NOT call env.mock_all_auths() - this will make require_auth() fail
+
+    let admin = Address::generate(&env);
+    let token_id = env.register_contract(None, Sep41Token);
+    let token = Sep41TokenClient::new(&env, &token_id);
+    let name = String::from_str(&env, "Soroban USD");
+    let symbol = Symbol::new(&env, "SUSD");
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+
+    let alice = Address::generate(&env);
+
+    // This requires `from.require_auth()` - should panic without auth
+    token.transfer(&admin, &alice, &500_000);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_approve_missing_auth() {
+    let env = Env::default();
+
+    let admin = Address::generate(&env);
+    let token_id = env.register_contract(None, Sep41Token);
+    let token = Sep41TokenClient::new(&env, &token_id);
+    let name = String::from_str(&env, "Soroban USD");
+    let symbol = Symbol::new(&env, "SUSD");
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+
+    let alice = Address::generate(&env);
+
+    // This requires `owner.require_auth()` - should panic without auth
+    token.approve(&admin, &alice, &300_000);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_transfer_from_missing_spender_auth() {
+    let env = Env::default();
+
+    let admin = Address::generate(&env);
+    let token_id = env.register_contract(None, Sep41Token);
+    let token = Sep41TokenClient::new(&env, &token_id);
+    let name = String::from_str(&env, "Soroban USD");
+    let symbol = Symbol::new(&env, "SUSD");
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+
+    // First set up allowance with auth (using mock_all_auths for setup only)
+    env.mock_all_auths();
+    token.approve(&admin, &alice, &300_000).unwrap();
+
+    // Now disable all auth mocking
+    env.mock_auths(&[]);
+
+    // This requires `spender.require_auth()` - should panic without auth
+    token.transfer_from(&alice, &admin, &bob, &250_000);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_mint_missing_auth() {
+    let env = Env::default();
+
+    let admin = Address::generate(&env);
+    let token_id = env.register_contract(None, Sep41Token);
+    let token = Sep41TokenClient::new(&env, &token_id);
+    let name = String::from_str(&env, "Soroban USD");
+    let symbol = Symbol::new(&env, "SUSD");
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+
+    let alice = Address::generate(&env);
+
+    // This requires `admin.require_auth()` - should panic without auth
+    token.mint(&admin, &alice, &250_000);
+}
+
+#[test]
+#[should_panic(expected = "HostError")]
+fn test_burn_missing_auth() {
+    let env = Env::default();
+
+    let admin = Address::generate(&env);
+    let token_id = env.register_contract(None, Sep41Token);
+    let token = Sep41TokenClient::new(&env, &token_id);
+    let name = String::from_str(&env, "Soroban USD");
+    let symbol = Symbol::new(&env, "SUSD");
+    token.initialize(&admin, &name, &symbol, &2u32, &1_000_000i128).unwrap();
+
+    // This requires `owner.require_auth()` - should panic without auth
+    token.burn(&admin, &50_000);
+}
