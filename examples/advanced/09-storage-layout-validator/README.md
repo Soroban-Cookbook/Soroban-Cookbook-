@@ -29,12 +29,12 @@ introspection utility.
 | Type | Role |
 | --- | --- |
 | `FieldType` | `U32`, `I128`, `Address`, `Symbol`, `Bytes` |
-| `FieldDef` | Declared field: `key` + `field_type` |
+| `FieldDef` | Declared field: `key`, `field_type`, and required/optional status |
 | `StorageLayout` | Versioned list of `FieldDef`s |
 | `MigrationOp` | `Retain` / `Add` / `TypeChange` / `Remove` |
 | `MigrationStep` | One key + one migration op |
 | `ValidationReport` | `compatible`, `collisions`, `steps` |
-| `LayoutError` | `MalformedLayout` when `version == 0` |
+| `LayoutError` | `MalformedLayout`, `SchemaVersionMismatch`, or `MissingRequiredKey` |
 
 ## Compatibility rules
 
@@ -55,6 +55,12 @@ and no migration steps are produced. The `current` layout is assumed to already
 represent a valid schema.
 
 Layouts with `version == 0` are rejected as `LayoutError::MalformedLayout`.
+Use `validate_layout(expected_version, current, next)` when the caller must
+assert the exact schema version it expects. A mismatch returns
+`SchemaVersionMismatch`. If a required field is missing from `next`, it returns
+`MissingRequiredKey`; optional fields may be removed and appear as `Remove` in
+the migration report. The validator compares declared schemas and does not
+inspect another contract's live ledger entries.
 
 ## Migration guidance
 
@@ -74,6 +80,7 @@ migration steps.
 
 ```text
 validate(current, next) -> Result<ValidationReport, LayoutError>
+validate_layout(expected_version, current, next) -> Result<ValidationReport, LayoutError>
 find_collisions(layout) -> Vec<Symbol>
 ```
 

@@ -68,6 +68,16 @@ fn initialization_is_one_time() {
 }
 
 #[test]
+#[should_panic(expected = "Already initialized")]
+fn initialization_remains_blocked_after_implementation_upgrade() {
+    let contracts = setup();
+    contracts.proxy.upgrade(&contracts.implementation_v2);
+    contracts
+        .proxy
+        .init(&contracts.admin, &contracts.implementation_v2);
+}
+
+#[test]
 #[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
 fn upgrade_requires_admin_auth() {
     let env = Env::default();

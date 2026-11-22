@@ -27,15 +27,6 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
 
-  typos:
-    name: Spelling Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Check spelling
-        uses: crate-ci/typos@v1.52.2
-
   clippy:
     name: Clippy Lint
     runs-on: ubuntu-latest
@@ -305,5 +296,5 @@ jobs:
       - name: Install dependencies
         run: cd webapp && bun install
 
-      - name: Run spell check
+      - name: Run spell check across Markdown, Rust, and YAML
         run: cd webapp && bun run spellcheck

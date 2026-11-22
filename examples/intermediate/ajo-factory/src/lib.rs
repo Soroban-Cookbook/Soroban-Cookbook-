@@ -12,9 +12,10 @@
 //! `escrow`  | Two-party escrow      | `beneficiary`, `amount` |
 //!
 //! ## Access control
-//! `initialize` authenticates the factory admin. Template registration
+//! `initialize` authenticates the factory admin. `initialize_with_fee` also
+//! configures a SEP-41 fee token and per-deployment fee. Template registration
 //! requires that admin. Duplicate IDs are rejected. Instance creation
-//! requires the creator to authorise.
+//! requires the creator to authorise and, when enabled, approve the fee token.
 
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
@@ -22,7 +23,7 @@ use ajo::AjoClient;
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, BytesN, Env,
-    Symbol, Vec,
+    Symbol, Vec, token,
 };
 
 // ---------------------------------------------------------------------------
@@ -51,6 +52,7 @@ pub enum FactoryError {
     InvalidAmount = 7,
     InvalidMaxMembers = 8,
     InvalidDeadline = 9,
+    InvalidDeployFee = 10,
 }
 
 // ---------------------------------------------------------------------------
@@ -69,6 +71,8 @@ pub enum FactoryDataKey {
     TemplateIds,
     /// All deployed instances (across all templates).
     Instances,
+    FeeToken,
+    DeployFee,
 }
 
 // ---------------------------------------------------------------------------
@@ -162,11 +166,42 @@ impl AjoFactory {
         if env.storage().instance().has(&FactoryDataKey::WasmHash) {
             return Err(FactoryError::AlreadyInitialized);
         }
+        Self::initialize_with_config(env, admin, wasm_hash, None, 0)
+    }
+
+    /// Initialize the factory with a token and amount charged for each deploy.
+    pub fn initialize_with_fee(
+        env: Env,
+        admin: Address,
+        wasm_hash: BytesN<32>,
+        fee_token: Address,
+        deploy_fee: i128,
+    ) -> Result<(), FactoryError> {
+        if env.storage().instance().has(&FactoryDataKey::WasmHash) {
+            return Err(FactoryError::AlreadyInitialized);
+        }
+        if deploy_fee <= 0 {
+            return Err(FactoryError::InvalidDeployFee);
+        }
+        Self::initialize_with_config(env, admin, wasm_hash, Some(fee_token), deploy_fee)
+    }
+
+    fn initialize_with_config(
+        env: Env,
+        admin: Address,
+        wasm_hash: BytesN<32>,
+        fee_token: Option<Address>,
+        deploy_fee: i128,
+    ) -> Result<(), FactoryError> {
         admin.require_auth();
         env.storage().instance().set(&FactoryDataKey::Admin, &admin);
         env.storage()
             .instance()
             .set(&FactoryDataKey::WasmHash, &wasm_hash);
+        if let Some(fee_token) = fee_token {
+            env.storage().instance().set(&FactoryDataKey::FeeToken, &fee_token);
+        }
+        env.storage().instance().set(&FactoryDataKey::DeployFee, &deploy_fee);
 
         // Legacy list kept for backward-compat with `get_deployed_ajos`.
         let ajos: Vec<Address> = Vec::new(&env);
@@ -195,6 +230,57 @@ impl AjoFactory {
             .instance()
             .set(&FactoryDataKey::Template(TEMPLATE_AJO), &meta);
 
+        Ok(())
+    }
+
+    fn collect_fee(env: &Env, payer: &Address) -> Result<(), FactoryError> {
+        let fee: i128 = env
+            .storage()
+            .instance()
+            .get(&FactoryDataKey::DeployFee)
+            .unwrap_or(0);
+        if fee == 0 {
+            return Ok(());
+        }
+        let fee_token: Address = env
+            .storage()
+            .instance()
+            .get(&FactoryDataKey::FeeToken)
+            .ok_or(FactoryError::NotInitialized)?;
+        let factory = env.current_contract_address();
+        token::Client::new(env, &fee_token).transfer_from(&factory, payer, &factory, &fee);
+        env.events()
+            .publish((symbol_short!("fee_paid"), payer.clone()), fee);
+        Ok(())
+    }
+
+    /// Withdraw factory-held fee tokens to `recipient`. Only the admin may withdraw.
+    pub fn withdraw_fees(
+        env: Env,
+        recipient: Address,
+        amount: i128,
+    ) -> Result<(), FactoryError> {
+        if amount <= 0 {
+            return Err(FactoryError::InvalidAmount);
+        }
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&FactoryDataKey::Admin)
+            .ok_or(FactoryError::NotInitialized)?;
+        admin.require_auth();
+        let fee_token: Address = env
+            .storage()
+            .instance()
+            .get(&FactoryDataKey::FeeToken)
+            .ok_or(FactoryError::NotInitialized)?;
+        token::Client::new(&env, &fee_token).transfer(
+            &env.current_contract_address(),
+            &recipient,
+            &amount,
+        );
+        env.events()
+            .publish((symbol_short!("fees_out"), recipient), amount);
         Ok(())
     }
 
@@ -309,6 +395,8 @@ impl AjoFactory {
             _ => return Err(FactoryError::InvalidTemplateParams),
         }
 
+        Self::collect_fee(&env, &creator)?;
+
         let mut instances: Vec<InstanceRecord> = env
             .storage()
             .instance()
@@ -363,6 +451,12 @@ impl AjoFactory {
         creator: Address,
     ) -> Result<Address, FactoryError> {
         creator.require_auth();
+        if amount <= 0 {
+            return Err(FactoryError::InvalidAmount);
+        }
+        if max_members < 2 {
+            return Err(FactoryError::InvalidMaxMembers);
+        }
 
         let wasm_hash: BytesN<32> = env
             .storage()
@@ -381,6 +475,8 @@ impl AjoFactory {
             .instance()
             .get(&FactoryDataKey::Instances)
             .unwrap_or(Vec::new(&env));
+
+        Self::collect_fee(&env, &creator)?;
 
         let nonce = ajos.len();
         let salt_preimage = DeploySalt::Ajo(creator.clone(), nonce);

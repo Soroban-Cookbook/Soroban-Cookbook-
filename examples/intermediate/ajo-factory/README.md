@@ -2,6 +2,15 @@
 
 This example demonstrates how to build a Soroban factory that manages versioned deployment templates. A factory can register multiple template IDs, validate template-specific parameters, deploy an instance from the registered Wasm hash, and keep metadata for every created instance.
 
+## Deployment fees
+
+Initialize with `initialize_with_fee(admin, wasm_hash, fee_token, deploy_fee)`
+to require creators to approve a token transfer before `create_instance` or
+`create_ajo` deploys. Fees are sent to the factory address, and the admin can
+withdraw accumulated tokens with `withdraw_fees(recipient, amount)`. Fee
+collection emits a `fee_paid` event. The original `initialize` method keeps
+fees disabled for existing integrations.
+
 ## Features
 
 - Versioned template metadata with `TemplateMetadata`
