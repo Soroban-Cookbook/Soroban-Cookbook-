@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-4fbc4f5a.js";
+            window.path_to_searchindex_js = "../searchindex-7ddff20c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-8daf4f14.js"></script>
+        <script src="../toc-5c19c24f.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -184,6 +184,55 @@
                         <h1 id="interactive-playground--basic-examples"><a class="header" href="#interactive-playground--basic-examples">Interactive Playground — Basic Examples</a></h1>
 <p>Run, edit, and explore all 14 basic Soroban examples locally. Each example is
 a self-contained Rust crate you can clone, modify, and test in minutes.</p>
+<hr>
+<h2 id="try-it-online-no-local-setup"><a class="header" href="#try-it-online-no-local-setup">Try It Online (No Local Setup)</a></h2>
+<p><a href="https://codespaces.new/Soroban-Cookbook/Soroban-Cookbook-?quickstart=1"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces"></a></p>
+<p>The button opens the cookbook in a GitHub Codespace, a full VS Code editor and
+terminal in your browser with Rust preinstalled. The repository is already
+checked out, so the Hello World example is ready at
+<code>examples/basics/01-hello-world</code>. A free GitHub account is required.</p>
+<p><strong>1. Run the Hello World example</strong></p>
+<p>In the Codespace terminal:</p>
+<pre><code class="language-bash">cd examples/basics/01-hello-world
+cargo test
+</code></pre>
+<p><strong>2. Modify it</strong></p>
+<p>Open <code>examples/basics/01-hello-world/src/lib.rs</code>, change
+<code>symbol_short!("Hello")</code> to <code>symbol_short!("Hola")</code>, and run <code>cargo test</code>
+again. Update the expected value in the tests until they pass.</p>
+<p><strong>3. Redeploy it to testnet</strong></p>
+<pre><code class="language-bash"># One-time setup inside the Codespace
+cargo install --locked soroban-cli
+soroban keys generate alice --network testnet
+soroban keys fund alice --network testnet
+
+# Build and deploy your modified contract
+cargo build --target wasm32-unknown-unknown --release
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm ../../../target/wasm32-unknown-unknown/release/hello_world.wasm \
+  --source alice \
+  --network testnet)
+
+# Call it
+soroban contract invoke --id $CONTRACT_ID --source alice --network testnet \
+  -- hello --to World
+</code></pre>
+<p>Every time you edit <code>src/lib.rs</code>, repeat the build and deploy commands to get
+a new contract ID running your latest code.</p>
+<p><strong>4. Invoke it from the browser</strong></p>
+<p>Paste the contract ID into <a href="https://lab.stellar.org">Stellar Lab</a> (select
+<strong>Testnet</strong>) to inspect the contract and call <code>hello</code> from a web form.</p>
+<h3 id="on-a-phone-or-tablet"><a class="header" href="#on-a-phone-or-tablet">On a phone or tablet</a></h3>
+<p>Codespaces runs in mobile browsers, but editing and using the terminal on a
+small screen is awkward. On mobile you can instead:</p>
+<ul>
+<li>Read the contract source on GitHub:
+<a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/basics/01-hello-world/src/lib.rs"><code>examples/basics/01-hello-world/src/lib.rs</code></a></li>
+<li>Use <a href="https://lab.stellar.org">Stellar Lab</a>, which works in mobile browsers,
+to call a deployed contract by its contract ID.</li>
+<li>Follow the <a href="../guides/playground-tutorial-01-hello-world.html">Hello World tutorial</a>
+and run the examples later on a desktop.</li>
+</ul>
 <hr>
 <h2 id="how-to-use-this-playground"><a class="header" href="#how-to-use-this-playground">How to Use This Playground</a></h2>
 <h3 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h3>

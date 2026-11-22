@@ -37,10 +37,10 @@
             const path_to_root = "";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-4fbc4f5a.js";
+            window.path_to_searchindex_js = "searchindex-7ddff20c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-8daf4f14.js"></script>
+        <script src="toc-5c19c24f.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -6136,6 +6136,55 @@ deployment instructions all in one place?</p>
 <h1 id="interactive-playground--basic-examples"><a class="header" href="#interactive-playground--basic-examples">Interactive Playground — Basic Examples</a></h1>
 <p>Run, edit, and explore all 14 basic Soroban examples locally. Each example is
 a self-contained Rust crate you can clone, modify, and test in minutes.</p>
+<hr>
+<h2 id="try-it-online-no-local-setup"><a class="header" href="#try-it-online-no-local-setup">Try It Online (No Local Setup)</a></h2>
+<p><a href="https://codespaces.new/Soroban-Cookbook/Soroban-Cookbook-?quickstart=1"><img src="https://github.com/codespaces/badge.svg" alt="Open in GitHub Codespaces"></a></p>
+<p>The button opens the cookbook in a GitHub Codespace, a full VS Code editor and
+terminal in your browser with Rust preinstalled. The repository is already
+checked out, so the Hello World example is ready at
+<code>examples/basics/01-hello-world</code>. A free GitHub account is required.</p>
+<p><strong>1. Run the Hello World example</strong></p>
+<p>In the Codespace terminal:</p>
+<pre><code class="language-bash">cd examples/basics/01-hello-world
+cargo test
+</code></pre>
+<p><strong>2. Modify it</strong></p>
+<p>Open <code>examples/basics/01-hello-world/src/lib.rs</code>, change
+<code>symbol_short!("Hello")</code> to <code>symbol_short!("Hola")</code>, and run <code>cargo test</code>
+again. Update the expected value in the tests until they pass.</p>
+<p><strong>3. Redeploy it to testnet</strong></p>
+<pre><code class="language-bash"># One-time setup inside the Codespace
+cargo install --locked soroban-cli
+soroban keys generate alice --network testnet
+soroban keys fund alice --network testnet
+
+# Build and deploy your modified contract
+cargo build --target wasm32-unknown-unknown --release
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm ../../../target/wasm32-unknown-unknown/release/hello_world.wasm \
+  --source alice \
+  --network testnet)
+
+# Call it
+soroban contract invoke --id $CONTRACT_ID --source alice --network testnet \
+  -- hello --to World
+</code></pre>
+<p>Every time you edit <code>src/lib.rs</code>, repeat the build and deploy commands to get
+a new contract ID running your latest code.</p>
+<p><strong>4. Invoke it from the browser</strong></p>
+<p>Paste the contract ID into <a href="https://lab.stellar.org">Stellar Lab</a> (select
+<strong>Testnet</strong>) to inspect the contract and call <code>hello</code> from a web form.</p>
+<h3 id="on-a-phone-or-tablet"><a class="header" href="#on-a-phone-or-tablet">On a phone or tablet</a></h3>
+<p>Codespaces runs in mobile browsers, but editing and using the terminal on a
+small screen is awkward. On mobile you can instead:</p>
+<ul>
+<li>Read the contract source on GitHub:
+<a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/basics/01-hello-world/src/lib.rs"><code>examples/basics/01-hello-world/src/lib.rs</code></a></li>
+<li>Use <a href="https://lab.stellar.org">Stellar Lab</a>, which works in mobile browsers,
+to call a deployed contract by its contract ID.</li>
+<li>Follow the <a href="#playground-tutorial-1-your-first-smart-contract">Hello World tutorial</a>
+and run the examples later on a desktop.</li>
+</ul>
 <hr>
 <h2 id="how-to-use-this-playground-1"><a class="header" href="#how-to-use-this-playground-1">How to Use This Playground</a></h2>
 <h3 id="prerequisites-5"><a class="header" href="#prerequisites-5">Prerequisites</a></h3>
@@ -17310,7 +17359,7 @@ cargo test --workspace
 <h2 id="-project-structure"><a class="header" href="#-project-structure">🏗️ Project Structure</a></h2>
 <ul>
 <li><code>examples/</code>: Categorized smart contract examples.</li>
-<li><code>docs/</code>: General documentation and ADRs.</li>
+<li><code>docs/</code>: General documentation and ADRs (see the <a href="adr/README.html">Architecture Decision Records</a> for why the project is structured the way it is).</li>
 <li><code>guides/</code>: Step-by-step tutorials and guides.</li>
 <li><code>book/</code>: Source for the mdBook documentation.</li>
 <li><code>tests/</code>: Integration tests for the workspace.</li>
@@ -18227,7 +18276,12 @@ cargo test
 <blockquote>
 <blockquote>
 <blockquote>
-<p>8c99210 (Create Pattern Selection ADRs)</p>
+<p>8c99210 (Create Pattern Selection ADRs)
+| <a href="#8-use-mdbook-for-documentation">ADR-008</a> | Use mdBook for Documentation | Accepted |
+| <a href="#9-workspace-structure-and-ci-exclusion-mechanism">ADR-009</a> | Workspace Structure and CI Exclusion Mechanism | Accepted |
+| <a href="#10-soroban-sdk-version-migration-strategy">ADR-010</a> | Soroban SDK Version Migration Strategy | Accepted |
+| <a href="#11-code-coverage-toolchain-tarpaulin--codecov">ADR-011</a> | Code Coverage Toolchain (tarpaulin + Codecov) | Accepted |
+| <a href="#12-example-naming-convention-numeric-prefixes">ADR-012</a> | Example Naming Convention (Numeric Prefixes) | Accepted |</p>
 </blockquote>
 </blockquote>
 </blockquote>
@@ -19009,49 +19063,276 @@ storage schema; record that compatibility check in the upgrade review.</li>
 <p>Test migration from representative old-state fixtures, including repeated
 execution and partial completion.</p>
 <div style="break-before: page; page-break-before: always;"></div>
+<h1 id="8-use-mdbook-for-documentation"><a class="header" href="#8-use-mdbook-for-documentation">8. Use mdBook for Documentation</a></h1>
+<p><strong>Date:</strong> 2026-11-20</p>
+<h2 id="status-11"><a class="header" href="#status-11">Status</a></h2>
+<p><strong>Status:</strong> Accepted</p>
+<h2 id="context-11"><a class="header" href="#context-11">Context</a></h2>
+<p>The cookbook needs a documentation site that renders the markdown written next to the examples, deploys to GitHub Pages from CI, and can be previewed locally with one command. Most contributors are Rust developers, so a JavaScript toolchain would raise the barrier to editing docs.</p>
+<p>Alternatives considered (see the <a href="#documentation-platform-evaluation">Documentation Platform Evaluation</a>):</p>
+<ul>
+<li><strong>Docusaurus</strong> — React-based and highly customizable, but requires Node.js and React knowledge to maintain</li>
+<li><strong>MkDocs</strong> — Python-based; adds a second language toolchain with no clear benefit</li>
+<li><strong>GitBook</strong> — hosted service; vendor lock-in and cost at scale</li>
+</ul>
+<h2 id="decision-11"><a class="header" href="#decision-11">Decision</a></h2>
+<p>Use <strong>mdBook</strong> as the documentation platform. The book lives in <code>book/</code>, its sidebar is <code>book/src/SUMMARY.md</code>, and it is deployed by <code>.github/workflows/deploy-docs.yml</code>.</p>
+<ul>
+<li>Build: <code>cd book &amp;&amp; mdbook build</code></li>
+<li>Preview: <code>cd book &amp;&amp; mdbook serve</code></li>
+</ul>
+<p>mdBook was chosen over Docusaurus because it is a single Rust binary that fits the project’s existing toolchain, uses plain markdown with no MDX or React, and is the same tool used for the Rust Book, which most learners already know.</p>
+<h2 id="consequences-11"><a class="header" href="#consequences-11">Consequences</a></h2>
+<h3 id="positive-11"><a class="header" href="#positive-11">Positive</a></h3>
+<ul>
+<li>One toolchain (Rust/Cargo) for code and docs</li>
+<li>Contributors edit plain markdown; no front-end build knowledge needed</li>
+<li>Fast local builds and simple CI deployment</li>
+</ul>
+<h3 id="negative-11"><a class="header" href="#negative-11">Negative</a></h3>
+<ul>
+<li>Less UI customization than Docusaurus (no React components, limited theming)</li>
+<li>Features such as versioned docs or rich search need preprocessors or custom JS</li>
+</ul>
+<h3 id="neutral-11"><a class="header" href="#neutral-11">Neutral</a></h3>
+<ul>
+<li>Every new page must be added to <code>SUMMARY.md</code> to appear in the sidebar</li>
+</ul>
+<h2 id="references-11"><a class="header" href="#references-11">References</a></h2>
+<ul>
+<li><a href="#5-documentation-platform">Book ADR-005: Documentation Platform</a></li>
+<li><a href="https://rust-lang.github.io/mdBook/">mdBook documentation</a></li>
+</ul>
+<h2 id="notes-11"><a class="header" href="#notes-11">Notes</a></h2>
+<p>Revisit this decision if the project needs versioned documentation or interactive components that mdBook cannot support.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="9-workspace-structure-and-ci-exclusion-mechanism"><a class="header" href="#9-workspace-structure-and-ci-exclusion-mechanism">9. Workspace Structure and CI Exclusion Mechanism</a></h1>
+<p><strong>Date:</strong> 2026-11-20</p>
+<h2 id="status-12"><a class="header" href="#status-12">Status</a></h2>
+<p><strong>Status:</strong> Accepted</p>
+<h2 id="context-12"><a class="header" href="#context-12">Context</a></h2>
+<p>The cookbook holds many independent example contracts. They need to build and test together so that SDK upgrades and shared code changes are verified everywhere, but a few crates cannot always build with the rest:</p>
+<ul>
+<li>Learner templates (<code>templates/dao-governance-dapp</code>, <code>templates/token-dapp</code>) are standalone Cargo workspaces meant to be copied out, and a package cannot belong to two workspaces</li>
+<li>During an SDK migration, some examples may temporarily fail to compile</li>
+<li>Host-only crates (integration tests, fuzz harness) cannot be built for <code>wasm32v1-none</code></li>
+</ul>
+<p>Alternatives considered:</p>
+<ul>
+<li><strong>Independent crates, no workspace</strong> — every example pins its own dependencies; SDK versions drift and CI must loop over crates</li>
+<li><strong>One workspace with every crate always required</strong> — a single broken example blocks all CI</li>
+</ul>
+<h2 id="decision-12"><a class="header" href="#decision-12">Decision</a></h2>
+<p>Use a single root Cargo workspace (<code>Cargo.toml</code>) that lists each example under <code>members</code> and pins shared dependencies such as <code>soroban-sdk</code> in <code>[workspace.dependencies]</code>.</p>
+<ul>
+<li>Standalone template workspaces are listed under <code>exclude</code> in the root <code>Cargo.toml</code>, with a comment explaining why</li>
+<li>CI runs cargo through <code>scripts/ci-workspace.sh</code>, which reads <code>scripts/ci-exclude-packages.txt</code> and passes <code>--exclude &lt;pkg&gt;</code> for each entry; crates that are temporarily broken go in that file and are removed once fixed</li>
+<li>The same exclude list is applied to the tarpaulin coverage job</li>
+<li><code>ci-workspace.sh build</code> also excludes host-only crates (<code>integration-tests</code>, <code>security-tests</code>, <code>soroban-cookbook-fuzz</code>) for the wasm build</li>
+</ul>
+<h2 id="consequences-12"><a class="header" href="#consequences-12">Consequences</a></h2>
+<h3 id="positive-12"><a class="header" href="#positive-12">Positive</a></h3>
+<ul>
+<li>One <code>cargo test --workspace</code> verifies every example against the same SDK</li>
+<li>A broken crate can be parked without blocking unrelated PRs</li>
+<li>Exclusions are explicit, version-controlled and reviewable</li>
+</ul>
+<h3 id="negative-12"><a class="header" href="#negative-12">Negative</a></h3>
+<ul>
+<li>New examples must be added to <code>members</code> or they are silently not built</li>
+<li>Excluded crates can rot if entries are not removed after they are fixed</li>
+</ul>
+<h3 id="neutral-12"><a class="header" href="#neutral-12">Neutral</a></h3>
+<ul>
+<li>Templates are built by their own CI workflow (<code>templates.yml</code>), outside the root workspace</li>
+</ul>
+<h2 id="references-12"><a class="header" href="#references-12">References</a></h2>
+<ul>
+<li>Root <code>Cargo.toml</code> (<code>members</code> / <code>exclude</code>)</li>
+<li><code>scripts/ci-workspace.sh</code> and <code>scripts/ci-exclude-packages.txt</code></li>
+<li><code>.github/workflows/test.yml</code></li>
+</ul>
+<h2 id="notes-12"><a class="header" href="#notes-12">Notes</a></h2>
+<p>Keep <code>scripts/ci-exclude-packages.txt</code> free of package entries except while a migration or fix is in progress.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="10-soroban-sdk-version-migration-strategy"><a class="header" href="#10-soroban-sdk-version-migration-strategy">10. Soroban SDK Version Migration Strategy</a></h1>
+<p><strong>Date:</strong> 2026-11-20</p>
+<h2 id="status-13"><a class="header" href="#status-13">Status</a></h2>
+<p><strong>Status:</strong> Accepted</p>
+<h2 id="context-13"><a class="header" href="#context-13">Context</a></h2>
+<p>All examples depend on <code>soroban-sdk</code>, which ships breaking changes across major versions in step with Stellar protocol upgrades. The cookbook moved from SDK 26 to the 28 release candidate (<code>28.0.0-rc.1</code>) and then to 29.0.0. During these moves some examples stopped compiling, and the templates and fuzz harness drifted from the workspace version.</p>
+<p>Alternatives considered:</p>
+<ul>
+<li><strong>Per-example upgrades over time</strong> — each example bumps its own SDK; the repo ends up with mixed versions and inconsistent teaching material</li>
+<li><strong>Big-bang upgrade with no fallback</strong> — CI stays blocked until every example is fixed</li>
+</ul>
+<h2 id="decision-13"><a class="header" href="#decision-13">Decision</a></h2>
+<p>Upgrade the SDK at the workspace level, in one place, with a temporary exclusion list as a safety valve:</p>
+<ol>
+<li>Dependabot (or a maintainer) bumps <code>soroban-sdk</code> in <code>[workspace.dependencies]</code>; every example inherits it via <code>soroban-sdk = { workspace = true }</code></li>
+<li>Examples that no longer compile are fixed in the same PR where practical; otherwise they are added to <code>scripts/ci-exclude-packages.txt</code> (see ADR-009) and fixed in follow-up PRs</li>
+<li>Standalone templates and the fuzz harness are bumped to the same version so they stay in sync with the workspace</li>
+<li>Release candidates may be adopted to get ahead of protocol changes, then replaced by the stable release</li>
+<li>Stale version references in comments and docs are updated once the migration is complete</li>
+</ol>
+<h2 id="consequences-13"><a class="header" href="#consequences-13">Consequences</a></h2>
+<h3 id="positive-13"><a class="header" href="#positive-13">Positive</a></h3>
+<ul>
+<li>All examples teach a single SDK version</li>
+<li>CI immediately shows which examples a new SDK breaks</li>
+<li>Migrations can land incrementally without blocking unrelated work</li>
+</ul>
+<h3 id="negative-13"><a class="header" href="#negative-13">Negative</a></h3>
+<ul>
+<li>A major bump touches many crates at once and needs coordinated review</li>
+<li>Excluded crates are untested until they are fixed</li>
+</ul>
+<h3 id="neutral-13"><a class="header" href="#neutral-13">Neutral</a></h3>
+<ul>
+<li>The current workspace version and its history are tracked in <a href="#3-soroban-sdk-version">Book ADR-003: Soroban SDK Version</a></li>
+</ul>
+<h2 id="references-13"><a class="header" href="#references-13">References</a></h2>
+<ul>
+<li>Root <code>Cargo.toml</code> (<code>[workspace.dependencies]</code>)</li>
+<li><code>scripts/ci-exclude-packages.txt</code></li>
+<li><a href="https://github.com/stellar/rs-soroban-sdk/releases">Soroban SDK releases</a></li>
+</ul>
+<h2 id="notes-13"><a class="header" href="#notes-13">Notes</a></h2>
+<p>A migration is complete when <code>scripts/ci-exclude-packages.txt</code> has no package entries left.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="11-code-coverage-toolchain-tarpaulin--codecov"><a class="header" href="#11-code-coverage-toolchain-tarpaulin--codecov">11. Code Coverage Toolchain (tarpaulin + Codecov)</a></h1>
+<p><strong>Date:</strong> 2026-11-20</p>
+<h2 id="status-14"><a class="header" href="#status-14">Status</a></h2>
+<p><strong>Status:</strong> Accepted</p>
+<h2 id="context-14"><a class="header" href="#context-14">Context</a></h2>
+<p>The cookbook is teaching material, so example tests should exercise the code they demonstrate. The project needs coverage that runs in CI, works for a Cargo workspace, gives reviewers feedback on PRs, and is easy to reproduce locally.</p>
+<p>Alternatives considered:</p>
+<ul>
+<li><strong>cargo-llvm-cov</strong> — accurate source-based coverage, but needs the <code>llvm-tools</code> component and extra setup</li>
+<li><strong>grcov</strong> — flexible, but requires instrumented builds and more configuration</li>
+<li><strong>Coveralls</strong> — hosted service similar to Codecov, with weaker patch-coverage reporting</li>
+</ul>
+<h2 id="decision-14"><a class="header" href="#decision-14">Decision</a></h2>
+<p>Use <strong>cargo-tarpaulin</strong> to measure coverage and <strong>Codecov</strong> to report it.</p>
+<ul>
+<li><code>tarpaulin.toml</code> configures workspace-wide coverage, writes Cobertura XML, HTML and LCOV reports to <code>coverage/</code>, and sets <code>fail-under = 90</code></li>
+<li>The <code>coverage</code> job in <code>.github/workflows/test.yml</code> installs (and caches) tarpaulin, applies the CI exclude list, and uploads the XML report with <code>codecov/codecov-action</code></li>
+<li><code>codecov.yml</code> keeps project coverage informational and requires 90% patch coverage on changed lines</li>
+<li>Contributors run <code>cargo tarpaulin</code> locally with the same configuration</li>
+</ul>
+<h2 id="consequences-14"><a class="header" href="#consequences-14">Consequences</a></h2>
+<h3 id="positive-14"><a class="header" href="#positive-14">Positive</a></h3>
+<ul>
+<li>Single command for local and CI coverage</li>
+<li>PR comments and patch targets make untested new code visible</li>
+<li>Historical trends and badges via Codecov</li>
+</ul>
+<h3 id="negative-14"><a class="header" href="#negative-14">Negative</a></h3>
+<ul>
+<li>tarpaulin only runs on Linux x86_64, so macOS/Windows contributors need CI or a container</li>
+<li>Line coverage is less precise than LLVM source-based coverage</li>
+<li>Coverage builds are slower than normal test runs</li>
+</ul>
+<h3 id="neutral-14"><a class="header" href="#neutral-14">Neutral</a></h3>
+<ul>
+<li>Test modules, build artifacts and docs are excluded from coverage metrics</li>
+</ul>
+<h2 id="references-14"><a class="header" href="#references-14">References</a></h2>
+<ul>
+<li><code>tarpaulin.toml</code></li>
+<li><code>codecov.yml</code></li>
+<li><code>.github/workflows/test.yml</code> (coverage job)</li>
+<li><a href="https://github.com/xd009642/tarpaulin">cargo-tarpaulin</a></li>
+</ul>
+<h2 id="notes-14"><a class="header" href="#notes-14">Notes</a></h2>
+<p>Switching to cargo-llvm-cov would only change the CI job and local command; the Codecov setup could stay the same.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="12-example-naming-convention-numeric-prefixes"><a class="header" href="#12-example-naming-convention-numeric-prefixes">12. Example Naming Convention (Numeric Prefixes)</a></h1>
+<p><strong>Date:</strong> 2026-11-20</p>
+<h2 id="status-15"><a class="header" href="#status-15">Status</a></h2>
+<p><strong>Status:</strong> Accepted</p>
+<h2 id="context-15"><a class="header" href="#context-15">Context</a></h2>
+<p>Examples are grouped by category (<code>basics</code>, <code>intermediate</code>, <code>advanced</code>, <code>defi</code>, <code>tokens</code>, <code>nfts</code>, <code>governance</code>, <code>storage</code>). Learners need a clear order to follow within each category, and maintainers need directory names that sort predictably in file browsers, the book sidebar and the workspace <code>members</code> list.</p>
+<p>Alternatives considered:</p>
+<ul>
+<li><strong>Plain descriptive names</strong> (<code>hello-world</code>, <code>custom-errors</code>) — no implied learning order; listings sort alphabetically</li>
+<li><strong>Separate ordering file</strong> — order is defined outside the directory itself and easily drifts</li>
+</ul>
+<h2 id="decision-15"><a class="header" href="#decision-15">Decision</a></h2>
+<p>Name example directories <code>examples/&lt;category&gt;/NN-short-name</code>, where <code>NN</code> is a two-digit number giving the suggested reading order within the category, and <code>short-name</code> is lowercase kebab-case (for example <code>examples/basics/01-hello-world</code>, <code>examples/tokens/01-sep41-token</code>).</p>
+<ul>
+<li>Numbers are scoped to a category, not global</li>
+<li>New examples take the next free number in their category</li>
+<li>Closely related variants may share a number (for example <code>13-collection-types</code> and <code>13-queue-variants</code>)</li>
+<li>Book pages for examples mirror the directory name (for example <code>book/src/examples/tokens/01-sep41-token.md</code>)</li>
+</ul>
+<h2 id="consequences-15"><a class="header" href="#consequences-15">Consequences</a></h2>
+<h3 id="positive-15"><a class="header" href="#positive-15">Positive</a></h3>
+<ul>
+<li>Directory listings sort in learning order</li>
+<li>The number gives learners an obvious next step</li>
+<li>Book pages and example directories map one-to-one</li>
+</ul>
+<h3 id="negative-15"><a class="header" href="#negative-15">Negative</a></h3>
+<ul>
+<li>Inserting an example in the middle of a sequence means reusing a number or renumbering</li>
+<li>A few older directories without a prefix (for example <code>examples/hello-world</code>, <code>examples/basics/lazy-cache</code>) do not follow the convention</li>
+</ul>
+<h3 id="neutral-15"><a class="header" href="#neutral-15">Neutral</a></h3>
+<ul>
+<li>Crate names in <code>Cargo.toml</code> are independent of the numeric prefix</li>
+</ul>
+<h2 id="references-15"><a class="header" href="#references-15">References</a></h2>
+<ul>
+<li><code>examples/README.md</code></li>
+<li><code>book/src/SUMMARY.md</code></li>
+</ul>
+<h2 id="notes-15"><a class="header" href="#notes-15">Notes</a></h2>
+<p>Renaming existing directories to fill gaps is not required; prefer stable paths over a perfectly contiguous sequence.</p>
+<div style="break-before: page; page-break-before: always;"></div>
 <h1 id="number-title"><a class="header" href="#number-title">[Number]. [Title]</a></h1>
 <p><strong>Date:</strong> YYYY-MM-DD</p>
-<h2 id="status-11"><a class="header" href="#status-11">Status</a></h2>
+<h2 id="status-16"><a class="header" href="#status-16">Status</a></h2>
 <!-- Choose one: Proposed | Accepted | Deprecated | Superseded by ADR-XXX -->
 <p><strong>Status:</strong> Proposed</p>
-<h2 id="context-11"><a class="header" href="#context-11">Context</a></h2>
+<h2 id="context-16"><a class="header" href="#context-16">Context</a></h2>
 <!-- What is the issue we're facing? -->
 <!-- What factors are we considering? -->
 <!-- What constraints do we have? -->
 <!-- What alternatives did we consider? -->
-<h2 id="decision-11"><a class="header" href="#decision-11">Decision</a></h2>
+<h2 id="decision-16"><a class="header" href="#decision-16">Decision</a></h2>
 <!-- What decision have we made? -->
 <!-- Why did we make this decision? -->
 <!-- What are the key factors that led to this choice? -->
-<h2 id="consequences-11"><a class="header" href="#consequences-11">Consequences</a></h2>
-<h3 id="positive-11"><a class="header" href="#positive-11">Positive</a></h3>
+<h2 id="consequences-16"><a class="header" href="#consequences-16">Consequences</a></h2>
+<h3 id="positive-16"><a class="header" href="#positive-16">Positive</a></h3>
 <!-- What becomes easier? -->
 <!-- What benefits do we gain? -->
 <ul>
 <li></li>
 <li></li>
 </ul>
-<h3 id="negative-11"><a class="header" href="#negative-11">Negative</a></h3>
+<h3 id="negative-16"><a class="header" href="#negative-16">Negative</a></h3>
 <!-- What becomes harder? -->
 <!-- What downsides or costs do we incur? -->
 <ul>
 <li></li>
 <li></li>
 </ul>
-<h3 id="neutral-11"><a class="header" href="#neutral-11">Neutral</a></h3>
+<h3 id="neutral-16"><a class="header" href="#neutral-16">Neutral</a></h3>
 <!-- What stays the same? -->
 <!-- What are the trade-offs? -->
 <ul>
 <li></li>
 <li></li>
 </ul>
-<h2 id="references-11"><a class="header" href="#references-11">References</a></h2>
+<h2 id="references-16"><a class="header" href="#references-16">References</a></h2>
 <!-- Links to related documents, discussions, issues, or external resources -->
 <ul>
 <li></li>
 <li></li>
 </ul>
-<h2 id="notes-11"><a class="header" href="#notes-11">Notes</a></h2>
+<h2 id="notes-16"><a class="header" href="#notes-16">Notes</a></h2>
 <!-- Any additional information, implementation details, or future considerations -->
 
                     </main>
