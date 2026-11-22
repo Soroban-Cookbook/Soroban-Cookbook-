@@ -5,11 +5,13 @@ use soroban_sdk::{testutils::Address as _, Address, Env};
 
 fn setup() -> (Env, BatchBuilderContractClient<'static>, Address, Address) {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register(BatchBuilderContract, ());
     let client = BatchBuilderContractClient::new(&env, &contract_id);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
-    client.initialize();
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
     client.set_balance(&alice, &1_000);
     client.set_balance(&bob, &100);
     (env, client, alice, bob)

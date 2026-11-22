@@ -111,6 +111,14 @@ fn test_add_pool_zero_rate_panics() {
 }
 
 #[test]
+#[should_panic(expected = "Reward token must differ from stake token")]
+fn test_add_pool_rejects_reward_token_equal_to_stake_token() {
+    let t = setup();
+    t.mining
+        .add_pool(&1u32, &t.lp_token, &t.lp_token, &100i128);
+}
+
+#[test]
 fn test_multiple_pools_independent() {
     let t = setup();
     let (lp2, _) = create_token(&t.env, &t.admin);

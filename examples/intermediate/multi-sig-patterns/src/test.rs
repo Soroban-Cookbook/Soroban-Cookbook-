@@ -5,6 +5,7 @@ use soroban_sdk::{testutils::Address as _, vec, Address, Env};
 #[test]
 fn test_initialize() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, MultiPartyAuth);
     let client = MultiPartyAuthClient::new(&env, &contract_id);
 

@@ -16,7 +16,7 @@ pub struct AMMRouter;
 
 #[contractimpl]
 impl AMMRouter {
-    pub fn initialize(env: Env) {
+    pub fn initialize(env: Env, admin: Address) {
         if env
             .storage()
             .instance()
@@ -24,6 +24,10 @@ impl AMMRouter {
         {
             panic!("already initialized");
         }
+        admin.require_auth();
+        env.storage()
+            .instance()
+            .set(&soroban_sdk::Symbol::new(&env, "admin"), &admin);
         env.storage().instance().set(
             &soroban_sdk::Symbol::new(&env, "pools"),
             &Map::<(Address, Address), Pool>::new(&env),
@@ -31,6 +35,12 @@ impl AMMRouter {
     }
 
     pub fn add_pool(env: Env, pool: Pool) {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&soroban_sdk::Symbol::new(&env, "admin"))
+            .expect("not initialized");
+        admin.require_auth();
         let mut pools: Map<(Address, Address), Pool> = env
             .storage()
             .instance()
@@ -68,10 +78,16 @@ impl AMMRouter {
         if amount_in <= 0 {
             panic!("amount_in must be positive");
         }
-        let amount_in_with_fee = amount_in * 997;
-        let numerator = amount_in_with_fee * reserve_out;
-        let denominator = reserve_in * 1000 + amount_in_with_fee;
-        numerator / denominator
+        let amount_in_with_fee = amount_in.checked_mul(997).expect("overflow");
+        let numerator = amount_in_with_fee
+            .checked_mul(reserve_out)
+            .expect("overflow");
+        let denominator = reserve_in
+            .checked_mul(1000)
+            .expect("overflow")
+            .checked_add(amount_in_with_fee)
+            .expect("overflow");
+        numerator.checked_div(denominator).expect("overflow")
     }
 
     pub fn swap_exact_tokens_for_tokens(

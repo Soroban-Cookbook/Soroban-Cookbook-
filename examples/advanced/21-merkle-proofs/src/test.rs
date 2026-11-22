@@ -157,8 +157,8 @@ fn test_set_root_bumps_generation_and_resets_claims() {
     client.set_root(&admin, &root, &(leaves.len() as u32));
 
     let proof = merkle_proof(&env, &leaves, 0);
-    client.verify_and_claim(&leaves[0], &0u32, &proof);
-    assert!(client.is_claimed(&0u32));
+    client.verify_and_claim(&admin, &leaves[0], &0u32, &proof);
+    assert!(client.is_claimed(&admin, &0u32));
 
     // Publish a brand new root (new generation); old claim record must not
     // leak into the new generation's claim space.
@@ -166,7 +166,7 @@ fn test_set_root_bumps_generation_and_resets_claims() {
     let root2 = merkle_root(&env, &leaves2);
     client.set_root(&admin, &root2, &(leaves2.len() as u32));
 
-    assert!(!client.is_claimed(&0u32));
+    assert!(!client.is_claimed(&admin, &0u32));
     let info = client.get_root_info();
     assert_eq!(info.generation, 2);
 }
@@ -269,10 +269,10 @@ fn test_verify_and_claim_success() {
     let root = merkle_root(&env, &leaves);
     client.set_root(&admin, &root, &(leaves.len() as u32));
 
-    assert!(!client.is_claimed(&2u32));
+    assert!(!client.is_claimed(&admin, &2u32));
     let proof = merkle_proof(&env, &leaves, 2);
-    client.verify_and_claim(&leaves[2], &2u32, &proof);
-    assert!(client.is_claimed(&2u32));
+    client.verify_and_claim(&admin, &leaves[2], &2u32, &proof);
+    assert!(client.is_claimed(&admin, &2u32));
 }
 
 #[test]
@@ -283,9 +283,9 @@ fn test_verify_and_claim_twice_fails() {
     client.set_root(&admin, &root, &(leaves.len() as u32));
 
     let proof = merkle_proof(&env, &leaves, 0);
-    client.verify_and_claim(&leaves[0], &0u32, &proof);
+    client.verify_and_claim(&admin, &leaves[0], &0u32, &proof);
 
-    let result = client.try_verify_and_claim(&leaves[0], &0u32, &proof);
+    let result = client.try_verify_and_claim(&admin, &leaves[0], &0u32, &proof);
     assert_eq!(result, Err(Ok(MerkleError::AlreadyClaimed)));
 }
 
@@ -297,9 +297,9 @@ fn test_verify_and_claim_invalid_proof_fails() {
     client.set_root(&admin, &root, &(leaves.len() as u32));
 
     let bad_proof = merkle_proof(&env, &leaves, 1); // proof for the wrong leaf
-    let result = client.try_verify_and_claim(&leaves[0], &0u32, &bad_proof);
+    let result = client.try_verify_and_claim(&admin, &leaves[0], &0u32, &bad_proof);
     assert_eq!(result, Err(Ok(MerkleError::InvalidProof)));
-    assert!(!client.is_claimed(&0u32));
+    assert!(!client.is_claimed(&admin, &0u32));
 }
 
 #[test]
@@ -310,7 +310,7 @@ fn test_verify_and_claim_index_out_of_bounds_fails() {
     client.set_root(&admin, &root, &(leaves.len() as u32));
 
     let proof = merkle_proof(&env, &leaves, 0);
-    let result = client.try_verify_and_claim(&leaves[0], &99u32, &proof);
+    let result = client.try_verify_and_claim(&admin, &leaves[0], &99u32, &proof);
     assert_eq!(result, Err(Ok(MerkleError::IndexOutOfBounds)));
 }
 

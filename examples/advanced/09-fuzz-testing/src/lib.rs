@@ -101,18 +101,18 @@ impl ClaimableBalanceContract {
 
         from.require_auth();
 
-        token::Client::new(&env, &token).transfer(&from, env.current_contract_address(), &amount);
-
         env.storage().persistent().set(
             &DataKey::Balance,
             &ClaimableBalance {
-                token,
+                token: token.clone(),
                 amount,
                 time_bound,
                 claimants,
             },
         );
         env.storage().persistent().set(&DataKey::Init, &());
+
+        token::Client::new(&env, &token).transfer(&from, env.current_contract_address(), &amount);
     }
 
     /// Claim up to `amount` tokens. Fails if the time bound is not met, the
@@ -139,13 +139,11 @@ impl ClaimableBalanceContract {
             panic!("claimed amount greater than balance");
         }
 
-        token::Client::new(&env, &claimable_balance.token).transfer(
-            &env.current_contract_address(),
-            &claimant,
-            &amount,
-        );
-
-        let new_balance = claimable_balance.amount - amount;
+        let new_balance = claimable_balance
+            .amount
+            .checked_sub(amount)
+            .expect("balance underflow");
+        let token = claimable_balance.token.clone();
         if new_balance > 0 {
             claimable_balance.amount = new_balance;
             env.storage()
@@ -154,6 +152,12 @@ impl ClaimableBalanceContract {
         } else {
             env.storage().persistent().remove(&DataKey::Balance);
         }
+
+        token::Client::new(&env, &token).transfer(
+            &env.current_contract_address(),
+            &claimant,
+            &amount,
+        );
     }
 }
 

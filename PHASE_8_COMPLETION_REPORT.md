@@ -30,7 +30,7 @@ All Phase 8 acceptance criteria and milestone targets have been achieved with ze
 ### 1.1 Monthly Community Call Governance (#379, #380, #382, #383) ✅
 - **Location:** `GOVERNANCE/`
 - Standardized monthly call agendas (`monthly-call-agenda-template.md`), format guidelines (`monthly-call-format-guidelines.md`), moderation handbook (`monthly-call-moderation-guide.md`), live Q&A process (`monthly-call-qa-process.md`), and follow-up workflow (`monthly-call-followup-process.md`).
-- Established recurring monthly developer call on the third Thursday of each month.
+- Established the recurring monthly developer call on the first Tuesday of each month at 16:00 UTC; the [subscribable calendar](https://raw.githubusercontent.com/Soroban-Cookbook/Soroban-Cookbook-/main/GOVERNANCE/monthly-community-call.ics) includes seven-day and one-day reminders.
 
 ### 1.2 Bug Bounty & Security Audit Program (#386, #388) ✅
 - **Location:** `SECURITY_AUDIT.md`, `AUDIT_CHECKLIST.md`

@@ -191,10 +191,10 @@ impl VaultContract {
     ///
     /// Can only be called once.
     pub fn initialize(env: Env, admin: Address, initial_strategy: StrategyType) {
-        admin.require_auth();
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("Already initialized");
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()
@@ -252,13 +252,13 @@ impl VaultContract {
         // Risk check 2: allocation cap
         let params = strategy_params(&env, &strategy);
         let new_total = total.checked_add(amount).expect("Overflow");
-        // max_allowed = new_total * max_allocation_bps / BPS_DENOM
-        // We want: amount <= new_total * max_allocation_bps / BPS_DENOM
-        // Rearranged: amount * BPS_DENOM <= new_total * max_allocation_bps
-        if amount.checked_mul(BPS_DENOM).expect("Overflow")
-            > new_total
-                .checked_mul(params.max_allocation_bps)
-                .expect("Overflow")
+        // Opening deposit funds the strategy. Later deposits must stay within
+        // max_allocation_bps of the resulting TVL.
+        if total > 0
+            && amount.checked_mul(BPS_DENOM).expect("Overflow")
+                > new_total
+                    .checked_mul(params.max_allocation_bps)
+                    .expect("Overflow")
         {
             panic!("Exceeds strategy allocation cap");
         }
@@ -387,7 +387,6 @@ impl VaultContract {
 
     /// Pause the vault (admin only).  Deposits are blocked; withdrawals remain open.
     pub fn pause(env: Env, admin: Address) {
-        admin.require_auth();
         Self::assert_admin(&env, &admin);
         env.storage().instance().set(&DataKey::Paused, &true);
         env.events()

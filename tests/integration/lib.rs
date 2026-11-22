@@ -12,4 +12,5 @@ pub use test_data_generators::{
     TokenMetadata, NftMetadata, AccessControlScenario,
 };
 
+#[allow(unused_imports)]
 pub use parallel_tests::*;

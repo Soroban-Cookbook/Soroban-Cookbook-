@@ -9,7 +9,9 @@
 //!    shared beacon.
 //! 4. Tracks every deployed proxy in `instance` storage so callers can enumerate them.
 //! 5. Provides a `batch_deploy` function to deploy many proxies in one transaction.
-//! 6. Provides `upgrade_beacon` to atomically upgrade all proxies with a single call.
+//! 6. Provides a two-step beacon upgrade (`stage_beacon_upgrade` then
+//!    `execute_beacon_upgrade` after a timelock) that upgrades all proxies at once,
+//!    plus `cancel_beacon_upgrade` to abort a staged upgrade.
 //!
 //! ## Gas optimisation notes
 //!
@@ -32,7 +34,7 @@
 use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
     contract, contractimpl, contracttype, symbol_short, vec, Address, BytesN, Env, IntoVal, Symbol,
-    Vec,
+    Val, Vec,
 };
 
 // ---------------------------------------------------------------------------
@@ -199,38 +201,21 @@ impl BeaconProxyFactory {
     // Upgrade (batch upgrade via beacon)
     // -----------------------------------------------------------------------
 
-    /// Upgrade the shared beacon to a new implementation.
+    /// Stage an upgrade of the shared beacon to a new implementation.
     ///
-    /// Because all proxies resolve their implementation through this single
-    /// beacon, this call atomically upgrades **every** proxy in O(1) — regardless
-    /// of how many proxies have been deployed.
+    /// The upgrade only takes effect after the beacon's timelock delay, when
+    /// `execute_beacon_upgrade` is called. Until then it can be aborted with
+    /// `cancel_beacon_upgrade`.
     ///
     /// Only the factory admin can call this.
     ///
     /// # Arguments
     /// * `new_implementation` - address of the new implementation contract
     /// * `label` - human-readable tag for this version (max 9 chars)
-    pub fn upgrade_beacon(env: Env, new_implementation: Address, label: Symbol) {
-        let admin: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Admin)
-            .unwrap_or_else(|| panic!("Not initialized"));
-
-        admin.require_auth();
-
-        let beacon: Address = env
-            .storage()
-            .instance()
-            .get(&DataKey::Beacon)
-            .unwrap_or_else(|| panic!("Not initialized"));
-
-        // The beacon's admin is the factory contract itself, so we call upgrade
-        // as the factory (current_contract_address). The auth chain is:
-        //   admin → factory.upgrade_beacon → beacon.upgrade (factory is beacon admin)
-        env.invoke_contract::<()>(
-            &beacon,
-            &Symbol::new(&env, "upgrade"),
+    pub fn stage_beacon_upgrade(env: Env, new_implementation: Address, label: Symbol) {
+        Self::call_beacon_as_admin(
+            &env,
+            "stage_upgrade",
             vec![
                 &env,
                 new_implementation.into_val(&env),
@@ -240,9 +225,46 @@ impl BeaconProxyFactory {
 
         #[allow(deprecated)]
         env.events().publish(
-            (symbol_short!("factory"), symbol_short!("upgraded")),
+            (symbol_short!("factory"), symbol_short!("staged")),
             new_implementation,
         );
+    }
+
+    /// Execute the staged beacon upgrade once its timelock has expired.
+    ///
+    /// Because all proxies resolve their implementation through this single
+    /// beacon, this call atomically upgrades **every** proxy in O(1) — regardless
+    /// of how many proxies have been deployed.
+    ///
+    /// Only the factory admin can call this.
+    pub fn execute_beacon_upgrade(env: Env) {
+        Self::call_beacon_as_admin(&env, "execute_upgrade", vec![&env]);
+
+        #[allow(deprecated)]
+        env.events().publish(
+            (symbol_short!("factory"), symbol_short!("upgraded")),
+            (),
+        );
+    }
+
+    /// Cancel the staged beacon upgrade.
+    ///
+    /// Only the factory admin can call this.
+    pub fn cancel_beacon_upgrade(env: Env) {
+        Self::call_beacon_as_admin(&env, "cancel_upgrade", vec![&env]);
+
+        #[allow(deprecated)]
+        env.events().publish(
+            (symbol_short!("factory"), symbol_short!("cancelled")),
+            (),
+        );
+    }
+
+    /// Set the beacon's upgrade timelock delay (in seconds).
+    ///
+    /// Only the factory admin can call this.
+    pub fn set_beacon_upgrade_delay(env: Env, delay: u64) {
+        Self::call_beacon_as_admin(&env, "set_upgrade_delay", vec![&env, delay.into_val(&env)]);
     }
 
     // -----------------------------------------------------------------------
@@ -312,6 +334,29 @@ impl BeaconProxyFactory {
     // -----------------------------------------------------------------------
     // Private helpers
     // -----------------------------------------------------------------------
+
+    /// Require factory admin auth, then call an admin-only beacon function.
+    ///
+    /// The beacon's admin is the factory contract itself, so the call is made
+    /// as the factory (current_contract_address). The auth chain is:
+    ///   admin → factory.<fn> → beacon.<fn> (factory is beacon admin)
+    fn call_beacon_as_admin(env: &Env, func: &str, args: Vec<Val>) {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .unwrap_or_else(|| panic!("Not initialized"));
+
+        admin.require_auth();
+
+        let beacon: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Beacon)
+            .unwrap_or_else(|| panic!("Not initialized"));
+
+        env.invoke_contract::<()>(&beacon, &Symbol::new(env, func), args);
+    }
 
     /// Core proxy deployment logic.
     ///

@@ -28,10 +28,13 @@ pub struct FlashLoanContract;
 impl FlashLoanContract {
     /// Initialize the contract with an admin and fee in basis points (1/10000).
     pub fn init(env: Env, admin: Address, fee_bps: u32) {
-        admin.require_auth();
         if env.storage().instance().has(&DataKey::Admin) {
             panic!("already initialized");
         }
+        if fee_bps > 10_000 {
+            panic!("fee exceeds 100%");
+        }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::FeeBps, &fee_bps);
     }
@@ -55,7 +58,12 @@ impl FlashLoanContract {
 
         // 2. Calculate fee
         let fee_bps: u32 = env.storage().instance().get(&DataKey::FeeBps).unwrap_or(0);
-        let fee = (amount * fee_bps as i128) / 10000;
+        let fee = amount
+            .checked_mul(i128::from(fee_bps))
+            .expect("fee overflow")
+            .checked_div(10_000)
+            .expect("fee overflow");
+        let repay = amount.checked_add(fee).expect("repay overflow");
 
         let token_client = token::Client::new(&env, &token);
         let contract_address = env.current_contract_address();
@@ -76,12 +84,7 @@ impl FlashLoanContract {
         // 6. Verify repayment
         // We use transfer_from to pull the funds (amount + fee) back from the receiver.
         // The receiver MUST have approved the flash loan contract to spend this amount.
-        token_client.transfer_from(
-            &contract_address,
-            &receiver,
-            &contract_address,
-            &(amount + fee),
-        );
+        token_client.transfer_from(&contract_address, &receiver, &contract_address, &repay);
 
         // 7. Release lock
         env.storage().temporary().remove(&DataKey::Locked);
@@ -97,6 +100,9 @@ impl FlashLoanContract {
     pub fn set_fee(env: Env, new_fee_bps: u32) {
         let admin: Address = env.storage().instance().get(&DataKey::Admin).unwrap();
         admin.require_auth();
+        if new_fee_bps > 10_000 {
+            panic!("fee exceeds 100%");
+        }
         env.storage().instance().set(&DataKey::FeeBps, &new_fee_bps);
     }
 

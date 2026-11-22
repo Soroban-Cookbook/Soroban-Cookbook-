@@ -9,6 +9,7 @@ use soroban_sdk::{testutils::Address as _, Env, IntoVal, TryIntoVal};
 #[test]
 fn test_proxy_initialization() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let proxy_id = env.register_contract(None, DiamondProxyContract);
@@ -27,6 +28,7 @@ fn test_proxy_initialization() {
 #[test]
 fn test_add_facet_requires_admin() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let non_admin = Address::generate(&env);
 
@@ -50,6 +52,7 @@ fn test_add_facet_requires_admin() {
 #[test]
 fn test_add_facet_interface_verification() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let proxy_id = env.register_contract(None, DiamondProxyContract);
@@ -77,6 +80,7 @@ fn test_add_facet_interface_verification() {
 #[test]
 fn test_execute_routes_correctly() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let proxy_id = env.register_contract(None, DiamondProxyContract);
@@ -104,6 +108,7 @@ fn test_execute_routes_correctly() {
 #[test]
 fn test_facet_access_control() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let random_user = Address::generate(&env);
 
@@ -128,6 +133,7 @@ fn test_facet_access_control() {
 #[test]
 fn test_namespaced_storage_isolation() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let proxy_id = env.register_contract(None, DiamondProxyContract);
@@ -185,6 +191,7 @@ fn test_namespaced_storage_isolation() {
 #[test]
 fn test_remove_facet() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
 
     let proxy_id = env.register_contract(None, DiamondProxyContract);
@@ -217,6 +224,7 @@ fn test_remove_facet() {
 #[test]
 fn test_upgrade_admin() {
     let env = Env::default();
+    env.mock_all_auths();
     let admin = Address::generate(&env);
     let new_admin = Address::generate(&env);
 

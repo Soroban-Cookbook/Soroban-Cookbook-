@@ -12,8 +12,11 @@ fn setup() -> (
     Address,
 ) {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, BatchOperations);
     let client = BatchOperationsClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+    client.initialize(&admin);
 
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);

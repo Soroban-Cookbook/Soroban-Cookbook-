@@ -181,6 +181,8 @@ impl StateChannelDisputesContract {
         if challenger != channel.participant_a && challenger != channel.participant_b {
             return Err(Error::InvalidParticipant);
         }
+        channel.participant_a.require_auth();
+        channel.participant_b.require_auth();
 
         if proposed_balance_a < 0 || proposed_balance_b < 0 {
             return Err(Error::InvalidBalance);
@@ -317,7 +319,7 @@ impl StateChannelDisputesContract {
     ) -> Result<(), Error> {
         submitter.require_auth();
 
-        let mut channel: ChannelState = env
+        let channel: ChannelState = env
             .storage()
             .instance()
             .get(&DataKey::Channel)
@@ -342,36 +344,14 @@ impl StateChannelDisputesContract {
             return Err(Error::InvalidFraudProof);
         }
 
-        // Verify the fraud proof target matches the disputed sequence
+        // Verify the fraud proof target matches the disputed sequence.
+        // Echoing the sequence is not a signature or state proof, so the
+        // channel is not awarded.
         if dispute.sequence != invalid_sequence {
             return Err(Error::InvalidFraudProof);
         }
-
-        // Fraud detected: Challenger tried to cheat with an invalid/revoked state.
-        // Penalty: Entire total deposit goes to the honest submitter/victim.
-        if submitter == channel.participant_a {
-            channel.balance_a = channel.total_deposit;
-            channel.balance_b = 0;
-        } else {
-            channel.balance_a = 0;
-            channel.balance_b = channel.total_deposit;
-        }
-
-        channel.status = ChannelStatus::Closed;
-        env.storage().instance().set(&DataKey::Channel, &channel);
-        env.storage().instance().remove(&DataKey::Dispute);
-
-        env.events().publish(
-            (CONTRACT_NS, ACTION_FRAUD, submitter),
-            DisputeEventData {
-                sequence: invalid_sequence,
-                balance_a: channel.balance_a,
-                balance_b: channel.balance_b,
-                timestamp: env.ledger().timestamp(),
-            },
-        );
-
-        Ok(())
+        let _ = (submitter, channel);
+        Err(Error::InvalidFraudProof)
     }
 
     /// Finalizes the dispute after the dispute deadline has passed.

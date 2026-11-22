@@ -17,15 +17,19 @@
 //! | `Pool(id)`              | instance     | `RewardPool` metadata               |
 //! | `Balance(addr)`         | persistent   | Per-account token balance           |
 //! | `Claimed(addr, pool)`   | persistent   | Lifetime rewards claimed by user    |
+//! | `RewardCredit(addr)`    | persistent   | Rewards paid into the balance       |
 //!
 //! ## Reward formula
 //!
 //! ```text
-//! claimable = (balance * rate_per_token / 1_000_000) - already_claimed
+//! earning = balance - reward_credit
+//! claimable = (earning * rate_per_token / 1_000_000) - already_claimed
 //! ```
 //!
-//! `rate_per_token` is expressed in micro-units (1 = 0.000001 tokens reward
-//! per token held), so a rate of `1_000_000` means 1:1 reward.
+//! `reward_credit` is the sum of rewards already paid into `balance`. Those
+//! tokens stay spendable, but they are not part of the balance that earns the
+//! next claim. `rate_per_token` is expressed in micro-units (1 = 0.000001
+//! tokens reward per token held), so a rate of `1_000_000` means 1:1 reward.
 
 #![no_std]
 
@@ -49,6 +53,8 @@ pub enum DataKey {
     Pool(u32),
     Balance(Address),
     Claimed(Address, u32),
+    /// Rewards already paid into `Balance`. Excluded from the next claim.
+    RewardCredit(Address),
 }
 
 // ---------------------------------------------------------------------------
@@ -123,6 +129,8 @@ impl RewardToken {
             return Err(RewardError::AlreadyInitialized);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Name, &name);
         env.storage().instance().set(&DataKey::Symbol, &symbol);
@@ -187,6 +195,7 @@ impl RewardToken {
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &new_balance);
+        clamp_reward_credit(&env, &from);
 
         env.events().publish((NS, EV_BURN, from), amount);
         Ok(())
@@ -202,19 +211,22 @@ impl RewardToken {
             return Err(RewardError::InsufficientBalance);
         }
 
-        let to_balance = read_balance(&env, &to)
-            .checked_add(amount)
-            .ok_or(RewardError::ArithmeticOverflow)?;
         let new_from_balance = from_balance
             .checked_sub(amount)
             .ok_or(RewardError::ArithmeticOverflow)?;
-
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &new_from_balance);
+
+        let to_balance = read_balance(&env, &to)
+            .checked_add(amount)
+            .ok_or(RewardError::ArithmeticOverflow)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &to_balance);
+        if from != to {
+            clamp_reward_credit(&env, &from);
+        }
 
         env.events().publish((NS, EV_XFER, from, to), amount);
         Ok(())
@@ -301,6 +313,7 @@ impl RewardToken {
         env.storage()
             .persistent()
             .set(&DataKey::Balance(admin.clone()), &new_admin_balance);
+        clamp_reward_credit(&env, &admin);
         env.storage().instance().set(&DataKey::Pool(pool_id), &pool);
 
         env.events().publish((NS, EV_DEP, pool_id), amount);
@@ -319,8 +332,8 @@ impl RewardToken {
     /// Return how many reward tokens `user` can currently claim from `pool_id`.
     pub fn claimable_rewards(env: Env, user: Address, pool_id: u32) -> Result<i128, RewardError> {
         let pool = read_pool(&env, pool_id)?;
-        let balance = read_balance(&env, &user);
-        let gross = balance
+        let earning = earning_balance(&env, &user)?;
+        let gross = earning
             .checked_mul(pool.rate_per_token)
             .ok_or(RewardError::ArithmeticOverflow)?
             .checked_div(1_000_000)
@@ -335,9 +348,9 @@ impl RewardToken {
         user.require_auth();
 
         let mut pool = read_pool(&env, pool_id)?;
-        let balance = read_balance(&env, &user);
+        let earning = earning_balance(&env, &user)?;
 
-        let gross = balance
+        let gross = earning
             .checked_mul(pool.rate_per_token)
             .ok_or(RewardError::ArithmeticOverflow)?
             .checked_div(1_000_000)
@@ -353,9 +366,13 @@ impl RewardToken {
             return Err(RewardError::InsufficientBalance);
         }
 
-        // Credit user, deduct from pool reserve.
+        // Pay the user, but record the payout in RewardCredit so it does not
+        // increase the balance used for the next claim.
         let user_balance = read_balance(&env, &user);
         let new_user_balance = user_balance
+            .checked_add(reward)
+            .ok_or(RewardError::ArithmeticOverflow)?;
+        let new_credit = read_reward_credit(&env, &user)
             .checked_add(reward)
             .ok_or(RewardError::ArithmeticOverflow)?;
         pool.total_deposited = pool
@@ -370,6 +387,9 @@ impl RewardToken {
         env.storage()
             .persistent()
             .set(&DataKey::Balance(user.clone()), &new_user_balance);
+        env.storage()
+            .persistent()
+            .set(&DataKey::RewardCredit(user.clone()), &new_credit);
         env.storage()
             .persistent()
             .set(&DataKey::Claimed(user.clone(), pool_id), &new_claimed);
@@ -425,6 +445,31 @@ fn read_claimed(env: &Env, user: &Address, pool_id: u32) -> i128 {
         .persistent()
         .get(&DataKey::Claimed(user.clone(), pool_id))
         .unwrap_or(0)
+}
+
+fn read_reward_credit(env: &Env, user: &Address) -> i128 {
+    env.storage()
+        .persistent()
+        .get(&DataKey::RewardCredit(user.clone()))
+        .unwrap_or(0)
+}
+
+/// Token balance minus rewards already paid into it.
+fn earning_balance(env: &Env, user: &Address) -> Result<i128, RewardError> {
+    read_balance(env, user)
+        .checked_sub(read_reward_credit(env, user))
+        .ok_or(RewardError::ArithmeticOverflow)
+}
+
+/// Keep recorded reward credit from exceeding the spendable balance.
+fn clamp_reward_credit(env: &Env, user: &Address) {
+    let balance = read_balance(env, user);
+    let credit = read_reward_credit(env, user);
+    if credit > balance {
+        env.storage()
+            .persistent()
+            .set(&DataKey::RewardCredit(user.clone()), &balance);
+    }
 }
 
 fn require_positive(amount: i128) -> Result<(), RewardError> {

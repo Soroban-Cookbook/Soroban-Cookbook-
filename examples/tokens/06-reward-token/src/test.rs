@@ -294,15 +294,13 @@ fn claimable_rewards_view() {
     let view = f.contract.claimable_rewards(&f.alice, &0u32);
     assert_eq!(view, 1_000_000);
 
-    // After claiming, Alice's balance grows to 2_000_000.
-    // gross = 2_000_000 * 1_000_000 / 1_000_000 = 2_000_000
-    // already_claimed = 1_000_000 → claimable = 1_000_000.
-    // This is consistent with the `double_claim_returns_nothing` test.
+    // After claiming, Alice's spendable balance grows, but the payout is
+    // excluded from the earning balance, so nothing further is claimable.
     let actual = f.contract.claim_rewards(&f.alice, &0u32);
     assert_eq!(actual, 1_000_000);
 
     let view_after = f.contract.claimable_rewards(&f.alice, &0u32);
-    assert_eq!(view_after, 1_000_000);
+    assert_eq!(view_after, 0);
 }
 
 #[test]
@@ -340,11 +338,12 @@ fn double_claim_returns_nothing() {
     let first = f.contract.claim_rewards(&f.alice, &0u32);
     assert_eq!(first, 1_000_000);
 
-    // Second claim: balance is now 2_000_000, but already claimed 1_000_000.
-    // New gross = 2_000_000 * 1_000_000 / 1_000_000 = 2_000_000.
-    // Claimable = 2_000_000 - 1_000_000 = 1_000_000.
-    let second = f.contract.claim_rewards(&f.alice, &0u32);
-    assert_eq!(second, 1_000_000);
+    // The payout is excluded from the earning balance, so a second claim
+    // on the same holdings pays nothing.
+    assert_eq!(
+        f.contract.try_claim_rewards(&f.alice, &0u32),
+        Err(Ok(RewardError::NothingToClaim))
+    );
 }
 
 #[test]
@@ -366,9 +365,7 @@ fn independent_pools_track_separately() {
 
     // Pool 0 reward = 1_000_000 * 1_000_000 / 1_000_000 = 1_000_000
     assert_eq!(claim0, 1_000_000);
-    // Pool 1 reward based on updated balance (2_000_000) * 500_000 / 1_000_000 = 1_000_000
-    // But claimed from p1 is 0, so full amount.
-    // Balance after pool0 claim = 2_000_000.
-    // Pool1 reward = 2_000_000 * 500_000 / 1_000_000 = 1_000_000.
-    assert_eq!(claim1, 1_000_000);
+    // Pool 0's payout is excluded from the earning balance, so pool 1
+    // still pays 1_000_000 * 500_000 / 1_000_000 = 500_000.
+    assert_eq!(claim1, 500_000);
 }

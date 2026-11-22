@@ -7,12 +7,17 @@
 - [Setup Environment](./guides/getting-started.md)
 - [macOS Setup Guide](./guides/macos-setup.md)
 
+# Community
+
+- [Community Calls](./community-calls.md)
+
 # Guides
 
 - [Testing Guide](./guides/testing.md)
 - [Mobile Testing Guide](./guides/mobile-testing.md)
 - [Local Simulation](./guides/local-simulation.md)
 - [Deployment Guide](./guides/deployment.md)
+- [Deployment Best Practices](./docs/deployment-best-practices.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
 - [Project Templates](./docs/project-templates.md)
 - [Video Creation Tools](./guides/video-creation.md)
@@ -21,6 +26,7 @@
 # Playground
 
 - [Playground Infrastructure](./playground.md)
+- [Interactive Playground — Intermediate Examples](./examples/playground-intermediate.md)
 
 ## Interactive Tutorials
 
@@ -50,6 +56,7 @@
 ## Advanced (3 examples)
 - [Multi-party auth](./examples/advanced.md)
 - [Oracle Pattern](./examples/oracle-pattern.md)
+- [Off-chain Signatures](./examples/off-chain-signatures.md)
 - [Diamond Pattern (canonical)](./examples/advanced/38-diamond-pattern/README.md)
 - [Diamond Security (security-focused)](./examples/advanced/19-diamond-security/README.md)
 - [Diamond Facets (router orchestration)](./examples/advanced/18-diamond-facets/README.md)
@@ -79,6 +86,7 @@
 - [03 Â· NFT Metadata Standards](./examples/nfts/03-nft-metadata-standards.md)
 - [04 Â· NFT Marketplace](./examples/nfts/04-nft-marketplace.md)
 - [NFT Patterns Reference](./docs/nft-patterns.md)
+- [NFT Best Practices](./docs/nft-best-practices.md)
 - [NFT Development Video Walkthrough](./docs/nft-development-video.md)
 
 ## Governance (11 examples)
@@ -105,7 +113,7 @@
 - [11 · Automatic Snapshot Triggers](./examples/governance/11-automatic-snapshot-triggers.md)
 
 
-## Tokens (9 examples)
+## Tokens (10 examples)
 - [Overview](./examples/tokens.md)
 - [Token Security Checklist](./docs/token-security-checklist.md)
 - [01 Â· SEP-41 Token](./examples/tokens/01-sep41-token.md)
@@ -117,6 +125,7 @@
 - [07 Â· Token Metadata](./examples/tokens/07-token-metadata.md)
 - [08 Â· Multi-Token Balance Manager](./examples/tokens/08-multi-token-balance-manager.md)
 - [09 Â· Optimized Token Ops](./examples/tokens/09-optimized-token-ops.md)
+- [11 · Authorized Token](./examples/tokens/11-authorized-token.md)
 
 # Analytics
 
@@ -124,6 +133,7 @@
 
 # API Reference
 
+- [Code Examples](./docs/code-examples.md)
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
 - [Code Review Checklist](./docs/review-checklist.md)
@@ -138,7 +148,6 @@
 - [Featured Projects](./../docs/featured-projects.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
-- [Documentation Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)
 - [Glossary](./docs/glossary.md)
 - [Translation Infrastructure](./docs/translation-infrastructure.md)
@@ -153,20 +162,25 @@
 - [Security Best Practices](./docs/security-best-practices.md)
 - [Site Search](./docs/search.md)
 
+# Languages
+
+- [Language Support](./language-support.md)
+
 # Community
 
 - [Community Guidelines](./community-guidelines.md)
 - [Quality Dashboard](./docs/quality-dashboard.md)
-- [Community Guidelines](./community-guidelines.md)
 - [How to Contribute](./CONTRIBUTING.md)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Grants Application Process](./docs/grants-process.md)
-- [Monthly Call Governance](../GOVERNANCE/README.md)
-  - [Agenda Template](../GOVERNANCE/monthly-call-agenda-template.md)
-  - [Format Guidelines](../GOVERNANCE/monthly-call-format-guidelines.md)
-  - [Moderation Guide](../GOVERNANCE/monthly-call-moderation-guide.md)
-  - [Q&A Process](../GOVERNANCE/monthly-call-qa-process.md)
-  - [Follow-up Process](../GOVERNANCE/monthly-call-followup-process.md)
+- [Governance](./governance/README.md)
+  - [Agenda Template](./governance/monthly-call-agenda-template.md)
+  - [Format Guidelines](./governance/monthly-call-format-guidelines.md)
+  - [Moderation Guide](./governance/monthly-call-moderation-guide.md)
+  - [Q&A Process](./governance/monthly-call-qa-process.md)
+  - [Follow-up Process](./governance/monthly-call-followup-process.md)
+  - [Community Call Archive](./governance/notes/README.md)
+    - [Call Notes Template](./governance/notes/TEMPLATE.md)
 
 # ä¸­æ–‡æ–‡æ¡£
 
@@ -181,5 +195,15 @@
   - [ADR-003: Soroban SDK Version](./adr/003-soroban-sdk-version.md)
   - [ADR-004: Testing Framework](./adr/004-testing-framework.md)
   - [ADR-005: Documentation Platform](./adr/005-documentation-platform.md)
+  - [ADR-002: Select Storage Tier by Lifetime](./adr/002-select-storage-tier.md)
+  - [ADR-003: Stable Storage Keys and TTL](./adr/003-stable-storage-keys-and-ttl.md)
+  - [ADR-004: Authenticate Before State Changes](./adr/004-authenticate-before-state-changes.md)
+  - [ADR-005: Least-Privilege Access Control](./adr/005-use-least-privilege-access-control.md)
+  - [ADR-006: Guard Contract Code Upgrades](./adr/006-guard-contract-upgrades.md)
+  - [ADR-007: Versioned State Migrations](./adr/007-version-state-migrations.md)
+  - [ADR-008: Use mdBook for Documentation](./adr/008-mdbook-documentation-platform.md)
+  - [ADR-009: Workspace Structure and CI Exclusion](./adr/009-workspace-structure-and-ci-exclusion.md)
+  - [ADR-010: SDK Version Migration Strategy](./adr/010-sdk-version-migration-strategy.md)
+  - [ADR-011: Code Coverage Toolchain](./adr/011-code-coverage-toolchain.md)
+  - [ADR-012: Example Naming Convention](./adr/012-example-naming-convention.md)
   - [ADR Template](./adr/template.md)
-

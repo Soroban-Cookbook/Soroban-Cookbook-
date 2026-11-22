@@ -352,6 +352,22 @@ fn test_approve_and_transfer() {
 }
 
 #[test]
+fn test_transfer_from_approved_operator() {
+    let (env, contract_id, admin) = setup();
+    let client = NftMetadataContractClient::new(&env, &contract_id);
+
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+    let charlie = Address::generate(&env);
+    let meta = valid_metadata(&env);
+
+    client.mint(&admin, &alice, &1u32, &meta);
+    client.approve(&alice, &bob, &1u32);
+    client.transfer_from(&bob, &alice, &charlie, &1u32);
+    assert_eq!(client.owner_of(&1u32), charlie);
+}
+
+#[test]
 fn test_set_approval_for_all() {
     let (env, contract_id, admin) = setup();
     let client = NftMetadataContractClient::new(&env, &contract_id);

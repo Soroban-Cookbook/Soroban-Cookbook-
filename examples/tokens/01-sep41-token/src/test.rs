@@ -255,3 +255,27 @@ fn uninitialized_contract_returns_not_initialized_for_metadata() {
     assert_eq!(token.try_decimals(), Err(Ok(TokenError::NotInitialized)));
     assert_eq!(token.try_admin(), Err(Ok(TokenError::NotInitialized)));
 }
+
+#[test]
+fn transfer_rejects_self_transfer() {
+    let f = setup();
+
+    assert_eq!(
+        f.token.try_transfer(&f.admin, &f.admin, &100),
+        Err(Ok(TokenError::InvalidTransfer))
+    );
+    assert_eq!(f.token.balance(&f.admin), 1_000_000);
+}
+
+#[test]
+fn transfer_from_rejects_self_transfer_without_consuming_allowance() {
+    let f = setup();
+
+    f.token.approve(&f.admin, &f.alice, &100).unwrap();
+    assert_eq!(
+        f.token.try_transfer_from(&f.alice, &f.admin, &f.admin, &50),
+        Err(Ok(TokenError::InvalidTransfer))
+    );
+    assert_eq!(f.token.allowance(&f.admin, &f.alice), 100);
+    assert_eq!(f.token.balance(&f.admin), 1_000_000);
+}

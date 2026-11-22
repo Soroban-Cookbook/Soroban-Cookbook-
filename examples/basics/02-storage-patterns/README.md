@@ -65,3 +65,5 @@ cargo test -p storage-patterns
 - [Detailed Instance Storage](../instance-storage/)
 - [Detailed Persistent Storage](../persistent-storage/)
 - [Detailed Temporary Storage](../temporary_storage/)
+- [ADR-002: Select Storage Tier by Lifetime](../../../docs/adr/002-select-storage-tier.md)
+- [ADR-003: Stable Storage Keys and TTL](../../../docs/adr/003-stable-storage-keys-and-ttl.md)

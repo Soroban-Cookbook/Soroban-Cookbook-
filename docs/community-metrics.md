@@ -39,7 +39,7 @@ Tracking metrics allows us to:
 
 | Category | Description | Tracking Source |
 |---|---|---|
-| **Growth** | New contributors, stars, forks, clone traffic | GitHub Insights / Actions |
+| **Growth** | Contributor activity, stars, forks, clone traffic | GitHub Insights / Actions |
 | **Engagement** | Issues opened/closed, PR activity, discussion threads | GitHub API |
 | **Content Quality** | CI pass rate, test coverage, clippy warnings | GitHub Actions badges |
 | **Community Health** | Response time, PR review velocity, Code of Conduct incidents | GitHub API / manual |
@@ -53,7 +53,7 @@ Tracking metrics allows us to:
 
 | Metric | Definition | Target | Frequency |
 |---|---|---|---|
-| **New Contributors** | GitHub accounts that open their first merged PR in the period | ≥ 2 / month | Monthly |
+| **Contributors** | Unique GitHub accounts with at least one merged PR in the period | ≥ 2 / month | Monthly |
 | **Repository Stars** | Cumulative star count at the end of the period | Sustained upward trend | Monthly |
 | **Forks** | Cumulative fork count | Sustained upward trend | Monthly |
 | **Unique Cloners** | 14-day unique clone traffic (from GitHub Traffic API) | ≥ 100 / 14 days | Bi-weekly |
@@ -223,7 +223,7 @@ Periodic community surveys are managed through the
 ### Growth
 | Metric | This Month | Last Month | Δ |
 |---|---|---|---|
-| New Contributors | | | |
+| Contributors | | | |
 | Stars | | | |
 | Unique Cloners | | | |
 
@@ -259,7 +259,7 @@ the on-call maintainer:
 | Median issue response time | > 72 hours in rolling 7 days | Warning |
 | Median PR review time | > 5 days in rolling 7 days | Warning |
 | Issues close rate | < 50% for the month | Warning |
-| No new contributors | 0 new merged contributors in 60 days | Warning |
+| No contributor PR activity | 0 contributors with merged PRs in 30 days | Warning |
 | Community satisfaction drops | Survey score < 3.5 / 5 | High |
 | CoC incident reported | Any confirmed incident | Critical |
 

@@ -123,6 +123,8 @@ impl AllowancePattern {
             return Err(AllowanceError::InvalidAmount);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()
             .persistent()

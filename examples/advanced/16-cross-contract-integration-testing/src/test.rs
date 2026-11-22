@@ -15,7 +15,8 @@ fn test_cross_contract_integration_and_upgrade_simulation() {
     let factory_id = env.register(Factory, ());
     let factory_client = FactoryClient::new(&env, &factory_id);
     let wasm_hash = BytesN::from_array(&env, &[0x42; 32]);
-    factory_client.initialize(&wasm_hash, &registry_id);
+    let admin = Address::generate(&env);
+    factory_client.initialize(&admin, &wasm_hash, &registry_id);
 
     let name = symbol_short!("example1");
     let _creator = Address::generate(&env);

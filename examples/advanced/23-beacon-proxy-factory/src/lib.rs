@@ -48,9 +48,14 @@
 //!
 //! ## Upgrade flow
 //!
-//! Because all proxies reference the same beacon, a single call to
-//! `BeaconProxyFactory::upgrade_beacon` atomically upgrades **every** deployed
-//! proxy in one transaction — O(1) cost regardless of how many proxies exist.
+//! Because all proxies reference the same beacon, a single executed beacon
+//! upgrade atomically upgrades **every** deployed proxy in one transaction —
+//! O(1) cost regardless of how many proxies exist.
+//!
+//! Upgrades are two-step: `BeaconProxyFactory::stage_beacon_upgrade` records the
+//! new implementation and starts a timelock, and `execute_beacon_upgrade` applies
+//! it once the delay has passed. `cancel_beacon_upgrade` aborts a staged upgrade,
+//! so a wrong implementation address cannot brick every proxy in a single call.
 //!
 //! ## Gas optimisation
 //!
