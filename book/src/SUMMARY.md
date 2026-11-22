@@ -19,6 +19,7 @@
 - [Deployment Guide](./guides/deployment.md)
 - [Deployment Best Practices](./docs/deployment-best-practices.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
+- [Solana to Soroban](./guides/solana-to-soroban.md)
 - [Project Templates](./docs/project-templates.md)
 - [Video Creation Tools](./guides/video-creation.md)
 - [Introduction Video](./guides/introduction-video.md)

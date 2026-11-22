@@ -14,6 +14,7 @@ every snippet is covered by the repository test-suites.
 | [Local Simulation](./local-simulation.md) | Run a local Stellar node |
 | [Deployment Guide](./deployment.md) | Deploy to testnet and mainnet |
 | [Ethereum to Soroban](./ethereum-to-soroban.md) | Translate Solidity habits to Soroban |
+| [Solana to Soroban](./solana-to-soroban.md) | Map accounts, PDAs, Anchor and CPI to Soroban |
 | [Project Templates](./docs/project-templates.md) | Start from a template project |
 | [Security Checklist](./security-checklist.md) | Review a contract before shipping |
 | [Video Creation Tools](./video-creation.md) | Record the walkthrough videos |
