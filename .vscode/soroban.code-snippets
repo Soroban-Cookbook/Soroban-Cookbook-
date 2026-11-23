@@ -1,0 +1,117 @@
+{
+  // Soroban snippets for the cookbook. Type the prefix in a .rs file and press Tab.
+  "Soroban contract skeleton": {
+    "scope": "rust",
+    "prefix": "soroban-contract",
+    "body": [
+      "#![no_std]",
+      "use soroban_sdk::{contract, contractimpl, Env};",
+      "",
+      "#[contract]",
+      "pub struct ${1:MyContract};",
+      "",
+      "#[contractimpl]",
+      "impl ${1:MyContract} {",
+      "    pub fn ${2:hello}(env: Env) {",
+      "        $0",
+      "    }",
+      "}",
+      "",
+      "#[cfg(test)]",
+      "mod test;"
+    ],
+    "description": "New #![no_std] Soroban contract with a test module"
+  },
+  "Soroban contract error enum": {
+    "scope": "rust",
+    "prefix": "soroban-error",
+    "body": [
+      "#[contracterror]",
+      "#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]",
+      "#[repr(u32)]",
+      "pub enum ${1:Error} {",
+      "    NotInitialized = 1,",
+      "    AlreadyInitialized = 2,",
+      "    Unauthorized = 3,",
+      "    $0",
+      "}"
+    ],
+    "description": "#[contracterror] enum with common variants"
+  },
+  "Soroban storage DataKey": {
+    "scope": "rust",
+    "prefix": "soroban-datakey",
+    "body": [
+      "#[contracttype]",
+      "#[derive(Clone)]",
+      "pub enum DataKey {",
+      "    Admin,",
+      "    ${1:Balance}(Address),",
+      "    $0",
+      "}"
+    ],
+    "description": "#[contracttype] storage key enum"
+  },
+  "Soroban admin guard": {
+    "scope": "rust",
+    "prefix": "soroban-admin",
+    "body": [
+      "let admin: Address = env",
+      "    .storage()",
+      "    .instance()",
+      "    .get(&DataKey::Admin)",
+      "    .ok_or(${1:Error}::NotInitialized)?;",
+      "admin.require_auth();",
+      "$0"
+    ],
+    "description": "Load the admin from instance storage and require its auth"
+  },
+  "Soroban extend instance TTL": {
+    "scope": "rust",
+    "prefix": "soroban-ttl",
+    "body": [
+      "env.storage()",
+      "    .instance()",
+      "    .extend_ttl(${1:INSTANCE_TTL_THRESHOLD}, ${2:INSTANCE_TTL_EXTEND_TO});"
+    ],
+    "description": "Extend the contract instance TTL"
+  },
+  "Soroban publish event": {
+    "scope": "rust",
+    "prefix": "soroban-event",
+    "body": [
+      "env.events()",
+      "    .publish((symbol_short!(\"${1:topic}\"), ${2:subject}), ${3:data});"
+    ],
+    "description": "Publish a contract event"
+  },
+  "Soroban unit test": {
+    "scope": "rust",
+    "prefix": "soroban-test",
+    "body": [
+      "#[test]",
+      "fn ${1:test_name}() {",
+      "    let env = Env::default();",
+      "    env.mock_all_auths();",
+      "",
+      "    let contract_id = env.register(${2:MyContract}, ());",
+      "    let client = ${2:MyContract}Client::new(&env, &contract_id);",
+      "    let user = Address::generate(&env);",
+      "",
+      "    $0",
+      "}"
+    ],
+    "description": "Soroban test with mocked auth and a generated client"
+  },
+  "Soroban expect contract error": {
+    "scope": "rust",
+    "prefix": "soroban-try",
+    "body": [
+      "assert_eq!(",
+      "    client.try_${1:method}(${2:args}),",
+      "    Err(Ok(${3:Error}::${4:Variant}))",
+      ");"
+    ],
+    "description": "Assert a contract call returns a specific #[contracterror]"
+  }
+}

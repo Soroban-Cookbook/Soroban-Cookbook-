@@ -80,6 +80,8 @@ impl CustomToken {
             return Err(TokenError::InvalidThreshold);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Name, &name);
         env.storage().instance().set(&DataKey::Symbol, &symbol);
@@ -112,14 +114,14 @@ impl CustomToken {
             return Err(TokenError::InsufficientBalance);
         }
 
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+
         let to_balance = read_balance(&env, &to);
         let new_to_balance = to_balance
             .checked_add(amount)
             .ok_or(TokenError::ArithmeticOverflow)?;
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);
@@ -171,11 +173,6 @@ impl CustomToken {
             return Err(TokenError::InsufficientBalance);
         }
 
-        let to_balance = read_balance(&env, &to);
-        let new_to_balance = to_balance
-            .checked_add(amount)
-            .ok_or(TokenError::ArithmeticOverflow)?;
-
         env.storage().persistent().set(
             &DataKey::Allowance(owner.clone(), spender.clone()),
             &(allowance - amount),
@@ -183,6 +180,11 @@ impl CustomToken {
         env.storage()
             .persistent()
             .set(&DataKey::Balance(owner.clone()), &(owner_balance - amount));
+
+        let to_balance = read_balance(&env, &to);
+        let new_to_balance = to_balance
+            .checked_add(amount)
+            .ok_or(TokenError::ArithmeticOverflow)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);
@@ -344,7 +346,12 @@ impl CustomToken {
             return Err(TokenError::InsufficientApprovals);
         }
 
+        let mut seen: Vec<Address> = Vec::new(&env);
         for signer in signers.iter() {
+            if seen.contains(&signer) {
+                return Err(TokenError::InsufficientApprovals);
+            }
+            seen.push_back(signer.clone());
             if !authorized.contains(&signer) {
                 return Err(TokenError::NotSigner);
             }
@@ -357,14 +364,14 @@ impl CustomToken {
             return Err(TokenError::InsufficientBalance);
         }
 
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+
         let to_balance = read_balance(&env, &to);
         let new_to_balance = to_balance
             .checked_add(amount)
             .ok_or(TokenError::ArithmeticOverflow)?;
-
-        env.storage()
-            .persistent()
-            .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &new_to_balance);

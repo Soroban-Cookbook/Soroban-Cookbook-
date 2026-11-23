@@ -1,0 +1,28 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Soroban Cookbook//Monthly Community Call//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:monthly-community-call@soroban-cookbook.github.io
+DTSTAMP:20261021T092147Z
+DTSTART:20261103T160000Z
+DURATION:PT60M
+RRULE:FREQ=MONTHLY;BYDAY=1TU
+SUMMARY:Soroban Cookbook Monthly Community Call
+DESCRIPTION:First Tuesday of each month at 16:00 UTC. The meeting
+ platform and join link will be announced and added when confirmed.
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+TRIGGER:-P7D
+ACTION:DISPLAY
+DESCRIPTION:Soroban Cookbook community call in one week
+END:VALARM
+BEGIN:VALARM
+TRIGGER:-P1D
+ACTION:DISPLAY
+DESCRIPTION:Soroban Cookbook community call tomorrow
+END:VALARM
+END:VEVENT
+END:VCALENDAR

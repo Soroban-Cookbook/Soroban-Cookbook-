@@ -186,6 +186,8 @@ impl DaoContract {
         if weight <= 0 {
             return Err(DaoError::InvalidAmount);
         }
+        // One vote per address. The caller-supplied weight is not voting power.
+        let weight = 1i128;
 
         let mut proposal = Self::load_proposal(&env, proposal_id)?;
         if proposal.state == ProposalState::Cancelled || proposal.state == ProposalState::Executed {

@@ -2,14 +2,19 @@
 extern crate std;
 
 use super::*;
-use soroban_sdk::{testutils::Ledger, Bytes, Env, Symbol};
+use soroban_sdk::{
+    testutils::{Address as _, Ledger},
+    Address, Bytes, Env, Symbol,
+};
 
-fn setup() -> (Env, ProposalValidationClient<'static>) {
+fn setup() -> (Env, Address, ProposalValidationClient<'static>) {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, ProposalValidation);
     let client = ProposalValidationClient::new(&env, &contract_id);
     env.ledger().with_mut(|ledger| ledger.timestamp = 1_000);
-    (env, client)
+    let creator = Address::generate(&env);
+    (env, creator, client)
 }
 
 fn bytes(env: &Env, input: &[u8]) -> Bytes {
@@ -18,11 +23,11 @@ fn bytes(env: &Env, input: &[u8]) -> Bytes {
 
 #[test]
 fn test_create_proposal_success() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
     let topic = Symbol::new(&env, "treasury");
 
     let id = client
-        .try_create_proposal(&topic, &1_020, &1_120, &6_000, &bytes(&env, b"hash-1"))
+        .try_create_proposal(&creator, &topic, &1_020, &1_120, &6_000, &bytes(&env, b"hash-1"))
         .unwrap()
         .unwrap();
 
@@ -34,9 +39,9 @@ fn test_create_proposal_success() {
 
 #[test]
 fn test_reject_start_too_soon() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
-    let result = client.try_create_proposal(
+    let result = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_009,
         &1_100,
@@ -48,9 +53,9 @@ fn test_reject_start_too_soon() {
 
 #[test]
 fn test_reject_end_before_start() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
-    let result = client.try_create_proposal(
+    let result = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_019,
@@ -62,9 +67,9 @@ fn test_reject_end_before_start() {
 
 #[test]
 fn test_reject_duration_too_short() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
-    let result = client.try_create_proposal(
+    let result = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_030,
@@ -76,9 +81,9 @@ fn test_reject_duration_too_short() {
 
 #[test]
 fn test_reject_invalid_quorum() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
-    let low = client.try_create_proposal(
+    let low = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -87,7 +92,7 @@ fn test_reject_invalid_quorum() {
     );
     assert_eq!(low, Err(Ok(ProposalError::InvalidQuorum)));
 
-    let high = client.try_create_proposal(
+    let high = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -99,9 +104,9 @@ fn test_reject_invalid_quorum() {
 
 #[test]
 fn test_reject_empty_metadata() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
-    let result = client.try_create_proposal(
+    let result = client.try_create_proposal(&creator, 
         &Symbol::new(&env, "ops"),
         &1_020,
         &1_120,
@@ -113,32 +118,32 @@ fn test_reject_empty_metadata() {
 
 #[test]
 fn test_detect_topic_conflict() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
     let topic = Symbol::new(&env, "bridge");
 
     client
-        .try_create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .try_create_proposal(&creator, &topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
         .unwrap()
         .unwrap();
 
     let conflict =
-        client.try_create_proposal(&topic, &1_100, &1_200, &5_000, &bytes(&env, b"hash-b"));
+        client.try_create_proposal(&creator, &topic, &1_100, &1_200, &5_000, &bytes(&env, b"hash-b"));
     assert_eq!(conflict, Err(Ok(ProposalError::TopicConflict)));
 }
 
 #[test]
 fn test_allow_same_topic_after_close() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
     let topic = Symbol::new(&env, "bridge");
 
     let first = client
-        .try_create_proposal(&topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
+        .try_create_proposal(&creator, &topic, &1_020, &1_120, &5_000, &bytes(&env, b"hash-a"))
         .unwrap()
         .unwrap();
-    client.try_close_proposal(&first).unwrap().unwrap();
+    client.try_close_proposal(&creator, &first).unwrap().unwrap();
 
     let second = client
-        .try_create_proposal(&topic, &1_130, &1_230, &5_000, &bytes(&env, b"hash-b"))
+        .try_create_proposal(&creator, &topic, &1_130, &1_230, &5_000, &bytes(&env, b"hash-b"))
         .unwrap()
         .unwrap();
     assert_eq!(second, 2);
@@ -146,10 +151,10 @@ fn test_allow_same_topic_after_close() {
 
 #[test]
 fn test_non_conflicting_topics_are_allowed() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
     client
-        .try_create_proposal(
+        .try_create_proposal(&creator, 
             &Symbol::new(&env, "treasury"),
             &1_020,
             &1_120,
@@ -160,7 +165,7 @@ fn test_non_conflicting_topics_are_allowed() {
         .unwrap();
 
     let other = client
-        .try_create_proposal(
+        .try_create_proposal(&creator, 
             &Symbol::new(&env, "validator"),
             &1_030,
             &1_130,
@@ -175,15 +180,15 @@ fn test_non_conflicting_topics_are_allowed() {
 
 #[test]
 fn test_close_errors_for_missing_or_closed_proposal() {
-    let (env, client) = setup();
+    let (env, creator, client) = setup();
 
     assert_eq!(
-        client.try_close_proposal(&404),
+        client.try_close_proposal(&creator, &404),
         Err(Ok(ProposalError::ProposalNotFound))
     );
 
     let id = client
-        .try_create_proposal(
+        .try_create_proposal(&creator, 
             &Symbol::new(&env, "ops"),
             &1_020,
             &1_120,
@@ -192,10 +197,10 @@ fn test_close_errors_for_missing_or_closed_proposal() {
         )
         .unwrap()
         .unwrap();
-    client.try_close_proposal(&id).unwrap().unwrap();
+    client.try_close_proposal(&creator, &id).unwrap().unwrap();
 
     assert_eq!(
-        client.try_close_proposal(&id),
+        client.try_close_proposal(&creator, &id),
         Err(Ok(ProposalError::ProposalAlreadyClosed))
     );
 }

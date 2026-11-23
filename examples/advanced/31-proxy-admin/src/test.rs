@@ -368,6 +368,29 @@ fn execute_without_auth_panics() {
     env.set_auths(&[]);
     client.execute_upgrade();
 }
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn initialize_without_auth_panics() {
+    let env = Env::default();
+    // do NOT call mock_all_auths
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    client.initialize(&admin); // should panic — no auth mocked
+}
+
+#[test]
+fn initialize_with_auth_succeeds() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let id = env.register_contract(None, ProxyAdmin);
+    let client = ProxyAdminClient::new(&env, &id);
+    let admin = Address::generate(&env);
+    assert_eq!(client.initialize(&admin), ());
+    assert_eq!(client.admin(), admin);
+    assert!(!client.is_paused());
+}
 // ---------------------------------------------------------------------------
 // Benchmarks
 // ---------------------------------------------------------------------------

@@ -35,6 +35,8 @@ fn build_updates(env: &Env) -> Vec<PackedUpdate> {
 #[test]
 fn test_sequential_and_batched_cross_contract_updates_match() {
     let env = Env::default();
+    env.mock_all_auths();
+    let caller = Address::generate(&env);
     let (target, unoptimized, optimized) = setup_contracts(&env);
     let target_client = TargetContractClient::new(&env, &target);
     let unoptimized_client = UnoptimizedCallerClient::new(&env, &unoptimized);
@@ -44,7 +46,7 @@ fn test_sequential_and_batched_cross_contract_updates_match() {
 
     env.budget().reset_default();
     println!("--- Sequential cross-contract invocation ---");
-    let sequential_last = unoptimized_client.invoke_updates_sequential(&target, &updates);
+    let sequential_last = unoptimized_client.invoke_updates_sequential(&caller, &target, &updates);
     env.budget().print();
 
     assert_eq!(sequential_last, 15);
@@ -58,7 +60,7 @@ fn test_sequential_and_batched_cross_contract_updates_match() {
 
     env.budget().reset_default();
     println!("--- Batched cross-contract invocation ---");
-    let batched_last = optimized_client.invoke_updates_batched(&optimized_target, &updates);
+    let batched_last = optimized_client.invoke_updates_batched(&caller, &optimized_target, &updates);
     env.budget().print();
 
     assert_eq!(batched_last, sequential_last);

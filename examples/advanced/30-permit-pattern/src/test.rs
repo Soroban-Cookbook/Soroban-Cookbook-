@@ -73,3 +73,39 @@ fn test_transfer_from_uses_permit_allowance() {
     assert_eq!(client.balance(&owner), 700);
     assert_eq!(client.balance(&recipient), 300);
 }
+
+#[test]
+fn test_transfer_overflow_returns_error() {
+    let (env, client, owner) = setup(1_000);
+    let recipient = Address::generate(&env);
+
+    env.as_contract(&client.address, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(recipient.clone()), &i128::MAX);
+    });
+
+    let result = client.try_transfer(&owner, &recipient, &1);
+    assert_eq!(result, Err(Ok(PermitError::ArithmeticOverflow)));
+    assert_eq!(client.balance(&recipient), i128::MAX);
+    assert_eq!(client.balance(&owner), 1_000);
+}
+
+#[test]
+fn test_transfer_from_overflow_returns_error() {
+    let (env, client, owner) = setup(1_000);
+    let spender = Address::generate(&env);
+    let recipient = Address::generate(&env);
+
+    client.permit(&owner, &spender, &400, &100_000);
+    env.as_contract(&client.address, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(recipient.clone()), &i128::MAX);
+    });
+
+    let result = client.try_transfer_from(&spender, &owner, &recipient, &300);
+    assert_eq!(result, Err(Ok(PermitError::ArithmeticOverflow)));
+    assert_eq!(client.balance(&recipient), i128::MAX);
+    assert_eq!(client.allowance(&owner, &spender), 400);
+}

@@ -24,7 +24,23 @@ DAOs, voting, treasury management.
 - [`10-dao-treasury`](../../examples/governance/10-dao-treasury/) — Multisig fund management with role-based access
 - [`11-automatic-snapshot-triggers`](../../examples/governance/11-automatic-snapshot-triggers/) — Automated voting-power snapshots
 
+## Playground Use Cases
+
+Try governance flows interactively in the [Playground](../playground.md). The playground use-case examples mirror the contracts in this section, so you can experiment with proposal creation, voting, and delegation before deploying.
+
+Run any governance example locally:
+
+```bash
+cd examples/governance/01-simple-voting && cargo test
+```
+
+Swap in `02-token-voting`, `06-vote-delegation`, or `09-timelock-governance` to explore token-weighted voting, delegation, and timelocks. See the [Playground use cases](../playground.md#use-cases) for the full set of DeFi, NFT, governance, and token examples.
+
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)
+
+## Testing
+
+Building a frontend or TypeScript bindings for these governance contracts? See the [Frontend / TypeScript Testing](../docs/testing-best-practices.md#frontend--typescript-testing) section for `soroban-spec-typescript` client generation, Jest/Vitest tests, and RPC mocking.
 
 ## Next: [Tokens](../tokens.md)

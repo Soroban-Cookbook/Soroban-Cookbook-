@@ -82,3 +82,27 @@ fn upgrade_requires_admin_auth() {
     env.set_auths(&[]);
     client.upgrade(&implementation_v2);
 }
+
+#[test]
+#[should_panic(expected = "HostError: Error(Auth, InvalidAction)")]
+fn init_requires_admin_auth() {
+    let env = Env::default();
+    // do NOT call mock_all_auths
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let proxy = env.register(ProxyContract, ());
+    let client = ProxyContractClient::new(&env, &proxy);
+    let admin = Address::generate(&env);
+    client.init(&admin, &implementation_v1); // should panic — no auth mocked
+}
+
+#[test]
+fn init_with_auth_succeeds() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let implementation_v1 = env.register(ImplementationV1, ());
+    let proxy = env.register(ProxyContract, ());
+    let client = ProxyContractClient::new(&env, &proxy);
+    let admin = Address::generate(&env);
+    client.init(&admin, &implementation_v1);
+    assert_eq!(client.get_implementation(), implementation_v1);
+}

@@ -178,14 +178,12 @@ fn test_submit_fraud_proof_slashes_challenger() {
     client.open_channel(&party_a, &party_b, &100, &50, &3600); // total 150
     client.open_dispute(&party_a, &1, &80, &70);
 
-    // Party B proves sequence 1 submitted by party A is fraudulent
+    // Echoing the disputed sequence is not a proof, so the channel stays open.
     let res = client.try_submit_fraud_proof(&party_b, &1);
-    assert!(res.is_ok());
+    assert_eq!(res, Err(Ok(Error::InvalidFraudProof)));
 
     let ch = client.get_channel();
-    assert_eq!(ch.status, ChannelStatus::Closed);
-    assert_eq!(ch.balance_a, 0);
-    assert_eq!(ch.balance_b, 150); // party B receives full total deposit
+    assert_eq!(ch.status, ChannelStatus::Disputed);
 }
 
 #[test]

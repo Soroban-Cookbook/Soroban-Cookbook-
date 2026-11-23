@@ -6,6 +6,7 @@ use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DataKey {
+    Admin,
     Balance(Address),
     Paused,
 }
@@ -27,6 +28,8 @@ pub enum BatchError {
     InsufficientBalance = 2,
     ArithmeticOverflow = 3,
     ContractPaused = 4,
+    Unauthorized = 5,
+    AlreadyInitialized = 6,
 }
 
 #[contracttype]
@@ -49,7 +52,17 @@ pub struct BatchOperations;
 
 #[contractimpl]
 impl BatchOperations {
+    pub fn initialize(env: Env, admin: Address) -> Result<(), BatchError> {
+        if env.storage().instance().has(&DataKey::Admin) {
+            return Err(BatchError::AlreadyInitialized);
+        }
+        admin.require_auth();
+        env.storage().instance().set(&DataKey::Admin, &admin);
+        Ok(())
+    }
+
     pub fn set_balance(env: Env, user: Address, amount: i128) -> Result<(), BatchError> {
+        Self::require_admin(&env)?;
         if amount < 0 {
             return Err(BatchError::InvalidAmount);
         }
@@ -77,6 +90,7 @@ impl BatchOperations {
         env: Env,
         operations: Vec<BatchOperation>,
     ) -> Result<(), BatchError> {
+        Self::require_admin(&env)?;
         let (tracked_accounts, snapshot_balances) = Self::snapshot_balances(&env, &operations);
         let paused_before = Self::is_paused(env.clone());
 
@@ -90,7 +104,8 @@ impl BatchOperations {
         Ok(())
     }
 
-    pub fn execute_batch_partial(env: Env, operations: Vec<BatchOperation>) -> BatchExecution {
+    pub fn execute_batch_partial(env: Env, operations: Vec<BatchOperation>) -> Result<BatchExecution, BatchError> {
+        Self::require_admin(&env)?;
         let mut statuses = Vec::new(&env);
         let mut applied = 0u32;
         let mut failed = 0u32;
@@ -108,11 +123,21 @@ impl BatchOperations {
             }
         }
 
-        BatchExecution {
+        Ok(BatchExecution {
             applied,
             failed,
             statuses,
-        }
+        })
+    }
+
+    fn require_admin(env: &Env) -> Result<(), BatchError> {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::Admin)
+            .ok_or(BatchError::Unauthorized)?;
+        admin.require_auth();
+        Ok(())
     }
 
     fn apply_operation(env: &Env, op: BatchOperation) -> Result<(), BatchError> {

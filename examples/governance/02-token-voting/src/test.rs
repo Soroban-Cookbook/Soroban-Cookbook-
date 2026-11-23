@@ -384,3 +384,19 @@ fn test_cancel_proposal() {
         ProposalState::Cancelled
     );
 }
+
+#[test]
+fn test_mint_supply_overflow_returns_error() {
+    let env = Env::default();
+    let (admin, client, alice, _) = setup(&env);
+
+    client.initialize(&admin, &100i128);
+    client.mint(&admin, &alice, &i128::MAX);
+
+    let bob = Address::generate(&env);
+    let result = client.try_mint(&admin, &bob, &1i128);
+    assert_eq!(result, Err(Ok(VotingError::ArithmeticOverflow)));
+
+    assert_eq!(client.get_balance(&alice), i128::MAX);
+    assert_eq!(client.get_balance(&bob), 0);
+}

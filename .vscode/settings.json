@@ -1,0 +1,50 @@
+{
+  // Workspace settings shared by all contributors. Personal preferences
+  // (theme, font, keybindings) belong in your user settings, not here.
+
+  // --- Rust / rust-analyzer -------------------------------------------------
+  // Run clippy on save with the same strictness as CI.
+  "rust-analyzer.check.command": "clippy",
+  "rust-analyzer.check.allTargets": true,
+  "rust-analyzer.check.extraArgs": ["--", "-D", "warnings", "-A", "deprecated"],
+  // Keep rust-analyzer's build artifacts apart from `cargo build` so the two
+  // do not block each other on the target-dir lock.
+  "rust-analyzer.cargo.targetDir": true,
+  "rust-analyzer.procMacro.enable": true,
+  "rust-analyzer.lens.enable": true,
+  "rust-analyzer.lens.run.enable": true,
+  "rust-analyzer.lens.debug.enable": true,
+
+  "[rust]": {
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.formatOnSave": true
+  },
+  "[toml]": {
+    "editor.defaultFormatter": "tamasfe.even-better-toml"
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on"
+  },
+
+  // --- Lint & coverage -------------------------------------------------------
+  "typos.config": "_typos.toml",
+  "coverage-gutters.coverageBaseDir": "coverage",
+  "coverage-gutters.coverageFileNames": ["lcov.info", "cobertura.xml"],
+
+  // --- Noise reduction -------------------------------------------------------
+  "files.exclude": {
+    "**/target": true,
+    "**/book-output": true
+  },
+  "search.exclude": {
+    "**/target": true,
+    "**/book-output": true,
+    "**/node_modules": true,
+    "**/test_snapshots": true,
+    "coverage": true
+  },
+  "files.watcherExclude": {
+    "**/target/**": true,
+    "**/book-output/**": true
+  }
+}

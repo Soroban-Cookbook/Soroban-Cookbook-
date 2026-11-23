@@ -64,8 +64,17 @@ let yield_amount = client.estimate_yield(&10_000, &365);
 - Performance fees
 - Emergency withdrawal
 
-## Prerequisites
-- [Basics](../basics.md), [Tokens](../tokens.md)
+## Playground Use Cases
+
+The [Playground Use Cases](../playground-use-cases.md) page walks through complete, runnable DeFi scenarios — swaps, liquidity provision, and yield vaults — that you can try in the playground and then reproduce locally.
+
+Run any DeFi example interactively from the repository:
+
+```bash
+cd examples/defi/01-simple-swap && cargo test
+```
+
+Swap in the example name for the one you want to explore (for example `examples/defi/vault-strategies`), then follow the matching playground use case to see the same flow step by step.
 
 ## Prerequisites
 - [Basics](../basics.md), [Tokens](../tokens.md)

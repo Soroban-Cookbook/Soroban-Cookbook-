@@ -2,7 +2,7 @@
 #![allow(deprecated)]
 
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Vec,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env, Vec,
 };
 
 #[contracttype]
@@ -48,6 +48,7 @@ pub struct TradeRecord {
 #[derive(Clone)]
 pub enum DataKey {
     Admin,
+    PaymentToken,
     ListingCount,
     Listing(u32),
     HighestBid(u32),
@@ -77,18 +78,41 @@ pub enum MarketplaceError {
 #[contract]
 pub struct NftMarketplaceContract;
 
+// ---------------------------------------------------------------------------
+// Internal helper — retrieves a token Client for the configured payment token.
+// ---------------------------------------------------------------------------
+fn payment_token_client(env: &Env) -> token::Client {
+    let token_addr: Address = env
+        .storage()
+        .instance()
+        .get(&DataKey::PaymentToken)
+        .expect("marketplace not initialized");
+    token::Client::new(env, &token_addr)
+}
+
 #[contractimpl]
 impl NftMarketplaceContract {
-    pub fn initialize(env: Env, admin: Address) -> Result<(), MarketplaceError> {
+    /// One-time initializer.  `payment_token` is the SEP-41 token address used
+    /// for all bids and purchases (e.g. a stablecoin or wrapped-XLM contract).
+    pub fn initialize(
+        env: Env,
+        admin: Address,
+        payment_token: Address,
+    ) -> Result<(), MarketplaceError> {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(MarketplaceError::AlreadyInitialized);
         }
         admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::PaymentToken, &payment_token);
         env.storage().instance().set(&DataKey::ListingCount, &0u32);
         env.storage().instance().set(&DataKey::TradeCount, &0u32);
-        env.events()
-            .publish((symbol_short!("init"), symbol_short!("mkt")), (admin,));
+        env.events().publish(
+            (symbol_short!("init"), symbol_short!("mkt")),
+            (admin, payment_token),
+        );
         Ok(())
     }
 
@@ -195,6 +219,11 @@ impl NftMarketplaceContract {
         Ok(listing_id)
     }
 
+    /// Place a bid on an active auction.
+    ///
+    /// The bid amount is transferred from `bidder` into this contract for
+    /// escrow.  If a previous highest bid exists it is refunded to that bidder
+    /// before the new bid is recorded, so funds are never double-locked.
     pub fn place_bid(
         env: Env,
         bidder: Address,
@@ -225,13 +254,31 @@ impl NftMarketplaceContract {
             .persistent()
             .get(&DataKey::HighestBid(listing_id));
         let minimum = match current_bid.clone() {
-            Some(bid) => bid.amount + 1,
+            Some(ref bid) => bid.amount + 1,
             None => listing.reserve_price,
         };
 
         if bid_amount < minimum {
             return Err(MarketplaceError::BidTooLow);
         }
+
+        let token = payment_token_client(&env);
+        let contract_addr = env.current_contract_address();
+
+        // 1. Refund the outbid participant before accepting the new bid.
+        //    This ordering ensures we never leave the previous bidder's funds
+        //    locked if the refund transfer were to fail for any reason.
+        if let Some(prev) = current_bid {
+            token.transfer(&contract_addr, &prev.bidder, &prev.amount);
+        }
+
+        // 2. Escrow the new bid inside this contract.
+        token.transfer_from(
+            &contract_addr, // spender (uses the bidder's approval)
+            &bidder,
+            &contract_addr,
+            &bid_amount,
+        );
 
         let bid = Bid {
             bidder: bidder.clone(),
@@ -247,6 +294,10 @@ impl NftMarketplaceContract {
         Ok(())
     }
 
+    /// Buy a fixed-price listing.
+    ///
+    /// Transfers `offer_amount` from `buyer` into this contract and immediately
+    /// disburses proceeds to the seller and royalty recipient via `settle_sale`.
     pub fn buy(
         env: Env,
         buyer: Address,
@@ -270,9 +321,18 @@ impl NftMarketplaceContract {
             return Err(MarketplaceError::InvalidPrice);
         }
 
+        // Pull payment from buyer into escrow, then settle immediately.
+        let token = payment_token_client(&env);
+        let contract_addr = env.current_contract_address();
+        token.transfer_from(&contract_addr, &buyer, &contract_addr, &offer_amount);
+
         Self::settle_sale(&env, &listing, buyer, offer_amount, listing_id)
     }
 
+    /// Finalize an auction after its `end_ledger` has passed.
+    ///
+    /// The winning bid is already held in escrow; this function disburses it
+    /// to the seller and royalty recipient.  Anyone may call this entry-point.
     pub fn finalize_auction(
         env: Env,
         _executor: Address,
@@ -331,6 +391,10 @@ impl NftMarketplaceContract {
             .unwrap_or(0)
     }
 
+    /// Internal settlement: disburse escrowed funds and record the trade.
+    ///
+    /// At this point the `amount` in payment tokens already sits in this
+    /// contract (transferred by `buy` or escrowed by `place_bid`).
     fn settle_sale(
         env: &Env,
         listing: &Listing,
@@ -339,6 +403,17 @@ impl NftMarketplaceContract {
         listing_id: u32,
     ) -> Result<(), MarketplaceError> {
         let royalty_paid = amount * (listing.royalty_bps as i128) / 10000;
+        let seller_proceeds = amount - royalty_paid;
+
+        let token = payment_token_client(env);
+        let contract_addr = env.current_contract_address();
+
+        // Royalty first, then seller proceeds.
+        if royalty_paid > 0 {
+            token.transfer(&contract_addr, &listing.royalty_recipient, &royalty_paid);
+        }
+        token.transfer(&contract_addr, &listing.seller, &seller_proceeds);
+
         let trade = TradeRecord {
             buyer: buyer.clone(),
             seller: listing.seller.clone(),

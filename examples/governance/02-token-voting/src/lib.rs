@@ -192,6 +192,7 @@ pub enum VotingError {
     QuorumNotMet = 12,
     ProposalNotFound = 13,
     ProposalFailed = 14,
+    ArithmeticOverflow = 15,
 }
 
 #[contractevent]
@@ -295,13 +296,18 @@ impl TokenVotingContract {
             .instance()
             .get(&DataKey::TotalSupply)
             .unwrap_or(0);
-        let new_supply = old_supply + amount;
+        let new_supply = old_supply
+            .checked_add(amount)
+            .ok_or(VotingError::ArithmeticOverflow)?;
         env.storage()
             .instance()
             .set(&DataKey::TotalSupply, &new_supply);
 
         let current_balance = Self::current_balance(&env, &to);
-        Self::set_balance(&env, &to, current_balance + amount);
+        let new_balance = current_balance
+            .checked_add(amount)
+            .ok_or(VotingError::ArithmeticOverflow)?;
+        Self::set_balance(&env, &to, new_balance);
 
         TokenMinted { to, amount }.publish(&env);
         Ok(())

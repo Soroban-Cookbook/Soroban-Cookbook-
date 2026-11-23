@@ -8,7 +8,7 @@ A Soroban smart contract implementing an AMM router with multi-hop swap capabili
 - Multi-hop swaps
 - Deadline enforcement
 - Slippage control
-- Pool management
+- Pool management with one persistent-storage entry per pool (no monolithic map)
 
 ## Usage
 

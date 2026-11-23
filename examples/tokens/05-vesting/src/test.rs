@@ -2,6 +2,9 @@
 #![allow(deprecated)]
 
 use super::*;
+
+const ADMIN_FUNDING: i128 = 10_000_000;
+
 use soroban_sdk::{
     testutils::{Address as _, Ledger, MockAuth, MockAuthInvoke},
     token, Address, Env, IntoVal,
@@ -25,7 +28,9 @@ fn setup_test(
     let contract_id = env.register(VestingContract, ());
     let client = VestingContractClient::new(env, &contract_id);
 
+    env.mock_all_auths();
     client.initialize(&admin, &token_address);
+    token_client.mint(&admin, &ADMIN_FUNDING);
 
     (client, admin, token_address, token_client)
 }

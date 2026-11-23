@@ -1,26 +1,24 @@
-# pre-commit
+# Pre-Commit Hooks
 
-To use `typos` with [`pre-commit`](https://pre-commit.com), point its
-config at this repository:
+The repository configures Rust formatting and typo checks before commits, and
+Clippy plus integration tests before pushes. Install
+[`pre-commit`](https://pre-commit.com) and run these commands from the repository
+root:
 
-```yaml
-repos:
-  - repo: https://github.com/crate-ci/typos
-    rev: v1.28.0
-    hooks:
-      - id: typos
+```bash
+pre-commit install
+pre-commit install --hook-type pre-push
 ```
 
-The `typos` id installs a prebuilt executable from GitHub releases. If
-one does not exist for the target platform, or if one built from
-sources is preferred, use `typos-docker` (requires Docker), or `typos-src`
-(requires Rust) as the hook id instead.
+The checks can also be run manually:
 
-Be sure to change `rev` to use the desired `typos` git tag or
-revision.
+```bash
+cargo fmt --all -- --check
+cargo clippy --tests --lib -- -D warnings
+cargo test -p integration-tests
+pre-commit run --all-files
+```
 
-The hook configuration defaults to writing fixes, which triggers a
-`pre-commit` failure if any files are modified. To make it report its
-findings only instead, override the hook's `args` with something that
-does not contain `-w`/`--write-changes`, for example `[]` (meaning
-pass no options).
+The `typos` hook uses a prebuilt executable from GitHub releases and reports
+findings without modifying files. For details on contribution checks and the
+broader test suites, see [CONTRIBUTING.md](../CONTRIBUTING.md).

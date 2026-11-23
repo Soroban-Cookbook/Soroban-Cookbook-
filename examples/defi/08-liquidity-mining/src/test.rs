@@ -111,6 +111,14 @@ fn test_add_pool_zero_rate_panics() {
 }
 
 #[test]
+#[should_panic(expected = "Reward token must differ from stake token")]
+fn test_add_pool_rejects_reward_token_equal_to_stake_token() {
+    let t = setup();
+    t.mining
+        .add_pool(&1u32, &t.lp_token, &t.lp_token, &100i128);
+}
+
+#[test]
 fn test_multiple_pools_independent() {
     let t = setup();
     let (lp2, _) = create_token(&t.env, &t.admin);
@@ -368,6 +376,16 @@ fn test_paused_pool_stops_reward_accrual() {
     // Pending should reflect 5 + 5 = 10 ledgers of rewards (not 20)
     let pending = t.mining.pending_rewards(&1u32, &user);
     assert_eq!(pending, 10_000); // 10 * 1000
+}
+
+#[test]
+fn test_initialize_requires_admin_auth() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let contract_id = env.register_contract(None, LiquidityMining);
+    let client = LiquidityMiningClient::new(&env, &contract_id);
+
+    assert!(client.try_initialize(&admin).is_err());
 }
 
 // ─── 9. Unstake accumulates pending before withdrawal ────────────────────────

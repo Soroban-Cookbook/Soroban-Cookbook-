@@ -8,7 +8,15 @@ use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, 
 use crate::{
     ArgType, CounterFacet, CounterFacetClient, DiamondBase, DiamondBaseClient, DispatchError,
     FacetCut, FacetCutAction, TokenFacet, TokenFacetClient,
+    CounterFacet, CounterFacetClient, DataKey, DiamondBase, DiamondBaseClient, FacetCut,
+    FacetCutAction, TokenFacet, TokenFacetClient,
 };
+
+fn authorize_minter(env: &Env, token_id: &Address, minter: &Address) {
+    env.as_contract(token_id, || {
+        env.storage().instance().set(&DataKey::Admin, minter);
+    });
+}
 
 // ---------------------------------------------------------------------------
 // Helper: register the three contracts and initialise the diamond
@@ -364,6 +372,7 @@ fn test_fallback_dispatch_via_facet_address() {
     // Dispatch to the resolved facet.
     let minter = Address::generate(&env);
     let recipient = Address::generate(&env);
+    authorize_minter(&env, &token_id, &minter);
     token.tf_mint(&minter, &recipient, &750i128);
 
     assert_eq!(token.tf_balance_of(&recipient), 750);
@@ -519,10 +528,11 @@ fn test_dispatch_counter_facet_via_builtin_signature() {
 
 #[test]
 fn test_token_mint_and_balance() {
-    let (env, _admin, _diamond, _tid, token, _cid, _counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, _counter) = setup();
     let minter = Address::generate(&env);
     let recipient = Address::generate(&env);
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &recipient, &1_000i128);
 
     assert_eq!(token.tf_balance_of(&recipient), 1_000);
@@ -531,11 +541,12 @@ fn test_token_mint_and_balance() {
 
 #[test]
 fn test_token_transfer_updates_balances() {
-    let (env, _admin, _diamond, _tid, token, _cid, _counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, _counter) = setup();
     let minter = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &alice, &500i128);
     token.tf_transfer(&alice, &bob, &200i128);
 
@@ -547,23 +558,25 @@ fn test_token_transfer_updates_balances() {
 #[test]
 #[should_panic(expected = "insufficient balance")]
 fn test_token_transfer_insufficient_balance_panics() {
-    let (env, _admin, _diamond, _tid, token, _cid, _counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, _counter) = setup();
     let minter = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &alice, &100i128);
     token.tf_transfer(&alice, &bob, &200i128);
 }
 
 #[test]
 fn test_token_approve_and_transfer_from() {
-    let (env, _admin, _diamond, _tid, token, _cid, _counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, _counter) = setup();
     let minter = Address::generate(&env);
     let owner = Address::generate(&env);
     let spender = Address::generate(&env);
     let recipient = Address::generate(&env);
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &owner, &1_000i128);
     token.tf_approve(&owner, &spender, &400i128);
     token.tf_transfer_from(&spender, &owner, &recipient, &300i128);
@@ -575,12 +588,13 @@ fn test_token_approve_and_transfer_from() {
 #[test]
 #[should_panic(expected = "allowance exceeded")]
 fn test_token_transfer_from_exceeds_allowance_panics() {
-    let (env, _admin, _diamond, _tid, token, _cid, _counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, _counter) = setup();
     let minter = Address::generate(&env);
     let owner = Address::generate(&env);
     let spender = Address::generate(&env);
     let recipient = Address::generate(&env);
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &owner, &1_000i128);
     token.tf_approve(&owner, &spender, &100i128);
     token.tf_transfer_from(&spender, &owner, &recipient, &500i128);
@@ -638,11 +652,12 @@ fn test_counter_independent_names_do_not_interfere() {
 fn test_storage_namespaces_do_not_collide() {
     // TfBalance(address) and CfCount(symbol) live in different DataKey variants;
     // writes to one can never bleed into the other.
-    let (env, _admin, _diamond, _tid, token, _cid, counter) = setup();
+    let (env, _admin, _diamond, tid, token, _cid, counter) = setup();
     let minter = Address::generate(&env);
     let user = Address::generate(&env);
     let name = symbol_short!("views");
 
+    authorize_minter(&env, &tid, &minter);
     token.tf_mint(&minter, &user, &5_000i128);
     counter.cf_increment(&user, &name);
     counter.cf_increment(&user, &name);

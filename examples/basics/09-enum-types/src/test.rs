@@ -60,6 +60,7 @@ fn test_contract_error_enum() {
 #[test]
 fn test_contract_initialization() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, EnumContract);
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
 
@@ -89,6 +90,7 @@ fn test_contract_initialization() {
 #[test]
 fn test_user_role_management() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, EnumContract);
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
     let user = <soroban_sdk::Address as AddressTest>::generate(&env);
@@ -140,6 +142,7 @@ fn test_user_role_management() {
 #[test]
 fn test_operation_execution() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, EnumContract);
     let user1 = <soroban_sdk::Address as AddressTest>::generate(&env);
     let user2 = <soroban_sdk::Address as AddressTest>::generate(&env);
@@ -147,6 +150,8 @@ fn test_operation_execution() {
     // Initialize contract
     env.as_contract(&contract_id, || {
         EnumContract::initialize(env.clone(), user1.clone()).unwrap();
+    });
+    env.as_contract(&contract_id, || {
         EnumContract::set_user_role(env.clone(), user1.clone(), user2.clone(), UserRole::User)
             .unwrap();
     });
@@ -319,6 +324,7 @@ fn test_enum_iteration() {
 #[test]
 fn test_comprehensive_workflow() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, EnumContract);
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
     let user = <soroban_sdk::Address as AddressTest>::generate(&env);
@@ -340,6 +346,8 @@ fn test_comprehensive_workflow() {
             EnumContract::set_user_role(env.clone(), admin.clone(), user.clone(), UserRole::User),
             Ok(())
         );
+    });
+    env.as_contract(&contract_id, || {
         assert_eq!(
             EnumContract::set_user_role(
                 env.clone(),
@@ -424,6 +432,7 @@ fn test_comprehensive_workflow() {
 #[test]
 fn test_error_scenarios() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, EnumContract);
     let admin = <soroban_sdk::Address as AddressTest>::generate(&env);
     let unauthorized_user = <soroban_sdk::Address as AddressTest>::generate(&env);

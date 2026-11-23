@@ -2,7 +2,8 @@
 //!
 //! End-to-end storage migration for live contracts: prepare → batched migrate →
 //! finalize, with version gates so v2 entry points refuse to run on unmigrated
-//! data.
+//! data. Writes are staged under separate keys and only promoted on commit, so
+//! `rollback_migration` can discard a failed migration without losing v1 data.
 //!
 //! Complements [`07-upgrade-patterns`](../07-upgrade-patterns/) (single-key
 //! schema change + WASM upgrade) and the intermediate `storage-migration`
@@ -16,8 +17,10 @@
 //! | v1 | `LegacyAccount { balance: i128 }` under `DataKey::Legacy(Address)` |
 //! | v2 | `AccountV2 { balance: i128, last_active: u64, tier: u32 }` under `DataKey::Account(Address)` |
 //!
-//! During migration, reads prefer v2 and fall back to v1 so the contract stays
-//! usable while batches run.
+//! During migration, v2 records sit under staging keys and stay invisible;
+//! reads keep serving v1 data until the final commit promotes them, flips
+//! `MigrationComplete`, and drops the legacy entries. V2 entry points gate on
+//! that flag; v1 entry points gate on the version and migration state.
 
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
@@ -37,6 +40,7 @@ const EV_PREP: Symbol = symbol_short!("prepare");
 const EV_BATCH: Symbol = symbol_short!("batch");
 const EV_DONE: Symbol = symbol_short!("done");
 const EV_UPGRADE: Symbol = symbol_short!("upgrade");
+const EV_ROLLBACK: Symbol = symbol_short!("rollback");
 
 #[contracttype]
 #[derive(Clone)]
@@ -45,10 +49,14 @@ pub enum DataKey {
     Version,
     MigrationState,
     UserList,
-    /// v1 layout — removed entry-by-entry during migration.
+    /// Flipped to `true` only after every staged record has been committed.
+    MigrationComplete,
+    /// v1 layout — untouched until the migration commits.
     Legacy(Address),
     /// v2 layout.
     Account(Address),
+    /// v2 record written during migration; promoted to `Account` at commit.
+    Staged(Address),
 }
 
 #[contracttype]
@@ -100,6 +108,7 @@ impl ContractMigrations {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(MigrationError::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::Version, &VERSION_V1);
         env.storage()
@@ -108,6 +117,9 @@ impl ContractMigrations {
         env.storage()
             .instance()
             .set(&DataKey::MigrationState, &MigrationState::None);
+        env.storage()
+            .instance()
+            .set(&DataKey::MigrationComplete, &false);
 
         env.events().publish((NS, EV_INIT, admin), VERSION_V1);
         Ok(())
@@ -200,29 +212,24 @@ impl ContractMigrations {
                 0
             };
 
+            // Stage the v2 record under a separate key. The legacy entry is
+            // left untouched, so a failed migration can be rolled back
+            // without losing any v1 data.
             env.storage().persistent().set(
-                &DataKey::Account(user.clone()),
+                &DataKey::Staged(user),
                 &AccountV2 {
                     balance: legacy.balance,
                     last_active: now,
                     tier,
                 },
             );
-            env.storage().persistent().remove(&DataKey::Legacy(user));
 
             processed += 1;
             next_index += 1;
         }
 
         if next_index >= total {
-            env.storage()
-                .instance()
-                .set(&DataKey::Version, &target_version);
-            env.storage()
-                .instance()
-                .set(&DataKey::MigrationState, &MigrationState::None);
-            env.events()
-                .publish((NS, EV_DONE), (processed, target_version));
+            commit_migration(&env, target_version, processed)?;
         } else {
             env.storage().instance().set(
                 &DataKey::MigrationState,
@@ -235,15 +242,36 @@ impl ContractMigrations {
         Ok(processed)
     }
 
-    pub fn cancel_migration(env: Env) -> Result<(), MigrationError> {
+    /// Discard every staged v2 record and return to the v1 layout. Legacy
+    /// entries were never modified, so the contract resumes normal v1
+    /// operation and the migration can be prepared again from scratch.
+    pub fn rollback_migration(env: Env) -> Result<(), MigrationError> {
         require_admin(&env)?;
         if matches!(read_migration_state(&env), MigrationState::None) {
             return Err(MigrationError::MigrationNotPrepared);
         }
+        let users: Vec<Address> = env
+            .storage()
+            .instance()
+            .get(&DataKey::UserList)
+            .unwrap_or_else(|| Vec::new(&env));
+        for user in users.iter() {
+            env.storage().persistent().remove(&DataKey::Staged(user));
+        }
         env.storage()
             .instance()
             .set(&DataKey::MigrationState, &MigrationState::None);
+        env.storage()
+            .instance()
+            .set(&DataKey::MigrationComplete, &false);
+        env.events().publish((NS, EV_ROLLBACK), ());
         Ok(())
+    }
+
+    /// Abort a prepared migration. Cancelling is now identical to rolling
+    /// back: staged records are dropped and v1 data stays authoritative.
+    pub fn cancel_migration(env: Env) -> Result<(), MigrationError> {
+        Self::rollback_migration(env)
     }
 
     /// v2-only credit. Refuses to run until migration has finished.
@@ -283,7 +311,15 @@ impl ContractMigrations {
     }
 
     pub fn get_account(env: Env, user: Address) -> Option<AccountV2> {
+        if !migration_complete(&env) {
+            return None;
+        }
         env.storage().persistent().get(&DataKey::Account(user))
+    }
+
+    /// Whether the migration has fully committed (`MigrationComplete`).
+    pub fn migration_complete(env: Env) -> bool {
+        migration_complete(&env)
     }
 
     pub fn get_version(env: Env) -> u32 {
@@ -325,7 +361,7 @@ fn require_admin(env: &Env) -> Result<(), MigrationError> {
 }
 
 fn require_migrated(env: &Env) -> Result<(), MigrationError> {
-    if read_version(env) < CURRENT_VERSION {
+    if read_version(env) < CURRENT_VERSION || !migration_complete(env) {
         return Err(MigrationError::MigrationRequired);
     }
     if !matches!(read_migration_state(env), MigrationState::None) {
@@ -346,6 +382,52 @@ fn read_migration_state(env: &Env) -> MigrationState {
         .instance()
         .get(&DataKey::MigrationState)
         .unwrap_or(MigrationState::None)
+}
+
+/// True only after every staged record has been committed.
+fn migration_complete(env: &Env) -> bool {
+    env.storage()
+        .instance()
+        .get(&DataKey::MigrationComplete)
+        .unwrap_or(false)
+}
+
+/// Promote all staged v2 records to their final keys, drop the legacy
+/// entries, and flip `MigrationComplete`. Idempotent: if a step fails the host
+/// rolls back the whole invocation, leaving `InProgress` state so the next
+/// `migrate_batch` call simply re-runs the commit.
+fn commit_migration(env: &Env, target_version: u32, processed: u32) -> Result<(), MigrationError> {
+    let users: Vec<Address> = env
+        .storage()
+        .instance()
+        .get(&DataKey::UserList)
+        .unwrap_or_else(|| Vec::new(env));
+    for user in users.iter() {
+        let staged: AccountV2 = match env
+            .storage()
+            .persistent()
+            .get(&DataKey::Staged(user.clone()))
+        {
+            Some(staged) => staged,
+            None => continue,
+        };
+        env.storage()
+            .persistent()
+            .set(&DataKey::Account(user.clone()), &staged);
+        env.storage()
+            .persistent()
+            .remove(&DataKey::Staged(user.clone()));
+        env.storage().persistent().remove(&DataKey::Legacy(user));
+    }
+    env.storage().instance().set(&DataKey::Version, &target_version);
+    env.storage()
+        .instance()
+        .set(&DataKey::MigrationState, &MigrationState::None);
+    env.storage()
+        .instance()
+        .set(&DataKey::MigrationComplete, &true);
+    env.events().publish((NS, EV_DONE), (processed, target_version));
+    Ok(())
 }
 
 fn read_account_v2(env: &Env, user: &Address) -> Result<Option<AccountV2>, MigrationError> {

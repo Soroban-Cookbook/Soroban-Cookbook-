@@ -258,6 +258,24 @@ fn transfer_above_balance_is_rejected() {
     );
 }
 
+#[test]
+fn test_initialize_requires_admin_auth() {
+    let env = Env::default();
+    let admin = Address::generate(&env);
+    let contract_id = env.register_contract(None, TokenMetadataContract);
+    let client = TokenMetadataContractClient::new(&env, &contract_id);
+
+    assert!(client
+        .try_initialize(
+            &admin,
+            &String::from_str(&env, "Gold"),
+            &String::from_str(&env, "GLD"),
+            &7u32,
+            &String::from_str(&env, ""),
+        )
+        .is_err());
+}
+
 // ---------------------------------------------------------------------------
 // Benchmarks
 // ---------------------------------------------------------------------------

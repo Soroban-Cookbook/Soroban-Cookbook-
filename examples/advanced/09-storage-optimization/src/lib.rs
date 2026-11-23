@@ -50,6 +50,7 @@ impl StorageOptimization {
         if env.storage().instance().has(&DataKey::Config) {
             panic!("Already initialized");
         }
+        admin.require_auth();
         let config = CompactConfig {
             admin: admin.clone(),
             paused: false,

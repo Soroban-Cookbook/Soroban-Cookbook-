@@ -380,9 +380,19 @@ impl VotingContract {
         let now = env.ledger().timestamp();
 
         let new_state = match proposal.state {
-            ProposalState::Active if now > proposal.voting_deadline => ProposalState::GracePeriod,
+            ProposalState::Active if now > proposal.voting_deadline => {
+                if Self::proposal_passed(&proposal) {
+                    ProposalState::GracePeriod
+                } else {
+                    ProposalState::Cancelled
+                }
+            }
             ProposalState::GracePeriod if now >= proposal.executable_after => {
-                ProposalState::Executable
+                if Self::proposal_passed(&proposal) {
+                    ProposalState::Executable
+                } else {
+                    ProposalState::Cancelled
+                }
             }
             other => other,
         };
@@ -414,6 +424,9 @@ impl VotingContract {
 
         if proposal.state != ProposalState::Executable {
             return Err(VotingError::InvalidState);
+        }
+        if !Self::proposal_passed(&proposal) {
+            return Err(VotingError::QuorumNotMet);
         }
 
         proposal.state = ProposalState::Executed;
@@ -462,6 +475,10 @@ impl VotingContract {
             return Err(VotingError::NotInitialized);
         }
         Ok(())
+    }
+
+    fn proposal_passed(proposal: &Proposal) -> bool {
+        proposal.votes_for >= proposal.quorum_threshold && proposal.votes_for > proposal.votes_against
     }
 
     fn require_admin(env: &Env, caller: &Address) -> Result<(), VotingError> {

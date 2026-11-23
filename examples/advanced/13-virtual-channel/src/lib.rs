@@ -316,7 +316,7 @@ impl VirtualChannelContract {
     /// Rebalances the backing ledger channels so each endpoint's collateral
     /// equals its virtual balance (the intermediary's exposure is reduced to
     /// zero once materialized — the settlement step).
-    pub fn materialize(env: Env, channel_id: u64, seq: u64, bal_a: i128, bal_b: i128) {
+    pub fn materialize(env: Env, caller: Address, channel_id: u64, seq: u64, bal_a: i128, bal_b: i128) {
         let mut vc: VirtualChannel = env
             .storage()
             .instance()
@@ -331,8 +331,10 @@ impl VirtualChannelContract {
         if seq <= vc.seq {
             panic!("Sequence must increase");
         }
-        vc.alice.require_auth();
-        vc.bob.require_auth();
+        caller.require_auth();
+        if caller != vc.alice && caller != vc.bob {
+            panic!("not an endpoint");
+        }
 
         // Rebalance backing ledger channels: endpoint deposits track the
         // virtual balances; the intermediary tops up the difference from its

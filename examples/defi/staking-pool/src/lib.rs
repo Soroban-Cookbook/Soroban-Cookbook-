@@ -1,7 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol, Vec};
 
 const LOCKUP_30_DAYS: u64 = 2_592_000;
 const LOCKUP_90_DAYS: u64 = 7_776_000;
@@ -15,6 +15,7 @@ const BASIS_POINTS_DENOMINATOR: i128 = 10_000;
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum DataKey {
+    Token,
     Stake(Address),
 }
 
@@ -65,6 +66,20 @@ pub struct StakingPoolContract;
 
 #[contractimpl]
 impl StakingPoolContract {
+    pub fn initialize(env: Env, token_addr: Address) {
+        if env.storage().instance().has(&DataKey::Token) {
+            panic!("already initialized");
+        }
+        env.storage().instance().set(&DataKey::Token, &token_addr);
+    }
+
+    fn staking_token(env: &Env) -> Address {
+        env.storage()
+            .instance()
+            .get(&DataKey::Token)
+            .expect("staking token not initialized")
+    }
+
     pub fn get_lockup_options(env: Env) -> Vec<LockupOption> {
         soroban_sdk::vec![
             &env,
@@ -96,6 +111,10 @@ impl StakingPoolContract {
         if env.storage().persistent().has(&key) {
             panic!("Active stake exists");
         }
+
+        let staking_token = Self::staking_token(&env);
+        let contract = env.current_contract_address();
+        token::Client::new(&env, &staking_token).transfer(&staker, &contract, &amount);
 
         let boost_bps = Self::lockup_boost(duration);
         let start_ts = env.ledger().timestamp();
@@ -136,12 +155,33 @@ impl StakingPoolContract {
         let now = env.ledger().timestamp();
 
         let (net_amount, penalty, matured) = if now < stake.mature_ts {
-            let penalty = stake.amount * PENALTY_BPS / BASIS_POINTS_DENOMINATOR;
-            (stake.amount - penalty, penalty, false)
+            let penalty = stake
+                .amount
+                .checked_mul(PENALTY_BPS)
+                .expect("overflow")
+                .checked_div(BASIS_POINTS_DENOMINATOR)
+                .expect("overflow");
+            (
+                stake.amount.checked_sub(penalty).expect("underflow"),
+                penalty,
+                false,
+            )
         } else {
-            let bonus = stake.amount * stake.boost_bps / BASIS_POINTS_DENOMINATOR;
-            (stake.amount + bonus, 0, true)
+            let bonus = stake
+                .amount
+                .checked_mul(stake.boost_bps)
+                .expect("overflow")
+                .checked_div(BASIS_POINTS_DENOMINATOR)
+                .expect("overflow");
+            (
+                stake.amount.checked_add(bonus).expect("overflow"),
+                0,
+                true,
+            )
         };
+
+        let contract = env.current_contract_address();
+        token::Client::new(&env, &Self::staking_token(&env)).transfer(&contract, &staker, &net_amount);
 
         env.events().publish(
             (CONTRACT_NS, ACTION_WITHDRAW, staker.clone()),

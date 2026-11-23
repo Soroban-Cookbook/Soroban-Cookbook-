@@ -26,6 +26,11 @@ The pass rate below is the success share among the latest 20 completed `test.yml
 | 2026-11-02 | 0.0% (0/1) | failure | failure |
 | 2026-10-26 | 0.0% (0/1) | failure | failure |
 | 2026-10-19 | 0.0% (0/1) | success | failure |
+| 2026-11-16 | 50.0% (2/4) | failure | failure |
+| 2026-11-09 | 50.0% (2/4) | failure | failure |
+| 2026-11-02 | 50.0% (2/4) | failure | failure |
+| 2026-10-26 | 50.0% (2/4) | failure | failure |
+| 2026-10-19 | 0.0% (0/20) | action_required | action_required |
 <!-- QUALITY-SNAPSHOT-END -->
 
 ## Measurement Sources

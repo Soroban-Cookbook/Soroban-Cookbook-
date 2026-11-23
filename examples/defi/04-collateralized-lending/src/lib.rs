@@ -12,6 +12,27 @@ pub struct Position {
     pub debt: i128,
 }
 
+/// Per-collateral-token risk parameters, denominated in basis points
+/// (10_000 bps = 100%). Volatility profiles differ per asset, so each
+/// collateral token gets its own LTV and liquidation threshold: stablecoins
+/// can safely run ~9_000 bps LTV, blue-chip assets ~7_500, and long-tail
+/// assets ~5_000.
+#[derive(Clone, Debug, Eq, PartialEq)]
+#[contracttype]
+pub struct CollateralConfig {
+    /// Maximum debt-to-collateral ratio for new borrows.
+    pub ltv_bps: u32,
+    /// Debt-to-collateral ratio above which a position becomes liquidatable.
+    pub liquidation_threshold_bps: u32,
+}
+
+/// Storage keys for per-token data.
+#[derive(Clone)]
+#[contracttype]
+pub enum DataKey {
+    CollateralConfig(Address),
+}
+
 #[contract]
 pub struct LendingContract;
 
@@ -22,6 +43,41 @@ fn token_client<'a>(env: &'a Env, key: &str) -> TokenClient<'a> {
         .get(&Symbol::new(env, key))
         .unwrap();
     TokenClient::new(env, &token)
+}
+
+/// The configured collateral token address.
+fn collateral_token(env: &Env) -> Address {
+    env.storage()
+        .instance()
+        .get(&Symbol::new(env, "collateral_token"))
+        .unwrap()
+}
+
+/// Risk parameters for `token`. Falls back to the global `ltv_ratio` /
+/// `liquidation_threshold` (percent, as set at initialization) when no
+/// per-token config has been stored.
+fn read_collateral_config(env: &Env, token: &Address) -> CollateralConfig {
+    if let Some(config) = env
+        .storage()
+        .persistent()
+        .get::<_, CollateralConfig>(&DataKey::CollateralConfig(token.clone()))
+    {
+        return config;
+    }
+    let ltv_ratio: i128 = env
+        .storage()
+        .instance()
+        .get(&Symbol::new(env, "ltv_ratio"))
+        .unwrap();
+    let liquidation_threshold: i128 = env
+        .storage()
+        .instance()
+        .get(&Symbol::new(env, "liquidation_threshold"))
+        .unwrap();
+    CollateralConfig {
+        ltv_bps: (ltv_ratio * 100) as u32,
+        liquidation_threshold_bps: (liquidation_threshold * 100) as u32,
+    }
 }
 
 #[contractimpl]
@@ -67,6 +123,15 @@ impl LendingContract {
             &Symbol::new(&env, "partial_liquidation_ratio"),
             &partial_liquidation_ratio,
         );
+        // Seed the collateral token's risk profile from the global defaults;
+        // admins can override it per token via `set_collateral_config`.
+        env.storage().persistent().set(
+            &DataKey::CollateralConfig(collateral_token.clone()),
+            &CollateralConfig {
+                ltv_bps: (ltv_ratio * 100) as u32,
+                liquidation_threshold_bps: (liquidation_threshold * 100) as u32,
+            },
+        );
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "emergency_paused"), &false);
@@ -89,6 +154,42 @@ impl LendingContract {
         env.storage()
             .instance()
             .set(&Symbol::new(&env, "emergency_paused"), &paused);
+    }
+
+    /// Admin-only: set the risk profile for one collateral token.
+    ///
+    /// `ltv_bps` caps new borrowing against that collateral;
+    /// `liquidation_threshold_bps` is the debt level above which a position
+    /// becomes liquidatable. Both are basis points (10_000 = 100%).
+    pub fn set_collateral_config(
+        env: Env,
+        admin: Address,
+        token: Address,
+        config: CollateralConfig,
+    ) {
+        let stored_admin: Address = env
+            .storage()
+            .instance()
+            .get(&Symbol::new(&env, "admin"))
+            .unwrap();
+        if admin != stored_admin {
+            panic!("not admin");
+        }
+        admin.require_auth();
+        if config.ltv_bps > 10_000
+            || config.liquidation_threshold_bps > 10_000
+            || config.ltv_bps > config.liquidation_threshold_bps
+        {
+            panic!("invalid collateral config");
+        }
+        env.storage()
+            .persistent()
+            .set(&DataKey::CollateralConfig(token), &config);
+    }
+
+    /// Read the stored risk profile for a collateral token.
+    pub fn get_collateral_config(env: Env, token: Address) -> CollateralConfig {
+        read_collateral_config(&env, &token)
     }
 
     pub fn deposit_collateral(env: Env, user: Address, amount: i128) {
@@ -152,12 +253,8 @@ impl LendingContract {
             panic!("insufficient collateral");
         }
         let new_collateral = position.collateral - amount;
-        let ltv_ratio: i128 = env
-            .storage()
-            .instance()
-            .get(&Symbol::new(&env, "ltv_ratio"))
-            .unwrap();
-        if new_collateral * ltv_ratio / 100 < position.debt {
+        let config = read_collateral_config(&env, &collateral_token(&env));
+        if new_collateral * config.ltv_bps as i128 / 10_000 < position.debt {
             panic!("health factor too low");
         }
         position.collateral = new_collateral;
@@ -195,12 +292,10 @@ impl LendingContract {
             collateral: 0,
             debt: 0,
         });
-        let ltv_ratio: i128 = env
-            .storage()
-            .instance()
-            .get(&Symbol::new(&env, "ltv_ratio"))
-            .unwrap();
-        let max_borrow = position.collateral * ltv_ratio / 100;
+        // Per-token LTV instead of one global ratio: stablecoin collateral
+        // can be configured near 95%, long-tail assets down to 50%.
+        let config = read_collateral_config(&env, &collateral_token(&env));
+        let max_borrow = position.collateral * config.ltv_bps as i128 / 10_000;
         if position.debt + amount > max_borrow {
             panic!("exceeds maximum borrow amount");
         }
@@ -249,11 +344,7 @@ impl LendingContract {
 
     pub fn liquidate(env: Env, liquidator: Address, borrower: Address, repay_amount: i128) {
         liquidator.require_auth();
-        let liquidation_threshold: i128 = env
-            .storage()
-            .instance()
-            .get(&Symbol::new(&env, "liquidation_threshold"))
-            .unwrap();
+        let config = read_collateral_config(&env, &collateral_token(&env));
         let liquidation_incentive: i128 = env
             .storage()
             .instance()
@@ -276,7 +367,9 @@ impl LendingContract {
         if position.debt == 0 {
             panic!("no debt to liquidate");
         }
-        if position.collateral * liquidation_threshold / 100 >= position.debt {
+        if position.collateral * config.liquidation_threshold_bps as i128 / 10_000
+            >= position.debt
+        {
             panic!("position is healthy");
         }
         let max_repay = position.debt * partial_liquidation_ratio / 100;
@@ -361,11 +454,7 @@ impl LendingContract {
     }
 
     pub fn get_health_factor(env: Env, user: Address) -> i128 {
-        let liquidation_threshold: i128 = env
-            .storage()
-            .instance()
-            .get(&Symbol::new(&env, "liquidation_threshold"))
-            .unwrap();
+        let config = read_collateral_config(&env, &collateral_token(&env));
         let positions: Map<Address, Position> = env
             .storage()
             .instance()
@@ -378,7 +467,8 @@ impl LendingContract {
         if position.debt == 0 {
             return i128::MAX;
         }
-        (position.collateral * liquidation_threshold) / (position.debt * 100)
+        (position.collateral * config.liquidation_threshold_bps as i128)
+            / (position.debt * 10_000)
     }
 }
 

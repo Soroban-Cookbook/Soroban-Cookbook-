@@ -36,6 +36,29 @@ Removed completed issues during Agent 2 reconciliation (June 22, 2026).
 
 ## Phase 8 — completed issues (in-repo deliverables created)
 
+### October 20, 2026 — Issues #946, #948, #949, #950 ✅
+
+**#946 — Build Regression Test Suite (Phase 6 Issue #305)**
+- `tests/integration/tests/regression_tests.rs` — Comprehensive regression test suite validating state invariants across Basics, Tokens, Governance, NFTs, Intermediate, and DeFi.
+- `tests/integration/REGRESSION_TEST_SUITE.md` — Test suite architecture, invariant matrix, and execution documentation.
+- `tests/integration/README.md` — Updated with regression test details and execution commands.
+
+**#948 — Propose Partnership (Phase 8 Issue #395)**
+- `docs/formal-partnership-proposal.md` — Formal partnership framework, mutual benefits across stakeholder groups, qualification criteria, bilateral MOU agreement template, and confirmed partner tracking.
+- `phase 8 issues.md` — Updated with Issue #395 completed status and acceptance checklist.
+- `README.md` & `CONTRIBUTING.md` — Links added to formal partnership proposal framework.
+
+**#949 — Create Governance Best Practices (Phase 7 Issue #356)**
+- `docs/governance-best-practices.md` & `book/src/docs/governance-best-practices.md` — Complete governance guide covering voting systems (1-account-1-vote, token-weighted, quadratic, conviction, quorums), proposal lifecycle and state machines, security mitigations (flash-loan immunity, snapshot ledgers, timelocks, guardian vetoes), and real-world Soroban examples.
+- `book/src/SUMMARY.md` — Indexed under Governance section for mdBook.
+
+**#950 — Add Compatibility Tests (Phase 6 Issue #306)**
+- `tests/integration/tests/compatibility_tests.rs` — Compatibility test suite verifying SDK type representation, network protocol simulation (Protocols 20, 21, and 22), upgrade state preservation across proxies, storage schema evolution, and error discriminant stability.
+- `tests/integration/COMPATIBILITY_REPORT.md` — Version matrix, test coverage report, and verification instructions.
+- `tests/integration/README.md` — Updated with compatibility test suite documentation.
+
+---
+
 ### Aug 28, 2026 — Issue #441: 10+ Projects Built ✅
 
 - `SHOWCASE.md` — showcases 11 real production Stellar/Soroban projects built using the cookbook, with case studies, developer support, and project tracking sections

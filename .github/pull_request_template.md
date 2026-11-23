@@ -48,6 +48,26 @@ Closes #
 
 ## Checklist
 
+> For the full reviewer guide see [docs/review-checklist.md](../docs/review-checklist.md).
+
+### Correctness
+- [ ] The change does what the PR description says it does
+- [ ] Edge cases are handled (empty collections, zero amounts, maximum values)
+- [ ] No partial storage writes are left on error paths
+
+### Security
+- [ ] `env.require_auth()` / `env.require_auth_for_args()` is present on every privileged entry point
+- [ ] Caller-supplied addresses are validated before use
+- [ ] Re-entrancy is not possible or is guarded
+- [ ] No `unwrap()` / `expect()` in contract code paths
+- [ ] No secrets or private keys committed to the repository
+- [ ] New dependencies are from known, audited crates
+
+### Performance
+- [ ] Hot paths avoid unnecessary storage reads
+- [ ] `Map` / `Vec` sizes are bounded or documented
+- [ ] No cross-contract calls inside unbounded loops
+
 ### Code Quality
 - [ ] My code follows the style guidelines of this project
 - [ ] I have performed a self-review of my own code
@@ -59,18 +79,26 @@ Closes #
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Integration tests are included for multi-contract interactions (if applicable)
+- [ ] Security-sensitive paths have a test in `tests/security/` (if applicable)
+- [ ] Test coverage for changed crates is ≥ 90% (`cargo tarpaulin --package <crate>`)
 
 ### Documentation
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have updated the main README.md if needed
 - [ ] I have added/updated the example's README.md (if this is a new/modified example)
-- [ ] I have updated SUMMARY.md if adding new content to the book
+- [ ] I have updated `book/src/SUMMARY.md` if adding new content to the book
+- [ ] `cd book && mdbook build` succeeds without config errors
+- [ ] An ADR has been opened or referenced if an architectural decision was made
 
 ### Pre-submission Validation
 - [ ] Code formatting passes: `cargo fmt --all --check`
 - [ ] Linting passes with no warnings: `cargo clippy --workspace --all-targets --all-features -- -D warnings`
 - [ ] All tests pass: `cargo test --workspace --all-features`
 - [ ] WASM build succeeds: `cargo build --workspace --target wasm32-unknown-unknown --release`
+
+### Breaking Changes
+- [ ] Breaking changes are documented in this PR description under a **Breaking Changes** heading (or N/A)
+- [ ] Public API changes in `shared/` have consumers updated across the workspace (or N/A)
 
 ### Other
 - [ ] Any dependent changes have been merged and published

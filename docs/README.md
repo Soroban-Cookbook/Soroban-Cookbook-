@@ -27,6 +27,7 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 
 - [Best Practices](./best-practices.md) — Security, storage, and code quality guidelines
 - [Style Guide](./style-guide.md) — Naming, documentation, and testing standards
+- [Documentation Style Guide](./doc-style-guide.md) — Writing standards, code example standards, formatting guidelines, and tool recommendations for docs
 - [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
 - [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
 - [Wallet Integration Guide](./wallet-integration.md) — Connecting Freighter, xBull, Albedo, and WalletConnect-compatible flows to Soroban apps

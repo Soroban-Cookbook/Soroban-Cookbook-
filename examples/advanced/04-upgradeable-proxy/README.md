@@ -1,6 +1,12 @@
 # Upgradeable Proxy
 
+<<<<<<< HEAD
 Admin-gated implementation upgrades with proxy-owned storage preservation.
+=======
+Related decisions: [ADR-006: Guard Contract Code Upgrades](../../../docs/adr/006-guard-contract-upgrades.md) and [ADR-007: Versioned State Migrations](../../../docs/adr/007-version-state-migrations.md).
+
+A simple proxy pattern for contract upgrades that separates the proxy and implementation contracts, preserving storage across upgrades.
+>>>>>>> 8c99210 (Create Pattern Selection ADRs)
 
 ## Scope In the Upgradeability Sequence
 

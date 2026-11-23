@@ -63,6 +63,8 @@ impl CircuitBreakerContract {
             return Err(CircuitError::AlreadyInitialized);
         }
 
+        admin.require_auth();
+
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()
             .instance()
