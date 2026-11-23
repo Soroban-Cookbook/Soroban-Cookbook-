@@ -3,11 +3,11 @@
 
 extern crate std;
 
-use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, Vec};
+use soroban_sdk::{symbol_short, testutils::Address as _, Address, Env, IntoVal, Val, Vec};
 
 use crate::{
-    CounterFacet, CounterFacetClient, DiamondBase, DiamondBaseClient, FacetCut, FacetCutAction,
-    TokenFacet, TokenFacetClient,
+    ArgType, CounterFacet, CounterFacetClient, DiamondBase, DiamondBaseClient, DispatchError,
+    FacetCut, FacetCutAction, TokenFacet, TokenFacetClient,
 };
 
 // ---------------------------------------------------------------------------
@@ -368,6 +368,149 @@ fn test_fallback_dispatch_via_facet_address() {
 
     assert_eq!(token.tf_balance_of(&recipient), 750);
     assert_eq!(token.tf_total_supply(), 750);
+}
+
+// ---------------------------------------------------------------------------
+// Validated dispatch — ABI checking before facet invocation
+// ---------------------------------------------------------------------------
+
+/// Register `selector` → `facet_id` on the diamond.
+fn register_selector(
+    env: &Env,
+    diamond: &DiamondBaseClient,
+    admin: &Address,
+    facet_id: &Address,
+    selector: &soroban_sdk::Symbol,
+) {
+    let mut sels = Vec::new(env);
+    sels.push_back(selector.clone());
+    let mut cuts = Vec::new(env);
+    cuts.push_back(FacetCut {
+        facet_address: facet_id.clone(),
+        action: FacetCutAction::Add,
+        selectors: sels,
+    });
+    diamond.diamond_cut(admin, &cuts);
+}
+
+fn tf_mint_args(env: &Env, minter: &Address, to: &Address, amount: i128) -> Vec<Val> {
+    let mut args = Vec::new(env);
+    args.push_back(minter.into_val(env));
+    args.push_back(to.into_val(env));
+    args.push_back(amount.into_val(env));
+    args
+}
+
+#[test]
+fn test_dispatch_valid_args_invokes_facet() {
+    let (env, admin, diamond, token_id, token, _cid, _counter) = setup();
+    // tf_mint's require_auth happens in the facet (non-root) invocation.
+    env.mock_all_auths_allowing_non_root_auth();
+    register_selector(&env, &diamond, &admin, &token_id, &symbol_short!("tf_mint"));
+
+    let minter = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    let args = tf_mint_args(&env, &minter, &recipient, 750i128);
+
+    let result = diamond.try_dispatch(&symbol_short!("tf_mint"), &args);
+    assert!(matches!(result, Ok(Ok(_))));
+    assert_eq!(token.tf_balance_of(&recipient), 750);
+}
+
+#[test]
+fn test_dispatch_wrong_arg_type_returns_typed_error() {
+    let (env, admin, diamond, token_id, _token, _cid, _counter) = setup();
+    register_selector(&env, &diamond, &admin, &token_id, &symbol_short!("tf_mint"));
+
+    // Third arg should be i128; pass a Symbol instead.
+    let mut args = Vec::new(&env);
+    args.push_back(Address::generate(&env).into_val(&env));
+    args.push_back(Address::generate(&env).into_val(&env));
+    args.push_back(symbol_short!("oops").into_val(&env));
+
+    let result = diamond.try_dispatch(&symbol_short!("tf_mint"), &args);
+    assert!(matches!(result, Err(Ok(DispatchError::InvalidArguments))));
+}
+
+#[test]
+fn test_dispatch_wrong_arg_count_returns_typed_error() {
+    let (env, admin, diamond, token_id, _token, _cid, _counter) = setup();
+    register_selector(&env, &diamond, &admin, &token_id, &symbol_short!("tf_mint"));
+
+    // tf_mint expects 3 args; supply only 2.
+    let mut args = Vec::new(&env);
+    args.push_back(Address::generate(&env).into_val(&env));
+    args.push_back(Address::generate(&env).into_val(&env));
+
+    let result = diamond.try_dispatch(&symbol_short!("tf_mint"), &args);
+    assert!(matches!(result, Err(Ok(DispatchError::ArgCountMismatch))));
+}
+
+#[test]
+fn test_dispatch_unregistered_selector_returns_typed_error() {
+    let (env, _admin, diamond, _tid, _token, _cid, _counter) = setup();
+
+    let args = Vec::new(&env);
+    let result = diamond.try_dispatch(&symbol_short!("nope"), &args);
+    assert!(matches!(result, Err(Ok(DispatchError::UnknownSelector))));
+}
+
+#[test]
+fn test_dispatch_unknown_signature_returns_typed_error() {
+    let (env, admin, diamond, token_id, _token, _cid, _counter) = setup();
+    // "mystery" is registered to a facet but has no known signature.
+    register_selector(&env, &diamond, &admin, &token_id, &symbol_short!("mystery"));
+
+    let args = Vec::new(&env);
+    let result = diamond.try_dispatch(&symbol_short!("mystery"), &args);
+    assert!(matches!(result, Err(Ok(DispatchError::UnknownSignature))));
+}
+
+#[test]
+fn test_register_signature_overrides_builtin() {
+    let (env, admin, diamond, token_id, _token, _cid, _counter) = setup();
+    register_selector(&env, &diamond, &admin, &token_id, &symbol_short!("tf_mint"));
+
+    // Built-in signature for tf_mint is [Address, Address, I128].
+    let builtin = diamond
+        .function_signature(&symbol_short!("tf_mint"))
+        .expect("builtin signature missing");
+    assert_eq!(builtin.len(), 3);
+
+    // Override with a different signature: now expects a single Address.
+    let mut arg_types = Vec::new(&env);
+    arg_types.push_back(ArgType::Address);
+    diamond.register_signature(&admin, &symbol_short!("tf_mint"), &arg_types);
+
+    let sig = diamond
+        .function_signature(&symbol_short!("tf_mint"))
+        .expect("registered signature missing");
+    assert_eq!(sig.len(), 1);
+
+    // Dispatching the real 3-arg call now fails count validation.
+    let minter = Address::generate(&env);
+    let recipient = Address::generate(&env);
+    let args = tf_mint_args(&env, &minter, &recipient, 10i128);
+    let result = diamond.try_dispatch(&symbol_short!("tf_mint"), &args);
+    assert!(matches!(result, Err(Ok(DispatchError::ArgCountMismatch))));
+}
+
+#[test]
+fn test_dispatch_counter_facet_via_builtin_signature() {
+    let (env, admin, diamond, _tid, _token, counter_id, counter) = setup();
+
+    // "cf_get_count" is 12 chars — too long for symbol_short!.
+    let selector = soroban_sdk::Symbol::new(&env, "cf_get_count");
+    register_selector(&env, &diamond, &admin, &counter_id, &selector);
+
+    counter.cf_increment(&Address::generate(&env), &symbol_short!("hits"));
+    counter.cf_increment(&Address::generate(&env), &symbol_short!("hits"));
+
+    let mut args = Vec::new(&env);
+    args.push_back(symbol_short!("hits").into_val(&env));
+
+    let result = diamond.try_dispatch(&selector, &args);
+    assert!(matches!(result, Ok(Ok(_))));
 }
 
 // ---------------------------------------------------------------------------
