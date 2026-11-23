@@ -48,3 +48,23 @@ jobs:
 
       - name: Run the template test suite
         run: cargo test
+
+  dao-governance-dapp:
+    name: dao-governance-dapp (standalone workspace)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: templates/dao-governance-dapp
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+
+      - name: Check the template workspace
+        run: cargo check
+
+      - name: Run the template test suite
+        run: cargo test
