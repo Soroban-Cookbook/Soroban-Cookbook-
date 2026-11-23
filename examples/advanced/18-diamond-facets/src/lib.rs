@@ -43,6 +43,30 @@
 //! (e.g. `mint_and_register` first calls the token facet to mint, then the
 //! registry facet to log metadata).
 //!
+//! ## Inline facets for read-heavy operations (Issue #1463)
+//!
+//! Every `invoke_contract` dispatch pays Soroban's full cross-contract call
+//! overhead: argument serialization/deserialization, contract lookup, a new
+//! execution frame, and per-frame metering — typically **thousands of CPU
+//! instructions** even when the facet body only reads one storage key. A
+//! direct (inline) function call in the router skips all of that and costs
+//! only the storage read itself (tens to a few hundred instructions).
+//!
+//! The trade-off:
+//! - **Cross-contract dispatch**: upgradeable, independently deployable
+//!   facets; pays ~10-100x more CPU for tiny read-only operations.
+//! - **Inline facet**: read-heavy logic co-located in the router contract;
+//!   cheapest reads, but the code is frozen with the router and must be
+//!   redeployed to change.
+//!
+//! This example demonstrates the hybrid pattern: `set_entry_inline` /
+//! `get_entry_inline` keep a read-heavy key→value view inside the router,
+//! while `get_entry_via_facet` shows the equivalent cross-contract dispatch
+//! to [`RegistryFacet`]. Write-heavy or rarely-called operations stay on
+//! external facets. The test `test_inline_vs_cross_contract_read_cost`
+//! measures both paths with the host budget and asserts the inline read is
+//! cheaper (run it to see the exact instruction counts on your SDK version).
+//!
 //! ## Introspection (Issue #202)
 //!
 //! `DiamondRouter` now exposes loupe-style introspection:
@@ -406,6 +430,10 @@ pub enum RouterKey {
     FacetList,
     /// Per-facet selector list: `FacetSelectors(facet_addr)` → Vec<Symbol>.
     FacetSelectors(Address),
+    /// Inline facet namespace (Issue #1463): `InlineEntry(key)` → String.
+    /// Read-heavy key→value view co-located in the router to avoid
+    /// cross-contract dispatch overhead.
+    InlineEntry(Symbol),
 }
 
 /// Introspection record returned by `get_facets`.
@@ -606,6 +634,48 @@ impl DiamondRouter {
         } else {
             None
         }
+    }
+
+    // ── Inline facet (Issue #1463) ────────────────────────────────────────
+    //
+    // Read-heavy operations co-located in the router. No cross-contract
+    // call: the storage read happens in the current execution frame.
+
+    /// Inline write: store a key→value entry in the router's own storage.
+    ///
+    /// Mirrors [`RegistryFacet::set_entry`] but without dispatching to an
+    /// external facet. Use for hot data that the router itself reads often.
+    pub fn set_entry_inline(env: Env, caller: Address, key: Symbol, value: String) {
+        caller.require_auth();
+        env.storage()
+            .persistent()
+            .set(&RouterKey::InlineEntry(key.clone()), &value.clone());
+        env.events().publish(
+            (symbol_short!("inline"), symbol_short!("set"), caller, key),
+            value,
+        );
+    }
+
+    /// Inline read-heavy view: direct storage read, no cross-contract call.
+    ///
+    /// Cost: one persistent-storage lookup in the current frame. Compare
+    /// with [`Self::get_entry_via_facet`] which pays full dispatch overhead.
+    pub fn get_entry_inline(env: Env, key: Symbol) -> Option<String> {
+        env.storage().persistent().get(&RouterKey::InlineEntry(key))
+    }
+
+    /// Cross-contract read: dispatch the same lookup to [`RegistryFacet`].
+    ///
+    /// Kept for comparison/benchmarking — pays argument serialization, a
+    /// new execution frame, and contract lookup on every call.
+    pub fn get_entry_via_facet(env: Env, key: Symbol) -> Option<String> {
+        let registry_id: Address = env
+            .storage()
+            .instance()
+            .get(&RouterKey::Registry)
+            .expect("registry facet not registered");
+        let registry_client = RegistryFacetClient::new(&env, &registry_id);
+        registry_client.get_entry(&key)
     }
 }
 

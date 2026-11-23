@@ -258,8 +258,14 @@ fn test_router_register_and_query_facets() {
 
     router.register_facets(&admin, &token_id, &access_id, &registry_id);
 
-    assert_eq!(router.get_facet(&symbol_short!("token")), Some(token_id.clone()));
-    assert_eq!(router.get_facet(&symbol_short!("access")), Some(access_id.clone()));
+    assert_eq!(
+        router.get_facet(&symbol_short!("token")),
+        Some(token_id.clone())
+    );
+    assert_eq!(
+        router.get_facet(&symbol_short!("access")),
+        Some(access_id.clone())
+    );
     assert_eq!(
         router.get_facet(&symbol_short!("registry")),
         Some(registry_id.clone())
@@ -351,5 +357,71 @@ fn test_router_mint_and_register_inter_facet() {
     assert_eq!(
         registry_client.get_entry(&symbol_short!("mint_meta")),
         Some(String::from_str(&env, "initial-mint"))
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Inline facet tests (Issue #1463)
+// ---------------------------------------------------------------------------
+
+#[test]
+fn test_inline_facet_read_write() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let router_id = env.register(DiamondRouter, ());
+    let router = DiamondRouterClient::new(&env, &router_id);
+    let owner = Address::generate(&env);
+    let key = symbol_short!("hot_key");
+
+    assert_eq!(router.get_entry_inline(&key), None);
+
+    let value = String::from_str(&env, "hot-value");
+    router.set_entry_inline(&owner, &key, &value);
+    assert_eq!(router.get_entry_inline(&key), Some(value));
+}
+
+#[test]
+fn test_inline_vs_cross_contract_read_cost() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let router_id = env.register(DiamondRouter, ());
+    let token_id = env.register(TokenFacet, ());
+    let access_id = env.register(AccessFacet, ());
+    let registry_id = env.register(RegistryFacet, ());
+
+    let router = DiamondRouterClient::new(&env, &router_id);
+    let registry_client = RegistryFacetClient::new(&env, &registry_id);
+    let admin = Address::generate(&env);
+    router.register_facets(&admin, &token_id, &access_id, &registry_id);
+
+    // Store the same entry both inline (router storage) and on the external
+    // registry facet, then read it back through both dispatch strategies.
+    let key = symbol_short!("bench");
+    let value = String::from_str(&env, "value");
+    router.set_entry_inline(&admin, &key, &value);
+    registry_client.set_entry(&admin, &key, &value);
+
+    let mut budget = env.cost_estimate().budget();
+
+    budget.reset_unlimited();
+    assert_eq!(router.get_entry_inline(&key), Some(value.clone()));
+    let inline_cost = budget.cpu_instruction_cost();
+
+    budget.reset_unlimited();
+    assert_eq!(router.get_entry_via_facet(&key), Some(value));
+    let facet_cost = budget.cpu_instruction_cost();
+
+    std::println!(
+        "inline read: {} cpu insns, cross-contract read: {} cpu insns",
+        inline_cost,
+        facet_cost
+    );
+    assert!(
+        inline_cost < facet_cost,
+        "inline read ({}) should be cheaper than cross-contract dispatch ({})",
+        inline_cost,
+        facet_cost
     );
 }
