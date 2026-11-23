@@ -1,0 +1,68 @@
+name: Templates CI
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "templates/**"
+      - ".github/workflows/templates.yml"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "templates/**"
+      - ".github/workflows/templates.yml"
+
+env:
+  RUST_VERSION: stable
+
+jobs:
+  templates:
+    name: Build & Test Templates
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        template:
+          - dao-governance-dapp
+          - token-dapp
+          - nft-marketplace-dapp
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+          target: wasm32-unknown-unknown
+
+      - name: Cache cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            templates/${{ matrix.template }}/target
+          key: ${{ runner.os }}-templates-${{ matrix.template }}-cargo-${{ hashFiles(format('templates/{0}/Cargo.lock', matrix.template)) }}
+          restore-keys: ${{ runner.os }}-templates-${{ matrix.template }}-cargo-
+
+      - name: Build template contracts (release)
+        working-directory: templates/${{ matrix.template }}
+        run: cargo build --release
+
+      - name: Run template contract tests
+        working-directory: templates/${{ matrix.template }}
+        run: cargo test --release
+
+      - name: Setup Bun
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: bun install
+
+      - name: Build frontend
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: bun run build
