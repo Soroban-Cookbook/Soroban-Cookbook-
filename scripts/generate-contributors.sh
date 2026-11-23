@@ -1,8 +1,22 @@
 #!/usr/bin/env bash
+# Generate the contributor list from Git history (commits reachable from HEAD).
+#
+# Usage: ./scripts/generate-contributors.sh [OUTPUT_FILE]
+#
+#   OUTPUT_FILE defaults to book/src/contributors.md.
+#
+#   If OUTPUT_FILE contains the markers
+#       <!-- contributors:start --> ... <!-- contributors:end -->
+#   only the text between them is replaced (used for CONTRIBUTORS.md, whose
+#   tier tables are maintained by hand). Otherwise the whole file is written.
+#
+# Run from the repository root. Runs automatically after every merge to main
+# via .github/workflows/contributors.yml.
 set -euo pipefail
 
 OUTPUT_FILE="${1:-book/src/contributors.md}"
-SCRIPT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+START_MARKER="<!-- contributors:start -->"
+END_MARKER="<!-- contributors:end -->"
 
 if ! command -v git >/dev/null 2>&1; then
   echo "git is required to generate the contributors page." >&2
@@ -14,56 +28,75 @@ if [ ! -d .git ]; then
   exit 1
 fi
 
-# Gather contribution statistics
-TOTAL_COMMITS=$(git rev-list --all --count)
-TOTAL_CONTRIBUTORS=$(git shortlog -sne --all | wc -l | tr -d ' ')
-GENERATED_AT=$(date -u +"%Y-%m-%d %H:%M UTC")
-
-# Generate contributor rows
-CONTRIBUTORS_MARKDOWN=$(git shortlog -sne --all | awk 'function format_profile(email,name) {
-    match(email, /^[^+]+\+([^@]+)@users\.noreply\.github\.com$/, arr)
-    if (arr[1] != "") {
-      return "[" name "](https://github.com/" arr[1] ")"
-    }
-    match(email, /^([^@]+)@users\.noreply\.github\.com$/, arr)
-    if (arr[1] != "") {
-      return "[" name "](https://github.com/" arr[1] ")"
-    }
-    return name
-  }
+# Portable awk (works with mawk/BSD awk, not only gawk). Bot accounts are skipped.
+# Names link to the GitHub profile when the commit email is a GitHub noreply
+# address; other email addresses are not published.
+CONTRIBUTORS_MARKDOWN=$(git shortlog -sne HEAD | awk '
   {
     count = $1
-    line = substr($0, index($0,$2))
-    email = gensub(/.*<([^>]+)>$/, "\\1", "g", line)
-    name = gensub(/ <[^>]+>$/, "", "g", line)
-    profile = format_profile(email, name)
-    printf("| %s | %s | %s |\n", count, profile, email)
-  }')
+    line = $0
+    sub(/^[ \t]*[0-9]+[ \t]+/, "", line)
+    email = line; sub(/^.*</, "", email); sub(/>$/, "", email)
+    name = line;  sub(/ <[^>]*>$/, "", name)
+    if (name ~ /\[bot\]$/) next
+    profile = name
+    if (email ~ /@users\.noreply\.github\.com$/) {
+      user = email
+      sub(/@.*$/, "", user)
+      sub(/^[^+]*\+/, "", user)
+      profile = "[" name "](https://github.com/" user ")"
+    }
+    printf("| %s | %s |\n", count, profile)
+    total += count; people++
+  }
+  END { printf("TOTALS %d %d\n", total, people) }')
+
+TOTALS_LINE=$(printf '%s\n' "$CONTRIBUTORS_MARKDOWN" | tail -n 1)
+CONTRIBUTORS_MARKDOWN=$(printf '%s\n' "$CONTRIBUTORS_MARKDOWN" | sed '$d')
+TOTAL_COMMITS=$(echo "$TOTALS_LINE" | cut -d' ' -f2)
+TOTAL_CONTRIBUTORS=$(echo "$TOTALS_LINE" | cut -d' ' -f3)
+
+TABLE=$(cat <<EOF
+- **Total commits:** $TOTAL_COMMITS
+- **Total contributors:** $TOTAL_CONTRIBUTORS
+
+| Commits | Contributor |
+| --- | --- |
+$CONTRIBUTORS_MARKDOWN
+EOF
+)
+
+if [ -f "$OUTPUT_FILE" ] && grep -qF "$START_MARKER" "$OUTPUT_FILE"; then
+  if ! grep -qF "$END_MARKER" "$OUTPUT_FILE"; then
+    echo "$OUTPUT_FILE has $START_MARKER but no $END_MARKER." >&2
+    exit 1
+  fi
+  TMP_FILE="$(mktemp)"
+  TABLE="$TABLE" awk -v start="$START_MARKER" -v end="$END_MARKER" '
+    $0 == start { print; print ENVIRON["TABLE"]; skip = 1; next }
+    $0 == end   { skip = 0 }
+    !skip       { print }
+  ' "$OUTPUT_FILE" > "$TMP_FILE"
+  mv "$TMP_FILE" "$OUTPUT_FILE"
+  exit 0
+fi
 
 cat > "$OUTPUT_FILE" <<EOF
 # Contributors
 
-This page is generated automatically from Git commit history by \\`scripts/generate-contributors.sh\\`.
+This page is generated automatically from Git commit history by \`scripts/generate-contributors.sh\`.
 
 > Thank you to everyone who contributes to the Soroban Cookbook. Your work helps the project grow and improve.
 
 ## Project Contribution Statistics
 
-- **Total commits:** $TOTAL_COMMITS
-- **Total contributors:** $TOTAL_CONTRIBUTORS
-- **Last generated:** $GENERATED_AT
-
-## Contributors
-
-| Commits | Contributor | Contact / Profile |
-| --- | --- | --- |
-$CONTRIBUTORS_MARKDOWN
+$TABLE
 
 ## How this page is updated
 
-This page is rebuilt automatically as part of the documentation deployment workflow and can also be regenerated locally with:
+This page is regenerated after every merge to \`main\` by the Contributors workflow and can also be regenerated locally with:
 
-```bash
+\`\`\`bash
 ./scripts/generate-contributors.sh
-```
+\`\`\`
 EOF
