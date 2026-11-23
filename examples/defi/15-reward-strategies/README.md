@@ -17,6 +17,10 @@ pool to registered participants.
   exponentiation by squaring (`O(log periods)`), not a per-period loop.
 - Admin-gated participant registration and per-participant claimed-amount
   tracking to prevent double claims.
+- Single-I/O compounding: `compound_rewards` reads the participant's
+  `Position` once, updates the claimed and staked amounts in memory, and
+  writes it once. Calling `claim` then `stake` gives the same result but
+  reads and writes the position twice.
 
 ## Public API
 
@@ -26,6 +30,9 @@ pool to registered participants.
 | `register(admin, participant, weight)` | Register a participant's share (or performance score) |
 | `claimable(participant, now)` | View the amount currently available to claim |
 | `claim(participant, now)` | Claim the currently available amount |
+| `stake(participant, amount)` | Re-stake up to the amount already claimed |
+| `compound_rewards(participant, now)` | Claim and re-stake in one storage read and write |
+| `position(participant)` | View the participant's claimed and staked totals |
 
 `decay_bps` and `period_length` are only used by `Strategy::ExponentialDecay`;
 pass `0` for the other strategies.

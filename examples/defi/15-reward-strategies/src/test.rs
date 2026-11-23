@@ -221,3 +221,132 @@ fn test_initialize_rejects_invalid_configuration() {
         Err(Ok(RewardError::AlreadyInitialized))
     );
 }
+
+/// Registers `alice` and `bob` with equal weight on a 1000-token linear pool
+/// that fully unlocks over 100 seconds.
+fn setup_two_equal_participants(env: &Env) -> (Address, Address, RewardDistributorClient<'static>) {
+    let admin = Address::generate(env);
+    let alice = Address::generate(env);
+    let bob = Address::generate(env);
+    let (_, client) = setup(env);
+
+    client
+        .try_initialize(&admin, &Strategy::Linear, &1000, &0, &100, &0, &0)
+        .unwrap()
+        .unwrap();
+    client.try_register(&admin, &alice, &1).unwrap().unwrap();
+    client.try_register(&admin, &bob, &1).unwrap().unwrap();
+    (alice, bob, client)
+}
+
+#[test]
+fn test_compound_matches_claim_then_stake() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let (alice, bob, client) = setup_two_equal_participants(&env);
+
+    // Two compounding cycles: alice uses claim + stake, bob uses compound_rewards.
+    for now in [50u64, 100u64] {
+        at(&env, now);
+        let claimed = client.try_claim(&alice, &now).unwrap().unwrap();
+        client.try_stake(&alice, &claimed).unwrap().unwrap();
+        let compounded = client.try_compound_rewards(&bob, &now).unwrap().unwrap();
+
+        assert_eq!(compounded, claimed);
+        assert_eq!(client.position(&bob), client.position(&alice));
+        assert_eq!(client.claimable(&bob, &now), client.claimable(&alice, &now));
+    }
+
+    assert_eq!(
+        client.position(&bob),
+        Position {
+            claimed: 500,
+            staked: 500
+        }
+    );
+    assert_eq!(client.claimable(&bob, &100), 0);
+}
+
+#[test]
+fn test_compound_costs_one_position_cycle() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let (alice, bob, client) = setup_two_equal_participants(&env);
+    at(&env, 50);
+
+    env.cost_estimate().budget().reset_default();
+    let claimed = client.claim(&alice, &50);
+    let claim_cpu = env.cost_estimate().budget().cpu_instruction_cost();
+
+    env.cost_estimate().budget().reset_default();
+    client.stake(&alice, &claimed);
+    let stake_cpu = env.cost_estimate().budget().cpu_instruction_cost();
+
+    env.cost_estimate().budget().reset_default();
+    client.compound_rewards(&bob, &50);
+    let compound_cpu = env.cost_estimate().budget().cpu_instruction_cost();
+
+    // compound_rewards does the same position read and write as a single claim
+    // (plus one in-memory addition), so it must cost about the same as claim
+    // alone and clearly less than claim + stake.
+    assert!(compound_cpu < claim_cpu + stake_cpu);
+    assert!(compound_cpu <= claim_cpu + claim_cpu / 20);
+}
+
+#[test]
+fn test_compound_rejects_nothing_to_claim_and_unregistered() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let (_, bob, client) = setup_two_equal_participants(&env);
+    let stranger = Address::generate(&env);
+
+    at(&env, 0);
+    assert_eq!(
+        client.try_compound_rewards(&bob, &0),
+        Err(Ok(RewardError::NothingToClaim))
+    );
+
+    at(&env, 50);
+    client.try_compound_rewards(&bob, &50).unwrap().unwrap();
+    // Already settled up to this timestamp.
+    assert_eq!(
+        client.try_compound_rewards(&bob, &50),
+        Err(Ok(RewardError::NothingToClaim))
+    );
+    assert_eq!(
+        client.try_compound_rewards(&stranger, &50),
+        Err(Ok(RewardError::NotRegistered))
+    );
+}
+
+#[test]
+fn test_stake_rejects_invalid_amount_and_unclaimed_rewards() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let (alice, _, client) = setup_two_equal_participants(&env);
+
+    assert_eq!(
+        client.try_stake(&alice, &0),
+        Err(Ok(RewardError::InvalidAmount))
+    );
+    // Nothing claimed yet, so nothing can be staked.
+    assert_eq!(
+        client.try_stake(&alice, &1),
+        Err(Ok(RewardError::InsufficientClaimed))
+    );
+
+    at(&env, 50);
+    let claimed = client.try_claim(&alice, &50).unwrap().unwrap();
+    assert_eq!(
+        client.try_stake(&alice, &(claimed + 1)),
+        Err(Ok(RewardError::InsufficientClaimed))
+    );
+    client.try_stake(&alice, &claimed).unwrap().unwrap();
+    assert_eq!(
+        client.position(&alice),
+        Position {
+            claimed,
+            staked: claimed
+        }
+    );
+}
