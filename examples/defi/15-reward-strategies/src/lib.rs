@@ -38,7 +38,18 @@ pub enum DataKey {
     PeriodLength,
     TotalWeight,
     Weight(Address),
-    Claimed(Address),
+    Position(Address),
+}
+
+/// A participant's reward position, kept in a single storage entry so that
+/// every operation on it costs at most one read and one write.
+#[contracttype]
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct Position {
+    /// Cumulative rewards settled so far, whether claimed or compounded.
+    pub claimed: i128,
+    /// Settled rewards the participant has re-staked instead of withdrawing.
+    pub staked: i128,
 }
 
 #[contracterror]
@@ -54,10 +65,13 @@ pub enum RewardError {
     NotRegistered = 7,
     NothingToClaim = 8,
     Overflow = 9,
+    InsufficientClaimed = 10,
 }
 
 const EVENT_REGISTER: Symbol = symbol_short!("register");
 const EVENT_CLAIM: Symbol = symbol_short!("claim");
+const EVENT_STAKE: Symbol = symbol_short!("stake");
+const EVENT_COMPOUND: Symbol = symbol_short!("compound");
 
 const BPS_DENOMINATOR: i128 = 10_000;
 
@@ -155,34 +169,83 @@ impl RewardDistributor {
     /// Amount `participant` is currently entitled to but has not yet claimed.
     pub fn claimable(env: Env, participant: Address, now: u64) -> Result<i128, RewardError> {
         let entitled = Self::entitled(&env, &participant, now)?;
-        let claimed: i128 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Claimed(participant))
-            .unwrap_or(0);
-        Ok(entitled - claimed)
+        let position = load_position(&env, &participant);
+        Ok(entitled - position.claimed)
     }
 
-    /// Claim the currently available reward for `participant`.
+    /// Claim (harvest) the currently available reward for `participant`.
     pub fn claim(env: Env, participant: Address, now: u64) -> Result<i128, RewardError> {
         participant.require_auth();
 
         let entitled = Self::entitled(&env, &participant, now)?;
-        let claimed: i128 = env
-            .storage()
-            .persistent()
-            .get(&DataKey::Claimed(participant.clone()))
-            .unwrap_or(0);
-        let amount = entitled - claimed;
+        let mut position = load_position(&env, &participant);
+        let amount = entitled - position.claimed;
         if amount <= 0 {
             return Err(RewardError::NothingToClaim);
         }
 
-        env.storage()
-            .persistent()
-            .set(&DataKey::Claimed(participant.clone()), &entitled);
+        position.claimed = entitled;
+        save_position(&env, &participant, &position);
         env.events().publish((EVENT_CLAIM, participant), amount);
         Ok(amount)
+    }
+
+    /// Re-stake `amount` of previously claimed rewards.
+    ///
+    /// A participant can only stake rewards they have already claimed, so
+    /// `staked` never exceeds `claimed`.
+    pub fn stake(env: Env, participant: Address, amount: i128) -> Result<(), RewardError> {
+        participant.require_auth();
+        if amount <= 0 {
+            return Err(RewardError::InvalidAmount);
+        }
+
+        let mut position = load_position(&env, &participant);
+        let new_staked = position
+            .staked
+            .checked_add(amount)
+            .ok_or(RewardError::Overflow)?;
+        if new_staked > position.claimed {
+            return Err(RewardError::InsufficientClaimed);
+        }
+
+        position.staked = new_staked;
+        save_position(&env, &participant, &position);
+        env.events().publish((EVENT_STAKE, participant), amount);
+        Ok(())
+    }
+
+    /// Claim the currently available reward and re-stake it in one step.
+    ///
+    /// The result is the same as `claim` followed by `stake` with the claimed
+    /// amount, but cheaper. Calling those two functions in sequence loads and
+    /// saves the participant's `Position` twice. Here the position is read
+    /// once, both the claimed and the staked amounts are updated in memory,
+    /// and it is written back once. That halves the position storage I/O for
+    /// participants who compound often.
+    pub fn compound_rewards(env: Env, participant: Address, now: u64) -> Result<i128, RewardError> {
+        participant.require_auth();
+
+        let entitled = Self::entitled(&env, &participant, now)?;
+        let mut position = load_position(&env, &participant);
+        let amount = entitled - position.claimed;
+        if amount <= 0 {
+            return Err(RewardError::NothingToClaim);
+        }
+
+        position.claimed = entitled;
+        position.staked = position
+            .staked
+            .checked_add(amount)
+            .ok_or(RewardError::Overflow)?;
+        save_position(&env, &participant, &position);
+        env.events().publish((EVENT_COMPOUND, participant), amount);
+        Ok(amount)
+    }
+
+    /// Current reward position of `participant` (zeroed if never touched).
+    pub fn position(env: Env, participant: Address) -> Position {
+        load_position(&env, &participant)
     }
 
     fn entitled(env: &Env, participant: &Address, now: u64) -> Result<i128, RewardError> {
@@ -294,6 +357,19 @@ fn pow_bps(base_bps: i128, exp: u64) -> Result<i128, RewardError> {
         e >>= 1;
     }
     Ok(result)
+}
+
+fn load_position(env: &Env, participant: &Address) -> Position {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Position(participant.clone()))
+        .unwrap_or_default()
+}
+
+fn save_position(env: &Env, participant: &Address, position: &Position) {
+    env.storage()
+        .persistent()
+        .set(&DataKey::Position(participant.clone()), position);
 }
 
 fn require_admin(env: &Env, admin: &Address) -> Result<(), RewardError> {
