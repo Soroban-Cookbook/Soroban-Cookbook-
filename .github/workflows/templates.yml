@@ -21,9 +21,10 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # The templates legitimately use deprecated `Events::publish` APIs; keep the
-  # same policy as .github/workflows/test.yml instead of the toolchain default.
-  RUSTFLAGS: "-D warnings -A deprecated"
+  # Templates are learner starter kits and intentionally tolerate warnings
+  # (deprecated APIs, unused imports, unused workspace keys). Setting this
+  # also prevents setup-rust-toolchain from injecting its `-D warnings` default.
+  RUSTFLAGS: "-A warnings"
 
 jobs:
   templates:
