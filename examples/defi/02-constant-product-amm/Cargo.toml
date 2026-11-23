@@ -11,4 +11,5 @@ crate-type = ["cdylib", "rlib"]
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]
+insta = "1.48.0"
 soroban-sdk = { workspace = true, features = ["testutils"] }

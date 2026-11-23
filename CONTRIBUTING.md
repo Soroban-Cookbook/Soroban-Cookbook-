@@ -392,6 +392,36 @@ The repository's [pre-commit hooks](./doc/pre-commit.md) run formatting and typo
 checks before commits, then Clippy and integration tests before pushes. Install
 both hooks during setup so these checks run automatically.
 
+### Snapshot Tests
+
+The `sep41-token`, `simple-voting`, and `constant-product-amm` examples use
+[`insta`](https://insta.rs) to pin serialized return values and contract state.
+Their snapshots are checked into `src/snapshots/` next to the test that creates
+them.
+
+Install the review tool once:
+
+```bash
+cargo install cargo-insta --locked
+```
+
+After an intentional change to observable output, regenerate and review the
+snapshots:
+
+```bash
+cargo insta test -p sep41-token -p simple-voting -p constant-product-amm
+cargo insta review
+```
+
+`cargo insta review` walks through each diff so you can accept or reject it.
+Commit the accepted `.snap` files with your change. CI runs the pilot tests with
+`INSTA_UPDATE=no`, so a stale or missing snapshot fails the build. You can run
+the same check locally with:
+
+```bash
+INSTA_UPDATE=no cargo test -p sep41-token -p simple-voting -p constant-product-amm
+```
+
 ### Where to Add a Test
 
 - **Example-level test** (`src/test.rs` or `tests/` inside the example crate): the default for any new or changed example. If the behavior only involves that one contract, it belongs here.

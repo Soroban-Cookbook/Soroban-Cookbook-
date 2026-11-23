@@ -1,0 +1,9 @@
+---
+source: examples/defi/02-constant-product-amm/src/lib.rs
+expression: "format!(\"swap_out: {swap_out}\\n{}\", pool_state(&f))"
+---
+swap_out: 906
+reserves: (11000, 9094)
+total_supply: 10000
+alice_lp: 10000
+bob_lp: 0

@@ -112,6 +112,9 @@ jobs:
             fi
           done
 
+      - name: Verify snapshots are up to date
+        run: INSTA_UPDATE=no cargo test -p sep41-token -p simple-voting -p constant-product-amm --target x86_64-unknown-linux-gnu
+
       - name: Run security tests
         run: cargo test --package security-tests --target x86_64-unknown-linux-gnu
 

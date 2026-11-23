@@ -354,3 +354,6 @@ fn read_allowance(env: &Env, owner: &Address, spender: &Address) -> i128 {
         .get(&DataKey::Allowance(owner.clone(), spender.clone()))
         .unwrap_or(0)
 }
+
+#[cfg(test)]
+mod snapshot_test;

@@ -1,0 +1,14 @@
+---
+source: examples/governance/01-simple-voting/src/test.rs
+expression: "format!(\"{proposal:#?}\")"
+---
+Proposal {
+    id: 1,
+    title: String(Fund development),
+    proposer: AccountId(GAAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQDZ7H),
+    deadline: 500,
+    votes_for: 2,
+    votes_against: 1,
+    votes_abstain: 1,
+    status: Active,
+}

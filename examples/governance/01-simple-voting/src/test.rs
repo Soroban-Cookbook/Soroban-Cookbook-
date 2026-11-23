@@ -2,7 +2,8 @@
 use super::*;
 use soroban_sdk::{
     testutils::{Address as _, Ledger},
-    Env, String,
+    xdr::ToXdr,
+    Env, IntoVal, String, Val,
 };
 
 // ---------------------------------------------------------------------------
@@ -16,6 +17,17 @@ fn setup(env: &Env) -> (VotingContractClient<'_>, Address) {
     env.mock_all_auths();
     client.initialize(&admin);
     (client, admin)
+}
+
+fn xdr_hex<T>(env: &Env, value: T) -> std::string::String
+where
+    T: IntoVal<Env, Val>,
+{
+    value
+        .to_xdr(env)
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect()
 }
 
 // ---------------------------------------------------------------------------
@@ -317,4 +329,36 @@ fn test_tie_results_in_rejected() {
     env.ledger().set_timestamp(300);
     let status = client.execute(&1);
     assert_eq!(status, ProposalStatus::Rejected);
+}
+
+#[test]
+fn snapshot_proposal_state_after_voting() {
+    let env = Env::default();
+    env.ledger().set_timestamp(100);
+    env.mock_all_auths();
+
+    let contract_id = env.register_contract(None, VotingContract);
+    let client = VotingContractClient::new(&env, &contract_id);
+    let admin = Address::from_str(
+        &env,
+        "GAAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQCAIBAEAQDZ7H",
+    );
+    client.initialize(&admin);
+
+    let title = String::from_str(&env, "Fund development");
+    client.create_prop(&admin, &title, &500);
+
+    for choice in [
+        VoteChoice::For,
+        VoteChoice::For,
+        VoteChoice::Against,
+        VoteChoice::Abstain,
+    ] {
+        let voter = Address::generate(&env);
+        client.cast_vote(&voter, &1, &choice);
+    }
+
+    let proposal = client.get_prop(&1);
+    insta::assert_snapshot!("proposal_state_after_voting", format!("{proposal:#?}"));
+    insta::assert_snapshot!("proposal_state_after_voting_xdr", xdr_hex(&env, proposal));
 }

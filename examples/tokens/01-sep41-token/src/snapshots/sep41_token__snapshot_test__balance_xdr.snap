@@ -1,0 +1,5 @@
+---
+source: examples/tokens/01-sep41-token/src/snapshot_test.rs
+expression: "xdr_hex(&env, token.balance(&alice))"
+---
+0000000a0000000000000000000000000007a120

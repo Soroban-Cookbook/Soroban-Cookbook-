@@ -1,0 +1,5 @@
+---
+source: examples/tokens/01-sep41-token/src/snapshot_test.rs
+expression: "xdr_hex(&env, token.symbol())"
+---
+0000000f0000000453555344

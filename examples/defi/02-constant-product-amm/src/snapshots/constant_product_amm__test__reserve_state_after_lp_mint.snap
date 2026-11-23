@@ -1,0 +1,8 @@
+---
+source: examples/defi/02-constant-product-amm/src/lib.rs
+expression: pool_state(&f)
+---
+reserves: (10000, 10000)
+total_supply: 10000
+alice_lp: 10000
+bob_lp: 0

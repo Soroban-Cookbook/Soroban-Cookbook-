@@ -825,6 +825,30 @@ mod test {
         assert_eq!(reserve_y, 9_094);
     }
 
+    #[test]
+    fn snapshot_reserve_state_after_lp_mint_and_swap() {
+        let f = setup();
+
+        f.amm.add_liquidity(&f.alice, &10_000, &10_000);
+        insta::assert_snapshot!("reserve_state_after_lp_mint", pool_state(&f));
+
+        let swap_out = f.amm.swap(&f.bob, &f.token_x.address, &1_000, &900);
+        insta::assert_snapshot!(
+            "reserve_state_after_swap",
+            format!("swap_out: {swap_out}\n{}", pool_state(&f))
+        );
+    }
+
+    fn pool_state(f: &Fixture) -> String {
+        let (reserve_x, reserve_y) = f.amm.reserves();
+        format!(
+            "reserves: ({reserve_x}, {reserve_y})\ntotal_supply: {}\nalice_lp: {}\nbob_lp: {}",
+            f.amm.total_supply(),
+            f.amm.lp_balance(&f.alice),
+            f.amm.lp_balance(&f.bob)
+        )
+    }
+
     fn assert_lock_released(f: &Fixture) {
         f.env.as_contract(&f.amm.address, || {
             assert!(!f.env.storage().instance().has(&DataKey::Entered));
