@@ -49,6 +49,7 @@ impl OptimizedToken {
         }
 
         require_positive(total_supply)?;
+        owner.require_auth();
         env.storage()
             .persistent()
             .set(&DataKey::Balance(owner.clone()), &total_supply);
@@ -68,13 +69,12 @@ impl OptimizedToken {
             return Err(TokenError::InsufficientBalance);
         }
 
-        let to_balance = read_balance(&env, &to)
-            .checked_add(amount)
-            .ok_or(TokenError::ArithmeticOverflow)?;
-
         env.storage()
             .persistent()
             .set(&DataKey::Balance(from.clone()), &(from_balance - amount));
+        let to_balance = read_balance(&env, &to)
+            .checked_add(amount)
+            .ok_or(TokenError::ArithmeticOverflow)?;
         env.storage()
             .persistent()
             .set(&DataKey::Balance(to.clone()), &to_balance);
@@ -100,14 +100,13 @@ impl OptimizedToken {
                 return Err(TokenError::InsufficientBalance);
             }
 
-            let to_balance = read_balance(&env, &payment.recipient)
-                .checked_add(payment.amount)
-                .ok_or(TokenError::ArithmeticOverflow)?;
-
             env.storage().persistent().set(
                 &DataKey::Balance(from.clone()),
                 &(from_balance - payment.amount),
             );
+            let to_balance = read_balance(&env, &payment.recipient)
+                .checked_add(payment.amount)
+                .ok_or(TokenError::ArithmeticOverflow)?;
             env.storage()
                 .persistent()
                 .set(&DataKey::Balance(payment.recipient.clone()), &to_balance);

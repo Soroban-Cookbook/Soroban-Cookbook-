@@ -82,6 +82,7 @@ impl GuardedConsumer {
             return Err(ConsumerError::InvalidConfig);
         }
 
+        admin.require_auth();
         env.storage().instance().set(&GuardKey::Admin, &admin);
         env.storage().instance().set(&GuardKey::Config, &config);
         Ok(())

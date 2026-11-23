@@ -224,6 +224,10 @@ impl BridgeSecurityContract {
         reviewer.require_auth();
         ensure_initialized(&env)?;
         require_not_paused(&env)?;
+        let admin = read_admin(&env)?;
+        if reviewer != admin {
+            return Err(BridgeError::Unauthorized);
+        }
 
         let mut transfer = read_transfer(&env, transfer_id)?;
         match transfer.status {

@@ -1,5 +1,28 @@
 # Oracle Consumer
 
+> **⚠️ UNAUDITED EXAMPLE — NOT FOR PRODUCTION USE**
+>
+> The contract code and patterns shown on this page have **not been audited**.
+> They are provided solely as a learning resource to illustrate Soroban
+> development techniques.  **Do not deploy this contract with real funds
+> or in a production environment without a professional security audit.**
+>
+> **Reentrancy:** Soroban's execution model does not support re-entrant
+> cross-contract calls within the same transaction — re-entry is a
+> protocol-level impossibility on Soroban.  Any reentrancy-style guards
+> in this example are therefore illustrative rather than strictly
+> necessary.
+>
+> **Storage TTL / data-expiry:** Soroban instance and persistent storage
+> entries expire after a ledger-defined TTL (default ~30 days on Mainnet).
+> Oracle consumer contracts that are not called for an extended period
+> will have their cached data, quorum configuration, and circuit-breaker
+> state **silently deleted**.  Production deployments **must** extend
+> instance (and any persistent) storage TTL on every call or via an
+> off-chain keeper.  Failure to do so will cause cached oracle values
+> to vanish, safety thresholds to be lost, and settlement logic to
+> operate against uninitialized state.
+
 Three oracle consumer contracts: validated cache, quorum median consensus, and settlement circuit breaker.
 
 ## Role in Learning Path
@@ -13,8 +36,8 @@ This is the **fifth step** in the [oracle patterns learning path](../README.md#o
 
 **Prerequisites:** Understand oracle producer patterns:
 - [`03-oracle-pattern`](../03-oracle-pattern/) — Basic oracle mechanics
-- [`03-data-aggregation-oracle`](../03-data-aggregation-oracle/) — Aggregation strategies
-- [`04-oracle-integration`](../04-oracle-integration/) — Integration patterns
+- [`26-data-aggregation-oracle`](../26-data-aggregation-oracle/) — Aggregation strategies
+- [`15-oracle-integration`](../15-oracle-integration/) — Integration patterns
 - [`06-price-oracle`](../06-price-oracle/) — Price oracle specifics
 
 **Next step:**

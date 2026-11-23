@@ -81,10 +81,10 @@ pub struct ProtectedCallEventData {
 }
 
 const CONTRACT_NS: Symbol = symbol_short!("hac");
-const ACTION_ROLE_GRANT: Symbol = symbol_short!("role_grnt");
-const ACTION_ROLE_REVOKE: Symbol = symbol_short!("role_rvk");
-const ACTION_PERM_GRANT: Symbol = symbol_short!("perm_grnt");
-const ACTION_PERM_REVOKE: Symbol = symbol_short!("perm_rvk");
+const ACTION_ROLE_GRANT: Symbol = symbol_short!("r_grant");
+const ACTION_ROLE_REVOKE: Symbol = symbol_short!("r_revoke");
+const ACTION_PERM_GRANT: Symbol = symbol_short!("p_grant");
+const ACTION_PERM_REVOKE: Symbol = symbol_short!("p_revoke");
 const ACTION_CALL: Symbol = symbol_short!("call");
 
 // ---------------------------------------------------------------------------
@@ -125,6 +125,7 @@ impl HierarchicalAccessControlContract {
         if env.storage().instance().has(&DataKey::Initialized) {
             panic!("Already initialized");
         }
+        initial_admin.require_auth();
 
         // Grant ADMIN to initial admin
         let mut admin_members: Vec<Address> = Vec::new(&env);
@@ -176,7 +177,7 @@ impl HierarchicalAccessControlContract {
     // Role management
     // -----------------------------------------------------------------------
 
-    /// Grant a role to an account. Caller must have MANAGE_ROLES permission
+    /// Grant a role to an account. Caller must have MNG_ROLES permission
     /// AND hold a role strictly above `role` in the hierarchy (see module
     /// comment). A MANAGER can only grant OPERATOR; only ADMIN can grant
     /// MANAGER; nobody can grant ADMIN after initialization.
@@ -211,7 +212,7 @@ impl HierarchicalAccessControlContract {
         );
     }
 
-    /// Revoke a role from an account. Caller must have MANAGE_ROLES permission
+    /// Revoke a role from an account. Caller must have MNG_ROLES permission
     /// AND hold a role strictly above `role` in the hierarchy (same invariant
     /// as `grant_role`).
     pub fn revoke_role(env: Env, caller: Address, role: Symbol, account: Address) {
@@ -385,7 +386,7 @@ impl HierarchicalAccessControlContract {
     // Protected operations
     // -----------------------------------------------------------------------
 
-    /// Operation requiring MANAGE_RESOURCES permission.
+    /// Operation requiring MNG_RES permission.
     pub fn manage_resource(env: Env, caller: Address, _resource_id: Symbol) {
         caller.require_auth();
         Self::require_permission(&env, &caller, PERM_MANAGE_RESOURCES);
@@ -490,165 +491,4 @@ impl HierarchicalAccessControlContract {
 }
 
 #[cfg(test)]
-mod test {
-    use super::*;
-    use soroban_sdk::testutils::Address as _;
-
-    fn deploy(
-        env: &Env,
-    ) -> (
-        HierarchicalAccessControlContractClient<'_>,
-        Address,
-        Address,
-        Address,
-    ) {
-        let admin = Address::generate(env);
-        let manager = Address::generate(env);
-        let operator = Address::generate(env);
-
-        let contract_id = env.register_contract(None, HierarchicalAccessControlContract);
-        let client = HierarchicalAccessControlContractClient::new(env, &contract_id);
-
-        client.initialize(&admin);
-        client.grant_role(&admin, &ROLE_MANAGER, &manager);
-        client.grant_role(&admin, &ROLE_OPERATOR, &operator);
-
-        (client, admin, manager, operator)
-    }
-
-    #[test]
-    fn test_grant_revoke_and_checks() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let user = Address::generate(&env);
-        let (client, admin, _manager, _operator) = deploy(&env);
-
-        assert!(!client.has_role(&ROLE_OPERATOR, &user));
-        assert!(!client.account_has_permission(&user, &PERM_USE_RESOURCES));
-
-        client.grant_role(&admin, &ROLE_OPERATOR, &user);
-        assert!(client.has_role(&ROLE_OPERATOR, &user));
-        assert!(client.account_has_permission(&user, &PERM_USE_RESOURCES));
-
-        client.revoke_role(&admin, &ROLE_OPERATOR, &user);
-        assert!(!client.has_role(&ROLE_OPERATOR, &user));
-        assert!(!client.account_has_permission(&user, &PERM_USE_RESOURCES));
-    }
-
-    #[test]
-    fn test_hierarchy_inherits_permissions() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, admin, manager, _operator) = deploy(&env);
-
-        let custom = symbol_short!("CUSTOM");
-        client.grant_permission(&admin, &custom, &ROLE_OPERATOR);
-
-        assert!(client.role_has_permission(&ROLE_OPERATOR, &custom));
-        assert!(client.account_has_permission(&admin, &custom));
-        assert!(client.account_has_permission(&manager, &custom));
-    }
-
-    #[test]
-    fn test_manager_can_manage_operator_role() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, _admin, manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&manager, &ROLE_OPERATOR, &user);
-        assert!(client.has_role(&ROLE_OPERATOR, &user));
-
-        client.revoke_role(&manager, &ROLE_OPERATOR, &user);
-        assert!(!client.has_role(&ROLE_OPERATOR, &user));
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller cannot manage target role")]
-    fn test_manager_cannot_manage_admin_role() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, _admin, manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&manager, &ROLE_ADMIN, &user);
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller cannot manage target role")]
-    fn test_manager_cannot_grant_manager_role() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, _admin, manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&manager, &ROLE_MANAGER, &user);
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller cannot manage target role")]
-    fn test_manager_cannot_revoke_admin_role() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, admin, manager, _operator) = deploy(&env);
-
-        client.revoke_role(&manager, &ROLE_ADMIN, &admin);
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller cannot manage target role")]
-    fn test_admin_cannot_grant_admin_role() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, admin, _manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&admin, &ROLE_ADMIN, &user);
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller cannot manage target role")]
-    fn test_unknown_role_cannot_be_granted() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, admin, _manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&admin, &symbol_short!("SUPERUSER"), &user);
-    }
-
-    #[test]
-    fn test_admin_can_grant_lower_roles() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, admin, _manager, _operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&admin, &ROLE_MANAGER, &user);
-        assert!(client.has_role(&ROLE_MANAGER, &user));
-
-        client.grant_role(&admin, &ROLE_OPERATOR, &user);
-        assert!(client.has_role(&ROLE_OPERATOR, &user));
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller does not have required permission")]
-    fn test_operator_cannot_manage_roles() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, _admin, _manager, operator) = deploy(&env);
-        let user = Address::generate(&env);
-
-        client.grant_role(&operator, &ROLE_OPERATOR, &user);
-    }
-
-    #[test]
-    #[should_panic(expected = "Caller does not have required permission")]
-    fn test_operator_cannot_manage_resources() {
-        let env = Env::default();
-        env.mock_all_auths();
-        let (client, _admin, _manager, operator) = deploy(&env);
-
-        client.manage_resource(&operator, &symbol_short!("res"));
-    }
-}
+mod test;

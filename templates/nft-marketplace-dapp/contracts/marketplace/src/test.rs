@@ -31,13 +31,14 @@ fn test_mint_list_and_buy() {
     assert_eq!(listing.seller, creator);
     assert_eq!(listing.price, 500);
 
-    // Buyer purchases NFT
-    client.buy_item(&buyer, &1);
+    // No payment token is configured, so the NFT stays in escrow.
+    assert_eq!(
+        client.try_buy_item(&buyer, &1),
+        Err(Ok(MarketplaceError::PaymentFailed))
+    );
     let updated_nft = client.get_nft(&1);
-    assert_eq!(updated_nft.owner, buyer);
-
-    // Listing should now be removed
-    assert!(client.try_get_listing(&1).is_err());
+    assert_eq!(updated_nft.owner, contract_id);
+    assert_eq!(client.get_listing(&1).price, 500);
 }
 
 #[test]

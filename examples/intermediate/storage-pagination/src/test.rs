@@ -148,9 +148,7 @@ fn test_page_size_zero_errors() {
 fn test_page_size_cap() {
     let (_env, client) = setup();
     client.add_item(&item(0));
-    let err = client
-        .try_list(&(MAX_PAGE_SIZE + 1), &None)
-        .unwrap_err();
+    let err = client.try_list(&(MAX_PAGE_SIZE + 1), &None).unwrap_err();
     assert_eq!(err, Ok(PaginationError::InvalidPageSize));
 
     let page = client.list(&MAX_PAGE_SIZE, &None);
@@ -219,7 +217,11 @@ fn test_full_pagination_no_duplicates_or_gaps() {
         for i in 0..page.items.len() {
             let value = page.items.get(i).unwrap();
             let expected_index = count;
-            assert_eq!(value, item(expected_index), "unexpected item at position {count}");
+            assert_eq!(
+                value,
+                item(expected_index),
+                "unexpected item at position {count}"
+            );
             assert!(
                 collected[expected_index as usize].is_none(),
                 "duplicate at index {expected_index}"

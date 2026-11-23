@@ -4,6 +4,18 @@ version.workspace = true
 edition.workspace = true
 publish = false
 
+[profile.test]
+opt-level = 0
+split-debuginfo = "packed"
+
+[[test]]
+name = "integration_tests"
+path = "integration_tests.rs"
+harness = true
+
+[lib]
+path = "lib.rs"
+
 [dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }
 soroban-validation = { path = "../../shared", package = "soroban-validation" }
@@ -34,18 +46,18 @@ data_types = { path = "../../examples/basics/12-data-types", package = "data-typ
 collection_types = { path = "../../examples/basics/13-collection-types", package = "collection-types" }
 basic_nft = { path = "../../examples/nfts/01-basic-nft", package = "basic-nft" }
 nft_marketplace = { path = "../../examples/nfts/04-nft-marketplace", package = "nft-marketplace" }
-proposal_lifecycle = { path = "../../examples/governance/03-proposal-lifecycle", package = "proposal-lifecycle" }
+proposal_lifecycle = { path = "../../examples/governance/04-proposal-lifecycle", package = "proposal-lifecycle" }
 role_based_access_control = { path = "../../examples/intermediate/02-role-based-access-control", package = "role-based-access-control" }
-rbac_modifiers = { path = "../../examples/advanced/03-rbac-modifiers", package = "rbac-modifiers" }
+rbac_modifiers = { path = "../../examples/advanced/32-rbac-modifiers", package = "rbac-modifiers" }
 pause_unpause = { path = "../../examples/intermediate/03-pause-unpause", package = "pause-unpause" }
-registry_access_controls = { path = "../../examples/advanced/03-registry-access-controls", package = "registry-access-controls" }
-proxy_admin = { path = "../../examples/advanced/03-proxy-admin", package = "proxy-admin" }
+registry_access_controls = { path = "../../examples/advanced/33-registry-access-controls", package = "registry-access-controls" }
+proxy_admin = { path = "../../examples/advanced/31-proxy-admin", package = "proxy-admin" }
 simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }
 constant_product_amm = { path = "../../examples/defi/02-constant-product-amm", package = "constant-product-amm" }
 lending_pool = { path = "../../examples/defi/03-lending-pool", package = "lending-pool" }
 collateralized_lending = { path = "../../examples/defi/04-collateralized-lending", package = "collateralized-lending" }
 proptest = "1.6"
-voting_time_constraints = { path = "../../examples/governance/02-voting-time-constraints", package = "voting-time-constraints" }
+voting_time_constraints = { path = "../../examples/governance/03-voting-time-constraints", package = "voting-time-constraints" }
 oracle_pattern = { path = "../../examples/advanced/03-oracle-pattern", package = "oracle-pattern" }
 cross_contract_integration_testing = { path = "../../examples/advanced/16-cross-contract-integration-testing", package = "cross_contract_integration_testing" }
 upgradeable_proxy = { path = "../../examples/advanced/04-upgradeable-proxy", package = "upgradeable-proxy" }
@@ -62,9 +74,9 @@ farming_pool = { path = "../../examples/defi/12-farming-pool", package = "farmin
 amm_router = { path = "../../examples/defi/13-amm-router", package = "amm-router" }
 staking_pool_legacy = { path = "../../examples/defi/staking-pool", package = "staking-pool-legacy" }
 soroban_flash_loan_use_cases = { path = "../../examples/defi/06-flash-loan-use-cases", package = "soroban-flash-loan-use-cases" }
-batch_operations = { path = "../../examples/advanced/08-batch-operations", package = "batch-operations" }
-proposal_validation = { path = "../../examples/governance/01-proposal-validation", package = "proposal-validation" }
-dao_treasury = { path = "../../examples/governance/03-dao-treasury", package = "dao-treasury" }
+batch_operations = { path = "../../examples/advanced/39-batch-operations", package = "batch-operations" }
+proposal_validation = { path = "../../examples/governance/05-proposal-validation", package = "proposal-validation" }
+dao_treasury = { path = "../../examples/governance/10-dao-treasury", package = "dao-treasury" }
 compressed_storage = { path = "../../examples/basics/13-compressed-storage", package = "compressed-storage" }
 queue_variants = { path = "../../examples/basics/13-queue-variants", package = "queue-variants" }
 event_filtering = { path = "../../examples/basics/14-event-filtering", package = "event_filtering" }
@@ -76,5 +88,40 @@ diamond_security = { path = "../../examples/advanced/19-diamond-security", packa
 facet_adder = { path = "../../examples/advanced/19-diamond-security/facet-adder", package = "facet-adder" }
 facet_multiplier = { path = "../../examples/advanced/19-diamond-security/facet-multiplier", package = "facet-multiplier" }
 bridge_security = { path = "../../examples/advanced/17-bridge-security", package = "bridge-security" }
-price_oracle = { path = "../../examples/advanced/06-price-oracle", package = "price-oracle" }
+price_oracle = { path = "../../examples/advanced/36-price-oracle", package = "price-oracle" }
 diamond_facets = { path = "../../examples/advanced/18-diamond-facets", package = "diamond-facets" }
+
+# --- Advanced-example coverage (issue #904) -------------------------------
+circuit_breaker = { path = "../../examples/advanced/04-circuit-breaker", package = "circuit-breaker" }
+rate_limiting = { path = "../../examples/advanced/05-rate-limiting", package = "rate-limiting" }
+reentrancy_guard = { path = "../../examples/advanced/15-reentrancy-guard", package = "reentrancy-guard" }
+permit_pattern = { path = "../../examples/advanced/30-permit-pattern", package = "permit-pattern" }
+merkle_proofs = { path = "../../examples/advanced/21-merkle-proofs", package = "merkle-proofs" }
+merkle_airdrop = { path = "../../examples/advanced/28-merkle-airdrop", package = "merkle-airdrop" }
+merkle_whitelist = { path = "../../examples/advanced/29-merkle-whitelist", package = "merkle-whitelist" }
+batch_transfer = { path = "../../examples/advanced/20-batch-transfer", package = "batch-transfer" }
+batch_builder = { path = "../../examples/advanced/22-batch-builder", package = "batch-builder" }
+multicall = { path = "../../examples/advanced/42-multicall", package = "multicall" }
+hierarchical_access_control = { path = "../../examples/advanced/16-hierarchical-access-control", package = "hierarchical-access-control" }
+data_aggregation_oracle = { path = "../../examples/advanced/26-data-aggregation-oracle", package = "data-aggregation-oracle" }
+upgrade_patterns = { path = "../../examples/advanced/07-upgrade-patterns", package = "upgrade-patterns", features = ["testutils"] }
+beacon_management = { path = "../../examples/advanced/37-beacon-management", package = "beacon-management" }
+
+# --- Use-case coverage (issue #901) ---------------------------------------
+
+snapshot_triggers_defi = { path = "../../examples/defi/14-automatic-snapshot-triggers", package = "snapshot-triggers-defi" }
+reward_strategies = { path = "../../examples/defi/15-reward-strategies", package = "reward-strategies" }
+nft_metadata_advanced = { path = "../../examples/nfts/02-nft-metadata", package = "nft-metadata-advanced" }
+nft_metadata_standards = { path = "../../examples/nfts/03-nft-metadata-standards", package = "nft-metadata-standards" }
+snapshot_triggers_nfts = { path = "../../examples/nfts/05-automatic-snapshot-triggers", package = "snapshot-triggers-nfts" }
+vote_delegation = { path = "../../examples/governance/06-vote-delegation", package = "vote-delegation" }
+timelock_governance = { path = "../../examples/governance/09-timelock-governance", package = "timelock-governance" }
+snapshot_triggers_governance = { path = "../../examples/governance/11-automatic-snapshot-triggers", package = "snapshot-triggers-governance" }
+vesting_management = { path = "../../examples/tokens/01-vesting-management", package = "vesting-management" }
+minting_strategies_token = { path = "../../examples/tokens/02-minting-strategies", package = "minting-strategies-token" }
+allowance_pattern = { path = "../../examples/tokens/05-allowance-pattern", package = "allowance-pattern" }
+reward_token = { path = "../../examples/tokens/06-reward-token", package = "reward-token" }
+token_metadata = { path = "../../examples/tokens/07-token-metadata", package = "token-metadata" }
+multi_token_balance_manager = { path = "../../examples/tokens/08-multi-token-balance-manager", package = "multi-token-balance-manager" }
+custom_token = { path = "../../examples/tokens/10-custom-token", package = "custom-token" }
+token_lock = { path = "../../examples/tokens/token-lock", package = "token-lock" }

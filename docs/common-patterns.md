@@ -123,7 +123,7 @@ authoritative.
 
 ## 4. Role-Based Access Control (RBAC)
 
-**Canonical Source:** [`03-rbac-modifiers`](../examples/advanced/03-rbac-modifiers/src/lib.rs)  
+**Canonical Source:** [`32-rbac-modifiers`](../examples/advanced/32-rbac-modifiers/src/lib.rs)  
 **Also see:** [`02-role-based-access-control`](../examples/intermediate/02-role-based-access-control/) (numeric hierarchy), [`05-hierarchical-access-control`](../examples/advanced/05-hierarchical-access-control/) (permission inheritance)
 
 Assign roles to addresses in persistent storage. A helper checks whether the

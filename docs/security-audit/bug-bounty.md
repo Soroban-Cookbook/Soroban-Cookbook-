@@ -6,6 +6,10 @@ The Soroban Cookbook Bug Bounty Program rewards responsible disclosure of securi
 
 This is an **educational repository** containing smart contract examples. While no real funds are at risk on-chain, insecure example code can teach harmful patterns to developers building production contracts. The bug bounty program exists to keep those examples correct and safe.
 
+Launch copy and the external outreach checklist are maintained in the
+[Bug Bounty Program Launch Kit](./bug-bounty-launch.md). The checklist records
+publication and participant milestones only after they are verified.
+
 ## Scope
 
 ### In Scope

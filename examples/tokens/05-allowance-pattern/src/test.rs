@@ -8,7 +8,8 @@ use soroban_sdk::{
 };
 
 const INITIAL_SUPPLY: i128 = 1_000_000;
-const FAR_FUTURE: u32 = 100_000;
+// Unix timestamp far in the future (2100-01-01), per SEP-41.
+const FAR_FUTURE: u64 = 4_102_444_800;
 
 struct Fixture {
     env: Env,
@@ -85,7 +86,7 @@ fn approve_sets_allowance_and_emits_event() {
         f.contract.allowance_details(&f.admin, &f.alice),
         AllowanceValue {
             amount: 300_000,
-            expiration_ledger: FAR_FUTURE,
+            expiration_timestamp: FAR_FUTURE,
         }
     );
 }
@@ -107,7 +108,7 @@ fn transfer_from_moves_tokens_and_decrements_allowance() {
     assert_eq!(
         f.contract
             .allowance_details(&f.admin, &f.alice)
-            .expiration_ledger,
+            .expiration_timestamp,
         FAR_FUTURE
     );
 }
@@ -201,7 +202,7 @@ fn expired_allowance_is_zero_and_blocks_transfer_from() {
     f.contract.approve(&f.admin, &f.alice, &300_000, &100);
 
     // Advance the ledger past the allowance expiration.
-    f.env.ledger().with_mut(|li| li.sequence_number = 101);
+    f.env.ledger().with_mut(|li| li.timestamp = 101);
 
     assert_eq!(f.contract.allowance(&f.admin, &f.alice), 0);
     // The raw entry still holds the stale amount; only the spendable view is 0.
@@ -219,7 +220,7 @@ fn expired_allowance_is_zero_and_blocks_transfer_from() {
 fn approve_rejects_past_expiration_for_live_allowance() {
     let f = setup();
 
-    f.env.ledger().with_mut(|li| li.sequence_number = 100);
+    f.env.ledger().with_mut(|li| li.timestamp = 100);
 
     assert_eq!(
         f.contract.try_approve(&f.admin, &f.alice, &300_000, &50),
@@ -228,13 +229,13 @@ fn approve_rejects_past_expiration_for_live_allowance() {
 }
 
 #[test]
-fn allowance_valid_through_expiration_ledger() {
+fn allowance_valid_through_expiration_timestamp() {
     let f = setup();
 
     f.contract.approve(&f.admin, &f.alice, &300_000, &100);
 
-    // Exactly at the expiration ledger the allowance is still spendable.
-    f.env.ledger().with_mut(|li| li.sequence_number = 100);
+    // Exactly at the expiration timestamp the allowance is still spendable.
+    f.env.ledger().with_mut(|li| li.timestamp = 100);
     assert_eq!(f.contract.allowance(&f.admin, &f.alice), 300_000);
     f.contract
         .transfer_from(&f.alice, &f.admin, &f.bob, &100_000);

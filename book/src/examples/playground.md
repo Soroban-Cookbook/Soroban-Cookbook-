@@ -5,6 +5,72 @@ a self-contained Rust crate you can clone, modify, and test in minutes.
 
 ---
 
+## Try It Online (No Local Setup)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Soroban-Cookbook/Soroban-Cookbook-?quickstart=1)
+
+The button opens the cookbook in a GitHub Codespace, a full VS Code editor and
+terminal in your browser with Rust preinstalled. The repository is already
+checked out, so the Hello World example is ready at
+`examples/basics/01-hello-world`. A free GitHub account is required.
+
+**1. Run the Hello World example**
+
+In the Codespace terminal:
+
+```bash
+cd examples/basics/01-hello-world
+cargo test
+```
+
+**2. Modify it**
+
+Open `examples/basics/01-hello-world/src/lib.rs`, change
+`symbol_short!("Hello")` to `symbol_short!("Hola")`, and run `cargo test`
+again. Update the expected value in the tests until they pass.
+
+**3. Redeploy it to testnet**
+
+```bash
+# One-time setup inside the Codespace
+cargo install --locked soroban-cli
+soroban keys generate alice --network testnet
+soroban keys fund alice --network testnet
+
+# Build and deploy your modified contract
+cargo build --target wasm32-unknown-unknown --release
+CONTRACT_ID=$(soroban contract deploy \
+  --wasm ../../../target/wasm32-unknown-unknown/release/hello_world.wasm \
+  --source alice \
+  --network testnet)
+
+# Call it
+soroban contract invoke --id $CONTRACT_ID --source alice --network testnet \
+  -- hello --to World
+```
+
+Every time you edit `src/lib.rs`, repeat the build and deploy commands to get
+a new contract ID running your latest code.
+
+**4. Invoke it from the browser**
+
+Paste the contract ID into [Stellar Lab](https://lab.stellar.org) (select
+**Testnet**) to inspect the contract and call `hello` from a web form.
+
+### On a phone or tablet
+
+Codespaces runs in mobile browsers, but editing and using the terminal on a
+small screen is awkward. On mobile you can instead:
+
+- Read the contract source on GitHub:
+  [`examples/basics/01-hello-world/src/lib.rs`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/basics/01-hello-world/src/lib.rs)
+- Use [Stellar Lab](https://lab.stellar.org), which works in mobile browsers,
+  to call a deployed contract by its contract ID.
+- Follow the [Hello World tutorial](../guides/playground-tutorial-01-hello-world.md)
+  and run the examples later on a desktop.
+
+---
+
 ## How to Use This Playground
 
 ### Prerequisites
@@ -789,9 +855,121 @@ env.ledger().with_mut(|li| { li.sequence_number = 100; li.timestamp = 1_000_000;
 
 ---
 
+## Use-Case Examples
+
+The basic examples above teach individual Soroban primitives. The use-case
+examples below combine those primitives into realistic contracts you can run,
+edit, and deploy. Each section links to the example directory in the repo and
+to the matching book page.
+
+### DeFi — Simple Swap
+
+> **Example:** [`examples/defi/simple-swap`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/simple-swap)
+> **Book page:** [DeFi Examples →](./defi.md)
+
+A constant-product (x·y = k) liquidity pool with `deposit`, `swap`, and
+`withdraw` entry points. It demonstrates token transfers between contracts,
+slippage checks, and LP-share accounting.
+
+```bash
+cd examples/defi/simple-swap
+cargo test
+```
+
+**What to try:**
+- Change the fee constant (e.g. from 30 bps to 100 bps) and re-run the swap
+  tests to see how output amounts shift.
+- Add a `get_price` view function that returns the current reserve ratio.
+- Write a test that performs two swaps in a row and asserts the invariant
+  `reserve_a * reserve_b` never decreases (minus fees).
+
+### NFT — Basic NFT
+
+> **Example:** [`examples/nft/basic-nft`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nft/basic-nft)
+> **Book page:** [NFT Examples →](./nft.md)
+
+A minimal non-fungible token implementing `mint`, `owner_of`, `transfer`, and
+`approve`, with per-token metadata stored under persistent keys.
+
+```bash
+cd examples/nft/basic-nft
+cargo test
+```
+
+**What to try:**
+- Add a `burn` function that requires the owner's auth and removes the token
+  from storage.
+- Emit a `transfer` event with `(from, to, token_id)` topics and assert on it
+  in a test using `env.events().all()`.
+- Add a max-supply cap and a test that minting past the cap returns an error.
+
+### Governance — Simple Voting
+
+> **Example:** [`examples/governance/simple-voting`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/simple-voting)
+> **Book page:** [Governance Examples →](./governance.md)
+
+An on-chain proposal-and-vote contract: create a proposal with a deadline,
+cast weighted votes, and finalize the result once voting closes.
+
+```bash
+cd examples/governance/simple-voting
+cargo test
+```
+
+**What to try:**
+- Add a `quorum` check so a proposal only passes if total votes exceed a
+  threshold.
+- Prevent double-voting by keying votes on `(proposal_id, voter)`.
+- Use `env.ledger().set_timestamp(...)` in a test to advance past the deadline
+  and assert that late votes are rejected.
+
+### Token — SEP-41 Token
+
+> **Example:** [`examples/tokens/sep41-token`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/sep41-token)
+> **Book page:** [Token Examples →](./tokens.md)
+
+A fungible token implementing the SEP-41 interface: `allowance`, `approve`,
+`balance`, `transfer`, `transfer_from`, `burn`, and `burn_from`, plus
+`decimals`, `name`, and `symbol` metadata.
+
+```bash
+cd examples/tokens/sep41-token
+cargo test
+```
+
+**What to try:**
+- Add a `mint` function gated on an admin address stored in instance storage.
+- Write a test for the approve → `transfer_from` → allowance-decrement flow.
+- Verify that `transfer` without `from.require_auth()` fails the auth tests.
+
+### Running All Use-Case Examples
+
+```bash
+# From the workspace root
+cargo test -p soroban-simple-swap-example \
+           -p soroban-basic-nft-example \
+           -p soroban-simple-voting-example \
+           -p soroban-sep41-token-example
+```
+
+Or build every use-case Wasm artifact:
+
+```bash
+for dir in examples/defi/*/ examples/nft/*/ examples/governance/*/ examples/tokens/*/; do
+    echo "Building $dir..."
+    cargo build --manifest-path "$dir/Cargo.toml" \
+                --target wasm32-unknown-unknown \
+                --release
+done
+```
+
+---
+
 ## Next Steps
 
 - [Intermediate Examples →](./intermediate.md) — tokens, multi-sig, pause/unpause
+- [Interactive Playground — Intermediate Examples →](./playground-intermediate.md) — hands-on token, cross-contract and access-control walkthroughs
+- [Code Examples →](../docs/code-examples.md) — tested snippet for every topic
 - [Advanced Examples →](./advanced.md) — cross-contract calls, oracle patterns, upgradeable proxies
 - [Testing Guide →](../guides/testing.md) — mocking auth, time manipulation, event assertions
 - [Best Practices →](../docs/best-practices.md) — production-ready patterns

@@ -1,8 +1,95 @@
 #![cfg(test)]
+
+use super::*;
+use soroban_sdk::{testutils::Address as _, Address, Env};
+
+struct Fixture {
+    token: TokenVotingClient<'static>,
+    alice: Address,
+    bob: Address,
+}
+
+fn setup() -> Fixture {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let contract_id = env.register(TokenVoting, ());
+    let token = TokenVotingClient::new(&env, &contract_id);
+    token.initialize(&admin);
+
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+
+    Fixture { token, alice, bob }
+}
+
+#[test]
+fn transfer_moves_voting_tokens() {
+    let f = setup();
+    f.token.mint(&f.alice, &100);
+
+    f.token.transfer(&f.alice, &f.bob, &40);
+
+    assert_eq!(f.token.balance(&f.alice), 60);
+    assert_eq!(f.token.balance(&f.bob), 40);
+}
+
+#[test]
+fn transfer_rejects_insufficient_balance() {
+    let f = setup();
+    f.token.mint(&f.alice, &10);
+
+    assert_eq!(
+        f.token.try_transfer(&f.alice, &f.bob, &11),
+        Err(Ok(TokenVotingError::InsufficientBalance))
+    );
+    assert_eq!(f.token.balance(&f.alice), 10);
+    assert_eq!(f.token.balance(&f.bob), 0);
+}
+
+#[test]
+fn transfer_rejects_recipient_balance_overflow() {
+    let f = setup();
+    f.token.mint(&f.alice, &1);
+    f.token.mint(&f.bob, &i128::MAX);
+
+    assert_eq!(
+        f.token.try_transfer(&f.alice, &f.bob, &1),
+        Err(Ok(TokenVotingError::Overflow))
+    );
+    assert_eq!(f.token.balance(&f.alice), 1);
+    assert_eq!(f.token.balance(&f.bob), i128::MAX);
+}
+
+#[test]
+fn mint_rejects_balance_overflow() {
+    let f = setup();
+    f.token.mint(&f.alice, &i128::MAX);
+
+    assert_eq!(
+        f.token.try_mint(&f.alice, &1),
+        Err(Ok(TokenVotingError::Overflow))
+    );
+    assert_eq!(f.token.balance(&f.alice), i128::MAX);
+}
+
+#[test]
+fn self_transfer_preserves_balance() {
+    let f = setup();
+    f.token.mint(&f.alice, &10);
+
+    f.token.transfer(&f.alice, &f.alice, &5);
+
+    assert_eq!(f.token.balance(&f.alice), 10);
 #![allow(deprecated)]
 
 use super::*;
-use soroban_sdk::{symbol_short, testutils::{Address as _, Ledger}, Address, Env, IntoVal, String, Symbol, Vec};
+use soroban_sdk::{
+    symbol_short,
+    testutils::{Address as _, Ledger},
+    Address, Env, IntoVal, String, Symbol, Vec,
+};
 
 #[contract]
 pub struct DummyTargetContract;
@@ -10,11 +97,20 @@ pub struct DummyTargetContract;
 #[contractimpl]
 impl DummyTargetContract {
     pub fn execute_action(env: Env, value: u32) {
-        env.storage().instance().set(&symbol_short!("executed"), &value);
+        env.storage()
+            .instance()
+            .set(&symbol_short!("executed"), &value);
     }
 }
 
-fn setup(env: &Env) -> (Address, TokenVotingContractClient<'_>, Address, DummyTargetContractClient<'_>) {
+fn setup(
+    env: &Env,
+) -> (
+    Address,
+    TokenVotingContractClient<'_>,
+    Address,
+    DummyTargetContractClient<'_>,
+) {
     env.mock_all_auths();
 
     let admin = Address::generate(env);
@@ -77,7 +173,7 @@ fn test_delegate_and_delegate_at() {
     client.mint(&admin, &delegator, &80i128);
 
     env.ledger().with_mut(|l| l.sequence_number = 200);
-    client.delegate(&delegator, &delegatee).unwrap();
+    client.delegate(&delegator, &delegatee);
 
     assert_eq!(client.get_delegate(&delegator), Some(delegatee.clone()));
     assert_eq!(client.get_delegate_at(&delegator, &200u32), Some(delegatee));
@@ -94,16 +190,22 @@ fn test_proposal_snapshot_locks_voting_power() {
 
     let desc = String::from_str(&env, "Snapshot Proposal");
     let args = Vec::from_array(&env, [42u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&alice, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &alice,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 50);
     client.submit_proposal(&alice, &proposal_id, &20u32, &50u32);
 
     env.ledger().with_mut(|l| l.sequence_number = 51);
-    client.transfer(&alice, &bob, &30i128).unwrap();
+    client.transfer(&alice, &bob, &30i128);
 
     client.vote(&alice, &proposal_id, &true);
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert_eq!(proposal.votes_yes, 100);
 }
 
@@ -116,16 +218,22 @@ fn test_vote_for_delegated_balance() {
     client.initialize(&admin, &100i128);
     client.mint(&admin, &delegator, &120i128);
 
-    client.delegate(&delegator, &delegatee).unwrap();
+    client.delegate(&delegator, &delegatee);
     let desc = String::from_str(&env, "Delegate Proposal");
     let args = Vec::from_array(&env, [11u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&delegatee, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &delegatee,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 500);
     client.submit_proposal(&delegatee, &proposal_id, &10u32, &20u32);
-    client.vote_for(&delegatee, &proposal_id, &delegator, &true).unwrap();
+    client.vote_for(&delegatee, &proposal_id, &delegator, &true);
 
-    let proposal = client.get_proposal(&proposal_id).unwrap();
+    let proposal = client.get_proposal(&proposal_id);
     assert_eq!(proposal.votes_yes, 120);
 }
 
@@ -139,12 +247,18 @@ fn test_double_vote_fails() {
 
     let desc = String::from_str(&env, "Double Vote");
     let args = Vec::from_array(&env, [99u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 600);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
 
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
     let result = client.try_vote(&voter, &proposal_id, &true);
     assert_eq!(result, Err(Ok(VotingError::AlreadyVoted)));
 }
@@ -159,14 +273,23 @@ fn test_quorum_not_met() {
 
     let desc = String::from_str(&env, "Quorum Fail");
     let args = Vec::from_array(&env, [7u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 700);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 711);
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Failed);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Failed
+    );
 }
 
 #[test]
@@ -179,19 +302,34 @@ fn test_execute_proposal_success() {
 
     let desc = String::from_str(&env, "Execute Proposal");
     let args = Vec::from_array(&env, [123u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 800);
     client.submit_proposal(&voter, &proposal_id, &10u32, &20u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 811);
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Passed);
-    client.execute_proposal(&voter, &proposal_id).unwrap();
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Executed);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Passed
+    );
+    client.execute_proposal(&voter, &proposal_id);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Executed
+    );
 
     let executed: u32 = env.as_contract(&dummy.address, || {
-        env.storage().instance().get(&symbol_short!("executed")).unwrap()
+        env.storage()
+            .instance()
+            .get(&symbol_short!("executed"))
+            .unwrap()
     });
     assert_eq!(executed, 123);
 }
@@ -206,11 +344,17 @@ fn test_execute_expired() {
 
     let desc = String::from_str(&env, "Expire Proposal");
     let args = Vec::from_array(&env, [321u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&voter, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &voter,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
     env.ledger().with_mut(|l| l.sequence_number = 900);
     client.submit_proposal(&voter, &proposal_id, &10u32, &15u32);
-    client.vote(&voter, &proposal_id, &true).unwrap();
+    client.vote(&voter, &proposal_id, &true);
 
     env.ledger().with_mut(|l| l.sequence_number = 926);
     let result = client.try_execute_proposal(&voter, &proposal_id);
@@ -226,8 +370,33 @@ fn test_cancel_proposal() {
 
     let desc = String::from_str(&env, "Cancel Proposal");
     let args = Vec::from_array(&env, [111u32.into_val(&env)]);
-    let proposal_id = client.create_proposal(&proposer, &desc, &dummy.address, &Symbol::new(&env, "execute_action"), &args);
+    let proposal_id = client.create_proposal(
+        &proposer,
+        &desc,
+        &dummy.address,
+        &Symbol::new(&env, "execute_action"),
+        &args,
+    );
 
-    client.cancel_proposal(&proposer, &proposal_id).unwrap();
-    assert_eq!(client.get_proposal_state(&proposal_id).unwrap(), ProposalState::Cancelled);
+    client.cancel_proposal(&proposer, &proposal_id);
+    assert_eq!(
+        client.get_proposal_state(&proposal_id),
+        ProposalState::Cancelled
+    );
+}
+
+#[test]
+fn test_mint_supply_overflow_returns_error() {
+    let env = Env::default();
+    let (admin, client, alice, _) = setup(&env);
+
+    client.initialize(&admin, &100i128);
+    client.mint(&admin, &alice, &i128::MAX);
+
+    let bob = Address::generate(&env);
+    let result = client.try_mint(&admin, &bob, &1i128);
+    assert_eq!(result, Err(Ok(VotingError::ArithmeticOverflow)));
+
+    assert_eq!(client.get_balance(&alice), i128::MAX);
+    assert_eq!(client.get_balance(&bob), 0);
 }

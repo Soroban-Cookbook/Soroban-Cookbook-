@@ -115,11 +115,8 @@ impl AmmOracleContract {
             .expect("pool contract missing")
     }
 
-    fn last_timestamp(&self, env: &Env) -> u64 {
-        env.storage()
-            .instance()
-            .get(&OracleDataKey::LastTimestamp)
-            .unwrap_or(0u64)
+    fn last_timestamp(&self, env: &Env) -> Option<u64> {
+        env.storage().instance().get(&OracleDataKey::LastTimestamp)
     }
 
     fn start_timestamp(&self, env: &Env) -> u64 {
@@ -143,6 +140,7 @@ impl AmmPoolContract {
         if env.storage().instance().has(&PoolDataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         assert!(token_a != token_b, "pool tokens must differ");
         env.storage().instance().set(&PoolDataKey::Owner, &owner);
         env.storage().instance().set(&PoolDataKey::TokenA, &token_a);
@@ -161,19 +159,24 @@ impl AmmPoolContract {
         let this = AmmPoolContract;
         let token_a = this.token_a(&env);
         let token_b = this.token_b(&env);
-        let contract_addr = env.current_contract_address();
-
-        token::Client::new(&env, &token_a).transfer(&provider, &contract_addr, &amount_a);
-        token::Client::new(&env, &token_b).transfer(&provider, &contract_addr, &amount_b);
-
-        let reserve_a = this.reserve_a(&env) + amount_a;
-        let reserve_b = this.reserve_b(&env) + amount_b;
+        let reserve_a = this
+            .reserve_a(&env)
+            .checked_add(amount_a)
+            .expect("overflow");
+        let reserve_b = this
+            .reserve_b(&env)
+            .checked_add(amount_b)
+            .expect("overflow");
         env.storage()
             .instance()
             .set(&PoolDataKey::ReserveA, &reserve_a);
         env.storage()
             .instance()
             .set(&PoolDataKey::ReserveB, &reserve_b);
+
+        let contract_addr = env.current_contract_address();
+        token::Client::new(&env, &token_a).transfer(&provider, &contract_addr, &amount_a);
+        token::Client::new(&env, &token_b).transfer(&provider, &contract_addr, &amount_b);
     }
 
     pub fn swap(
@@ -201,22 +204,18 @@ impl AmmPoolContract {
             panic!("unsupported sell token");
         };
 
-        token::Client::new(&env, &in_token).transfer(&trader, &contract_addr, &amount_in);
-
         let amount_after_fee = amount_in
             .checked_mul(10000 - fee_bps)
             .unwrap()
             .checked_div(10000)
             .unwrap();
         let numerator = amount_after_fee.checked_mul(out_reserve).unwrap();
-        let denominator = in_reserve + amount_after_fee;
+        let denominator = in_reserve.checked_add(amount_after_fee).expect("overflow");
         let amount_out = numerator.checked_div(denominator).unwrap();
         assert!(amount_out >= min_amount_out, "slippage exceeded");
 
-        token::Client::new(&env, &out_token).transfer(&contract_addr, &trader, &amount_out);
-
-        let new_reserve_in = in_reserve + amount_in;
-        let new_reserve_out = out_reserve - amount_out;
+        let new_reserve_in = in_reserve.checked_add(amount_in).expect("overflow");
+        let new_reserve_out = out_reserve.checked_sub(amount_out).expect("underflow");
         if sell_token == token_a {
             env.storage()
                 .instance()
@@ -232,6 +231,9 @@ impl AmmPoolContract {
                 .instance()
                 .set(&PoolDataKey::ReserveA, &new_reserve_out);
         }
+
+        token::Client::new(&env, &in_token).transfer(&trader, &contract_addr, &amount_in);
+        token::Client::new(&env, &out_token).transfer(&contract_addr, &trader, &amount_out);
         amount_out
     }
 
@@ -271,19 +273,14 @@ impl AmmOracleContract {
         if env.storage().instance().has(&OracleDataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         env.storage().instance().set(&OracleDataKey::Owner, &owner);
         env.storage()
             .instance()
             .set(&OracleDataKey::PoolContract, &pool_contract);
         env.storage()
             .instance()
-            .set(&OracleDataKey::LastTimestamp, &0u64);
-        env.storage()
-            .instance()
             .set(&OracleDataKey::PriceCumulative, &0i128);
-        env.storage()
-            .instance()
-            .set(&OracleDataKey::StartTimestamp, &0u64);
     }
 
     pub fn update(env: Env) {
@@ -295,16 +292,17 @@ impl AmmOracleContract {
         let start_ts = this.start_timestamp(&env);
         let cumulative = this.cumulative(&env);
 
-        let new_cumulative = if last_ts == 0 {
-            current_price.checked_mul(0i128).unwrap()
-        } else {
-            let elapsed = timestamp.checked_sub(last_ts).unwrap() as i128;
-            cumulative
-                .checked_add(current_price.checked_mul(elapsed).unwrap())
-                .unwrap()
+        let new_cumulative = match last_ts {
+            None => 0,
+            Some(last_ts) => {
+                let elapsed = timestamp.checked_sub(last_ts).unwrap() as i128;
+                cumulative
+                    .checked_add(current_price.checked_mul(elapsed).unwrap())
+                    .unwrap()
+            }
         };
 
-        let new_start = if start_ts == 0 { timestamp } else { start_ts };
+        let new_start = if last_ts.is_none() { timestamp } else { start_ts };
 
         env.storage()
             .instance()
@@ -328,10 +326,12 @@ impl AmmOracleContract {
 
     pub fn get_twap(env: &Env) -> i128 {
         let this = AmmOracleContract;
-        let last_ts = this.last_timestamp(env);
+        let Some(last_ts) = this.last_timestamp(env) else {
+            return 0;
+        };
         let start_ts = this.start_timestamp(env);
         let cumulative = this.cumulative(env);
-        let duration = last_ts.checked_sub(start_ts).unwrap_or(1u64) as i128;
+        let duration = last_ts.checked_sub(start_ts).unwrap_or(0) as i128;
         if duration == 0 {
             return 0;
         }
@@ -348,3 +348,6 @@ impl AmmOracleContract {
         AmmOracleContract::get_twap(&env)
     }
 }
+
+#[cfg(test)]
+mod test;

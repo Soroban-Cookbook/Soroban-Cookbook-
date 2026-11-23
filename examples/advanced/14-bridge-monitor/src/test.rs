@@ -36,18 +36,16 @@ fn record_transaction_tracks_count_and_batches() {
     let (env, client, admin, _) = setup();
     let token = Address::generate(&env);
 
-    let id = client
-        .record_transaction(
-            &admin,
-            &s(&env, "tx-1"),
-            &s(&env, "inbound"),
-            &s(&env, "polygon"),
-            &s(&env, "soroban"),
-            &1_000_000,
-            &token,
-            &s(&env, "completed"),
-        )
-        ;
+    let id = client.record_transaction(
+        &admin,
+        &s(&env, "tx-1"),
+        &s(&env, "inbound"),
+        &s(&env, "polygon"),
+        &s(&env, "soroban"),
+        &1_000_000,
+        &token,
+        &s(&env, "completed"),
+    );
     assert_eq!(id, 1);
 
     let tx = client.transactions(&1, &10);
@@ -78,18 +76,16 @@ fn empty_tx_id_rejected() {
 fn failed_transfer_raises_high_alert() {
     let (env, client, admin, _) = setup();
     let token = Address::generate(&env);
-    client
-        .record_transaction(
-            &admin,
-            &s(&env, "tx-fail"),
-            &s(&env, "outbound"),
-            &s(&env, "soroban"),
-            &s(&env, "ethereum"),
-            &500,
-            &token,
-            &s(&env, "failed"),
-        )
-        ;
+    client.record_transaction(
+        &admin,
+        &s(&env, "tx-fail"),
+        &s(&env, "outbound"),
+        &s(&env, "soroban"),
+        &s(&env, "ethereum"),
+        &500,
+        &token,
+        &s(&env, "failed"),
+    );
 
     let alerts = client.list_alerts();
     assert_eq!(alerts.len(), 1);
@@ -127,18 +123,16 @@ fn small_balance_move_is_not_alerted() {
 fn resolve_alert_removes_it() {
     let (env, client, admin, _) = setup();
     let token = Address::generate(&env);
-    client
-        .record_transaction(
-            &admin,
-            &s(&env, "tx-fail"),
-            &s(&env, "outbound"),
-            &s(&env, "soroban"),
-            &s(&env, "ethereum"),
-            &1,
-            &token,
-            &s(&env, "failed"),
-        )
-        ;
+    client.record_transaction(
+        &admin,
+        &s(&env, "tx-fail"),
+        &s(&env, "outbound"),
+        &s(&env, "soroban"),
+        &s(&env, "ethereum"),
+        &1,
+        &token,
+        &s(&env, "failed"),
+    );
 
     assert_eq!(client.alert_count(), 1);
     client.resolve_alert(&admin, &1);
@@ -172,18 +166,16 @@ fn transactions_are_paged() {
     let token = Address::generate(&env);
     for i in 0..5u128 {
         let tx_id = s(&env, &format!("tx-{i}"));
-        client
-            .record_transaction(
-                &admin,
-                &tx_id,
-                &s(&env, "inbound"),
-                &s(&env, "polygon"),
-                &s(&env, "soroban"),
-                &100,
-                &token,
-                &s(&env, "completed"),
-            )
-            ;
+        client.record_transaction(
+            &admin,
+            &tx_id,
+            &s(&env, "inbound"),
+            &s(&env, "polygon"),
+            &s(&env, "soroban"),
+            &100,
+            &token,
+            &s(&env, "completed"),
+        );
     }
     let page = client.transactions(&3, &2);
     assert_eq!(page.len(), 2);

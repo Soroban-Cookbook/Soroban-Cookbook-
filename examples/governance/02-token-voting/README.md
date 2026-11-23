@@ -1,3 +1,12 @@
+# Token Voting
+
+A minimal token-balance contract for governance examples. An administrator can
+mint voting tokens, and holders can transfer them. Transfers reject insufficient
+balances and recipient balance overflow without changing stored balances.
+
+Run the tests with:
+
+```sh
 # 02 — Token-Weighted Voting
 
 A token-weighted governance example that demonstrates how token balances drive voting power, including delegation and vote snapshots.

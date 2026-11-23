@@ -201,14 +201,17 @@ mod arbitrage_tests {
         tb_s.mint(&pool1, &(amount * 11000 / 10000 + 100));
         ta_s.mint(&pool2, &(amount + 200));
 
+        let flash_loan_addr = Address::generate(&env);
         // Prime temporary storage as execute() would
         env.as_contract(&arb_addr, || {
             env.storage().temporary().set(&DataKey::Pool1, &pool1);
             env.storage().temporary().set(&DataKey::Pool2, &pool2);
             env.storage().temporary().set(&DataKey::TokenB, &tb_addr);
+            env.storage()
+                .temporary()
+                .set(&DataKey::FlashLoan, &flash_loan_addr);
         });
 
-        let flash_loan_addr = Address::generate(&env);
         arb.on_flash_loan(&flash_loan_addr, &ta_addr, &amount, &fee);
 
         // Arb contract must approve exactly amount+fee to flash loan provider
@@ -276,6 +279,7 @@ mod refinancing_tests {
         // Flash loan transferred `amount` to refi contract
         debt_s.mint(&refi_addr, &amount);
 
+        let flash_loan_addr = Address::generate(&env);
         // Prime temporary storage
         env.as_contract(&refi_addr, || {
             env.storage().temporary().set(&DataKey::OldPool, &old_pool);
@@ -284,9 +288,11 @@ mod refinancing_tests {
                 .temporary()
                 .set(&DataKey::Collateral, &coll_addr);
             env.storage().temporary().set(&DataKey::DebtAmount, &amount);
+            env.storage()
+                .temporary()
+                .set(&DataKey::FlashLoan, &flash_loan_addr);
         });
 
-        let flash_loan_addr = Address::generate(&env);
         refi.on_flash_loan(&flash_loan_addr, &debt_addr, &amount, &fee);
 
         // Must approve exactly amount+fee to flash loan provider

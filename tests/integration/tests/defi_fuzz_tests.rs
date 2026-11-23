@@ -13,7 +13,8 @@ use constant_product_amm::{AmmError, ConstantProductAmm, ConstantProductAmmClien
 use lending_pool::{LendingPool, LendingPoolClient};
 use proptest::prelude::*;
 use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, testutils::Address as _, Address, Env,
+    contract, contracterror, contractimpl, contracttype, testutils::Address as _, token, Address,
+    Env,
 };
 
 // ---------------------------------------------------------------------------
@@ -167,6 +168,20 @@ fn setup_amm(initial_liquidity_x: i128, initial_liquidity_y: i128) -> AmmFixture
     }
 }
 
+const LENDING_FUNDS: i128 = 1_000_000;
+
+/// Registers a Stellar asset and mints `LENDING_FUNDS` to each of `holders`.
+fn funded_asset(env: &Env, holders: &[&Address]) -> Address {
+    let asset = env
+        .register_stellar_asset_contract_v2(Address::generate(env))
+        .address();
+    let admin = token::StellarAssetClient::new(env, &asset);
+    for holder in holders {
+        admin.mint(holder, &LENDING_FUNDS);
+    }
+    asset
+}
+
 fn setup_lending_pool() -> (LendingPoolClient<'static>, Address, Address) {
     let env = Env::default();
     env.mock_all_auths();
@@ -174,7 +189,8 @@ fn setup_lending_pool() -> (LendingPoolClient<'static>, Address, Address) {
     let user_b = Address::generate(&env);
     let pool_id = env.register_contract(None, LendingPool);
     let pool = LendingPoolClient::new(&env, &pool_id);
-    pool.initialize(&5, &10, &80);
+    let asset = funded_asset(&env, &[&user_a, &user_b]);
+    pool.initialize(&asset, &5, &10, &80);
     (pool, user_a, user_b)
 }
 
@@ -186,7 +202,9 @@ fn setup_lending_contract() -> (LendingContractClient<'static>, Address, Address
     let admin = Address::generate(&env);
     let contract_id = env.register_contract(None, LendingContract);
     let client = LendingContractClient::new(&env, &contract_id);
-    client.initialize(&80, &75, &10, &50);
+    let collateral = funded_asset(&env, &[&borrower]);
+    let loan = funded_asset(&env, &[&contract_id, &liquidator]);
+    client.initialize(&admin, &collateral, &loan, &80, &75, &10, &50);
     (client, borrower, liquidator, admin)
 }
 
@@ -491,7 +509,8 @@ proptest! {
         let user = Address::generate(&env);
         let pool_id = env.register_contract(None, LendingPool);
         let pool = LendingPoolClient::new(&env, &pool_id);
-        pool.initialize(&5, &10, &80);
+        let asset = funded_asset(&env, &[&user]);
+        pool.initialize(&asset, &5, &10, &80);
         pool.deposit(&user, &10_000);
         pool.borrow(&user, &(10_000 * low_pct / 100));
         let rate_low = pool.get_borrow_rate();

@@ -25,8 +25,8 @@ A single-asset staking contract that distributes reward tokens proportionally to
 ```rust
 client.stake(&user, &1_000_i128);
 // ... time passes ...
-let pending = client.pending_reward(&user);
-client.claim(&user);   // transfers reward tokens to user
+let pending = client.earned(&user);
+client.claim_rewards(&user);   // transfers reward tokens to user
 client.unstake(&user, &1_000_i128);
 ```
 

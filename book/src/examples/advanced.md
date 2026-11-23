@@ -8,13 +8,13 @@ Follow these examples in order, from a single implementation pointer to fleet
 management and lower-level WASM and storage upgrade techniques:
 
 1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
-2. [Proxy Admin Controls](../examples/advanced/03-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
+2. [Proxy Admin Controls](../examples/advanced/31-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
 3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
-4. [Beacon Proxy Factory](../examples/advanced/03-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
-5. [Beacon Management](../examples/advanced/06-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
+4. [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+5. [Beacon Management](../examples/advanced/37-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
 6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
 
-## 📋 Examples
+## ðŸ“‹ Examples
 
 ### [01-multi-party-auth](../examples/advanced/01-multi-party-auth/)
 **Advanced multi-party authorization** beyond simple multisig.
@@ -31,7 +31,7 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [03-state-channel-disputes](../examples/advanced/03-state-channel-disputes/)
+### [34-state-channel-disputes](../examples/advanced/34-state-channel-disputes/)
 **State channel dispute resolution** with challenge submission, response mechanics, timeout handling, and fraud proofs.
 
 **Key Concepts:**
@@ -41,7 +41,7 @@ management and lower-level WASM and storage upgrade techniques:
 
 ---
 
-### [03-permit-pattern](../examples/advanced/03-permit-pattern/)
+### [30-permit-pattern](../examples/advanced/30-permit-pattern/)
 **Permit-based approvals** with signature-backed authorization and deadline enforcement.
 
 **Key Concepts:**
@@ -82,8 +82,8 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [06-diamond-pattern](../examples/advanced/06-diamond-pattern/) ⭐ Canonical
-**Diamond Pattern (EIP-2535)** — Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
+### [38-diamond-pattern](../examples/advanced/38-diamond-pattern/) â­ Canonical
+**Diamond Pattern (EIP-2535)** â€” Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
 
 **Key Concepts:**
 - Diamond storage pattern with namespaced `DataKey` enum
@@ -102,7 +102,7 @@ let value = client.get_value_strict(); // errors if stale
 - Upgrade safeguards with duplicate detection
 
 ### [05-diamond-facets](../examples/advanced/05-diamond-facets/)
-**Diamond Facets** — Router orchestration patterns demonstrating inter-facet communication.
+**Diamond Facets** â€” Router orchestration patterns demonstrating inter-facet communication.
 
 **Key Concepts:**
 - Atomic cross-facet operations (e.g., mint + register metadata)
@@ -120,7 +120,7 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [08-batch-operations](../examples/advanced/08-batch-operations/)
+### [39-batch-operations](../examples/advanced/39-batch-operations/)
 **Batch operations** with atomic and partial execution.
 
 **Key Concepts:**
@@ -160,9 +160,19 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
+### [44-off-chain-signatures](../examples/advanced/44-off-chain-signatures/)
+**Off-chain signature verification** for non-Stellar keys ([guide](./off-chain-signatures.md)).
+
+**Key Concepts:**
+- `ed25519_verify` over a SHA-256 digest
+- Ethereum signatures via `secp256k1_recover` + address comparison
+- Domain separators and nonces against replay
+
+---
+
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
-## ⚠️ Warning
+## âš ï¸ Warning
 Advanced patterns increase complexity - audit thoroughly!
 
 ## Prerequisites

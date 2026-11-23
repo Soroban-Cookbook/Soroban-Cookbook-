@@ -71,6 +71,7 @@ impl EventHistory {
         if max_entries == 0 {
             return Err(HistoryError::InvalidCapacity);
         }
+        admin.require_auth();
 
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage()
@@ -199,11 +200,7 @@ impl EventHistory {
             index += 1;
         }
 
-        let next_cursor = if end >= next_index {
-            None
-        } else {
-            Some(end)
-        };
+        let next_cursor = if end >= next_index { None } else { Some(end) };
 
         Ok(HistoryPage {
             entries: result,

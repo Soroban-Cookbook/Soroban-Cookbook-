@@ -2,6 +2,7 @@
 name = "token-voting"
 version.workspace = true
 edition.workspace = true
+publish = false
 rust-version.workspace = true
 
 [lib]

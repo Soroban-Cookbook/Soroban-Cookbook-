@@ -227,3 +227,14 @@ fn set_feed_requires_admin_auth() {
     env.set_auths(&[]);
     client.set_feed(&feed);
 }
+
+#[test]
+fn initialize_requires_admin_auth() {
+    let env = Env::default();
+    let feed = env.register(MockFeed, ());
+    let client = GuardedConsumerClient::new(&env, &env.register(GuardedConsumer, ()));
+
+    assert!(client
+        .try_initialize(&Address::generate(&env), &guard_config(&feed))
+        .is_err());
+}

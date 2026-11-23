@@ -17,16 +17,16 @@ What kind of access control?
 │
 ├─ Multiple roles with different permissions → Choose RBAC pattern below
 │   │
-│   ├─ Need flexible, custom role names? → **03-rbac-modifiers** ✅ CANONICAL
+│   ├─ Need flexible, custom role names? → **32-rbac-modifiers** ✅ CANONICAL
 │   │   └─ Roles: ADMIN, MINTER, PAUSER, or custom Symbol roles
 │   │
 │   ├─ Need strict numeric hierarchy? → 02-role-based-access-control
 │   │   └─ Roles: Owner (4) > Admin (3) > Moderator (2) > User (1)
 │   │
-│   ├─ Need role inheritance + dynamic permissions? → 05-hierarchical-access-control
+│   ├─ Need role inheritance + dynamic permissions? → 16-hierarchical-access-control
 │   │   └─ Roles: ADMIN → MANAGER → OPERATOR with permission propagation
 │   │
-│   └─ Building a registry with whitelist/fees? → 03-registry-access-controls
+│   └─ Building a registry with whitelist/fees? → 33-registry-access-controls
 │       └─ Owner + whitelist + registration fees + dispute resolution
 │
 └─ Need RBAC + Multisig + Timelock combined? → access-control
@@ -35,7 +35,7 @@ What kind of access control?
 
 ## Pattern Comparison Table
 
-| Feature | 03-rbac-modifiers<br/>**(CANONICAL)** | 02-role-based-access-control | 05-hierarchical-access-control | 03-registry-access-controls | access-control |
+| Feature | 32-rbac-modifiers<br/>**(CANONICAL)** | 02-role-based-access-control | 05-hierarchical-access-control | 33-registry-access-controls | access-control |
 |---------|------------------------|------------------------------|--------------------------------|------------------------------|----------------|
 | **Role Type** | Symbol-based (flexible) | Numeric enum (strict hierarchy) | Symbol-based + permissions | Owner-based | Numeric enum |
 | **Custom Roles** | ✅ Yes, any Symbol | ❌ Fixed: Owner/Admin/Moderator/User | ✅ Yes, via permissions | ❌ No roles, just owner | ❌ Fixed: Admin/Auditor/Operator/User |
@@ -54,9 +54,9 @@ What kind of access control?
 
 ## Pattern Details
 
-### 1. 03-rbac-modifiers (Canonical) ✅
+### 1. 32-rbac-modifiers (Canonical) ✅
 
-**Location:** `examples/advanced/03-rbac-modifiers/`
+**Location:** `examples/advanced/32-rbac-modifiers/`
 
 **Best for:**
 - Token contracts (minter, pauser, burner roles)
@@ -125,9 +125,9 @@ pub fn admin_or_minter_action(env: Env, caller: Address) {
 
 ---
 
-### 3. 05-hierarchical-access-control
+### 3. 16-hierarchical-access-control
 
-**Location:** `examples/advanced/05-hierarchical-access-control/`
+**Location:** `examples/advanced/16-hierarchical-access-control/`
 
 **Best for:**
 - Complex organizational structures
@@ -169,9 +169,9 @@ pub fn manage_resource(env: Env, caller: Address, resource_id: Symbol) {
 
 ---
 
-### 4. 03-registry-access-controls
+### 4. 33-registry-access-controls
 
-**Location:** `examples/advanced/03-registry-access-controls/`
+**Location:** `examples/advanced/33-registry-access-controls/`
 
 **Best for:**
 - Domain/name registries
@@ -246,7 +246,7 @@ client.execute(&anyone, &proposal_id); // After delay expires
 
 ### From No Access Control → Canonical RBAC
 
-1. Add `03-rbac-modifiers` code to your contract
+1. Add `32-rbac-modifiers` code to your contract
 2. Initialize with admin: `initialize(env, initial_admin)`
 3. Add `only_role` checks to protected functions
 4. Grant roles to addresses as needed
@@ -312,10 +312,10 @@ client.execute(&anyone, &proposal_id); // After delay expires
 
 | Pattern | Storage Reads per Check | Gas Cost | Best For |
 |---------|------------------------|----------|----------|
-| 03-rbac-modifiers | 1 (role member list) | Low | Most use cases |
+| 32-rbac-modifiers | 1 (role member list) | Low | Most use cases |
 | 02-role-based-access-control | 1 (user role) | Low | Simple hierarchies |
 | 05-hierarchical-access-control | 1-3 (role + permissions) | Medium | Complex hierarchies |
-| 03-registry-access-controls | 1-2 (owner + whitelist) | Low | Registries |
+| 33-registry-access-controls | 1-2 (owner + whitelist) | Low | Registries |
 | access-control | 3-5 (role + signers + proposals) | Medium-High | Governance |
 
 ---
@@ -336,12 +336,12 @@ Test these scenarios:
 
 ### Pattern-Specific Tests
 
-**Canonical (03-rbac-modifiers):**
+**Canonical (32-rbac-modifiers):**
 - Multi-role guard (`any_role`) with multiple roles
 - Custom role symbols
 - Idempotent grants
 
-**Hierarchical (05-hierarchical-access-control):**
+**Hierarchical (16-hierarchical-access-control):**
 - Permission inheritance across hierarchy
 - Dynamic permission grants
 - Manager can grant OPERATOR but not ADMIN
@@ -355,12 +355,12 @@ Test these scenarios:
 
 ## Recommended Learning Path
 
-1. **Start here:** [`03-rbac-modifiers`](../examples/advanced/03-rbac-modifiers/) — Learn the canonical pattern
+1. **Start here:** [`32-rbac-modifiers`](../examples/advanced/32-rbac-modifiers/) — Learn the canonical pattern
 2. **Then explore:**
    - [`02-role-based-access-control`](../examples/intermediate/02-role-based-access-control/) — See numeric hierarchy alternative
-   - [`05-hierarchical-access-control`](../examples/advanced/05-hierarchical-access-control/) — Learn permission inheritance
+   - [`16-hierarchical-access-control`](../examples/advanced/16-hierarchical-access-control/) — Learn permission inheritance
 3. **For specialized needs:**
-   - [`03-registry-access-controls`](../examples/advanced/03-registry-access-controls/) — Registry pattern
+   - [`33-registry-access-controls`](../examples/advanced/33-registry-access-controls/) — Registry pattern
    - [`access-control`](../examples/intermediate/access-control/) — Combined governance
 
 ---
@@ -379,10 +379,10 @@ Test these scenarios:
 
 | Your Need | Choose This Pattern |
 |-----------|---------------------|
-| 🎯 **General-purpose RBAC** | **03-rbac-modifiers (CANONICAL)** |
+| 🎯 **General-purpose RBAC** | **32-rbac-modifiers (CANONICAL)** |
 | 📊 Strict numeric hierarchy | 02-role-based-access-control |
 | 🏢 Complex org structure | 05-hierarchical-access-control |
-| 📝 Registry with whitelist | 03-registry-access-controls |
+| 📝 Registry with whitelist | 33-registry-access-controls |
 | 🏛️ DAO governance | access-control |
 
-**When in doubt, start with the canonical pattern (`03-rbac-modifiers`) and migrate only if you hit its limitations.**
+**When in doubt, start with the canonical pattern (`32-rbac-modifiers`) and migrate only if you hit its limitations.**

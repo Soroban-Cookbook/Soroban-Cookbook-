@@ -40,8 +40,18 @@ nft-marketplace-dapp/
 ## 🚀 Getting Started
 
 ### 1. Test Contracts
+This template is a single package that is a member of the cookbook Cargo
+workspace, so it is built and tested by `cargo build --workspace` /
+`cargo test --workspace`. Run it directly from the repository root:
+
 ```bash
-cd contracts/marketplace
+cargo test -p nft-marketplace-dapp
+```
+
+Or from inside the template directory:
+
+```bash
+cd templates/nft-marketplace-dapp
 cargo test
 ```
 

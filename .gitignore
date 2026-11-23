@@ -13,7 +13,14 @@ soroban-ledger*.json
 *.optimized.wasm
 
 # IDE
-.vscode/
+# Shared VS Code config is committed (see docs/ide-integration.md); everything
+# else under .vscode/ stays personal.
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/soroban.code-snippets
 .idea/
 *.iml
 *.swp
@@ -34,6 +41,7 @@ tests/fuzz/corpus/
 
 # Node / webapp
 webapp/node_modules/
+docs/wallet-examples/node_modules/
 
 # Local binaries (e.g. accidental `typos` copy in repo root)
 /typos

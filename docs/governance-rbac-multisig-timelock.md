@@ -249,10 +249,10 @@ A solid governance system often layers RBAC, multisig, and timelock.
 
 ## 6. Example references in this repository
 
-- **[`examples/advanced/03-rbac-modifiers/`](../examples/advanced/03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable role guards
+- **[`examples/advanced/32-rbac-modifiers/`](../examples/advanced/32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable role guards
 - [`examples/intermediate/02-role-based-access-control/`](../examples/intermediate/02-role-based-access-control/) — Simple RBAC with numeric role hierarchy
 - [`examples/intermediate/access-control/`](../examples/intermediate/access-control/) — Combined RBAC, multisig, and timelock with threat models
-- [`examples/advanced/05-hierarchical-access-control/`](../examples/advanced/05-hierarchical-access-control/) — Advanced RBAC with role hierarchy and permission inheritance
+- [`examples/advanced/16-hierarchical-access-control/`](../examples/advanced/16-hierarchical-access-control/) — Advanced RBAC with role hierarchy and permission inheritance
 - [`examples/basics/03-authentication/`](../examples/basics/03-authentication/) — Basic authentication patterns
 - [`examples/intermediate/multi-sig-patterns/`](../examples/intermediate/multi-sig-patterns/) — Proposal-based multisig and authorization vectors
 - [`examples/advanced/01-multi-party-auth/`](../examples/advanced/01-multi-party-auth/) — Threshold signatures and multi-party approval workflows

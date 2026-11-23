@@ -57,8 +57,18 @@ fn test_count_tracks_registers() {
     let client = ContractRegistryClient::new(&env, &contract_id);
 
     assert_eq!(client.count(), 0);
-    client.register(&symbol_short!("a"), &symbol_short!("cat"), &symbol_short!("v1"), &contract_id.clone());
-    client.register(&symbol_short!("b"), &symbol_short!("cat"), &symbol_short!("v1"), &contract_id.clone());
+    client.register(
+        &symbol_short!("a"),
+        &symbol_short!("cat"),
+        &symbol_short!("v1"),
+        &contract_id.clone(),
+    );
+    client.register(
+        &symbol_short!("b"),
+        &symbol_short!("cat"),
+        &symbol_short!("v1"),
+        &contract_id.clone(),
+    );
     assert_eq!(client.count(), 2);
 }
 

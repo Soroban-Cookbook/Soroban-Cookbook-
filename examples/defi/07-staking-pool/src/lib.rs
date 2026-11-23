@@ -160,6 +160,7 @@ impl StakingPoolContract {
         if env.storage().instance().has(&DataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         assert!(reward_rate >= 0, "reward rate must be non-negative");
         env.storage().instance().set(&DataKey::Owner, &owner);
         env.storage()
@@ -181,13 +182,13 @@ impl StakingPoolContract {
     }
 
     pub fn stake(env: Env, staker: Address, amount: i128) {
+        staker.require_auth();
         assert!(amount > 0, "stake amount must be positive");
         let this = StakingPoolContract;
         this.update_reward(&env, &staker);
 
         let contract = env.current_contract_address();
         token::Client::new(&env, &this.staking_token(&env)).transfer(&staker, &contract, &amount);
-
         let new_balance = this.balance_of_internal(&env, &staker) + amount;
         env.storage()
             .instance()
@@ -198,6 +199,7 @@ impl StakingPoolContract {
     }
 
     pub fn unstake(env: Env, staker: Address, amount: i128) {
+        staker.require_auth();
         assert!(amount > 0, "unstake amount must be positive");
         let this = StakingPoolContract;
         let balance = this.balance_of_internal(&env, &staker);
@@ -217,6 +219,7 @@ impl StakingPoolContract {
     }
 
     pub fn claim_rewards(env: Env, staker: Address) {
+        staker.require_auth();
         let this = StakingPoolContract;
         this.update_reward(&env, &staker);
         let reward = this.rewards(&env, &staker);

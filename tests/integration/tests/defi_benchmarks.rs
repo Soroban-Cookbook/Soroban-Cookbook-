@@ -146,7 +146,7 @@ fn benchmark_lending_operations() {
 
             let lending_id = env.register_contract(None, LendingPool);
             let lending = LendingPoolClient::new(&env, &lending_id);
-            lending.initialize(&2i128, &10i128, &80i128);
+            lending.initialize(&token_a, &2i128, &10i128, &80i128);
 
             mint_token(&env, &token_a, &user, 1_000_000);
             client_a.approve(
@@ -176,7 +176,7 @@ fn benchmark_lending_operations() {
 
             let lending_id = env.register_contract(None, LendingPool);
             let lending = LendingPoolClient::new(&env, &lending_id);
-            lending.initialize(&2i128, &10i128, &80i128);
+            lending.initialize(&token_a, &2i128, &10i128, &80i128);
 
             mint_token(&env, &token_a, &user, 1_000_000);
             client_a.approve(
@@ -223,7 +223,13 @@ fn benchmark_liquidation_operations() {
 
             let contract_id = env.register_contract(None, LendingContract);
             let client = LendingContractClient::new(&env, &contract_id);
-            client.initialize(&80, &75, &10, &50);
+            let (collateral, _) = create_token(&env, &Address::generate(&env));
+            let (loan, _) = create_token(&env, &Address::generate(&env));
+            mint_token(&env, &collateral, &borrower, 1000);
+            mint_token(&env, &loan, &contract_id, 800);
+            mint_token(&env, &loan, &liquidator, 400);
+            let admin = Address::generate(&env);
+            client.initialize(&admin, &collateral, &loan, &80, &75, &10, &50);
 
             // Unhealthy position (LTV 80% > liquidation threshold 75%).
             client.deposit_collateral(&borrower, &1000);
@@ -330,7 +336,7 @@ fn benchmark_report_and_analysis() {
 
             let lending_id = env.register_contract(None, LendingPool);
             let lending = LendingPoolClient::new(&env, &lending_id);
-            lending.initialize(&2i128, &10i128, &80i128);
+            lending.initialize(&token_a, &2i128, &10i128, &80i128);
 
             mint_token(&env, &token_a, &user, 1_000_000);
             client_a.approve(
@@ -358,7 +364,13 @@ fn benchmark_report_and_analysis() {
 
             let contract_id = env.register_contract(None, LendingContract);
             let client = LendingContractClient::new(&env, &contract_id);
-            client.initialize(&80, &75, &10, &50);
+            let (collateral, _) = create_token(&env, &Address::generate(&env));
+            let (loan, _) = create_token(&env, &Address::generate(&env));
+            mint_token(&env, &collateral, &borrower, 1000);
+            mint_token(&env, &loan, &contract_id, 800);
+            mint_token(&env, &loan, &liquidator, 400);
+            let admin = Address::generate(&env);
+            client.initialize(&admin, &collateral, &loan, &80, &75, &10, &50);
             client.deposit_collateral(&borrower, &1000);
             client.borrow(&borrower, &800);
 

@@ -28,7 +28,7 @@ Successfully resolved the prefix collision in `examples/advanced/` where 8 direc
 7. `examples/advanced/17-bridge-security/README.md` - Updated build instructions
 8. `examples/advanced/05-rate-limiting/README.md` - Updated bridge security reference
 9. `examples/advanced/19-diamond-security/README.md` - Updated directory path in example
-10. `examples/advanced/03-merkle-whitelist/README.md` - Updated related examples
+10. `examples/advanced/29-merkle-whitelist/README.md` - Updated related examples
 11. `docs/security/advanced-patterns-security-analysis.md` - Updated 5 contract references
 12. `docs/advanced-patterns.md` - Updated 5 location references
 13. `docs/gas-benchmarks.md` - Updated 3 benchmark entries
@@ -40,7 +40,7 @@ Successfully resolved the prefix collision in `examples/advanced/` where 8 direc
 
 ### Source Code Files (2 updates)
 1. `tests/integration/tests/token_security_tests.rs` - Updated 3 comments
-2. `examples/advanced/03-merkle-airdrop/src/test.rs` - Updated 1 comment
+2. `examples/advanced/28-merkle-airdrop/src/test.rs` - Updated 1 comment
 
 ## New Documentation
 - Added "Directory Organization" section to `examples/advanced/README.md` explaining the numbering scheme and the reorganization

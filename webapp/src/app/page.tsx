@@ -1,6 +1,7 @@
 "use client";
 
-import { useDeferredValue, useState } from "react";
+import { useDeferredValue, useEffect, useState } from "react";
+import { trackSearch } from "@/lib/analytics";
 
 type ShowcaseProject = {
   name: string;
@@ -99,6 +100,15 @@ export default function HomePage() {
   const [category, setCategory] = useState("All");
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
+
+  // Track search queries for documentation metrics (Issue #927).
+  // The deferred value acts as a natural debounce.
+  useEffect(() => {
+    const trimmed = deferredQuery.trim();
+    if (trimmed.length >= 3) {
+      trackSearch(trimmed);
+    }
+  }, [deferredQuery]);
 
   const filteredProjects = projects.filter((project) => {
     const inCategory = category === "All" || project.category === category;

@@ -235,6 +235,7 @@ The Soroban Cookbook is a community-driven resource for building smart contracts
 ## 🔗 Related Resources
 
 - [Contributing Guide](./CONTRIBUTING.md)
+- [Roadmap Input Process](./docs/roadmap-input-process.md)
 - [Style Guide](./docs/style-guide.md)
 - [Testing Guide](./docs/testing-guide.md)
 - [Best Practices](./docs/best-practices.md)

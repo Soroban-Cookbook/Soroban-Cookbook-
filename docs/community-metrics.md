@@ -39,7 +39,7 @@ Tracking metrics allows us to:
 
 | Category | Description | Tracking Source |
 |---|---|---|
-| **Growth** | New contributors, stars, forks, clone traffic | GitHub Insights / Actions |
+| **Growth** | Contributor activity, stars, forks, clone traffic | GitHub Insights / Actions |
 | **Engagement** | Issues opened/closed, PR activity, discussion threads | GitHub API |
 | **Content Quality** | CI pass rate, test coverage, clippy warnings | GitHub Actions badges |
 | **Community Health** | Response time, PR review velocity, Code of Conduct incidents | GitHub API / manual |
@@ -53,7 +53,7 @@ Tracking metrics allows us to:
 
 | Metric | Definition | Target | Frequency |
 |---|---|---|---|
-| **New Contributors** | GitHub accounts that open their first merged PR in the period | ≥ 2 / month | Monthly |
+| **Contributors** | Unique GitHub accounts with at least one merged PR in the period | ≥ 2 / month | Monthly |
 | **Repository Stars** | Cumulative star count at the end of the period | Sustained upward trend | Monthly |
 | **Forks** | Cumulative fork count | Sustained upward trend | Monthly |
 | **Unique Cloners** | 14-day unique clone traffic (from GitHub Traffic API) | ≥ 100 / 14 days | Bi-weekly |
@@ -102,6 +102,41 @@ Tracking metrics allows us to:
 | **Community Satisfaction Score** | Average rating from periodic surveys (1–5 scale) | ≥ 4.0 / 5 | Quarterly |
 | **Docs Clarity Score** | Self-reported clarity rating on feedback forms | ≥ 4.5 / 5 | Quarterly |
 
+### 3.6 Documentation Usage Metrics
+
+These metrics track how developers interact with the documentation surfaces — the
+mdBook site and the Next.js webapp. They are collected by privacy-respecting
+analytics scripts and aggregated weekly by the
+[`documentation-metrics.yml`](../.github/workflows/documentation-metrics.yml)
+workflow. See the [Documentation Metrics Dashboard](./documentation-metrics.md)
+for live data.
+
+**Privacy guarantees:** No cookies, no PII, no fingerprinting. Session data is
+stored in `sessionStorage` (per-tab, cleared on close). Do-Not-Track is fully
+respected. All reporting is aggregate-only.
+
+| Metric | Definition | Target | Frequency |
+|---|---|---|---|
+| **Page Views** | Total page load events across mdBook and webapp | Upward trend | Weekly |
+| **Unique Page Views** | Distinct paths viewed (deduplicated by path) | Upward trend | Weekly |
+| **Pages per Session** | Average number of pages viewed in a single session | ≥ 3 | Weekly |
+| **Search Queries** | Total search events fired on mdBook or webapp search bars | Tracking trend | Weekly |
+| **Unique Search Terms** | Distinct search query strings in the period | Tracking trend | Weekly |
+| **Top Search Term** | Most frequently searched term in the period | — | Weekly |
+| **Zero-Result Searches** | Search queries that returned no results | < 10% of searches | Weekly |
+| **Popular Content (Top 10)** | Most-viewed pages by view count | — | Weekly |
+| **Popular Content (Top 20)** | Most-viewed pages over 30-day window | — | Monthly |
+| **Entry Page** | Most common first page in a user session | — | Weekly |
+| **Exit Page** | Most common last page before session ends | — | Weekly |
+| **Avg Path Length** | Mean pages viewed per session across all sessions | ≥ 3 | Weekly |
+| **Top 3-Page Flow** | Most frequent 3-page navigation sequence | — | Weekly |
+| **mdBook vs Webapp Split** | Page views and searches by surface | — | Weekly |
+
+**Data sources:**
+- **mdBook** — `book/analytics.js` (page views, search, user path via `sessionStorage`)
+- **Webapp** — `webapp/src/lib/analytics.ts` (page views, search, user path)
+- **GitHub Traffic API** — repository-level page views and popular paths (fallback when no analytics endpoint configured)
+
 ---
 
 ## 4. Tracking Tools & Collection
@@ -128,6 +163,20 @@ at 09:00 UTC and:
 4. Opens a labeled issue (`metrics-alert`) if any alert threshold is breached.
 
 See [§ 6 Alert Thresholds](#6-alert-thresholds) for the list of conditions that trigger an alert.
+
+A second scheduled workflow (`.github/workflows/documentation-metrics.yml`) runs
+every Monday at 09:00 UTC and:
+
+1. Collects repository page views and popular paths via the **GitHub Traffic API**.
+2. Parses analytics event logs (from `book/analytics.js` and `webapp/src/lib/analytics.ts`)
+   for search queries, popular content, and user path analysis.
+3. Updates [`docs/documentation-metrics.md`](./documentation-metrics.md) with
+   weekly page view counts, top search terms, popular content, entry/exit pages,
+   average path length, and top user flows.
+4. Identifies zero-result search terms as candidates for new documentation.
+
+Both workflows commit their updates directly to `main` with `[skip ci]` to avoid
+triggering downstream CI.
 
 ### 4.3 External / Optional Tools
 
@@ -174,7 +223,7 @@ Periodic community surveys are managed through the
 ### Growth
 | Metric | This Month | Last Month | Δ |
 |---|---|---|---|
-| New Contributors | | | |
+| Contributors | | | |
 | Stars | | | |
 | Unique Cloners | | | |
 
@@ -210,7 +259,7 @@ the on-call maintainer:
 | Median issue response time | > 72 hours in rolling 7 days | Warning |
 | Median PR review time | > 5 days in rolling 7 days | Warning |
 | Issues close rate | < 50% for the month | Warning |
-| No new contributors | 0 new merged contributors in 60 days | Warning |
+| No contributor PR activity | 0 contributors with merged PRs in 30 days | Warning |
 | Community satisfaction drops | Survey score < 3.5 / 5 | High |
 | CoC incident reported | Any confirmed incident | Critical |
 
@@ -233,6 +282,7 @@ Community members can help improve metric quality:
 ## Related Documents
 
 - [Community Dashboard](./community-dashboard.md) — live rolling data table
+- [Documentation Metrics Dashboard](./documentation-metrics.md) — page views, search queries, popular content, user paths
 - [Recognition System](./recognition-system.md) — how contribution counts are used for tiers
 - [Feedback System](./feedback-system/README.md) — survey and feedback infrastructure
 - [Roadmap](../ROADMAP.md) — how metrics inform phase planning

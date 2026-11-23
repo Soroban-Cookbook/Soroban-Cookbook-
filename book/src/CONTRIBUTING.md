@@ -61,7 +61,7 @@ To maintain a consistent and high-quality codebase, please follow these guidelin
 ## 🏗️ Project Structure
 
 - `examples/`: Categorized smart contract examples.
-- `docs/`: General documentation and ADRs.
+- `docs/`: General documentation and ADRs (see the [Architecture Decision Records](./adr/README.md) for why the project is structured the way it is).
 - `guides/`: Step-by-step tutorials and guides.
 - `book/`: Source for the mdBook documentation.
 - `tests/`: Integration tests for the workspace.

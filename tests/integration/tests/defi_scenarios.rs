@@ -17,9 +17,10 @@ use liquidity_mining::LiquidityMiningClient;
 use simple_swap::SimpleSwapContractClient;
 use soroban_flash_loan::FlashLoanContractClient;
 use soroban_sdk::{
+    auth::{ContractContext, InvokerContractAuthEntry, SubContractInvocation},
     contract, contractimpl, symbol_short,
     testutils::{Address as _, Ledger as _},
-    token, Address, Env,
+    token, vec, Address, Env, IntoVal,
 };
 
 // ---------------------------------------------------------------------------
@@ -147,6 +148,22 @@ impl ArbitrageReceiver {
     }
 }
 
+/// Authorizes the token `transfer` a lending pool makes on this contract's
+/// behalf when it pulls a deposit or repayment.
+fn authorize_transfer(env: &Env, token: &Address, to: &Address, amount: i128) {
+    env.authorize_as_current_contract(vec![
+        env,
+        InvokerContractAuthEntry::Contract(SubContractInvocation {
+            context: ContractContext {
+                contract: token.clone(),
+                fn_name: symbol_short!("transfer"),
+                args: (env.current_contract_address(), to.clone(), amount).into_val(env),
+            },
+            sub_invocations: vec![env],
+        }),
+    ]);
+}
+
 // 3. Refinancing Receiver simulating debt movement
 #[contract]
 pub struct RefinancingReceiver;
@@ -197,30 +214,19 @@ impl RefinancingReceiver {
             .unwrap();
 
         let debt_client = token::Client::new(&env, &token);
-        let col_client = token::Client::new(&env, &col_tok);
 
         let pool1_client = LendingPoolClient::new(&env, &pool1);
         let pool2_client = LendingPoolClient::new(&env, &pool2);
 
         // 1. Repay debt in LendingPool 1
-        debt_client.approve(
-            &env.current_contract_address(),
-            &pool1,
-            &amount,
-            &(env.ledger().sequence() + 1),
-        );
+        authorize_transfer(&env, &token, &pool1, amount);
         pool1_client.repay(&env.current_contract_address(), &amount);
 
         // 2. Withdraw collateral from LendingPool 1
         pool1_client.withdraw(&env.current_contract_address(), &col_amt);
 
         // 3. Deposit collateral into LendingPool 2
-        col_client.approve(
-            &env.current_contract_address(),
-            &pool2,
-            &col_amt,
-            &(env.ledger().sequence() + 1),
-        );
+        authorize_transfer(&env, &col_tok, &pool2, col_amt);
         pool2_client.deposit(&env.current_contract_address(), &col_amt);
 
         // 4. Borrow from LendingPool 2 (borrow enough to cover flash loan + fee)
@@ -287,7 +293,7 @@ fn test_swap_then_deposit_to_lending() {
     // Deploy and init Lending Pool
     let lending_id = env.register_contract(None, lending_pool::LendingPool);
     let lending_client = LendingPoolClient::new(&env, &lending_id);
-    lending_client.initialize(&0i128, &0i128, &0i128);
+    lending_client.initialize(&token_b, &0i128, &0i128, &0i128);
 
     // Fund the Swap Contract with Token B reserves
     mint_token(&env, &token_b, &swap_id, 10_000);
@@ -310,6 +316,8 @@ fn test_swap_then_deposit_to_lending() {
     let position = lending_client.get_user_position(&user);
     assert_eq!(position.deposit, 1000);
     assert_eq!(position.borrow, 0);
+    assert_eq!(client_b.balance(&user), 0);
+    assert_eq!(client_b.balance(&lending_id), 1000);
 }
 
 #[test]
@@ -327,10 +335,10 @@ fn test_borrow_from_lending_then_swap() {
     let swap_client = SimpleSwapContractClient::new(&env, &swap_id);
     swap_client.initialize(&admin, &token_b, &token_a, &1i128, &1i128);
 
-    // Lending Pool
+    // Lending Pool (single-asset, Token B)
     let lending_id = env.register_contract(None, lending_pool::LendingPool);
     let lending_client = LendingPoolClient::new(&env, &lending_id);
-    lending_client.initialize(&0i128, &0i128, &0i128);
+    lending_client.initialize(&token_b, &0i128, &0i128, &0i128);
 
     // Fund Lending Pool with Token B reserves by having Depositor deposit
     mint_token(&env, &token_b, &depositor, 5_000);
@@ -345,23 +353,21 @@ fn test_borrow_from_lending_then_swap() {
     // Fund Swap with Token A reserves
     mint_token(&env, &token_a, &swap_id, 2_000);
 
-    // Fund User with Token A collateral
-    mint_token(&env, &token_a, &user, 1_000);
-    client_a.approve(&user, &lending_id, &1_000, &(env.ledger().sequence() + 1));
+    // Fund User with Token B collateral
+    mint_token(&env, &token_b, &user, 1_000);
+    client_b.approve(&user, &lending_id, &1_000, &(env.ledger().sequence() + 1));
     lending_client.deposit(&user, &1_000);
 
     // User borrows 500 Token B (up to 80% borrow limit of 1000 collateral = 800)
     lending_client.borrow(&user, &500);
     assert_eq!(lending_client.get_user_position(&user).borrow, 500);
-
-    // Simulate user receiving the borrowed Token B (since lending pool is only a ledger keeper)
-    mint_token(&env, &token_b, &user, 500);
+    assert_eq!(client_b.balance(&user), 500);
 
     // User swaps 500 Token B for 500 Token A
     client_b.approve(&user, &swap_id, &500, &(env.ledger().sequence() + 1));
     swap_client.swap(&user, &token_b, &500, &500, &user);
 
-    assert_eq!(client_a.balance(&user), 1500);
+    assert_eq!(client_a.balance(&user), 500);
     assert_eq!(client_b.balance(&user), 0);
 }
 
@@ -377,7 +383,7 @@ fn test_lending_utilization_affects_borrow_rate() {
     // Lending Pool with base_rate = 2%, kink_rate = 10%, kink_utilization = 80%
     let lending_id = env.register_contract(None, lending_pool::LendingPool);
     let lending_client = LendingPoolClient::new(&env, &lending_id);
-    lending_client.initialize(&2i128, &10i128, &80i128);
+    lending_client.initialize(&token_a, &2i128, &10i128, &80i128);
 
     // User1 deposits 1000 Token A
     mint_token(&env, &token_a, &user1, 1000);
@@ -510,8 +516,9 @@ fn test_flash_loan_refinancing() {
     let admin = Address::generate(&env);
     let _user = Address::generate(&env);
 
-    let (collateral_token, client_c) = create_token(&env, &admin);
-    let (debt_token, _client_d) = create_token(&env, &admin);
+    // The lending pools are single-asset, so collateral and debt share a token.
+    let (debt_token, client_d) = create_token(&env, &admin);
+    let collateral_token = debt_token.clone();
 
     // 1. Deploy Flash Loan (0.5% fee)
     let flash_loan_id = env.register_contract(None, soroban_flash_loan::FlashLoanContract);
@@ -521,11 +528,11 @@ fn test_flash_loan_refinancing() {
     // 2. Deploy Lending Pools (Pool 1 and Pool 2)
     let pool1_id = env.register_contract(None, lending_pool::LendingPool);
     let pool1_client = LendingPoolClient::new(&env, &pool1_id);
-    pool1_client.initialize(&0i128, &0i128, &0i128);
+    pool1_client.initialize(&debt_token, &0i128, &0i128, &0i128);
 
     let pool2_id = env.register_contract(None, lending_pool::LendingPool);
     let pool2_client = LendingPoolClient::new(&env, &pool2_id);
-    pool2_client.initialize(&0i128, &0i128, &0i128);
+    pool2_client.initialize(&debt_token, &0i128, &0i128, &0i128);
 
     // 3. Deploy Refinancing Receiver
     let receiver_id = env.register_contract(None, RefinancingReceiver);
@@ -538,11 +545,11 @@ fn test_flash_loan_refinancing() {
     // 5. Setup initial User Position in Pool 1
     // Deposit 1000 Collateral Token, borrow 500 Debt Token
     mint_token(&env, &collateral_token, &receiver_id, 1000);
-    // Fund receiver with the fee (2) to cover the mock pool's non-transfer of tokens
+    // Fund receiver with the flash loan fee (0.5% of 500 = 2)
     mint_token(&env, &debt_token, &receiver_id, 2);
 
     // We mock authorization to simulate the receiver acting on its own behalf
-    client_c.approve(
+    client_d.approve(
         &receiver_id,
         &pool1_id,
         &1000,

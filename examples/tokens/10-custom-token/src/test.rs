@@ -183,7 +183,8 @@ fn test_multi_sig_transfer() {
     let signer2 = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
+    let signers: Vec<Address> =
+        Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
 
     let contract_id = env.register_contract(None, crate::CustomToken);
     let client = CustomTokenClient::new(&env, &contract_id);
@@ -218,7 +219,8 @@ fn test_multi_sig_insufficient_signers() {
     let signer2 = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
+    let signers: Vec<Address> =
+        Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
 
     let contract_id = env.register_contract(None, crate::CustomToken);
     let client = CustomTokenClient::new(&env, &contract_id);

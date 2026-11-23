@@ -21,6 +21,34 @@ fn op_id(env: &Env, s: &[u8]) -> Bytes {
     Bytes::from_slice(env, s)
 }
 
+#[test]
+fn test_initialize_requires_admin_auth_and_leaves_contract_uninitialized() {
+    let env = Env::default();
+    let contract_id = env.register_contract(None, TimelockContract);
+    let client = TimelockContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // An unauthenticated caller cannot select another account as admin.
+    assert!(client.try_initialize(&admin).is_err());
+    assert!(client.try_admin().is_err());
+
+    // The intended admin can still initialize with the default configuration.
+    env.mock_all_auths();
+    client.initialize(&admin);
+    assert_eq!(client.admin(), admin);
+    assert_eq!(client.get_delay_bounds(), (60, 86_400));
+    assert!(!client.is_paused());
+}
+
+#[test]
+#[should_panic(expected = "Already initialized")]
+fn test_initialize_twice_fails() {
+    let (env, _admin, client) = setup();
+    let replacement_admin = Address::generate(&env);
+
+    client.initialize(&replacement_admin);
+}
+
 // ── queue ────────────────────────────────────────────────────────────────────
 
 #[test]

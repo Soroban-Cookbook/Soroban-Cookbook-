@@ -1,57 +1,60 @@
-name: Templates CI
+name: Templates
+
+# The `templates/token-dapp` and `templates/dao-governance-dapp` directories are
+# intentionally standalone Cargo workspaces: each declares its own [workspace]
+# with its own pinned `soroban-sdk` so a learner can copy the directory out of
+# this repository and build it on its own. Because a package cannot belong to two
+# workspaces at once, they are listed in the root `exclude` table instead of
+# `members`, so `cargo ... --workspace` (and scripts/ci-workspace.sh) never
+# touches them. `templates/nft-marketplace-dapp` is a root workspace member.
+# Without a dedicated job like this one, a broken template would still ship
+# looking official. See #1184 and #1469.
+#
+# This job builds and tests the contracts of all three templates and verifies
+# that each frontend's dependencies install and build.
 
 on:
   push:
     branches: [main, develop]
-    paths:
-      - "templates/**"
-      - ".github/workflows/templates.yml"
   pull_request:
     branches: [main, develop]
-    paths:
-      - "templates/**"
-      - ".github/workflows/templates.yml"
 
 env:
-  RUST_VERSION: stable
+  CARGO_TERM_COLOR: always
+  # The templates legitimately use deprecated `Events::publish` APIs; keep the
+  # same policy as .github/workflows/test.yml instead of the toolchain default.
+  RUSTFLAGS: "-D warnings -A deprecated"
 
 jobs:
   templates:
-    name: Build & Test Templates
+    name: ${{ matrix.template }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        template:
-          - dao-governance-dapp
-          - token-dapp
-          - nft-marketplace-dapp
+        include:
+          - template: dao-governance-dapp
+            package: dao-governance
+          - template: token-dapp
+            package: token-contract
+          - template: nft-marketplace-dapp
+            package: nft-marketplace-dapp
+    defaults:
+      run:
+        working-directory: templates/${{ matrix.template }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: ${{ env.RUST_VERSION }}
-          target: wasm32-unknown-unknown
+          toolchain: stable
 
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            templates/${{ matrix.template }}/target
-          key: ${{ runner.os }}-templates-${{ matrix.template }}-cargo-${{ hashFiles(format('templates/{0}/Cargo.lock', matrix.template)) }}
-          restore-keys: ${{ runner.os }}-templates-${{ matrix.template }}-cargo-
-
-      - name: Build template contracts (release)
-        working-directory: templates/${{ matrix.template }}
-        run: cargo build --release
+      - name: Build template contract (release)
+        run: cargo build --release -p ${{ matrix.package }}
 
       - name: Run template contract tests
-        working-directory: templates/${{ matrix.template }}
-        run: cargo test --release
+        run: cargo test -p ${{ matrix.package }}
 
       - name: Setup Bun
         if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''

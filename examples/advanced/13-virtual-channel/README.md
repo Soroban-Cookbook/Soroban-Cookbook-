@@ -13,7 +13,7 @@ This is the **fourth step** in the [state channels learning path](../README.md#s
 **Prerequisites:** Understand all three previous patterns:
 - [`07-state-channels`](../07-state-channels/) — Foundation
 - [`08-payment-channels`](../08-payment-channels/) — Payment-specific logic
-- [`03-state-channel-disputes`](../03-state-channel-disputes/) — Dispute resolution
+- [`34-state-channel-disputes`](../34-state-channel-disputes/) — Dispute resolution
 
 ## Key Concepts
 

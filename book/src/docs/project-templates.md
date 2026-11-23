@@ -49,8 +49,18 @@ A full-stack digital collectible and marketplace dApp for minting NFTs and tradi
 - **Frontend Gallery:** Visual collectible grid, minting modal, listing cards with price in XLM, and 1-click buy button.
 
 ### Quick Start
+The NFT marketplace template is a single package that is a member of the cookbook
+Cargo workspace, so it is built and tested with the workspace `soroban-sdk`.
+From the repository root:
+
 ```bash
-cd templates/nft-marketplace-dapp/contracts/marketplace
+cargo test -p nft-marketplace-dapp
+```
+
+Or from inside the template directory:
+
+```bash
+cd templates/nft-marketplace-dapp
 cargo test
 ```
 

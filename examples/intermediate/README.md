@@ -12,12 +12,12 @@ Difficulty is relative to the basic examples: **Foundational** introduces the in
 
 | Order | Example | What it teaches | Difficulty | Prerequisites | Related docs |
 | --- | --- | --- | --- | --- | --- |
-| 1 | [Iterable mappings](./iterable-mappings/) | Enumerable maps with a maintained key index | Foundational | Storage, vectors, maps | [Storage types](../../docs/storage-types.md) |
+| 1 | [Iterable mapping](./iterable-mapping/) | Enumerable maps with a maintained key index | Foundational | Storage, vectors, maps | [Storage types](../../docs/storage-types.md) |
 | 2 | [Priority queue](./03-priority-queue/) | Heap-backed ordering and bounded collection operations | Foundational | Collections, validation | [Testing best practices](../../docs/testing-best-practices.md) |
 | 3 | [Event subscriptions](./event-subscriptions/) | Subscriber registration and event-driven contract coordination | Foundational | Authentication, events | [Common patterns](../../docs/common-patterns.md) |
 | 4 | [Event aggregation](./event-aggregation/) | Batching related actions into one event | Foundational | Events, collections | [Event filtering](../basics/14-event-filtering/) |
 | 5 | [Event history](./event-history/) | Persistent audit history with filtering and pagination | Intermediate | Events, persistent storage | [Security best practices](../../docs/security-best-practices.md) |
-| 6 | [Role-based access control](./02-role-based-access-control/) | Numeric role hierarchy (Owner/Admin/Moderator/User) | Intermediate | Authentication, events | [**Canonical RBAC** (03-rbac-modifiers)](../advanced/03-rbac-modifiers/) |
+| 6 | [Role-based access control](./02-role-based-access-control/) | Numeric role hierarchy (Owner/Admin/Moderator/User) | Intermediate | Authentication, events | [**Canonical RBAC** (32-rbac-modifiers)](../advanced/32-rbac-modifiers/) |
 | 7 | [Access control guide](./access-control/) | Combined RBAC, multisig, and timelock governance | Intermediate | RBAC, multisig, timelock | [Governance & Auth Patterns](../../docs/governance-rbac-multisig-timelock.md) |
 | 8 | [Pause and unpause](./03-pause-unpause/) | Emergency controls for sensitive contract operations | Intermediate | Authentication, RBAC | [Token pause permissions](../tokens/10-pausable-permissions/) |
 | 8 | [Multi-sig patterns](./multi-sig-patterns/) | Threshold approvals and multi-party authorization | Intermediate | Authentication, RBAC | [Multi-sig reference](./multi-sig-patterns/QUICK_REFERENCE.md) |
@@ -26,6 +26,10 @@ Difficulty is relative to the basic examples: **Foundational** introduces the in
 | 11 | [Lazy loading](./lazy-loading/) | Bounded caching and deferred reads for large state sets | Advanced | Persistent storage, pagination | [Gas benchmarks](../../docs/gas-benchmarks.md) |
 | 12 | [Storage pagination](./storage-pagination/) | Opaque cursors for stable, page-sized queries | Advanced | Persistent storage, collections | [Storage types](../../docs/storage-types.md) |
 | 13 | [Storage migration](./storage-migration/) | Staged, batched schema upgrades with rollback-friendly state | Advanced | Persistent storage, authorization | [Deployment guide](../../guides/deployment.md) |
+
+### Iterable Map Companion
+
+[`iterable-mappings`](./iterable-mappings/) is **not** a second entry point for the pattern above. It is a workspace member kept for its collection utilities — filtering, mapping, and reducing over an iterable map — which build directly on the canonical example. Work through `iterable-mapping` first.
 
 ## Related Learning Tracks
 

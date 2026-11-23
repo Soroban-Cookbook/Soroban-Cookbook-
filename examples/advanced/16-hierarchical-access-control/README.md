@@ -1,6 +1,6 @@
 # Hierarchical Access Control
 
-> **Note:** For learning RBAC patterns, start with [**03-rbac-modifiers**](../03-rbac-modifiers/) — the canonical RBAC example. This example demonstrates an **advanced hierarchical pattern** with role inheritance and dynamic permission management.
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates an **advanced hierarchical pattern** with role inheritance and dynamic permission management.
 
 This example demonstrates a hierarchical role-based access control (RBAC) system with dynamic permissions for Soroban smart contracts. It implements a multi-tier role architecture, fine-grained permission checks, and secure runtime updates.
 
@@ -10,7 +10,7 @@ This example extends the canonical RBAC pattern with **role hierarchy and permis
 
 - **Role Hierarchy**: ADMIN → MANAGER → OPERATOR (each inherits permissions from roles below)
 - **Dynamic Permissions**: Permissions can be granted/revoked from roles at runtime
-- **Permission System**: Fine-grained checks (MANAGE_ROLES, MANAGE_PERMS, MANAGE_RES, USE_RES)
+- **Permission System**: Fine-grained checks (MNG_ROLES, MNG_PERMS, MNG_RES, USE_RES)
 - **Inheritance**: Higher roles automatically inherit permissions from lower roles
 
 **When to use this pattern:**
@@ -40,8 +40,8 @@ The contract implements a hierarchical RBAC system with three core roles and fou
 
 [ Role | Permissions ]
 |-----|--------------|
-*|ADMIN** | MANAGE_ROLES, MANAGE_PERMS, MANAGE_RES, USE_RES |
-|**MANAGER** | MANAGE_RES, USE_RES |
+|**ADMIN** | MNG_ROLES, MNG_PERMS, MNG_RES, USE_RES |
+|**MANAGER** | MNG_RES, MNG_ROLES, USE_RES |
 |**OPERATOR** | USE_RES |
 
 ### Key Functions
@@ -74,7 +74,7 @@ pub fn account_has_permission(env: Env, account: Address, permission: Symbol) ->
 #### Protected Operations
 
 ```rust
-pub fn manage_resource(env: Env, caller: Address, resource_id: Symbol) // Requires MANAGE_RES
+pub fn manage_resource(env: Env, caller: Address, resource_id: Symbol) // Requires MNG_RES
 pub fn use_resource(env: Env, caller: Address, resource_id: Symbol) // Requires USE_RES
 ```
 
@@ -108,8 +108,8 @@ This allows off-chain indexers to reconstruct the full history of access control
 
 #### Privilege Escalation Prevention
 
-- Only accounts with `MANAGE_ROLES` permission can grant/revoke roles
-- Only accounts with `MANAGE_PERMS` permission can modify permissions
+- Only accounts with `MNG_ROLES` permission can grant/revoke roles
+- Only accounts with `MNG_PERMS` permission can modify permissions
 - Roles and permissions are checked in a strict hierarchy
 
 #### Authorization
@@ -155,8 +155,8 @@ soroban contract deploy \
 
 ## Related Examples
 
-- **[03-rbac-modifiers](../03-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible roles (start here before adding hierarchy)
+- **[32-rbac-modifiers](../32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible roles (start here before adding hierarchy)
 - [02-role-based-access-control](../../intermediate/02-role-based-access-control/) — Simple RBAC with numeric hierarchy
 - [access-control](../../intermediate/access-control/) — Combined RBAC + Multisig + Timelock
-- [03-registry-access-controls](../03-registry-access-controls/) — Registry-specific access controls
+- [33-registry-access-controls](../33-registry-access-controls/) — Registry-specific access controls
 - [01-multi-party-auth](../01-multi-party-auth/) — N-of-N and M-of-N authorization patterns

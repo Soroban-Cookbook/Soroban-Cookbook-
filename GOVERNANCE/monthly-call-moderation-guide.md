@@ -4,7 +4,7 @@ This guide defines the moderation standards and escalation path for Soroban Cook
 
 ## Code of Conduct Enforcement
 
-All calls are governed by the project [Code of Conduct](../CODE_OF_CONDUCT.md) and [Community Guidelines](../COMMUNITY_GUIDELINES.md). By joining, attendees agree to uphold these standards.
+All calls are governed by the project [Code of Conduct](../CODE_OF_CONDUCT.md) and [Community Guidelines](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/COMMUNITY_GUIDELINES.md). By joining, attendees agree to uphold these standards.
 
 ## Moderation Roles
 
@@ -44,7 +44,7 @@ At the start of every call, the host should read or link to the following rules:
 
 ### Post-Call Follow-Up
 
-Log incidents in a private moderation log maintained by maintainers. Align consequences with the severity table in [Community Guidelines](../COMMUNITY_GUIDELINES.md).
+Log incidents in a private moderation log maintained by maintainers. Align consequences with the severity table in [Community Guidelines](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/COMMUNITY_GUIDELINES.md).
 
 ## Handling Difficult Topics
 

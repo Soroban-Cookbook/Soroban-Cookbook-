@@ -1,47 +1,52 @@
-# Proxy Admin
+# Proxy Admin Controls
 
-Admin-authenticated upgrade proposals with timelock and emergency pause.
+Related decisions: [ADR-006: Guard Contract Code Upgrades](../../../docs/adr/006-guard-contract-upgrades.md) and [ADR-007: Versioned State Migrations](../../../docs/adr/007-version-state-migrations.md).
 
-## Scope In the Upgradeability Sequence
-
-This is step 2 of 6, following the [single upgradeable proxy](../04-upgradeable-proxy/).
-
-- **In scope:** timelocked upgrade proposals, cancellation, emergency pause,
-      and lifecycle events.
-- **Out of scope:** proxy call forwarding and shared implementation routing.
-      Continue to the [beacon proxy](../02-beacon-proxy/) for shared upgrades.
-
-## Role in Learning Path
-
-This is the **third step** in the [upgrade patterns learning path](../README.md#upgrade-patterns--proxy-patterns). After learning basic and factory-managed proxies, this example adds:
-- Admin authorization and access control
-- Timelock delays for planned upgrades
-- Emergency pause mechanisms
-- Staged upgrade governance
-- Risk mitigation for production systems
-
-**Prerequisites:** 
-- Start with [`02-beacon-proxy`](../02-beacon-proxy/) for beacon basics
-- Then [`03-beacon-proxy-factory`](../03-beacon-proxy-factory/) for factory patterns
-
-**Next steps:**
-- **[`04-upgradeable-proxy`](../04-upgradeable-proxy/)** — Alternative pattern: storage in proxy
-- **[`06-beacon-management`](../06-beacon-management/)** — Versioned implementations with rollback
-- **[`07-upgrade-patterns`](../07-upgrade-patterns/)** — Complete upgrade strategies
-
-## Key Concepts
-
-- Role-based access control for upgrades
-- Timelock-enforced delays
-- Emergency pause for rollback
-- Proposal lifecycle management
-- Production-grade safety checks
-
-## Pattern Progression
-
-**Basic beacon → Beacon factory → Governance → Direct upgrade → Versioning → Full patterns**
+Governance and safety controls around Soroban contract upgrades. The example
+combines four independent safety layers so that no single mistake can result
+in an irreversible bad upgrade.
 
 ## What It Demonstrates
+
+- Admin-only `propose_upgrade` with a configurable timelock delay
+- Proposal workflow: propose → wait → execute (or cancel)
+- Emergency pause switch that halts non-admin operations instantly
+- Structured events for every lifecycle transition
+- Auth guards and replay prevention
+
+## Upgrade Lifecycle
+
+```
+admin calls propose_upgrade(new_hash, delay)
+        │
+        ▼
+  ProposalState::Pending  ──── delay passes ────▶  ProposalState::Ready
+        │                                                   │
+  admin calls cancel_upgrade                       admin calls execute_upgrade
+        │                                                   │
+  proposal removed                         WASM replaced, proposal removed
+```
+
+## Contract API
+
+| Function | Auth required | Description |
+| --- | --- | --- |
+| `initialize(admin)` | — | One-time setup |
+| `propose_upgrade(new_wasm_hash, delay)` | admin | Queue an upgrade with a timelock |
+| `cancel_upgrade()` | admin | Remove the pending proposal |
+| `execute_upgrade()` | admin | Apply the upgrade after the delay |
+| `pause()` | admin | Halt non-admin operations |
+| `unpause()` | admin | Resume normal operations |
+| `proposal_state()` | — | Returns `None`, `Pending`, or `Ready` |
+| `get_proposal()` | — | Returns the full `UpgradeProposal` or `None` |
+| `is_paused()` | — | Returns the current pause flag |
+
+## Timelock Constants
+
+| Constant | Value | Rationale |
+| --- | --- | --- |
+| `MIN_DELAY` | 60 s | Prevents accidental instant upgrades |
+| `MAX_DELAY` | 604 800 s (7 days) | Keeps upgrades actionable within a week |
 
 ## Security Checklist
 
@@ -76,9 +81,6 @@ cargo test -p proxy-admin
 
 ## Related Examples
 
-- [Next: Beacon Proxy](../02-beacon-proxy/) — share one implementation across proxies
 - [02-timelock](../02-timelock/) — Core timelock pattern this example builds on
 - [01-multi-party-auth](../01-multi-party-auth/) — Threshold signatures for the admin role
 - [Governance Examples](../../governance/) — DAOs that govern upgrade proposals
-
-See the [advanced examples README](../README.md) for the full upgrade patterns learning path.

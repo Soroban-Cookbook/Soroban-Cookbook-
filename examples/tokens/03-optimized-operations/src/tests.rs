@@ -21,6 +21,69 @@ fn test_standard_initialize() {
 }
 
 #[test]
+fn test_standard_initialize_twice_fails() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let underlying = Address::generate(&env);
+    let standard =
+        StandardTokenOpsClient::new(&env, &env.register_contract(None, StandardTokenOps));
+
+    standard.initialize(&underlying);
+    assert_eq!(
+        standard.try_initialize(&Address::generate(&env)),
+        Err(Ok(StandardError::AlreadyInitialized))
+    );
+}
+
+#[test]
+fn test_standard_wrap_moves_underlying() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    let underlying = env
+        .register_stellar_asset_contract_v2(Address::generate(&env))
+        .address();
+    soroban_sdk::token::StellarAssetClient::new(&env, &underlying).mint(&user, &1000);
+
+    let standard_id = env.register_contract(None, StandardTokenOps);
+    let standard = StandardTokenOpsClient::new(&env, &standard_id);
+    standard.initialize(&underlying);
+
+    assert_eq!(standard.wrap(&user, &400), 400);
+    assert_eq!(standard.balance(&user), 400);
+
+    let underlying_client = soroban_sdk::token::Client::new(&env, &underlying);
+    assert_eq!(underlying_client.balance(&user), 600);
+    assert_eq!(underlying_client.balance(&standard_id), 400);
+}
+
+#[test]
+fn test_standard_wrap_rejects_reentry() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let user = Address::generate(&env);
+    let standard_id = env.register_contract(None, StandardTokenOps);
+    let standard = StandardTokenOpsClient::new(&env, &standard_id);
+    standard.initialize(&Address::generate(&env));
+
+    // Simulate a `wrap` that is still in flight (e.g. a hookable underlying
+    // token calling back into the wrapper).
+    env.as_contract(&standard_id, || {
+        env.storage()
+            .instance()
+            .set(&StandardDataKey::Entered, &true);
+    });
+
+    assert_eq!(
+        standard.try_wrap(&user, &100),
+        Err(Ok(StandardError::ReentrancyDetected))
+    );
+}
+
+#[test]
 fn test_standard_wrap_and_balance() {
     let env = Env::default();
     env.mock_all_auths();

@@ -18,11 +18,12 @@ pub enum RegistryKey {
 #[contractimpl]
 impl Registry {
     pub fn register(env: Env, name: Symbol, addr: Address) {
-        // allow anyone to register in this example
-        env.storage()
-            .persistent()
-            .set(&RegistryKey::Entry(name.clone()), &addr);
-        // track list omitted for brevity
+        addr.require_auth();
+        let key = RegistryKey::Entry(name);
+        if env.storage().persistent().has(&key) {
+            panic!("already registered");
+        }
+        env.storage().persistent().set(&key, &addr);
     }
 
     pub fn lookup(env: Env, name: Symbol) -> Option<Address> {
@@ -46,10 +47,11 @@ pub enum FactoryKey {
 
 #[contractimpl]
 impl Factory {
-    pub fn initialize(env: Env, wasm_hash: BytesN<32>, registry: Address) {
+    pub fn initialize(env: Env, admin: Address, wasm_hash: BytesN<32>, registry: Address) {
         if env.storage().instance().has(&FactoryKey::WasmHash) {
-            return;
+            panic!("already initialized");
         }
+        admin.require_auth();
         env.storage()
             .instance()
             .set(&FactoryKey::WasmHash, &wasm_hash);

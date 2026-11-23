@@ -8,6 +8,10 @@ A Soroban implementation of a Uniswap V2-style constant product automated market
 - Add and remove liquidity in proportion to the current pool reserves
 - Swap with price impact and a 0.3% fee
 - Internal LP token minting, burning, and balance tracking
+- One reentrancy mutex shared by `add_liquidity`, `remove_liquidity`, and `swap`,
+  held across authorization, reserve reads, and every transfer
+- Checks-effects-interactions ordering: LP accounting is finalized before the
+  token transfers run
 
 ## Contracts
 
@@ -17,6 +21,50 @@ A Soroban implementation of a Uniswap V2-style constant product automated market
 - `swap(trader: Address, sell_token: Address, sell_amount: i128, min_buy_amount: i128)`
 - `lp_balance(provider: Address)` — check LP token shares
 - `total_supply()` — total LP token supply
+
+## Reentrancy and token assumptions
+
+Every reserve-changing entry point (`add_liquidity`, `remove_liquidity`, and
+`swap`) acquires the same instance-storage mutex (`DataKey::Entered`) before
+authorization or any token call, including `balance`. It holds the mutex through
+every token transfer. An already-held mutex returns `AmmError::Reentrancy`
+without reading reserves or moving tokens. The scoped `AmmGuard` releases the
+mutex on successful and error returns; if a token call traps, Soroban rolls back
+the invocation, including the mutex and token changes.
+
+`add_liquidity` follows checks-effects-interactions. The amount, ratio, share,
+and overflow checks all run first, then the LP mint is applied, and only then
+are the two token transfers sent. The LP supply and the provider's LP balance
+are therefore already consistent when the token code runs, so a token that
+inspects the AMM mid-transfer cannot observe half-applied accounting. The same
+ordering is used by `remove_liquidity`, where the LP burn happens before the
+payout transfers. If a transfer fails, Soroban rolls the whole invocation back,
+including the mint or burn.
+
+Soroban's host currently [disallows contract reentrancy](https://stellar.org/blog/developers/soroban-the-smart-contract-platform-designed-for-developers),
+including a token calling back into an active AMM. The mutex makes the intended
+critical section explicit as a defensive teaching pattern. Callback tests
+exercise the host rejection; separate active-lock tests exercise the AMM's
+own `Reentrancy` error.
+
+If the mutex is omitted when adapting this example to an environment that permits
+callbacks, a hookable token can re-enter between the reserve reads and transfers.
+A nested swap can then price against intermediate reserves, and a nested
+`add_liquidity` can mint LP shares against a supply that does not yet match the
+reserves. Both violate the pool's accounting assumptions. Do not copy that
+unguarded ordering into such a runtime. The guard pattern to copy is
+[Advanced Reentrancy Protection](../../advanced/15-reentrancy-guard/)
+(`examples/advanced/15-reentrancy-guard`, formerly referenced as
+`examples/advanced/05-reentrancy-guard`). For a port that allows reentrancy,
+keep one shared lock across all reserve-changing entry points, including
+`add_liquidity` and `remove_liquidity`, keep the state changes ahead of the
+external calls, and review reads of intermediate state.
+
+This is an educational example, not a production-ready AMM. A mutex does not make
+arbitrary token extensions safe: dishonest balances, transfer fees, rebasing,
+or other token-side effects can still invalidate the pricing assumptions. Use
+reviewed tokens with standard transfer semantics and audit all external-call
+boundaries before deployment.
 
 ## Build
 

@@ -47,14 +47,9 @@ fn setup() -> Topology {
 #[test]
 fn test_open_ledger_and_virtual_channel() {
     let t = setup();
-    let vc_id = t.client.open_virtual(
-        &t.alice,
-        &t.bob,
-        &t.ingrid,
-        &t.ledger_a,
-        &t.ledger_b,
-        &50,
-    );
+    let vc_id = t
+        .client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &50);
     let vc = t.client.get_virtual(&vc_id);
     assert_eq!(vc.amount, 50);
     assert_eq!(vc.bal_a, 50);
@@ -67,7 +62,8 @@ fn test_open_ledger_and_virtual_channel() {
 #[should_panic(expected = "Insufficient collateral")]
 fn test_open_virtual_insufficient_collateral() {
     let t = setup();
-    t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &201);
+    t.client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &201);
 }
 
 #[test]
@@ -93,7 +89,9 @@ fn test_open_virtual_wrong_topology() {
 #[test]
 fn test_routing_update_and_settlement() {
     let t = setup();
-    let vc_id = t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
+    let vc_id = t
+        .client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
 
     // Off-chain: Alice pays Bob 30 (bal 70/30), then Bob pays back 10 (80/20).
     // Each update is signed by both endpoints; only the final state is
@@ -121,7 +119,10 @@ fn test_routing_update_and_settlement() {
     // each backing ledger channel holds exactly `amount` of collateral
     // (endpoint balance + intermediary top-up), so the topology holds 2x.
     assert_eq!(
-        la.endpoint_deposit + la.intermediary_deposit + lb.endpoint_deposit + lb.intermediary_deposit,
+        la.endpoint_deposit
+            + la.intermediary_deposit
+            + lb.endpoint_deposit
+            + lb.intermediary_deposit,
         2 * 100
     );
 }
@@ -129,7 +130,9 @@ fn test_routing_update_and_settlement() {
 #[test]
 fn test_materialize_rejects_stale_sequence() {
     let t = setup();
-    let vc_id = t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
+    let vc_id = t
+        .client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
     t.client.materialize(&vc_id, &3, &50, &50);
     // stale state (seq 2 < 3) must be rejected — replay protection.
     // try_materialize surfaces the contract panic as an Err instead of aborting.
@@ -141,7 +144,9 @@ fn test_materialize_rejects_stale_sequence() {
 #[should_panic(expected = "Balances must be non-negative and conserve amount")]
 fn test_materialize_rejects_amount_mismatch() {
     let t = setup();
-    let vc_id = t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
+    let vc_id = t
+        .client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
     t.client.materialize(&vc_id, &1, &60, &30); // 60+30 != 100
 }
 
@@ -149,7 +154,9 @@ fn test_materialize_rejects_amount_mismatch() {
 #[should_panic(expected = "Already materialized")]
 fn test_materialize_twice_fails() {
     let t = setup();
-    let vc_id = t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
+    let vc_id = t
+        .client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &100);
     t.client.materialize(&vc_id, &1, &50, &50);
     t.client.materialize(&vc_id, &2, &60, &40);
 }
@@ -177,5 +184,6 @@ fn test_close_ledger_twice_fails() {
 fn test_open_virtual_on_closed_ledger_fails() {
     let t = setup();
     t.client.close_ledger(&t.ledger_b);
-    t.client.open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &50);
+    t.client
+        .open_virtual(&t.alice, &t.bob, &t.ingrid, &t.ledger_a, &t.ledger_b, &50);
 }

@@ -231,3 +231,6 @@ fn write_u64_decimal(value: u64, buf: &mut [u8]) -> usize {
     }
     i
 }
+
+#[cfg(test)]
+mod test;

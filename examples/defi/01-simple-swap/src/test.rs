@@ -2,8 +2,7 @@
 use soroban_validation::test_events::EventList;
 #![cfg(test)]
 
-use soroban_sdk::testutils::Address as _;
-use soroban_sdk::{token, Address, Env, Symbol};
+use soroban_sdk::{testutils::Address as _, token, Address, Env, Symbol};
 use crate::SimpleSwapContractClient;
 
 fn register_token(env: &Env, admin: &Address, name: &Symbol, symbol: &Symbol) -> Address {
@@ -15,6 +14,7 @@ fn register_token(env: &Env, admin: &Address, name: &Symbol, symbol: &Symbol) ->
 
 fn setup() -> (Env, Address, Address, Address, SimpleSwapContractClient<'static>) {
     let env = Env::default();
+    env.mock_all_auths();
     let owner = Address::generate(&env);
     let alice = Address::generate(&env);
     let bob = Address::generate(&env);
@@ -39,6 +39,43 @@ fn test_initialize_and_pair_management() {
     swap_client.update_pair(&owner, &pair.0, &token_c, &1i128, &1i128);
     let new_pair = swap_client.get_pair();
     assert_eq!(new_pair.1, token_c);
+}
+
+#[test]
+#[should_panic(expected = "contract already initialized")]
+fn test_initialize_rejects_second_call() {
+    let (env, owner, _alice, _bob, swap_client) = setup();
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
+    swap_client.initialize(&owner, &token_a, &token_b, &3i128, &2i128);
+}
+
+#[test]
+fn test_initialize_requires_owner_auth() {
+    use soroban_sdk::testutils::{MockAuth, MockAuthInvoke};
+    use soroban_sdk::IntoVal;
+
+    let env = Env::default();
+    let owner = Address::generate(&env);
+    let attacker = Address::generate(&env);
+    let token_a = Address::generate(&env);
+    let token_b = Address::generate(&env);
+    let contract_id = env.register_contract(None, SimpleSwapContract);
+    let swap_client = SimpleSwapContractClient::new(&env, &contract_id);
+
+    env.mock_auths(&[MockAuth {
+        address: &attacker,
+        invoke: &MockAuthInvoke {
+            contract: &contract_id,
+            fn_name: "initialize",
+            args: (&owner, &token_a, &token_b, &2i128, &1i128).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert!(swap_client
+        .try_initialize(&owner, &token_a, &token_b, &2i128, &1i128)
+        .is_err());
 }
 
 #[test]
@@ -96,6 +133,7 @@ fn test_quote_rejects_unknown_token() {
 #[should_panic(expected = "rate must be positive")]
 fn test_initialize_rejects_zero_rate() {
     let env = Env::default();
+    env.mock_all_auths();
     let owner = Address::generate(&env);
     let token_a = Address::generate(&env);
     let token_b = Address::generate(&env);
