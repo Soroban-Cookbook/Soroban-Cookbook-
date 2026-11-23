@@ -1,7 +1,16 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Symbol};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, Address, Env, Executable, Symbol,
+};
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum RegistryError {
+    NotAContract = 1,
+}
 
 #[contract]
 pub struct RegistryContract;
@@ -51,7 +60,7 @@ impl RegistryContract {
 
     // Owner-only: remove from whitelist
     pub fn remove_whitelist(env: Env, addr: Address) {
-        let owner: Address = env
+        let _owner: Address = env
             .storage()
             .instance()
             .get(&DataKey::Owner)
@@ -85,7 +94,16 @@ impl RegistryContract {
 
     // Register an address. Caller must authorize themselves via `require_auth`.
     // `payment` is an abstract numeric amount the caller promises to have paid.
-    pub fn register(env: Env, who: Address, payment: i128) {
+    pub fn register(env: Env, who: Address, payment: i128) -> Result<(), RegistryError> {
+        // Registry entries are invoked as contracts later. Accounts and addresses
+        // with no deployed code would make every dispatch trap, so reject them here.
+        if !matches!(
+            who.executable(),
+            Some(Executable::Wasm(_)) | Some(Executable::StellarAsset)
+        ) {
+            return Err(RegistryError::NotAContract);
+        }
+
         who.require_auth();
         // check whitelist-only
         let whitelist_only: bool = env
@@ -112,6 +130,7 @@ impl RegistryContract {
         env.storage()
             .instance()
             .set(&DataKey::Registered(who), &true);
+        Ok(())
     }
 
     // Anyone can file a removal request (a dispute) against a registered address.

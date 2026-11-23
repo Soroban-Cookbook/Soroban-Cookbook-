@@ -5,6 +5,10 @@ use super::*;
 use soroban_sdk::testutils::Address as _;
 use soroban_sdk::{Address, Env, Symbol};
 
+fn deployed_contract_address(env: &Env) -> Address {
+    env.register_contract(None, RegistryContract)
+}
+
 #[test]
 fn test_whitelist_and_registration() {
     let env = Env::default();
@@ -13,8 +17,7 @@ fn test_whitelist_and_registration() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let alice = Address::generate(&env);
-    let _bob = Address::generate(&env);
+    let alice = deployed_contract_address(&env);
 
     // Initialize as whitelist-only with no fee
     client.init(&owner, &true, &0i128);
@@ -37,7 +40,7 @@ fn test_register_not_whitelisted() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let bob = Address::generate(&env);
+    let bob = deployed_contract_address(&env);
 
     client.init(&owner, &true, &0i128);
     client.register(&bob, &0i128);
@@ -51,7 +54,6 @@ fn test_fee_enforcement() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let _alice = Address::generate(&env);
 
     // Initialize without whitelist-only and fee = 10
     client.init(&owner, &false, &10i128);
@@ -66,7 +68,7 @@ fn test_register_insufficient_fee() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let alice = Address::generate(&env);
+    let alice = deployed_contract_address(&env);
 
     // Initialize without whitelist-only and fee = 10
     client.init(&owner, &false, &10i128);
@@ -83,7 +85,7 @@ fn test_fee_enforcement_success() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let alice = Address::generate(&env);
+    let alice = deployed_contract_address(&env);
 
     // Initialize without whitelist-only and fee = 10
     client.init(&owner, &false, &10i128);
@@ -101,7 +103,7 @@ fn test_dispute_and_owner_removal() {
     let client = RegistryContractClient::new(&env, &contract_id);
 
     let owner = Address::generate(&env);
-    let alice = Address::generate(&env);
+    let alice = deployed_contract_address(&env);
     let reporter = Address::generate(&env);
 
     client.init(&owner, &false, &0i128);
@@ -115,4 +117,34 @@ fn test_dispute_and_owner_removal() {
     client.resolve_removal(&alice, &true);
 
     assert!(!client.is_registered(&alice));
+}
+
+#[test]
+fn test_register_rejects_non_contract_address() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, RegistryContract);
+    let client = RegistryContractClient::new(&env, &contract_id);
+
+    let owner = Address::generate(&env);
+    client.init(&owner, &false, &0i128);
+
+    // A generated address has no deployed contract code.
+    let undeployed = Address::generate(&env);
+    assert_eq!(
+        client.try_register(&undeployed, &0i128),
+        Err(Ok(RegistryError::NotAContract))
+    );
+    assert!(!client.is_registered(&undeployed));
+
+    // Account addresses have no Wasm code to dispatch to either.
+    let account = env
+        .register_stellar_asset_contract_v2(owner.clone())
+        .issuer()
+        .address();
+    assert_eq!(
+        client.try_register(&account, &0i128),
+        Err(Ok(RegistryError::NotAContract))
+    );
+    assert!(!client.is_registered(&account));
 }
