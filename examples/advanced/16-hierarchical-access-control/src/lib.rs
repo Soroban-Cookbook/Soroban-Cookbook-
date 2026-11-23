@@ -1,9 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
 
 // ---------------------------------------------------------------------------
 // Hierarchical Access Control Contract
@@ -19,6 +17,19 @@ use soroban_sdk::{
 // - Fine-grained permission checks
 // - Secure role/permissions updates
 // - Event logging for all role/permission changes
+//
+// Hierarchy enforcement invariant (issue #1466):
+// `grant_role` and `revoke_role` validate the *requested* role against the
+// caller's position in the hierarchy, not just the caller's permission bit.
+// A role may only be managed by an account whose own highest role is
+// STRICTLY above the target role:
+// - ADMIN (level 3) may grant/revoke MANAGER (2) and OPERATOR (1)
+// - MANAGER (level 2) may only grant/revoke OPERATOR (1)
+// - OPERATOR (level 1) may not manage any role
+// - Unknown roles (level 0) can never be granted
+// This prevents privilege escalation: a MANAGER passing ROLE_ADMIN or
+// ROLE_MANAGER to `grant_role` is rejected, and even ADMIN cannot grant
+// ADMIN (bootstrap happens via `initialize`; admins can `renounce_role`).
 // ---------------------------------------------------------------------------
 
 // ---------------------------------------------------------------------------
@@ -70,10 +81,10 @@ pub struct ProtectedCallEventData {
 }
 
 const CONTRACT_NS: Symbol = symbol_short!("hac");
-const ACTION_ROLE_GRANT: Symbol = symbol_short!("role_grant");
-const ACTION_ROLE_REVOKE: Symbol = symbol_short!("role_revoke");
-const ACTION_PERM_GRANT: Symbol = symbol_short!("perm_grant");
-const ACTION_PERM_REVOKE: Symbol = symbol_short!("perm_revoke");
+const ACTION_ROLE_GRANT: Symbol = symbol_short!("role_grnt");
+const ACTION_ROLE_REVOKE: Symbol = symbol_short!("role_rvk");
+const ACTION_PERM_GRANT: Symbol = symbol_short!("perm_grnt");
+const ACTION_PERM_REVOKE: Symbol = symbol_short!("perm_rvk");
 const ACTION_CALL: Symbol = symbol_short!("call");
 
 // ---------------------------------------------------------------------------
@@ -84,9 +95,9 @@ pub const ROLE_ADMIN: Symbol = symbol_short!("ADMIN");
 pub const ROLE_MANAGER: Symbol = symbol_short!("MANAGER");
 pub const ROLE_OPERATOR: Symbol = symbol_short!("OPERATOR");
 
-pub const PERM_MANAGE_ROLES: Symbol = symbol_short!("MANAGE_ROLES");
-pub const PERM_MANAGE_PERMISSIONS: Symbol = symbol_short!("MANAGE_PERMS");
-pub const PERM_MANAGE_RESOURCES: Symbol = symbol_short!("MANAGE_RES");
+pub const PERM_MANAGE_ROLES: Symbol = symbol_short!("MNG_ROLES");
+pub const PERM_MANAGE_PERMISSIONS: Symbol = symbol_short!("MNG_PERMS");
+pub const PERM_MANAGE_RESOURCES: Symbol = symbol_short!("MNG_RES");
 pub const PERM_USE_RESOURCES: Symbol = symbol_short!("USE_RES");
 
 // ---------------------------------------------------------------------------
@@ -165,7 +176,10 @@ impl HierarchicalAccessControlContract {
     // Role management
     // -----------------------------------------------------------------------
 
-    /// Grant a role to an account. Caller must have MANAGE_ROLES permission.
+    /// Grant a role to an account. Caller must have MANAGE_ROLES permission
+    /// AND hold a role strictly above `role` in the hierarchy (see module
+    /// comment). A MANAGER can only grant OPERATOR; only ADMIN can grant
+    /// MANAGER; nobody can grant ADMIN after initialization.
     pub fn grant_role(env: Env, caller: Address, role: Symbol, account: Address) {
         caller.require_auth();
         Self::require_permission(&env, &caller, PERM_MANAGE_ROLES);
@@ -197,7 +211,9 @@ impl HierarchicalAccessControlContract {
         );
     }
 
-    /// Revoke a role from an account. Caller must have MANAGE_ROLES permission.
+    /// Revoke a role from an account. Caller must have MANAGE_ROLES permission
+    /// AND hold a role strictly above `role` in the hierarchy (same invariant
+    /// as `grant_role`).
     pub fn revoke_role(env: Env, caller: Address, role: Symbol, account: Address) {
         caller.require_auth();
         Self::require_permission(&env, &caller, PERM_MANAGE_ROLES);
@@ -408,7 +424,7 @@ impl HierarchicalAccessControlContract {
             .storage()
             .instance()
             .get(&DataKey::RoleMembers(role))
-            .unwrap_or_else(|| Vec::new(&env));
+            .unwrap_or_else(|| Vec::new(env));
         members.contains(account)
     }
 
@@ -418,7 +434,7 @@ impl HierarchicalAccessControlContract {
         let roles = [ROLE_ADMIN, ROLE_MANAGER, ROLE_OPERATOR];
         let mut start_role = roles.len();
         for (i, role) in roles.iter().enumerate() {
-            if Self::check_role(env, account, *role) {
+            if Self::check_role(env, account, role.clone()) {
                 start_role = i;
                 break;
             }
@@ -427,8 +443,8 @@ impl HierarchicalAccessControlContract {
             let perms: Vec<Symbol> = env
                 .storage()
                 .instance()
-                .get(&DataKey::RolePermissions(*role))
-                .unwrap_or_else(|| Vec::new(&env));
+                .get(&DataKey::RolePermissions(role.clone()))
+                .unwrap_or_else(|| Vec::new(env));
             if perms.contains(&permission) {
                 return true;
             }
@@ -436,18 +452,34 @@ impl HierarchicalAccessControlContract {
         false
     }
 
-    fn can_manage_role(env: &Env, caller: &Address, role: &Symbol) -> bool {
+    fn role_level(role: &Symbol) -> u32 {
         if *role == ROLE_ADMIN {
-            return Self::check_role(env, caller, ROLE_ADMIN);
+            3
+        } else if *role == ROLE_MANAGER {
+            2
+        } else if *role == ROLE_OPERATOR {
+            1
+        } else {
+            0
         }
-        if *role == ROLE_MANAGER {
-            return Self::check_role(env, caller, ROLE_ADMIN);
+    }
+
+    fn highest_role_level(env: &Env, account: &Address) -> u32 {
+        let roles = [ROLE_ADMIN, ROLE_MANAGER, ROLE_OPERATOR];
+        for role in roles.iter() {
+            if Self::check_role(env, account, role.clone()) {
+                return Self::role_level(role);
+            }
         }
-        if *role == ROLE_OPERATOR {
-            return Self::check_role(env, caller, ROLE_ADMIN)
-                || Self::check_role(env, caller, ROLE_MANAGER);
+        0
+    }
+
+    fn can_manage_role(env: &Env, caller: &Address, role: &Symbol) -> bool {
+        let target_level = Self::role_level(role);
+        if target_level == 0 {
+            return false;
         }
-        false
+        Self::highest_role_level(env, caller) > target_level
     }
 
     fn require_permission(env: &Env, account: &Address, permission: Symbol) {
@@ -465,7 +497,7 @@ mod test {
     fn deploy(
         env: &Env,
     ) -> (
-        HierarchicalAccessControlContractClient,
+        HierarchicalAccessControlContractClient<'_>,
         Address,
         Address,
         Address,
@@ -540,6 +572,63 @@ mod test {
         let user = Address::generate(&env);
 
         client.grant_role(&manager, &ROLE_ADMIN, &user);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller cannot manage target role")]
+    fn test_manager_cannot_grant_manager_role() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, _admin, manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&manager, &ROLE_MANAGER, &user);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller cannot manage target role")]
+    fn test_manager_cannot_revoke_admin_role() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, admin, manager, _operator) = deploy(&env);
+
+        client.revoke_role(&manager, &ROLE_ADMIN, &admin);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller cannot manage target role")]
+    fn test_admin_cannot_grant_admin_role() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, admin, _manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&admin, &ROLE_ADMIN, &user);
+    }
+
+    #[test]
+    #[should_panic(expected = "Caller cannot manage target role")]
+    fn test_unknown_role_cannot_be_granted() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, admin, _manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&admin, &symbol_short!("SUPERUSER"), &user);
+    }
+
+    #[test]
+    fn test_admin_can_grant_lower_roles() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let (client, admin, _manager, _operator) = deploy(&env);
+        let user = Address::generate(&env);
+
+        client.grant_role(&admin, &ROLE_MANAGER, &user);
+        assert!(client.has_role(&ROLE_MANAGER, &user));
+
+        client.grant_role(&admin, &ROLE_OPERATOR, &user);
+        assert!(client.has_role(&ROLE_OPERATOR, &user));
     }
 
     #[test]
