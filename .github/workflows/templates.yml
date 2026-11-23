@@ -49,7 +49,9 @@ jobs:
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: stable
+          # Match rust-toolchain.toml; the repo's other jobs use `stable`,
+          # which drifts ahead of the pinned SDK versions used by templates.
+          toolchain: 1.96.0
 
       - name: Build template contract (release)
         run: cargo build --release -p ${{ matrix.package }}
