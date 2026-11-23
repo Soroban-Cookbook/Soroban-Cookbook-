@@ -1,7 +1,49 @@
+//! # Merkle Airdrop
+//!
+//! Distributes tokens to a pre-approved set of claimers committed to in a
+//! Merkle tree. Only the 32-byte root is stored on-chain; claimers supply a
+//! proof of inclusion.
+//!
+//! ## Canonical leaf encoding (issue #1468)
+//!
+//! Leaves use a fixed-format byte concatenation — **not XDR** — so off-chain
+//! tooling can reproduce them exactly and the format stays stable across SDK
+//! versions:
+//!
+//! ```text
+//! leaf_hash = SHA256( strkey(claimer) || amount_be128 )
+//! ```
+//!
+//! - `strkey(claimer)`: the ASCII bytes of the SEP-23 strkey address string
+//!   (`G...` for accounts, `C...` for contracts). Always exactly **56 bytes**.
+//! - `amount_be128`: the claim amount as a **16-byte** two's-complement
+//!   big-endian `i128`.
+//!
+//! The preimage is therefore always exactly 72 bytes, regardless of address
+//! type or SDK version.
+//!
+//! Example: for amount `1000` the amount field is
+//! `00 00 00 00 00 00 00 00 00 00 00 00 00 00 03 e8`, appended directly after
+//! the 56 ASCII bytes of the claimer's strkey (no length prefixes, no padding
+//! beyond the fixed 16 bytes, no separators).
+//!
+//! Off-chain reference (JavaScript, amounts are positive — `claim` rejects
+//! `amount <= 0`):
+//!
+//! ```js
+//! const preimage = Buffer.concat([
+//!   Buffer.from(claimerStrkey, "ascii"),            // 56 bytes
+//!   Buffer.from(amountBigInt.toString(16).padStart(32, "0"), "hex"), // 16 bytes BE
+//! ]);
+//! const leafHash = sha256(preimage);
+//! ```
+//!
+//! Internal nodes are `SHA256(min(a, b) || max(a, b))` (sorted-pair hashing,
+//! lexicographic byte order), matching `21-merkle-proofs`.
+
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::xdr::ToXdr;
 use soroban_sdk::{
     contract, contracterror, contractevent, contractimpl, contracttype, token, Address, Bytes,
     BytesN, Env, Vec,
@@ -36,7 +78,8 @@ pub enum DataKey {
 }
 
 // ---------------------------------------------------------------------------
-// Leaf Structure (used for deterministic canonical hashing)
+// Leaf Structure (logical claim tuple; the on-chain hashing uses the
+// canonical fixed-format encoding documented in the module docs, NOT XDR)
 // ---------------------------------------------------------------------------
 
 #[contracttype]
@@ -176,9 +219,15 @@ impl MerkleAirdropContract {
     }
 
     /// Derive the leaf hash of a claim tuple (claimer, amount).
+    ///
+    /// Canonical encoding (see module docs): `SHA256(strkey(claimer) ||
+    /// amount_be128)` — 56 ASCII strkey bytes followed by the 16-byte
+    /// big-endian `i128` amount. Fixed 72-byte preimage, no XDR.
     pub fn hash_leaf(env: Env, claimer: Address, amount: i128) -> BytesN<32> {
-        let value = ClaimLeaf { claimer, amount };
-        env.crypto().sha256(&value.to_xdr(&env)).to_bytes()
+        let mut preimage = Bytes::new(&env);
+        preimage.append(&claimer.to_string().to_bytes());
+        preimage.append(&Bytes::from_slice(&env, &amount.to_be_bytes()));
+        env.crypto().sha256(&preimage).to_bytes()
     }
 }
 
