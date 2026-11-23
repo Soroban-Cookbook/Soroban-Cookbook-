@@ -223,7 +223,7 @@ fn test_max_depth_exceeded() {
     client.init(&admin);
     env.mock_all_auths();
 
-    // Create 7 users to exceed the MAX_DEPTH of 5
+    // Create 7 users to exceed the MAX_DELEGATION_DEPTH of 5
     let u1 = Address::generate(&env);
     let u2 = Address::generate(&env);
     let u3 = Address::generate(&env);
@@ -247,10 +247,10 @@ fn test_max_depth_exceeded() {
     client.delegate(&u4, &u5);
     client.delegate(&u5, &u6);
 
-    // Trying to delegate u6 -> u7 should exceed MAX_DEPTH (depth 6)
+    // Trying to delegate u6 -> u7 should exceed MAX_DELEGATION_DEPTH (depth 6)
     let res = client.try_delegate(&u6, &u7);
     assert_eq!(
         res.err().unwrap().ok().unwrap(),
-        DelegationError::MaxDelegationDepthExceeded
+        DelegationError::ChainTooDeep
     );
 }

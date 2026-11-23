@@ -152,6 +152,17 @@ jobs:
       - name: Build all contracts
         run: ./scripts/ci-workspace.sh build --target wasm32v1-none --release
 
+  fuzz-sdk-version:
+    name: Fuzz SDK Version Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check fuzz SDK version matches workspace root
+        run: |
+          chmod +x scripts/check-fuzz-sdk-version.sh
+          bash scripts/check-fuzz-sdk-version.sh
+
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
