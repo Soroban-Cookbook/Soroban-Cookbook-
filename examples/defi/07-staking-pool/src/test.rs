@@ -140,6 +140,66 @@ fn test_total_supply_updates_when_staking() {
 }
 
 #[test]
+fn test_set_reward_rate_updates_rate() {
+    let (env, _owner, alice, _bob, client, staking_token, _reward_token) = setup();
+    let staking = token::Client::new(&env, &staking_token);
+
+    env.mock_all_auths();
+    mint(&env, &staking_token, &alice, 1000);
+
+    client.stake(&alice, &100i128);
+    client.set_reward_rate(&50i128);
+    env.ledger().with_mut(|li| li.timestamp = 500);
+
+    assert!(client.earned(&alice) > 0);
+}
+
+#[test]
+fn test_set_reward_rate_rejects_negative_rate() {
+    let (_env, _owner, _alice, _bob, client, _staking_token, _reward_token) = setup();
+    let result = std::panic::catch_unwind(|| client.set_reward_rate(&-1i128));
+    assert!(result.is_err());
+}
+
+#[test]
+fn test_set_reward_rate_requires_owner_auth() {
+    use soroban_sdk::testutils::{MockAuth, MockAuthInvoke};
+    use soroban_sdk::IntoVal;
+
+    let env = Env::default();
+    let owner = Address::generate(&env);
+    let attacker = Address::generate(&env);
+    let staking_token = register_token(&env, &owner, &Symbol::short("Stake"), &Symbol::short("STK"));
+    let reward_token = register_token(&env, &owner, &Symbol::short("Reward"), &Symbol::short("RWD"));
+
+    let contract_id = env.register_contract(None, StakingPoolContract);
+    let client = StakingPoolContractClient::new(&env, &contract_id);
+
+    env.mock_auths(&[MockAuth {
+        address: &owner,
+        invoke: &MockAuthInvoke {
+            contract: &contract_id,
+            fn_name: "initialize",
+            args: (&owner, &staking_token, &reward_token, &10i128).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+    client.initialize(&owner, &staking_token, &reward_token, &10i128);
+
+    env.mock_auths(&[MockAuth {
+        address: &attacker,
+        invoke: &MockAuthInvoke {
+            contract: &contract_id,
+            fn_name: "set_reward_rate",
+            args: (&20i128).into_val(&env),
+            sub_invokes: &[],
+        },
+    }]);
+
+    assert!(client.try_set_reward_rate(&20i128).is_err());
+}
+
+#[test]
 #[should_panic(expected = "missing required authorization")]
 fn test_stake_requires_auth() {
     let (env, _owner, alice, _bob, client, staking_token, _reward_token) = setup();

@@ -23,7 +23,6 @@ pub enum DataKey {
 }
 
 impl StakingPoolContract {
-    /*
     fn require_owner(&self, env: &Env) {
         let owner: Address = env
             .storage()
@@ -32,7 +31,6 @@ impl StakingPoolContract {
             .expect("not initialized");
         owner.require_auth();
     }
-    */
 
     fn staking_token(&self, env: &Env) -> Address {
         env.storage()
@@ -181,6 +179,21 @@ impl StakingPoolContract {
         env.storage().instance().set(&DataKey::TotalSupply, &0i128);
     }
 
+    pub fn set_reward_rate(env: Env, rate: i128) {
+        let this = StakingPoolContract;
+        this.require_owner(&env);
+        assert!(rate >= 0, "reward rate must be non-negative");
+
+        let reward_per_token = this.reward_per_token_internal(&env);
+        env.storage()
+            .instance()
+            .set(&DataKey::RewardPerTokenStored, &reward_per_token);
+        env.storage()
+            .instance()
+            .set(&DataKey::LastUpdateTime, &env.ledger().timestamp());
+        env.storage().instance().set(&DataKey::RewardRate, &rate);
+    }
+
     pub fn stake(env: Env, staker: Address, amount: i128) {
         staker.require_auth();
         assert!(amount > 0, "stake amount must be positive");
@@ -248,3 +261,6 @@ impl StakingPoolContract {
         this.reward_per_token_internal(&env)
     }
 }
+
+#[cfg(test)]
+mod test;
