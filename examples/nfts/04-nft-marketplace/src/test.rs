@@ -160,6 +160,78 @@ fn test_buy_wrong_price_fails() {
     assert_eq!(err, Ok(MarketplaceError::InvalidPrice));
 }
 
+/// Funds `buyer` with `price` and lets the marketplace pull it. `buy` collects
+/// payment with `transfer_from`, so the buyer must approve the marketplace.
+fn fund_and_approve(
+    env: &Env,
+    token: &TokenClient,
+    buyer: &Address,
+    marketplace: &Address,
+    price: i128,
+) {
+    mint(env, token, buyer, price);
+    token.approve(
+        buyer,
+        marketplace,
+        &price,
+        &(env.ledger().sequence() + 1000),
+    );
+}
+
+#[test]
+fn test_buy_near_max_price_royalty_overflow_returns_invalid_price() {
+    let (env, client, token, contract_id) = setup();
+    let seller = Address::generate(&env);
+    let buyer = Address::generate(&env);
+    let royalty = Address::generate(&env);
+
+    // price * 1_000 bps does not fit in an i128.
+    let price = i128::MAX;
+    fund_and_approve(&env, &token, &buyer, &contract_id, price);
+
+    let item = ListingItem {
+        nft_contract: Address::generate(&env),
+        token_id: 9u32,
+    };
+    let listing_id =
+        client.create_fixed_price_listing(&seller, &vec![&env, item], &price, &royalty, &1000);
+
+    let err = client.try_buy(&buyer, &listing_id, &price).unwrap_err();
+    assert_eq!(err, Ok(MarketplaceError::InvalidPrice));
+
+    // The failed buy is rolled back: funds stay put and the listing is unsold.
+    assert_eq!(token.balance(&buyer), price);
+    assert_eq!(token.balance(&contract_id), 0);
+    assert!(!client.get_listing(&listing_id).sold);
+}
+
+#[test]
+fn test_buy_largest_price_without_royalty_overflow_succeeds() {
+    let (env, client, token, contract_id) = setup();
+    let seller = Address::generate(&env);
+    let buyer = Address::generate(&env);
+    let royalty = Address::generate(&env);
+
+    // Largest price whose royalty multiplication still fits at 1_000 bps.
+    let price = i128::MAX / 1000;
+    fund_and_approve(&env, &token, &buyer, &contract_id, price);
+
+    let item = ListingItem {
+        nft_contract: Address::generate(&env),
+        token_id: 10u32,
+    };
+    let listing_id =
+        client.create_fixed_price_listing(&seller, &vec![&env, item], &price, &royalty, &1000);
+
+    client.buy(&buyer, &listing_id, &price);
+
+    let royalty_paid = price * 1000 / 10000;
+    assert_eq!(token.balance(&royalty), royalty_paid);
+    assert_eq!(token.balance(&seller), price - royalty_paid);
+    assert_eq!(token.balance(&buyer), 0);
+    assert!(client.get_listing(&listing_id).sold);
+}
+
 // ---------------------------------------------------------------------------
 // Auction tests
 // ---------------------------------------------------------------------------
