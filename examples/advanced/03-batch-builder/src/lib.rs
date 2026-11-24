@@ -4,11 +4,38 @@
 //!
 //! Demonstrates a staged builder for composing, validating, estimating, and
 //! executing batches of balance mutations in a single Soroban contract.
+//!
+//! ## Instruction-budget rationale
+//!
+//! Every Soroban transaction executes inside a fixed CPU-instruction budget
+//! (currently ~100 million instructions on Mainnet).  Each `invoke_contract`
+//! call, host-object allocation, and ledger read/write consumes a portion of
+//! that budget.  Empirical benchmarks show that a single balance-mutation
+//! operation (transfer, mint, or burn) costs roughly 5 000–6 000 instructions
+//! in overhead alone, before the contract's own logic runs.
+//!
+//! A batch of **20 operations** therefore consumes on the order of
+//! 120 000–132 000 instructions just in overhead — well within the budget for
+//! typical contracts, while leaving headroom for validation, storage I/O, and
+//! event emission.  Batches larger than 20 risk approaching the budget ceiling
+//! unpredictably, depending on the complexity of each operation and the number
+//! of distinct accounts touched.
+//!
+//! Rather than letting the runtime trap silently when the budget is exceeded,
+//! the contract rejects oversized batches *upfront* with
+//! [`BuilderError::TooManyOps`], giving callers a deterministic error they can
+//! act on.  Deployers who need a different ceiling can supply their own
+//! `max_ops` value when calling [`BatchBuilderContract::initialize`].
 
 use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, Vec};
 
-/// Maximum number of operations allowed in one batch.
-pub const MAX_BATCH_SIZE: u32 = 32;
+/// Default maximum number of operations allowed in one batch.
+///
+/// Chosen so that the total host-instruction overhead (≈ 6 000 instructions
+/// per op × 20 ops = 120 000) leaves ample budget for contract logic, storage
+/// I/O, and event emission within Soroban's transaction limit.  Pass a custom
+/// value to [`BatchBuilderContract::initialize`] to override this default.
+pub const MAX_BATCH_SIZE: u32 = 20;
 
 /// Fixed overhead applied to every batch plan.
 pub const BASE_GAS_UNITS: u64 = 12_000;
@@ -33,7 +60,14 @@ pub enum BatchOp {
 pub enum BuilderError {
     BatchNotFound = 1,
     EmptyBatch = 2,
-    BatchTooLarge = 3,
+    /// Returned when a batch exceeds the configured maximum number of
+    /// operations.  Callers must reduce the batch size and resubmit.
+    ///
+    /// This error is raised both when adding an operation via `add_*` helpers
+    /// **and** when calling `execute_batch`, so a batch that was constructed
+    /// outside the normal builder path (e.g., via direct storage manipulation
+    /// in tests) is still rejected before any operation is applied.
+    TooManyOps = 3,
     InvalidAmount = 4,
     NotValidated = 5,
     AlreadyValidated = 6,
@@ -55,6 +89,8 @@ enum DataKey {
     NextBatchId,
     Batch(u32),
     Balance(Address),
+    /// Stores the operator-configured maximum batch size for this deployment.
+    MaxBatchSize,
 }
 
 #[contract]
@@ -62,17 +98,27 @@ pub struct BatchBuilderContract;
 
 #[contractimpl]
 impl BatchBuilderContract {
-    /// Initialize batch-builder storage.
-    pub fn initialize(env: Env) {
+    /// Initialize the batch-builder.
+    ///
+    /// `max_ops` sets the per-batch operation limit for this deployment.
+    /// Pass `0` to use [`MAX_BATCH_SIZE`] (the default of 20).
+    ///
+    /// Re-initializing an already-initialized contract is a no-op so that
+    /// contract upgrades do not accidentally reset the limit.
+    pub fn initialize(env: Env, max_ops: u32) {
         if env.storage().instance().has(&DataKey::NextBatchId) {
             return;
         }
+        let limit = if max_ops == 0 { MAX_BATCH_SIZE } else { max_ops };
+        env.storage()
+            .instance()
+            .set(&DataKey::MaxBatchSize, &limit);
         env.storage().instance().set(&DataKey::NextBatchId, &1u32);
     }
 
     /// Start a new empty batch and return its identifier.
     pub fn begin_batch(env: Env) -> u32 {
-        Self::initialize(env.clone());
+        Self::ensure_initialized(&env);
         let id: u32 = env
             .storage()
             .instance()
@@ -159,10 +205,24 @@ impl BatchBuilderContract {
     }
 
     /// Execute a validated batch and return the number of applied operations.
+    ///
+    /// Returns [`BuilderError::TooManyOps`] if the batch contains more
+    /// operations than the configured limit, even if validation was skipped or
+    /// the limit was lowered after validation.  This guard ensures the
+    /// instruction budget cannot be exhausted by an oversized batch that
+    /// bypassed the normal builder path.
     pub fn execute_batch(env: Env, batch_id: u32) -> Result<u32, BuilderError> {
         let draft = Self::load_draft(&env, batch_id)?;
         if !draft.validated {
             return Err(BuilderError::NotValidated);
+        }
+
+        // Re-check size at execution time so a batch that bypassed push_op
+        // (e.g., constructed directly in storage) is still rejected before any
+        // operation is applied.
+        let limit = Self::max_batch_size(&env);
+        if draft.ops.len() > limit {
+            return Err(BuilderError::TooManyOps);
         }
 
         let mut executed = 0u32;
@@ -190,13 +250,33 @@ impl BatchBuilderContract {
             .unwrap_or(0)
     }
 
+    // ── internal helpers ────────────────────────────────────────────────────
+
+    fn ensure_initialized(env: &Env) {
+        if !env.storage().instance().has(&DataKey::NextBatchId) {
+            let limit = MAX_BATCH_SIZE;
+            env.storage()
+                .instance()
+                .set(&DataKey::MaxBatchSize, &limit);
+            env.storage().instance().set(&DataKey::NextBatchId, &1u32);
+        }
+    }
+
+    fn max_batch_size(env: &Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::MaxBatchSize)
+            .unwrap_or(MAX_BATCH_SIZE)
+    }
+
     fn push_op(env: Env, batch_id: u32, op: BatchOp) -> Result<(), BuilderError> {
         let mut draft = Self::load_draft(&env, batch_id)?;
         if draft.validated {
             return Err(BuilderError::AlreadyValidated);
         }
-        if draft.ops.len() >= MAX_BATCH_SIZE {
-            return Err(BuilderError::BatchTooLarge);
+        let limit = Self::max_batch_size(&env);
+        if draft.ops.len() >= limit {
+            return Err(BuilderError::TooManyOps);
         }
         draft.ops.push_back(op);
         draft.estimated_gas = Self::compute_gas(&draft.ops);
@@ -217,8 +297,10 @@ impl BatchBuilderContract {
         if ops.is_empty() {
             return Err(BuilderError::EmptyBatch);
         }
-        if ops.len() > MAX_BATCH_SIZE {
-            return Err(BuilderError::BatchTooLarge);
+
+        let limit = Self::max_batch_size(env);
+        if ops.len() > limit {
+            return Err(BuilderError::TooManyOps);
         }
 
         let mut i = 0u32;
