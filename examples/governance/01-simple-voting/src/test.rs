@@ -195,6 +195,61 @@ fn test_tally_votes() {
     assert_eq!(ab, 1);
 }
 
+/// Each vote adds 1, so reaching a huge tally by voting is impractical. Write
+/// the counters straight into contract storage instead.
+fn seed_tally(env: &Env, client: &VotingContractClient, id: u32, tally: (i128, i128, i128)) {
+    let mut prop = client.get_prop(&id);
+    prop.votes_for = tally.0;
+    prop.votes_against = tally.1;
+    prop.votes_abstain = tally.2;
+    env.as_contract(&client.address, || {
+        env.storage()
+            .persistent()
+            .set(&DataKey::Proposal(id), &prop);
+    });
+}
+
+#[test]
+fn test_vote_counter_counts_past_u32_max() {
+    let env = Env::default();
+    env.ledger().set_timestamp(100);
+    let (client, admin) = setup(&env);
+    let title = String::from_str(&env, "Big tally");
+    client.create_prop(&admin, &title, &500);
+
+    // A u32 counter would overflow on the next vote.
+    seed_tally(&env, &client, 1, (u32::MAX as i128, 0, 0));
+
+    let voter = Address::generate(&env);
+    client.cast_vote(&voter, &1, &VoteChoice::For);
+
+    assert_eq!(client.tally(&1), (u32::MAX as i128 + 1, 0, 0));
+}
+
+#[test]
+fn test_vote_counter_overflow_returns_error() {
+    let env = Env::default();
+    env.ledger().set_timestamp(100);
+    let (client, admin) = setup(&env);
+    let title = String::from_str(&env, "Overflow");
+    client.create_prop(&admin, &title, &500);
+
+    seed_tally(&env, &client, 1, (i128::MAX, i128::MAX, i128::MAX));
+
+    for choice in [VoteChoice::For, VoteChoice::Against, VoteChoice::Abstain] {
+        let voter = Address::generate(&env);
+        assert_eq!(
+            client.try_cast_vote(&voter, &1, &choice),
+            Err(Ok(VotingError::Overflow))
+        );
+        // The rejected vote is not recorded.
+        assert!(!client.has_voted(&voter, &1));
+    }
+
+    // Counters stay at the maximum instead of wrapping.
+    assert_eq!(client.tally(&1), (i128::MAX, i128::MAX, i128::MAX));
+}
+
 // ---------------------------------------------------------------------------
 // Execution
 // ---------------------------------------------------------------------------
