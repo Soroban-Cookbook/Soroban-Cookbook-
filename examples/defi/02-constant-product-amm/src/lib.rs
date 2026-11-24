@@ -958,4 +958,33 @@ mod test {
         assert_eq!(f.token_x.balance(&f.bob), 3_000);
         assert_eq!(f.token_y.balance(&f.bob), 3_000);
     }
+
+    #[test]
+    fn snapshot_reserves_after_lp_mint_and_swap() {
+        let f = setup();
+
+        let minted = f.amm.add_liquidity(&f.alice, &1_000, &1_000);
+        insta::assert_snapshot!(
+            "reserves_after_lp_mint",
+            format!(
+                "minted: {}\nreserves: {:?}\ntotal_supply: {}\nlp_balance: {}",
+                minted,
+                f.amm.reserves(),
+                f.amm.total_supply(),
+                f.amm.lp_balance(&f.alice)
+            )
+        );
+
+        let amount_out = f.amm.swap(&f.bob, &f.token_x.address, &100, &0);
+        insta::assert_snapshot!(
+            "reserves_after_swap",
+            format!(
+                "amount_out: {}\nreserves: {:?}\ntotal_supply: {}\nlp_balance: {}",
+                amount_out,
+                f.amm.reserves(),
+                f.amm.total_supply(),
+                f.amm.lp_balance(&f.alice)
+            )
+        );
+    }
 }

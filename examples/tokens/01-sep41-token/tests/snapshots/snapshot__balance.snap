@@ -1,0 +1,5 @@
+---
+source: examples/tokens/01-sep41-token/tests/snapshot.rs
+expression: "xdr_hex(&env, token.balance(&spender))"
+---
+[00, 00, 00, 0a, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 03, d0, 90]

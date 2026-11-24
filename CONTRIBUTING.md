@@ -388,6 +388,21 @@ cargo test -p docs-audit-tests
 
 CI also runs `cargo fmt --all -- --check` and `cargo clippy --tests --lib -- -D warnings` — run both locally before opening a PR to avoid a red pipeline.
 
+### Snapshot tests
+
+Three pilot examples use [`insta`](https://insta.rs/) snapshots to lock down observable contract output: token return values (`examples/tokens/01-sep41-token`), proposal state after voting (`examples/governance/01-simple-voting`), and AMM reserves after an LP mint and swap (`examples/defi/02-constant-product-amm`). Committed `.snap` files live in `tests/snapshots/` (or `src/snapshots/` for inline test modules).
+
+```bash
+# Run the snapshot tests locally
+cargo test -p sep41-token -p simple-voting -p constant-product-amm
+
+# Install the review tool once, then inspect and accept/reject snapshot changes
+cargo install cargo-insta
+cargo insta review
+```
+
+CI runs these tests with `INSTA_UPDATE=no`, so a missing or changed snapshot fails the build. After an intentional behavior change, run `cargo insta review`, commit the accepted `.snap` files with the code change, and never commit `.snap.new` files. Keep snapshot inputs deterministic (fixed addresses, amounts, and ledger timestamps).
+
 The repository's [pre-commit hooks](./doc/pre-commit.md) run formatting and typo
 checks before commits, then Clippy and integration tests before pushes. Install
 both hooks during setup so these checks run automatically.

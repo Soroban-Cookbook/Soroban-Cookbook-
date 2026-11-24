@@ -1,0 +1,5 @@
+---
+source: examples/tokens/01-sep41-token/tests/snapshot.rs
+expression: "xdr_hex(&env, token.name())"
+---
+[00, 00, 00, 0e, 00, 00, 00, 0b, 53, 6f, 72, 6f, 62, 61, 6e, 20, 55, 53, 44, 00]

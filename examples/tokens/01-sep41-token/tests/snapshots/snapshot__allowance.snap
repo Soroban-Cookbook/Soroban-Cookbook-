@@ -1,0 +1,5 @@
+---
+source: examples/tokens/01-sep41-token/tests/snapshot.rs
+expression: "xdr_hex(&env, token.allowance(&admin, &spender))"
+---
+[00, 00, 00, 0a, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 04, 93, e0]

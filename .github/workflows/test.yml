@@ -125,6 +125,23 @@ jobs:
         if: github.event_name != 'pull_request'
         run: ./scripts/ci-workspace.sh test --target x86_64-unknown-linux-gnu
 
+  snapshots:
+    name: Snapshot Tests
+    runs-on: ubuntu-latest
+    env:
+      # insta fails on missing or changed snapshots instead of writing .snap.new files.
+      INSTA_UPDATE: no
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: ${{ env.RUST_VERSION }}
+
+      - name: Verify committed snapshots are up to date
+        run: cargo test --target x86_64-unknown-linux-gnu -p sep41-token -p simple-voting -p constant-product-amm
+
   build:
     name: Build Contracts
     runs-on: ubuntu-latest
