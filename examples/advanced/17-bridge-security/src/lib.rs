@@ -1,3 +1,37 @@
+//! # 17 Bridge Security
+//!
+//! A Soroban contract that models the security controls around an inbound
+//! cross-chain bridge release flow. Every inbound release is recorded as a
+//! pending transfer, counted against a per-window rate limit, and only
+//! finalized once a challenge window has elapsed. A challenger can dispute a
+//! transfer during that window, and the admin can submit a fraud proof that
+//! permanently marks a transfer as fraudulent and non-finalizable. The admin
+//! can also pause new submissions and finalization during incident response.
+//!
+//! ## Ledger timestamp variance (read before relying on short windows)
+//!
+//! Challenge and finalization are gated on `env.ledger().timestamp()`. On the
+//! live Stellar network, validators set each ledger close timestamp within a
+//! roughly ±5-second window of wall-clock time, so a single close can land up
+//! to 5 seconds ahead of or behind the actual time. With a short time window
+//! this is not a rounding error: a transfer that *should* have expired may
+//! still be accepted, and one that is *still* valid may be rejected. The
+//! shorter the window, the larger the relative error, so short-TTL flows
+//! (for example the ~10-second windows sometimes used in atomic swaps) are
+//! unsafe to drive off `ledger().timestamp()` directly.
+//!
+//! To absorb this variance, safety-critical bridge transfers should use an
+//! expiry / challenge window of **at least 60 seconds**. This contract enforces
+//! that floor via [`MIN_CHALLENGE_PERIOD_SECONDS`] and rejects any
+//! [`BridgeSecurityContract::initialize`] call with a shorter
+//! `challenge_period`. The same ±5-second variance applies to every other
+//! timestamp-based window here (the rate-limit window rollover); treat those
+//! boundaries as approximate rather than exact. If a use case needs tighter
+//! determinism, derive expiry from the ledger sequence number (incremented
+//! exactly once per close) instead of the timestamp — that removes the
+//! clock-skew problem, though it is still subject to network propagation
+//! delay between submitting a transaction and the close that includes it.
+
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
@@ -12,6 +46,15 @@ const ACTION_FINALIZE: Symbol = symbol_short!("finalize");
 const ACTION_FRAUD: Symbol = symbol_short!("fraud");
 const ACTION_PAUSE: Symbol = symbol_short!("pause");
 const ACTION_UNPAUSE: Symbol = symbol_short!("unpause");
+
+/// Minimum recommended challenge / expiry window, in seconds.
+///
+/// Stellar validators may shift a single ledger close timestamp by up to
+/// ~5 seconds relative to wall-clock time, so windows shorter than this make
+/// timestamp-based expiry unsafe for bridge finality. `initialize` rejects
+/// any `challenge_period` below this value. See the module docs for the full
+/// rationale and the ledger-sequence alternative.
+const MIN_CHALLENGE_PERIOD_SECONDS: u64 = 60;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -92,7 +135,10 @@ impl BridgeSecurityContract {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(BridgeError::AlreadyInitialized);
         }
-        if rate_limit_amount <= 0 || rate_limit_window == 0 || challenge_period == 0 {
+        if rate_limit_amount <= 0
+            || rate_limit_window == 0
+            || challenge_period < MIN_CHALLENGE_PERIOD_SECONDS
+        {
             return Err(BridgeError::InvalidConfig);
         }
 

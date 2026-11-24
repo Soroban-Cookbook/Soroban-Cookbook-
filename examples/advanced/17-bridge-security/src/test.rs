@@ -7,8 +7,19 @@ use soroban_sdk::{
     Address, Bytes, Env,
 };
 
+// Timestamp-variance assumption
+// -----------------------------
+// The tests below advance the mock ledger by exact deltas (for example
+// `ledger.timestamp += CHALLENGE_PERIOD`) and assert behavior at the exact
+// window boundary. On the live Stellar network a single close timestamp can
+// land up to ~5 seconds ahead of or behind wall-clock time, so these edges
+// are not deterministic in production. The contract mitigates this by
+// enforcing a minimum challenge period (MIN_CHALLENGE_PERIOD_SECONDS, 60s);
+// the tests keep exact timestamps only because the mock ledger has no skew.
+// See the module docs in `lib.rs` for the full rationale.
 const RATE_LIMIT: i128 = 1_000;
 const RATE_WINDOW: u64 = 60;
+// 120s is comfortably above the 60s floor; see the note above.
 const CHALLENGE_PERIOD: u64 = 120;
 
 struct Fixture {
@@ -279,6 +290,49 @@ fn initialize_rejects_invalid_config() {
         client.try_initialize(&admin, &0, &RATE_WINDOW, &CHALLENGE_PERIOD),
         Err(Ok(BridgeError::InvalidConfig))
     );
+}
+
+#[test]
+fn initialize_rejects_challenge_period_below_minimum() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, BridgeSecurityContract);
+    let client = BridgeSecurityContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // A sub-60s window is unsafe: validator timestamp variance (up to ~5s per
+    // close) is too large a fraction of a short window. See the module docs and
+    // MIN_CHALLENGE_PERIOD_SECONDS.
+    assert_eq!(
+        client.try_initialize(
+            &admin,
+            &RATE_LIMIT,
+            &RATE_WINDOW,
+            &(MIN_CHALLENGE_PERIOD_SECONDS - 1),
+        ),
+        Err(Ok(BridgeError::InvalidConfig))
+    );
+}
+
+#[test]
+fn initialize_accepts_minimum_challenge_period() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let contract_id = env.register_contract(None, BridgeSecurityContract);
+    let client = BridgeSecurityContractClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // Exactly the 60s floor is accepted.
+    assert_eq!(
+        client.try_initialize(
+            &admin,
+            &RATE_LIMIT,
+            &RATE_WINDOW,
+            &MIN_CHALLENGE_PERIOD_SECONDS
+        ),
+        Ok(Ok(()))
+    );
+    assert_eq!(client.get_challenge_period(), MIN_CHALLENGE_PERIOD_SECONDS);
 }
 
 #[test]
