@@ -33,8 +33,9 @@
 - [Error Handling](./examples/error-handling.md)
 - [Events](./examples/events.md)
 
-## Intermediate (3 examples)
+## Intermediate (4 examples)
 - [Multi-sig patterns](./examples/intermediate.md)
+- [Multi-Contract Testing](../examples/intermediate/multi-contract-testing/README.md)
 - [Ajo Factory](./examples/ajo-factory.md)
 - [Pause / Unpause](./examples/pause-unpause.md)
 
@@ -98,6 +99,7 @@
 - [Quick Reference](./docs/quick-reference.md)
 - [Best Practices](./docs/best-practices.md)
 - [Testing Best Practices](./docs/testing-best-practices.md)
+- [Multi-Contract Testing Patterns](../examples/intermediate/multi-contract-testing/README.md)
 - [Testing Pitfalls](./docs/testing-pitfalls.md)
 - [Documentation Platform Evaluation](./docs/documentation-platform-evaluation.md)
 - [DeFi Best Practices](./docs/defi-best-practices.md)

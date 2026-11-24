@@ -30,6 +30,7 @@ members = [
     "examples/intermediate/03-priority-queue",
     "examples/intermediate/03-pause-unpause",
     "examples/intermediate/multi-sig-patterns",
+    "examples/intermediate/multi-contract-testing",
     "examples/intermediate/event-subscriptions",
     "examples/advanced/01-multi-party-auth",
     "examples/advanced/02-beacon-proxy",
