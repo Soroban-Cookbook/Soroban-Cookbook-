@@ -1,5 +1,7 @@
 # Beacon Proxy
 
+> **Note:** This example covers a *single* beacon shared by proxies you deploy yourself. To deploy and track a fleet of proxies from a factory, see [Beacon Proxy Factory](../23-beacon-proxy-factory/). The two examples implement overlapping delegation logic; if you change one, review the other (see the Contributing guide's "update both" requirement).
+
 A minimal beacon-and-proxy setup: the proxy resolves its implementation through
 a beacon on every call, so changing the beacon's implementation updates every
 proxy that uses it.
@@ -40,6 +42,15 @@ See the [advanced examples README](../README.md) for the full upgrade patterns l
 ```bash
 cargo test -p beacon-proxy
 ```
+
+## Pattern Comparison
+
+| Aspect | Beacon Proxy (02) | Beacon Proxy Factory (23) |
+|---|---|---|
+| Deployment | Manual, one proxy at a time | Factory deploys and tracks many proxies |
+| Beacon count | One beacon | One beacon, shared by all factory-made proxies |
+| Proxy tracking | Caller tracks addresses | Factory maintains the fleet registry |
+| Best for | Small, fixed sets of proxies | Fleet deployment at scale |
 
 ## Next
 

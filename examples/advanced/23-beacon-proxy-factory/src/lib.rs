@@ -1,6 +1,12 @@
 #![allow(deprecated)]
 //! # Beacon Proxy Factory
 //!
+//! > **Choosing between the beacon examples:** this crate is the *factory* variant.
+//! > Use it when you need to deploy and track many proxies that share one beacon.
+//! > For a single proxy pointing at one beacon, see
+//! > `examples/advanced/02-beacon-proxy`. Both crates implement the same delegation
+//! > logic, so bug fixes must be applied to both (see the contributing guide).
+//!
 //! This example demonstrates the **Beacon Proxy Factory** pattern — an extension of
 //! the Beacon Proxy pattern where a single factory contract is responsible for
 //! deploying and tracking multiple proxy contracts that all share one beacon.
@@ -45,6 +51,17 @@
 //! | `BeaconContract` | Single source-of-truth for the current implementation address. |
 //! | `ProxyContract` | Thin delegation layer — queries the beacon on every call and forwards to the live implementation. |
 //! | `ImplV1` / `ImplV2` | Versioned implementations with the actual business logic. |
+//!
+//! ## Comparison with the single beacon proxy
+//!
+//! | Aspect | `02-beacon-proxy` (single) | `23-beacon-proxy-factory` (this crate) |
+//! |---|---|---|
+//! | Proxies managed | One | Many, tracked by the factory |
+//! | Deployment | Manual | `deploy_proxy` / `batch_deploy` |
+//! | Upgrade cost | One beacon upgrade | One beacon upgrade, all proxies |
+//! | Best for | Simple single-instance upgradeability | Fleets of identical instances |
+//!
+//! Both patterns are also summarised in the book's "Upgrade Patterns" guide.
 //!
 //! ## Upgrade flow
 //!

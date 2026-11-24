@@ -11,6 +11,16 @@ management and lower-level WASM and storage upgrade techniques:
 2. [Proxy Admin Controls](../examples/advanced/31-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
 3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
 4. [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
+
+> **Beacon Proxy vs. Beacon Proxy Factory:** Use the single [Beacon Proxy](../examples/advanced/02-beacon-proxy/) example when you need one or a few proxies managed manually. Use the [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) when you need to deploy and track a fleet of proxies that share one beacon. The two examples implement overlapping delegation logic; bug fixes to one should be mirrored in the other.
+
+| Aspect | Beacon Proxy (02) | Beacon Proxy Factory (23) |
+|---|---|---|
+| Number of proxies | One or a few, created manually | Many, deployed on demand |
+| Proxy lifecycle | Caller-managed | Factory-tracked |
+| Shared implementation | Via a single beacon | Via a single beacon |
+| Typical use case | Simple shared-logic upgrades | Fleet deployment and management |
+| Overlap | Delegation logic | Delegation logic (see 02) |
 5. [Beacon Management](../examples/advanced/37-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
 6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
 
