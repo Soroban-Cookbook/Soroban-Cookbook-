@@ -23,14 +23,36 @@ Out of scope (but still welcome as issues/discussion):
 
 ## Reporting a Vulnerability
 
-**Please do not open a public issue for security findings.** Instead:
+**Please do not open a public issue or discussion for security findings, and
+never include vulnerability details in a public channel.**
 
-1. **Send a report to the maintainers** by opening a private report through the
-   GitHub Security Advisory workflow:
-   `https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new`
-2. If GitHub advisories are unavailable, e-mail the maintainers at the address
-   listed in `CONTRIBUTING.md` / `GOVERNANCE/` with the subject
-   `[SECURITY] <summary>`.
+### Preferred channel: GitHub private vulnerability reporting
+
+Open a private report from the repository's **Security** tab → **Report a
+vulnerability**, which creates a private GitHub Security Advisory:
+
+`https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new`
+
+If the "Report a vulnerability" button is missing on that page, private
+vulnerability reporting is not currently enabled for the repository. Use the
+fallback channel below instead.
+
+> **Maintainers:** enabling *Settings → Code security → Private vulnerability
+> reporting* restores the preferred channel. Until then, the fallback below is
+> the only working private route.
+
+### Fallback channel: request a private channel without disclosing details
+
+There is currently **no working security e-mail address**:
+`security@soroban-cookbook.dev` does not resolve (`soroban-cookbook.dev` has no
+DNS records), so reports sent to it are lost. Do not use it.
+
+1. Open a public issue titled `[SECURITY] Private channel request` containing
+   **only** a request for a private reporting channel and your GitHub handle.
+   Include no vulnerability details, affected file paths, or proof of concept.
+2. A maintainer will reply on that issue and move the conversation to a private
+   channel (a GitHub Security Advisory or a temporary private fork) within the
+   acknowledgement window below. Send the full report there.
 
 Include as much of the following as possible:
 
