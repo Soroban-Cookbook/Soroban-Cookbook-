@@ -1,0 +1,8 @@
+---
+source: examples/defi/02-constant-product-amm/src/lib.rs
+expression: "format!(\"amount_out: {}\\nreserves: {:?}\\ntotal_supply: {}\\nlp_balance: {}\",\namount_out, f.amm.reserves(), f.amm.total_supply(),\nf.amm.lp_balance(&f.alice))"
+---
+amount_out: 90
+reserves: (1100, 910)
+total_supply: 1000
+lp_balance: 1000

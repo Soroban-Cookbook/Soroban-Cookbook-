@@ -11,6 +11,7 @@ crate-type = ["cdylib", "rlib"]
 soroban-sdk = { workspace = true }
 
 [dev-dependencies]
+insta = "1"
 soroban-validation = { path = "../../../shared", features = ["testutils"] }
 
 soroban-sdk = { workspace = true, features = ["testutils"] }
