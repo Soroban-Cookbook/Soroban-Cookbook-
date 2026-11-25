@@ -35,7 +35,10 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec};
+use soroban_sdk::{
+    contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Val,
+    Vec, xdr::ScValType,
+};
 
 // ---------------------------------------------------------------------------
 // Diamond cut types
@@ -75,6 +78,103 @@ pub struct FacetInfo {
     pub selectors: Vec<Symbol>,
 }
 
+/// The expected Soroban value type of a single function argument.
+///
+/// Used by the dispatcher's ABI validation layer. Each variant maps to one
+/// `ScVal` discriminant, so validation is exact: an `I128` argument will not
+/// silently satisfy a `U64` parameter.
+#[contracttype]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum ArgType {
+    /// Sentinel used in error reporting when no type is expected.
+    None,
+    Bool,
+    U32,
+    I32,
+    U64,
+    I64,
+    Timepoint,
+    Duration,
+    U128,
+    I128,
+    U256,
+    I256,
+    Address,
+    Symbol,
+    String,
+    Bytes,
+    Vec,
+    Map,
+}
+
+impl ArgType {
+    /// Returns `true` when `v` carries exactly this argument type.
+    fn matches(&self, v: &Val) -> bool {
+        let Some(scval_ty) = v.get_tag().get_scval_type() else {
+            return false;
+        };
+        matches!(
+            (self, scval_ty),
+            (ArgType::Bool, ScValType::Bool)
+                | (ArgType::U32, ScValType::U32)
+                | (ArgType::I32, ScValType::I32)
+                | (ArgType::U64, ScValType::U64)
+                | (ArgType::I64, ScValType::I64)
+                | (ArgType::Timepoint, ScValType::Timepoint)
+                | (ArgType::Duration, ScValType::Duration)
+                | (ArgType::U128, ScValType::U128)
+                | (ArgType::I128, ScValType::I128)
+                | (ArgType::U256, ScValType::U256)
+                | (ArgType::I256, ScValType::I256)
+                | (ArgType::Address, ScValType::Address)
+                | (ArgType::Symbol, ScValType::Symbol)
+                | (ArgType::String, ScValType::String)
+                | (ArgType::Bytes, ScValType::Bytes)
+                | (ArgType::Vec, ScValType::Vec)
+                | (ArgType::Map, ScValType::Map)
+        )
+    }
+}
+
+/// Typed errors returned by [`DiamondBase::dispatch`].
+///
+/// Replaces the host trap that a raw `invoke_contract` produces when a caller
+/// supplies malformed arguments, making client-side bugs diagnosable on-chain.
+/// Detailed context (argument index, expected type, counts) is published as a
+/// `diamond/dsp_err` event alongside the returned variant.
+#[contracterror]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum DispatchError {
+    /// No facet is registered for this selector.
+    UnknownSelector = 1,
+    /// No argument signature is known for this selector.
+    UnknownSignature = 2,
+    /// Wrong number of arguments supplied.
+    ArgCountMismatch = 3,
+    /// An argument's type does not match the expected signature.
+    InvalidArguments = 4,
+    /// The facet call itself failed after validation passed.
+    FacetInvocationFailed = 5,
+}
+
+/// Detail payload published with the `diamond/dsp_err` event when dispatch
+/// validation fails, so callers can pinpoint the offending argument.
+#[contracttype]
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct DispatchErrorInfo {
+    /// The selector that failed validation.
+    pub selector: Symbol,
+    /// Index of the offending argument, or `u32::MAX` for count mismatches.
+    pub index: u32,
+    /// Expected type at `index`, or `ArgType::None` for count mismatches.
+    pub expected: ArgType,
+    /// Expected argument count.
+    pub expected_count: u32,
+    /// Actual argument count supplied.
+    pub got_count: u32,
+}
+
 // ---------------------------------------------------------------------------
 // Diamond storage pattern — namespaced DataKey enum
 // ---------------------------------------------------------------------------
@@ -98,6 +198,8 @@ pub enum DataKey {
     SelectorFacet(Symbol),
     /// `FacetSelectorList(facet)` → Vec<Symbol>: selectors served by a facet.
     FacetSelectorList(Address),
+    /// `SelectorSignature(selector)` → Vec<ArgType>: expected argument types.
+    SelectorSignature(Symbol),
 
     // ── TokenFacet storage namespace (tf_ prefix) ─────────────────────────
     /// ERC-20-style balance per owner.
@@ -247,7 +349,104 @@ impl DiamondBase {
         list.len()
     }
 
+    // ── Validated dispatch ────────────────────────────────────────────────
+
+    /// Register the expected argument types for `selector`.
+    ///
+    /// Admin-only. Signatures registered here take precedence over the
+    /// built-in signatures of the shipped facets, allowing custom facets to
+    /// participate in validated dispatch.
+    pub fn register_signature(env: Env, admin: Address, selector: Symbol, arg_types: Vec<ArgType>) {
+        admin.require_auth();
+        Self::assert_admin(&env, &admin);
+        env.storage()
+            .instance()
+            .set(&DataKey::SelectorSignature(selector), &arg_types);
+        env.events()
+            .publish((NS_DIAMOND, symbol_short!("sig"), admin), arg_types.len());
+    }
+
+    /// Return the registered or built-in argument signature for `selector`.
+    pub fn function_signature(env: Env, selector: Symbol) -> Option<Vec<ArgType>> {
+        Self::signature_for(&env, &selector)
+    }
+
+    /// Resolve `selector` to its facet and invoke it with ABI validation.
+    ///
+    /// Unlike a raw `env.invoke_contract`, this validates the argument count
+    /// and each argument's [`ScValType`] against the function's registered
+    /// signature *before* forwarding, returning a typed [`DispatchError`]
+    /// instead of letting the facet trap on malformed input.
+    pub fn dispatch(env: Env, selector: Symbol, args: Vec<Val>) -> Result<Val, DispatchError> {
+        let facet: Address = env
+            .storage()
+            .instance()
+            .get(&DataKey::SelectorFacet(selector.clone()))
+            .ok_or(DispatchError::UnknownSelector)?;
+
+        let Some(signature) = Self::signature_for(&env, &selector) else {
+            return Err(DispatchError::UnknownSignature);
+        };
+
+        if args.len() != signature.len() {
+            Self::publish_dispatch_error(
+                &env,
+                &selector,
+                DispatchErrorInfo {
+                    selector: selector.clone(),
+                    index: u32::MAX,
+                    expected: ArgType::None,
+                    expected_count: signature.len(),
+                    got_count: args.len(),
+                },
+            );
+            return Err(DispatchError::ArgCountMismatch);
+        }
+
+        for (i, (arg, expected)) in args.iter().zip(signature.iter()).enumerate() {
+            if !expected.matches(&arg) {
+                Self::publish_dispatch_error(
+                    &env,
+                    &selector,
+                    DispatchErrorInfo {
+                        selector: selector.clone(),
+                        index: i as u32,
+                        expected,
+                        expected_count: signature.len(),
+                        got_count: args.len(),
+                    },
+                );
+                return Err(DispatchError::InvalidArguments);
+            }
+        }
+
+        match env.try_invoke_contract::<Val, DispatchError>(&facet, &selector, args) {
+            Ok(Ok(val)) => Ok(val),
+            Ok(Err(_)) | Err(Err(_)) => Err(DispatchError::FacetInvocationFailed),
+            Err(Ok(err)) => Err(err),
+        }
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────
+
+    /// Publish a `diamond/dsp_err` event carrying validation failure details.
+    fn publish_dispatch_error(env: &Env, selector: &Symbol, info: DispatchErrorInfo) {
+        env.events()
+            .publish((NS_DIAMOND, symbol_short!("dsp_err"), selector.clone()), info);
+    }
+
+    /// Look up the argument signature for `selector`: on-chain registration
+    /// first, then the built-in signatures of the shipped facets.
+    fn signature_for(env: &Env, selector: &Symbol) -> Option<Vec<ArgType>> {
+        if let Some(sig) = env
+            .storage()
+            .instance()
+            .get(&DataKey::SelectorSignature(selector.clone()))
+        {
+            return Some(sig);
+        }
+        builtin_signature(env, selector)
+    }
 
     fn assert_admin(env: &Env, caller: &Address) {
         let admin: Address = env
@@ -451,6 +650,41 @@ impl DiamondBase {
 // ---------------------------------------------------------------------------
 // Module-level helpers (pure Rust; no host calls)
 // ---------------------------------------------------------------------------
+
+/// Built-in argument signatures for the shipped facet functions.
+///
+/// On-chain signatures registered via [`DiamondBase::register_signature`]
+/// take precedence over these defaults.
+fn builtin_signature(env: &Env, selector: &Symbol) -> Option<Vec<ArgType>> {
+    use ArgType as A;
+
+    let types: &[ArgType] = if *selector == Symbol::new(env, "tf_mint")
+        || *selector == Symbol::new(env, "tf_transfer")
+        || *selector == Symbol::new(env, "tf_approve")
+    {
+        &[A::Address, A::Address, A::I128]
+    } else if *selector == Symbol::new(env, "tf_transfer_from") {
+        &[A::Address, A::Address, A::Address, A::I128]
+    } else if *selector == Symbol::new(env, "tf_balance_of") {
+        &[A::Address]
+    } else if *selector == Symbol::new(env, "tf_total_supply") {
+        &[]
+    } else if *selector == Symbol::new(env, "cf_increment")
+        || *selector == Symbol::new(env, "cf_reset")
+    {
+        &[A::Address, A::Symbol]
+    } else if *selector == Symbol::new(env, "cf_get_count") {
+        &[A::Symbol]
+    } else {
+        return None;
+    };
+
+    let mut sig = Vec::new(env);
+    for t in types.iter() {
+        sig.push_back(*t);
+    }
+    Some(sig)
+}
 
 fn addr_in_list(list: &Vec<Address>, addr: &Address) -> bool {
     for a in list.iter() {
