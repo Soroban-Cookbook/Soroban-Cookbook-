@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-bcdb59af.js";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-5c19c24f.js"></script>
+        <script src="../toc-4c08ce7c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -416,19 +416,19 @@ $L_{\text{snap}} &lt; L_{\text{proposal_creation}}$</li>
 <tr><th>Component</th><th>Cookbook Example</th><th>Key Features Demonstrated</th></tr>
 </thead>
 <tbody>
-<tr><td><strong>Simple Voting</strong></td><td><a href="../examples/governance/01-simple-voting"><code>examples/governance/01-simple-voting</code></a></td><td>1-account-1-vote, ballot registration, tallying</td></tr>
-<tr><td><strong>Time Constraints</strong></td><td><a href="../examples/governance/03-voting-time-constraints"><code>examples/governance/03-voting-time-constraints</code></a></td><td>Ledger timestamp bounds, deadline enforcement</td></tr>
-<tr><td><strong>Proposal Lifecycle</strong></td><td><a href="../examples/governance/04-proposal-lifecycle"><code>examples/governance/04-proposal-lifecycle</code></a></td><td>State machine, quorum validation, status transitions</td></tr>
-<tr><td><strong>Proposal Validation</strong></td><td><a href="../examples/governance/05-proposal-validation"><code>examples/governance/05-proposal-validation</code></a></td><td>Parameter bounds checking, target contract whitelisting</td></tr>
-<tr><td><strong>Vote Delegation</strong></td><td><a href="../examples/governance/06-vote-delegation"><code>examples/governance/06-vote-delegation</code></a></td><td>Liquid democracy, transitive delegation, vote revocation</td></tr>
-<tr><td><strong>Timelock Controller</strong></td><td><a href="../examples/governance/09-timelock-governance"><code>examples/governance/09-timelock-governance</code></a></td><td>Queueing delay, execution window, guardian veto</td></tr>
-<tr><td><strong>DAO Treasury</strong></td><td><a href="../examples/governance/10-dao-treasury"><code>examples/governance/10-dao-treasury</code></a></td><td>Multi-sig token disbursement, spend limits, role access</td></tr>
-<tr><td><strong>Snapshot Triggers</strong></td><td><a href="../examples/governance/11-automatic-snapshot-triggers"><code>examples/governance/11-automatic-snapshot-triggers</code></a></td><td>Automated balance checkpointing, historical queries</td></tr>
+<tr><td><strong>Simple Voting</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/01-simple-voting"><code>examples/governance/01-simple-voting</code></a></td><td>1-account-1-vote, ballot registration, tallying</td></tr>
+<tr><td><strong>Time Constraints</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/03-voting-time-constraints"><code>examples/governance/03-voting-time-constraints</code></a></td><td>Ledger timestamp bounds, deadline enforcement</td></tr>
+<tr><td><strong>Proposal Lifecycle</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/04-proposal-lifecycle"><code>examples/governance/04-proposal-lifecycle</code></a></td><td>State machine, quorum validation, status transitions</td></tr>
+<tr><td><strong>Proposal Validation</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/05-proposal-validation"><code>examples/governance/05-proposal-validation</code></a></td><td>Parameter bounds checking, target contract whitelisting</td></tr>
+<tr><td><strong>Vote Delegation</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/06-vote-delegation"><code>examples/governance/06-vote-delegation</code></a></td><td>Liquid democracy, transitive delegation, vote revocation</td></tr>
+<tr><td><strong>Timelock Controller</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/09-timelock-governance"><code>examples/governance/09-timelock-governance</code></a></td><td>Queueing delay, execution window, guardian veto</td></tr>
+<tr><td><strong>DAO Treasury</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/10-dao-treasury"><code>examples/governance/10-dao-treasury</code></a></td><td>Multi-sig token disbursement, spend limits, role access</td></tr>
+<tr><td><strong>Snapshot Triggers</strong></td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/11-automatic-snapshot-triggers"><code>examples/governance/11-automatic-snapshot-triggers</code></a></td><td>Automated balance checkpointing, historical queries</td></tr>
 </tbody>
 </table>
 </div>
 <h3 id="dao-treasury-execution"><a class="header" href="#dao-treasury-execution">DAO Treasury Execution</a></h3>
-<p>In <a href="../examples/governance/10-dao-treasury"><code>examples/governance/10-dao-treasury</code></a>, funds cannot be moved by single administrators. Transfers require formal proposal authorization, adhering to strict withdrawal limits and role separation:</p>
+<p>In <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/10-dao-treasury"><code>examples/governance/10-dao-treasury</code></a>, funds cannot be moved by single administrators. Transfers require formal proposal authorization, adhering to strict withdrawal limits and role separation:</p>
 <pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Verify caller is authorized governance timelock
@@ -438,7 +438,7 @@ timelock_contract.require_auth();
 token_client.transfer(&amp;treasury_addr, &amp;recipient, &amp;amount);
 <span class="boring">}</span></code></pre>
 <h3 id="timelock-controller-workflow"><a class="header" href="#timelock-controller-workflow">Timelock Controller Workflow</a></h3>
-<p>In <a href="../examples/governance/09-timelock-governance"><code>examples/governance/09-timelock-governance</code></a>, actions cannot execute immediately upon passage:</p>
+<p>In <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/09-timelock-governance"><code>examples/governance/09-timelock-governance</code></a>, actions cannot execute immediately upon passage:</p>
 <pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
 </span>// Queue action with mandatory delay

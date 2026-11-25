@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-bcdb59af.js";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-5c19c24f.js"></script>
+        <script src="../toc-4c08ce7c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -181,7 +181,814 @@
 
                 <div id="mdbook-content" class="content">
                     <main>
-                        <h1 id="governance-patterns-guide"><a class="header" href="#governance-patterns-guide">Governance Patterns Guide</a></h1>
+                        <h1 id="governance-patterns-in-soroban"><a class="header" href="#governance-patterns-in-soroban">Governance Patterns in Soroban</a></h1>
+<p>Governance on Soroban enables decentralized decision-making through voting systems, DAOs, and multi-party controls. This guide covers core governance patterns: simple voting, delegation, multisig governance, proposal lifecycles, and treasury management.</p>
+<h2 id="why-governance-patterns-matter"><a class="header" href="#why-governance-patterns-matter">Why Governance Patterns Matter</a></h2>
+<p>On-chain governance requires:</p>
+<ul>
+<li><strong>Transparent decision-making</strong> with verifiable vote counts</li>
+<li><strong>Access control</strong> to restrict proposal creation and voting</li>
+<li><strong>Time-gated execution</strong> for review windows</li>
+<li><strong>Delegation support</strong> for token holders unable to vote directly</li>
+<li><strong>Treasury controls</strong> to prevent unauthorized fund movement</li>
+</ul>
+<p>Poor governance design can lead to:</p>
+<ul>
+<li>governance capture by a single large token holder</li>
+<li>flash loan attacks manipulating voting power</li>
+<li>rushed execution without community review</li>
+<li>unauthorized fund transfers or protocol changes</li>
+</ul>
+<h2 id="core-governance-patterns"><a class="header" href="#core-governance-patterns">Core Governance Patterns</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Pattern</th><th>Focus</th><th>Use case</th></tr>
+</thead>
+<tbody>
+<tr><td><strong>Simple Voting</strong></td><td>One-address-one-vote, deadline enforcement</td><td>Community polls, basic DAOs</td></tr>
+<tr><td><strong>Vote Delegation</strong></td><td>Liquid delegation with cycle prevention</td><td>Token-weighted voting, delegated authority</td></tr>
+<tr><td><strong>Token Voting</strong></td><td>Governance token balance checks</td><td>Large-scale DAOs with token distributions</td></tr>
+<tr><td><strong>Time Constraints</strong></td><td>Voting periods, grace periods, quorum</td><td>Production governance with formal phases</td></tr>
+<tr><td><strong>Proposal Lifecycle</strong></td><td>Full state machine: Draft → Active → Executed</td><td>Complex governance flows with multiple gates</td></tr>
+<tr><td><strong>Timelock Governance</strong></td><td>Mandatory delay + veto + emergency bypass</td><td>Protocol upgrades, large fund movements</td></tr>
+<tr><td><strong>DAO Treasury</strong></td><td>Multi-sig approval + timelock + role hierarchy</td><td>Decentralized fund management</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="1-simple-voting"><a class="header" href="#1-simple-voting">1. Simple Voting</a></h2>
+<h3 id="what-it-shows"><a class="header" href="#what-it-shows">What it shows</a></h3>
+<p>A foundational voting system with:</p>
+<ul>
+<li>Admin-gated proposal creation</li>
+<li>One-address-one-vote enforcement via persistent storage</li>
+<li>Vote options as typed enums (For, Against, Abstain)</li>
+<li>Time-based deadline checks using <code>env.ledger().timestamp()</code></li>
+<li>Event emission for indexing</li>
+<li>Typed error handling</li>
+</ul>
+<h3 id="key-patterns"><a class="header" href="#key-patterns">Key patterns</a></h3>
+<p><strong>Proposal state stored by ID:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone)]
+pub struct Proposal {
+    id: u32,
+    title: String,
+    deadline: u64,
+    votes_for: u32,
+    votes_against: u32,
+}
+
+#[contracttype]
+pub enum DataKey {
+    Proposal(u32),
+    Vote(u32, Address),  // (proposal_id, voter)
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Vote storage keyed by (proposal_id, voter):</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>env.storage().persistent()
+    .set(&amp;DataKey::Vote(proposal_id, voter), &amp;vote_choice);
+<span class="boring">}</span></code></pre>
+<p><strong>Timestamp validation:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let deadline: u64 = proposal.deadline;
+if env.ledger().timestamp() &gt; deadline {
+    return Err(VotingError::VotingClosed);
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use"><a class="header" href="#when-to-use">When to use</a></h3>
+<ul>
+<li>Community polls with time-limited voting</li>
+<li>Simple DAO governance with uniform voting weight</li>
+<li>Token airdrops requiring community confirmation</li>
+<li>Basic protocol parameter updates</li>
+</ul>
+<h3 id="security-considerations"><a class="header" href="#security-considerations">Security considerations</a></h3>
+<ul>
+<li><strong>One-address-one-vote</strong> enforces equal weight; vulnerable to Sybil attacks if addresses are free</li>
+<li><strong>Deadline enforcement</strong> prevents late votes; clock-dependence risks if validators manipulate timestamps (rare on Stellar)</li>
+<li><strong>Admin gating</strong> requires trusting the admin key; combine with multisig for higher security</li>
+</ul>
+<h3 id="example-reference"><a class="header" href="#example-reference">Example reference</a></h3>
+<p>See <a href="../examples/governance/01-simple-voting/"><code>examples/governance/01-simple-voting/</code></a> for full implementation.</p>
+<h2 id="2-vote-delegation"><a class="header" href="#2-vote-delegation">2. Vote Delegation</a></h2>
+<h3 id="what-it-shows-1"><a class="header" href="#what-it-shows-1">What it shows</a></h3>
+<p>Liquid voting delegation with:</p>
+<ul>
+<li>Addresses delegating their vote to another address</li>
+<li>Chain delegation (A → B → C) supported</li>
+<li>Cycle detection to prevent infinite loops</li>
+<li>Recursion depth limits for safety</li>
+<li>Vote power accumulation in delegated chains</li>
+</ul>
+<h3 id="key-patterns-1"><a class="header" href="#key-patterns-1">Key patterns</a></h3>
+<p><strong>Delegation graph stored in persistent storage:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+pub enum DataKey {
+    Delegate(Address),        // Maps voter → delegated_to
+    VotePower(Address),       // Accumulated vote count at delegation endpoint
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Vote power calculation with recursion limit:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn get_delegate(env: &amp;Env, voter: &amp;Address, depth: u32) -&gt; Result&lt;Address, Error&gt; {
+    if depth &gt; MAX_RECURSION {
+        return Err(Error::RecursionLimit);
+    }
+    
+    let delegate: Address = env.storage().persistent()
+        .get(&amp;DataKey::Delegate(voter))
+        .unwrap_or(voter.clone());
+    
+    if delegate == *voter {
+        Ok(voter.clone())
+    } else {
+        get_delegate(env, &amp;delegate, depth + 1)
+    }
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Cycle prevention via visited set:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn detect_delegation_cycle(env: &amp;Env, from: &amp;Address, to: &amp;Address) -&gt; Result&lt;(), Error&gt; {
+    let mut visited = vec![env, from.clone()];
+    let mut current = to.clone();
+    
+    loop {
+        if visited.contains(&amp;current) {
+            return Err(Error::CycleDetected);
+        }
+        visited.push(current.clone());
+        
+        let delegate: Address = env.storage().persistent()
+            .get(&amp;DataKey::Delegate(&amp;current))
+            .unwrap_or(current.clone());
+        
+        if delegate == current {
+            return Ok(());
+        }
+        current = delegate;
+    }
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use-1"><a class="header" href="#when-to-use-1">When to use</a></h3>
+<ul>
+<li>Token-holder governance where not all holders vote directly</li>
+<li>Delegated authority to trusted community members</li>
+<li>Proxy voting systems</li>
+<li>Emergency response with delegation to guardians</li>
+</ul>
+<h3 id="security-considerations-1"><a class="header" href="#security-considerations-1">Security considerations</a></h3>
+<ul>
+<li><strong>Chain delegation</strong> can be slow; depth limits prevent DOS attacks</li>
+<li><strong>Cycle detection</strong> is critical; untested cycle logic leads to infinite loops</li>
+<li><strong>Vote power accumulation</strong> can create centralization; monitor delegation patterns off-chain</li>
+<li><strong>Revocation</strong> is easy but requires active participation; consider lock-in periods</li>
+</ul>
+<h3 id="example-reference-1"><a class="header" href="#example-reference-1">Example reference</a></h3>
+<p>See <a href="../examples/governance/06-vote-delegation/"><code>examples/governance/06-vote-delegation/</code></a> for full implementation with cycle detection and depth limits.</p>
+<h2 id="3-token-voting"><a class="header" href="#3-token-voting">3. Token Voting</a></h2>
+<h3 id="what-it-shows-2"><a class="header" href="#what-it-shows-2">What it shows</a></h3>
+<p>Governance voting tied to token balance:</p>
+<ul>
+<li>Token balance snapshots at proposal creation time</li>
+<li>One-token-one-vote enforcement</li>
+<li>Integration with Stellar token standards</li>
+<li>Prevention of vote-then-transfer attacks via snapshot timing</li>
+<li>Withdrawal lock during active voting</li>
+</ul>
+<h3 id="key-patterns-2"><a class="header" href="#key-patterns-2">Key patterns</a></h3>
+<p><strong>Proposal includes voting power snapshot:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone)]
+pub struct Proposal {
+    id: u32,
+    title: String,
+    voting_power_snapshot: u64,  // Total eligible votes
+    deadline: u64,
+}
+
+#[contracttype]
+pub enum DataKey {
+    TokenBalance(Address, u64),  // Snapshot of balance at block height
+    ProposalSnapshot(u32, u64),  // Block height of proposal creation
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Vote power determined by token balance at snapshot block:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn get_voting_power(env: &amp;Env, voter: &amp;Address, proposal_id: u32) -&gt; Result&lt;u64, Error&gt; {
+    let block: u64 = env.storage().persistent()
+        .get(&amp;DataKey::ProposalSnapshot(proposal_id))
+        .ok_or(Error::ProposalNotFound)?;
+    
+    let balance: u64 = env.storage().persistent()
+        .get(&amp;DataKey::TokenBalance(voter, block))
+        .unwrap_or(0);
+    
+    Ok(balance)
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Block-height-based snapshots:</strong></p>
+<ul>
+<li>Proposal created at block N</li>
+<li>Voting power snapshot taken at block N</li>
+<li>Votes cast using balance at block N</li>
+<li>Transfer after block N doesn’t affect voting power in this proposal</li>
+</ul>
+<h3 id="when-to-use-2"><a class="header" href="#when-to-use-2">When to use</a></h3>
+<ul>
+<li>Token-holder governance (e.g., DAO governance tokens)</li>
+<li>Stake-weighted voting</li>
+<li>Protocol upgrade decisions</li>
+<li>DAO budget allocations</li>
+</ul>
+<h3 id="security-considerations-2"><a class="header" href="#security-considerations-2">Security considerations</a></h3>
+<ul>
+<li><strong>Snapshot timing</strong> is critical; off-by-one errors lead to vote dilution or inflation</li>
+<li><strong>Balance manipulation</strong> is prevented by snapshotting; confirm snapshot logic is airtight</li>
+<li><strong>Token wrapping</strong> can introduce voting power inconsistencies; vet token contracts</li>
+<li><strong>Flash loans</strong> on other blockchains bypass snapshots; Soroban’s atomic transactions may have similar risks</li>
+</ul>
+<h3 id="example-reference-2"><a class="header" href="#example-reference-2">Example reference</a></h3>
+<p>See <a href="../examples/governance/02-token-voting/"><code>examples/governance/02-token-voting/</code></a> for snapshot-based voting implementation.</p>
+<h2 id="4-voting-time-constraints"><a class="header" href="#4-voting-time-constraints">4. Voting Time Constraints</a></h2>
+<h3 id="what-it-shows-3"><a class="header" href="#what-it-shows-3">What it shows</a></h3>
+<p>Production-grade voting with formal phases:</p>
+<ul>
+<li>Configurable voting periods (e.g., 7 days open, 3 days grace)</li>
+<li>Quorum thresholds requiring minimum participation</li>
+<li>Early closure when consensus is clear</li>
+<li>Grace period for appeals or reversals</li>
+<li>Proposal state machine: Draft → Active → Grace → Closed</li>
+</ul>
+<h3 id="key-patterns-3"><a class="header" href="#key-patterns-3">Key patterns</a></h3>
+<p><strong>Proposal with time phases:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone)]
+pub struct Proposal {
+    id: u32,
+    created_at: u64,
+    voting_start: u64,
+    voting_end: u64,
+    grace_period_end: u64,
+    status: ProposalStatus,
+    votes_for: u32,
+    votes_against: u32,
+    quorum_threshold: u32,
+}
+
+#[contracttype]
+#[repr(u32)]
+pub enum ProposalStatus {
+    Draft = 0,
+    Active = 1,
+    Grace = 2,
+    Closed = 3,
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Early closure with supermajority:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn close_early_if_supermajority(env: &amp;Env, proposal_id: u32) -&gt; Result&lt;(), Error&gt; {
+    let proposal = get_proposal(env, proposal_id)?;
+    let total_votes = proposal.votes_for + proposal.votes_against;
+    let for_percentage = (proposal.votes_for * 100) / total_votes;
+    
+    if for_percentage &gt;= 80 {  // 80% supermajority
+        set_proposal_status(env, proposal_id, ProposalStatus::Closed)?;
+    }
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Quorum validation at execution:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn execute(env: &amp;Env, proposal_id: u32) -&gt; Result&lt;(), Error&gt; {
+    let proposal = get_proposal(env, proposal_id)?;
+    let total_votes = proposal.votes_for + proposal.votes_against;
+    
+    if total_votes &lt; proposal.quorum_threshold {
+        return Err(Error::QuorumNotMet);
+    }
+    if env.ledger().timestamp() &lt;= proposal.grace_period_end {
+        return Err(Error::GracePeriodActive);
+    }
+    
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use-3"><a class="header" href="#when-to-use-3">When to use</a></h3>
+<ul>
+<li>DAO governance with required participation minimums</li>
+<li>Protocol parameters requiring broad consensus</li>
+<li>Upgrades with community veto capability</li>
+<li>Governance token holder voting</li>
+</ul>
+<h3 id="security-considerations-3"><a class="header" href="#security-considerations-3">Security considerations</a></h3>
+<ul>
+<li><strong>Quorum games</strong> incentivize low participation; set thresholds to encourage real engagement</li>
+<li><strong>Grace period abuse</strong> by signers who create proposals; use multisig for proposal creation</li>
+<li><strong>State machine errors</strong> in phase transitions; test all state paths explicitly</li>
+<li><strong>Timestamp manipulation</strong> affects voting windows; rare but monitor ledger behavior</li>
+</ul>
+<h3 id="example-reference-3"><a class="header" href="#example-reference-3">Example reference</a></h3>
+<p>See <a href="../examples/governance/03-voting-time-constraints/"><code>examples/governance/03-voting-time-constraints/</code></a> for configurable voting periods and quorum logic.</p>
+<h2 id="5-proposal-lifecycle"><a class="header" href="#5-proposal-lifecycle">5. Proposal Lifecycle</a></h2>
+<h3 id="what-it-shows-4"><a class="header" href="#what-it-shows-4">What it shows</a></h3>
+<p>Complete proposal state machine with:</p>
+<ul>
+<li>Draft → Active → Voting → Grace → Queued → Executed/Defeated workflow</li>
+<li>Multiple stakeholder roles (Proposer, Voter, Executor)</li>
+<li>Cancellation and veto paths</li>
+<li>Event emission at each state transition</li>
+<li>Detailed state tracking and auditability</li>
+</ul>
+<h3 id="key-patterns-4"><a class="header" href="#key-patterns-4">Key patterns</a></h3>
+<p><strong>Full state machine:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[repr(u32)]
+pub enum ProposalStatus {
+    Draft = 0,      // Not yet active
+    Active = 1,     // Voting in progress
+    Defeated = 2,   // Voting ended, did not pass
+    Queued = 3,     // Passed voting, waiting for execution
+    Executed = 4,   // Successfully executed
+    Canceled = 5,   // Proposal withdrawn
+}
+<span class="boring">}</span></code></pre>
+<p><strong>State transition validation:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn advance_proposal_state(env: &amp;Env, proposal_id: u32) -&gt; Result&lt;(), Error&gt; {
+    let proposal = get_proposal(env, proposal_id)?;
+    let now = env.ledger().timestamp();
+    
+    let new_status = match proposal.status {
+        ProposalStatus::Draft if now &gt;= proposal.voting_start =&gt; {
+            ProposalStatus::Active
+        }
+        ProposalStatus::Active if now &gt;= proposal.voting_end =&gt; {
+            check_if_passed(&amp;proposal)
+                .map(|_| ProposalStatus::Queued)
+                .unwrap_or(ProposalStatus::Defeated)
+        }
+        _ =&gt; return Err(Error::InvalidStateTransition),
+    };
+    
+    set_proposal_status(env, proposal_id, new_status)?;
+    env.events().publish((symbol!("governance"), symbol!("state_change")), proposal_id);
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Veto and cancellation paths:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn cancel_proposal(env: &amp;Env, proposal_id: u32, guardian: Address) -&gt; Result&lt;(), Error&gt; {
+    guardian.require_auth();
+    require_guardian(&amp;env, &amp;guardian)?;
+    
+    let proposal = get_proposal(env, proposal_id)?;
+    if proposal.status == ProposalStatus::Executed {
+        return Err(Error::CannotCancelExecuted);
+    }
+    
+    set_proposal_status(env, proposal_id, ProposalStatus::Canceled)?;
+    env.events().publish((symbol!("governance"), symbol!("canceled")), proposal_id);
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use-4"><a class="header" href="#when-to-use-4">When to use</a></h3>
+<ul>
+<li>Complex DAOs requiring formal governance</li>
+<li>Protocol upgrades with multi-stage review</li>
+<li>Large fund movements with veto capability</li>
+<li>Community-driven development decisions</li>
+</ul>
+<h3 id="security-considerations-4"><a class="header" href="#security-considerations-4">Security considerations</a></h3>
+<ul>
+<li><strong>State machine complexity</strong> increases attack surface; test all transitions thoroughly</li>
+<li><strong>Transition race conditions</strong> occur at deadline boundaries; design idempotent transitions</li>
+<li><strong>Cancellation authority</strong> must be trustworthy; require multisig for cancellation</li>
+<li><strong>Event auditing</strong> is critical; emit events at every state change for off-chain monitoring</li>
+</ul>
+<h3 id="example-reference-4"><a class="header" href="#example-reference-4">Example reference</a></h3>
+<p>See <a href="../examples/governance/04-proposal-lifecycle/"><code>examples/governance/04-proposal-lifecycle/</code></a> for full state machine implementation.</p>
+<h2 id="6-timelock-governance"><a class="header" href="#6-timelock-governance">6. Timelock Governance</a></h2>
+<h3 id="what-it-shows-5"><a class="header" href="#what-it-shows-5">What it shows</a></h3>
+<p>Governance with mandatory execution delays:</p>
+<ul>
+<li>Proposal queue with mandatory delay</li>
+<li>Scheduled execution after delay expires</li>
+<li>Veto capability during delay window</li>
+<li>Emergency bypass for critical situations</li>
+<li>Audit trail via events</li>
+</ul>
+<h3 id="key-patterns-5"><a class="header" href="#key-patterns-5">Key patterns</a></h3>
+<p><strong>Queued proposal with execution window:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[derive(Clone)]
+pub struct QueuedProposal {
+    id: u32,
+    proposed_action: String,  // Action to execute
+    scheduled_execution: u64, // Earliest execution time
+    veto_deadline: u64,       // Latest veto time
+    status: QueueStatus,
+}
+
+#[contracttype]
+#[repr(u32)]
+pub enum QueueStatus {
+    Pending = 0,
+    Ready = 1,
+    Executed = 2,
+    Vetoed = 3,
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Queue with mandatory delay:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn queue_proposal(env: &amp;Env, proposal_id: u32, delay_seconds: u64) -&gt; Result&lt;(), Error&gt; {
+    let proposal = get_proposal(env, proposal_id)?;
+    
+    let now = env.ledger().timestamp();
+    let scheduled_execution = now + delay_seconds;
+    let veto_deadline = now + (delay_seconds / 2);  // Veto window is first half of delay
+    
+    let queued = QueuedProposal {
+        id: proposal_id,
+        proposed_action: proposal.action,
+        scheduled_execution,
+        veto_deadline,
+        status: QueueStatus::Pending,
+    };
+    
+    env.storage().persistent()
+        .set(&amp;DataKey::QueuedProposal(proposal_id), &amp;queued);
+    
+    env.events().publish(
+        (symbol!("governance"), symbol!("queued")),
+        scheduled_execution
+    );
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Veto during window:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn veto(env: &amp;Env, proposal_id: u32, guardian: Address) -&gt; Result&lt;(), Error&gt; {
+    guardian.require_auth();
+    require_guardian(&amp;env, &amp;guardian)?;
+    
+    let queued = get_queued_proposal(env, proposal_id)?;
+    let now = env.ledger().timestamp();
+    
+    if now &gt; queued.veto_deadline {
+        return Err(Error::VetoWindowClosed);
+    }
+    if queued.status != QueueStatus::Pending {
+        return Err(Error::CannotVeto);
+    }
+    
+    let mut queued = queued;
+    queued.status = QueueStatus::Vetoed;
+    env.storage().persistent()
+        .set(&amp;DataKey::QueuedProposal(proposal_id), &amp;queued);
+    
+    env.events().publish(
+        (symbol!("governance"), symbol!("vetoed")),
+        proposal_id
+    );
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Emergency execution with authorized caller:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn emergency_execute(env: &amp;Env, proposal_id: u32, emergecy_admin: Address) -&gt; Result&lt;(), Error&gt; {
+    emergency_admin.require_auth();
+    require_emergency_admin(&amp;env, &amp;emergency_admin)?;
+    
+    let queued = get_queued_proposal(env, proposal_id)?;
+    if queued.status == QueueStatus::Executed {
+        return Err(Error::AlreadyExecuted);
+    }
+    
+    execute_proposal(env, proposal_id)?;
+    
+    let mut queued = queued;
+    queued.status = QueueStatus::Executed;
+    env.storage().persistent()
+        .set(&amp;DataKey::QueuedProposal(proposal_id), &amp;queued);
+    
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use-5"><a class="header" href="#when-to-use-5">When to use</a></h3>
+<ul>
+<li>Protocol upgrades requiring review window</li>
+<li>Large fund transfers with stakeholder notification</li>
+<li>Emergency procedures with staged response</li>
+<li>Production governance with mandatory cooling-off</li>
+</ul>
+<h3 id="security-considerations-5"><a class="header" href="#security-considerations-5">Security considerations</a></h3>
+<ul>
+<li><strong>Delay length</strong> affects governance responsiveness; too short is insecure, too long blocks evolution</li>
+<li><strong>Veto window</strong> must be long enough for analysis; hidden vetoes erode community trust</li>
+<li><strong>Emergency bypass</strong> requires trusted guardians; keep count small and rotation frequent</li>
+<li><strong>Replay prevention</strong> is essential; ensure queued proposals cannot execute twice</li>
+</ul>
+<h3 id="example-reference-5"><a class="header" href="#example-reference-5">Example reference</a></h3>
+<p>See <a href="../examples/governance/09-timelock-governance/"><code>examples/governance/09-timelock-governance/</code></a> for mandatory delays and veto implementation.</p>
+<h2 id="7-dao-treasury"><a class="header" href="#7-dao-treasury">7. DAO Treasury</a></h2>
+<h3 id="what-it-shows-6"><a class="header" href="#what-it-shows-6">What it shows</a></h3>
+<p>Multi-party fund management contract with:</p>
+<ul>
+<li>Token balance tracking by denomination</li>
+<li>Withdrawal requests with multisig approval</li>
+<li>Role-based access (Treasurer, Guardian, Executor)</li>
+<li>Timelock on large transactions</li>
+<li>Withdrawal cancellation and recovery paths</li>
+</ul>
+<h3 id="key-patterns-6"><a class="header" href="#key-patterns-6">Key patterns</a></h3>
+<p><strong>Treasury state with denominations:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[contracttype]
+#[repr(u32)]
+pub enum TreasuryRole {
+    Treasurer = 0,
+    Guardian = 1,
+    Executor = 2,
+}
+
+#[contracttype]
+#[derive(Clone)]
+pub struct WithdrawalRequest {
+    id: u32,
+    destination: Address,
+    amount: u64,
+    token: Address,
+    approvals: u32,
+    threshold: u32,
+    scheduled_time: u64,
+    status: WithdrawalStatus,
+}
+
+#[contracttype]
+#[repr(u32)]
+pub enum WithdrawalStatus {
+    Pending = 0,
+    Approved = 1,
+    Executed = 2,
+    Canceled = 3,
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Request and multisig approval:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn request_withdrawal(env: &amp;Env, requester: Address, destination: Address,
+                     amount: u64, token: Address) -&gt; Result&lt;u32, Error&gt; {
+    requester.require_auth();
+    require_role(&amp;env, &amp;requester, TreasuryRole::Treasurer)?;
+    
+    let request_id = get_next_request_id(env);
+    let delay = if amount &gt; LARGE_AMOUNT_THRESHOLD {
+        LARGE_WITHDRAWAL_DELAY
+    } else {
+        NORMAL_WITHDRAWAL_DELAY
+    };
+    
+    let request = WithdrawalRequest {
+        id: request_id,
+        destination,
+        amount,
+        token,
+        approvals: 0,
+        threshold: 2,  // 2-of-3 multisig
+        scheduled_time: env.ledger().timestamp() + delay,
+        status: WithdrawalStatus::Pending,
+    };
+    
+    env.storage().persistent()
+        .set(&amp;DataKey::WithdrawalRequest(request_id), &amp;request);
+    
+    env.events().publish(
+        (symbol!("treasury"), symbol!("withdrawal_requested")),
+        (request_id, amount)
+    );
+    Ok(request_id)
+}
+
+fn approve_withdrawal(env: &amp;Env, request_id: u32, approver: Address) -&gt; Result&lt;(), Error&gt; {
+    approver.require_auth();
+    require_role(&amp;env, &amp;approver, TreasuryRole::Guardian)?;
+    
+    let mut request = get_withdrawal_request(env, request_id)?;
+    if request.status != WithdrawalStatus::Pending {
+        return Err(Error::InvalidStatus);
+    }
+    
+    request.approvals += 1;
+    if request.approvals &gt;= request.threshold {
+        request.status = WithdrawalStatus::Approved;
+    }
+    
+    env.storage().persistent()
+        .set(&amp;DataKey::WithdrawalRequest(request_id), &amp;request);
+    
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Timelock-gated execution:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>fn execute_withdrawal(env: &amp;Env, request_id: u32, executor: Address) -&gt; Result&lt;(), Error&gt; {
+    executor.require_auth();
+    require_role(&amp;env, &amp;executor, TreasuryRole::Executor)?;
+    
+    let mut request = get_withdrawal_request(env, request_id)?;
+    
+    if request.status != WithdrawalStatus::Approved {
+        return Err(Error::NotApproved);
+    }
+    if env.ledger().timestamp() &lt; request.scheduled_time {
+        return Err(Error::TimeLocked);
+    }
+    
+    // Transfer token (assuming token contract interface)
+    let client = TokenClient::new(env, &amp;request.token);
+    client.transfer(&amp;env.current_contract_address(), &amp;request.destination, &amp;(request.amount as i128));
+    
+    request.status = WithdrawalStatus::Executed;
+    env.storage().persistent()
+        .set(&amp;DataKey::WithdrawalRequest(request_id), &amp;request);
+    
+    env.events().publish(
+        (symbol!("treasury"), symbol!("withdrawal_executed")),
+        (request_id, request.amount)
+    );
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<h3 id="when-to-use-6"><a class="header" href="#when-to-use-6">When to use</a></h3>
+<ul>
+<li>Decentralized autonomous organizations (DAOs)</li>
+<li>Treasuries managed by multiple councils</li>
+<li>Protocol revenue distribution</li>
+<li>Grant programs and community funds</li>
+</ul>
+<h3 id="security-considerations-6"><a class="header" href="#security-considerations-6">Security considerations</a></h3>
+<ul>
+<li><strong>Role confusion</strong> can lead to privilege escalation; test role checks exhaustively</li>
+<li><strong>Reentrancy</strong> during token transfer; token interface must be trusted</li>
+<li><strong>Fund lock</strong> if approvals are misconfigured; set thresholds carefully at initialization</li>
+<li><strong>Cancellation authority</strong> must be clear; only trustees should cancel pending withdrawals</li>
+</ul>
+<h3 id="example-reference-6"><a class="header" href="#example-reference-6">Example reference</a></h3>
+<p>See <a href="../examples/governance/10-dao-treasury/"><code>examples/governance/10-dao-treasury/</code></a> for multisig-gated treasury implementation.</p>
+<h2 id="8-voting-system-comparison"><a class="header" href="#8-voting-system-comparison">8. Voting System Comparison</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>System</th><th>Access</th><th>Vote weight</th><th>Sybil protection</th><th>Scalability</th><th>Complexity</th></tr>
+</thead>
+<tbody>
+<tr><td>Simple Voting</td><td>Any address</td><td>Uniform</td><td>None (free accounts)</td><td>O(n)</td><td>Low</td></tr>
+<tr><td>Vote Delegation</td><td>Any address</td><td>Delegated</td><td>Delegation-dependent</td><td>O(n log n)</td><td>Medium</td></tr>
+<tr><td>Token Voting</td><td>Token holders</td><td>Balance-based</td><td>Liquidity-dependent</td><td>O(n log n)</td><td>Medium</td></tr>
+<tr><td>Time Constraints</td><td>Gated creation</td><td>Threshold-based</td><td>Quorum-dependent</td><td>O(n)</td><td>Medium-High</td></tr>
+<tr><td>Proposal Lifecycle</td><td>Multisig</td><td>Multi-stage approval</td><td>Multisig-dependent</td><td>O(n)</td><td>High</td></tr>
+<tr><td>Timelock Governance</td><td>Multisig + Guardian</td><td>Threshold-based</td><td>Guardian-dependent</td><td>O(n)</td><td>High</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="9-security-considerations-for-governance"><a class="header" href="#9-security-considerations-for-governance">9. Security Considerations for Governance</a></h2>
+<h3 id="common-vulnerabilities"><a class="header" href="#common-vulnerabilities">Common Vulnerabilities</a></h3>
+<p><strong>Flash Loan Attacks</strong></p>
+<ul>
+<li>Token balance can be artificially inflated for single transaction</li>
+<li>Mitigation: Use block height snapshots; require historical balance data</li>
+</ul>
+<p><strong>Governance Capture</strong></p>
+<ul>
+<li>Large token holder can unilaterally pass proposals</li>
+<li>Mitigation: Implement quorum thresholds, delegation, or vote splitting</li>
+</ul>
+<p><strong>Proposal Collision</strong></p>
+<ul>
+<li>Two simultaneous proposals with same ID</li>
+<li>Mitigation: Use monotonically increasing IDs with overflow checks</li>
+</ul>
+<p><strong>State Machine Races</strong></p>
+<ul>
+<li>Concurrent calls can transition proposal states unpredictably</li>
+<li>Mitigation: Use semaphore or atomic operations; test all interleaving paths</li>
+</ul>
+<p><strong>Timestamp Dependency</strong></p>
+<ul>
+<li>Validators can manipulate timestamps within bounds</li>
+<li>Mitigation: Use reasonable deadlines (hours/days, not seconds); assume timestamps are adversarial</li>
+</ul>
+<h3 id="best-practices"><a class="header" href="#best-practices">Best Practices</a></h3>
+<ol>
+<li><strong>Test all paths</strong>: Draft → Active → Closed → Executed is only one flow; test Draft → Canceled, Draft → Failed, etc.</li>
+<li><strong>Emit events</strong>: Every state change should emit an indexed event for off-chain monitoring</li>
+<li><strong>Require auth</strong>: Every state-changing call must have <code>caller.require_auth()</code></li>
+<li><strong>Validate roles</strong>: Never trust caller-provided role claims; fetch from storage</li>
+<li><strong>Use persistent storage</strong>: Governance state must survive contract upgrades</li>
+<li><strong>Document thresholds</strong>: Write down quorum%, delay periods, and veto windows clearly</li>
+<li><strong>Monitor off-chain</strong>: Keep logs of all governance events for auditability</li>
+</ol>
+<h2 id="10-real-dao-examples-in-this-repository"><a class="header" href="#10-real-dao-examples-in-this-repository">10. Real DAO Examples in This Repository</a></h2>
+<h3 id="simple-dao-example-01-simple-voting"><a class="header" href="#simple-dao-example-01-simple-voting">Simple DAO Example: 01-simple-voting</a></h3>
+<p>Demonstrates the minimum viable voting system: proposal creation, ballot casting, tally, execution.</p>
+<p><strong>When to use as template:</strong></p>
+<ul>
+<li>Quick prototype of governance concept</li>
+<li>Proof of concept for community polls</li>
+</ul>
+<h3 id="production-dao-stack-01-simple-voting--03-voting-time-constraints--04-proposal-lifecycle--09-timelock-governance"><a class="header" href="#production-dao-stack-01-simple-voting--03-voting-time-constraints--04-proposal-lifecycle--09-timelock-governance">Production DAO Stack: 01-simple-voting → 03-voting-time-constraints → 04-proposal-lifecycle → 09-timelock-governance</a></h3>
+<p><strong>Progression:</strong></p>
+<ol>
+<li>Start with simple voting for initial governance</li>
+<li>Add formal voting periods and quorum for maturity</li>
+<li>Implement full proposal lifecycle for complex governance</li>
+<li>Layer timelock + veto for production security</li>
+</ol>
+<h3 id="token-holder-dao-02-token-voting--10-dao-treasury"><a class="header" href="#token-holder-dao-02-token-voting--10-dao-treasury">Token-Holder DAO: 02-token-voting + 10-dao-treasury</a></h3>
+<p><strong>When to use as template:</strong></p>
+<ul>
+<li>DAO with fungible governance token</li>
+<li>Community treasuries</li>
+<li>Decentralized protocols with voting escrow</li>
+</ul>
+<h2 id="11-recommended-deployment-checklist"><a class="header" href="#11-recommended-deployment-checklist">11. Recommended Deployment Checklist</a></h2>
+<p>Before deploying governance to production:</p>
+<ul>
+<li><input disabled="" type="checkbox"> All proposal states have event emissions</li>
+<li><input disabled="" type="checkbox"> Role checks use <code>require_role()</code> not address comparison</li>
+<li><input disabled="" type="checkbox"> Timestamps use <code>env.ledger().timestamp()</code> consistently</li>
+<li><input disabled="" type="checkbox"> Multisig threshold matches security policy (2-of-3, 3-of-5, etc.)</li>
+<li><input disabled="" type="checkbox"> Proposal deadlines are in reasonable time frames (hours to weeks)</li>
+<li><input disabled="" type="checkbox"> Veto windows exist for large fund movements</li>
+<li><input disabled="" type="checkbox"> Quorum threshold encourages real participation (&gt;10% typical)</li>
+<li><input disabled="" type="checkbox"> Withdrawal limits prevent accidental fund loss</li>
+<li><input disabled="" type="checkbox"> Role assignment is gated by admin multisig</li>
+<li><input disabled="" type="checkbox"> Role rotation schedule is documented</li>
+<li><input disabled="" type="checkbox"> Off-chain governance process mirrors on-chain flows</li>
+<li><input disabled="" type="checkbox"> Emergency procedures are tested with guardians</li>
+<li><input disabled="" type="checkbox"> All test paths include failed authorization, timeout, and state race scenarios</li>
+</ul>
+<h2 id="12-cross-pattern-references"><a class="header" href="#12-cross-pattern-references">12. Cross-Pattern References</a></h2>
+<p><strong>RBAC with Governance</strong>
+See <a href="./governance-rbac-multisig-timelock.html"><code>docs/governance-rbac-multisig-timelock.md</code></a> for role hierarchy, multisig threshold patterns, and timelock configuration.</p>
+<p><strong>Events for Auditability</strong>
+See <a href="../examples/basics/04-events/"><code>examples/basics/04-events/</code></a> for event emission patterns used in all governance contracts.</p>
+<p><strong>Authentication Foundations</strong>
+See <a href="../examples/basics/03-authentication/"><code>examples/basics/03-authentication/</code></a> for <code>require_auth()</code> and role storage fundamentals.</p>
+<h2 id="13-quick-reference-pattern-selection-decision-tree"><a class="header" href="#13-quick-reference-pattern-selection-decision-tree">13. Quick Reference: Pattern Selection Decision Tree</a></h2>
+<pre><code>Start: Need to make a governance decision on-chain?
+│
+├─ Single decision, limited time?
+│  └─ Use: Simple Voting (01-simple-voting)
+│
+├─ Decisions require input from many token holders?
+│  └─ Use: Token Voting (02-token-voting) + Delegation (06-vote-delegation)
+│
+├─ Need formal phases: voting period → grace → execution?
+│  └─ Use: Time Constraints (03-voting-time-constraints) + Lifecycle (04-proposal-lifecycle)
+│
+├─ Managing shared treasury or protocol upgrades?
+│  └─ Use: Timelock (09-timelock-governance) + Treasury (10-dao-treasury)
+│
+└─ Production DAO with all requirements?
+   └─ Use: Stack all patterns: Voting → Delegation → Timelock → Treasury
+</code></pre>
+<h2 id="14-next-steps"><a class="header" href="#14-next-steps">14. Next Steps</a></h2>
+<ol>
+<li><strong>Try simple-voting</strong> to understand basic voting flow</li>
+<li><strong>Add token-voting</strong> to tie governance to economic incentives</li>
+<li><strong>Layer timelock</strong> for production governance with review windows</li>
+<li><strong>Implement treasury</strong> once governance mechanism is proven</li>
+</ol>
+<p>Start with examples in <a href="../examples/governance/"><code>examples/governance/</code></a>, then adapt patterns to your specific governance requirements.</p>
 
                     </main>
 

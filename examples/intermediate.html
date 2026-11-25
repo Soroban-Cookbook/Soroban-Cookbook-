@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-bcdb59af.js";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-5c19c24f.js"></script>
+        <script src="../toc-4c08ce7c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -189,7 +189,7 @@
 for runnable token, cross-contract and access-control walkthroughs.</p>
 </blockquote>
 <h2 id="-examples"><a class="header" href="#-examples">🍍 Examples</a></h2>
-<h3 id="multi-sig-patterns-multi-sig-patterns"><a class="header" href="#multi-sig-patterns-multi-sig-patterns">Multi-Sig Patterns <a href="../examples/intermediate/multi-sig-patterns/">./multi-sig-patterns/</a></a></h3>
+<h3 id="multi-sig-patterns-multi-sig-patterns"><a class="header" href="#multi-sig-patterns-multi-sig-patterns">Multi-Sig Patterns <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/multi-sig-patterns">./multi-sig-patterns/</a></a></h3>
 <p>Threshold signatures &amp; multi-party auth. N-of-M signers, sequential approvals, and single-transaction multi-auth.</p>
 <h2 id="key-concepts"><a class="header" href="#key-concepts">Key Concepts:</a></h2>
 <ul>
@@ -209,8 +209,8 @@ for signer in signers.iter() {
     signer.require_auth();
 }
 <span class="boring">}</span></code></pre>
-<h2 id="checklist-checklistmd"><a class="header" href="#checklist-checklistmd">Checklist: <a href="../examples/intermediate/multi-sig-patterns/CHECKLIST.html">CHECKLIST.md</a></a></h2>
-<h3 id="ajo-factory-ajo-factory"><a class="header" href="#ajo-factory-ajo-factory">Ajo Factory <a href="../examples/intermediate/ajo-factory/">./ajo-factory/</a></a></h3>
+<h2 id="checklist-checklistmd"><a class="header" href="#checklist-checklistmd">Checklist: <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/intermediate/multi-sig-patterns/CHECKLIST.md">CHECKLIST.md</a></a></h2>
+<h3 id="ajo-factory-ajo-factory"><a class="header" href="#ajo-factory-ajo-factory">Ajo Factory <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory">./ajo-factory/</a></a></h3>
 <p>Contract deployment from within a contract. Spawn isolated instances from Wasm hash.</p>
 <h2 id="key-concepts-1"><a class="header" href="#key-concepts-1">Key Concepts:</a></h2>
 <ul>
@@ -227,7 +227,7 @@ for signer in signers.iter() {
     .deploy(wasm_hash);
 AjoClient::new(&amp;env, &amp;address).initialize(...);
 <span class="boring">}</span></code></pre>
-<h3 id="pause--unpause-03-pause-unpause"><a class="header" href="#pause--unpause-03-pause-unpause">Pause / Unpause <a href="../examples/intermediate/03-pause-unpause/">./03-pause-unpause/</a></a></h3>
+<h3 id="pause--unpause-03-pause-unpause"><a class="header" href="#pause--unpause-03-pause-unpause">Pause / Unpause <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/03-pause-unpause">./03-pause-unpause/</a></a></h3>
 <p>Emergency shutdown mechanism. Admin-controlled pause toggle that halts sensitive operations while keeping read-only functions available.</p>
 <h2 id="key-concepts-2"><a class="header" href="#key-concepts-2">Key Concepts:</a></h2>
 <ul>
@@ -246,7 +246,7 @@ fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), PauseError&gt; {
     Ok()
 }
 <span class="boring">}</span></code></pre>
-<h3 id="storage-migration-storage-migration"><a class="header" href="#storage-migration-storage-migration">Storage Migration <a href="../examples/intermediate/storage-migration/">./storage-migration/</a></a></h3>
+<h3 id="storage-migration-storage-migration"><a class="header" href="#storage-migration-storage-migration">Storage Migration <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/storage-migration">./storage-migration/</a></a></h3>
 <p>Versioned storage upgrades. Stage migrations, transform legacy storage, and execute in safe batches with explicit version checks and rollback-friendly state.</p>
 <h2 id="key-concepts-3"><a class="header" href="#key-concepts-3">Key Concepts:</a></h2>
 <ul>
@@ -255,7 +255,7 @@ fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), PauseError&gt; {
 <li>Concrete legacy-to-new data transforms such as <code>migrate_v1_to_v2()</code></li>
 <li>Safe rollback/cancellation and migration-safety tests</li>
 </ul>
-<h3 id="event-history-event-history"><a class="header" href="#event-history-event-history">Event History <a href="../examples/intermediate/event-history/">./event-history/</a></a></h3>
+<h3 id="event-history-event-history"><a class="header" href="#event-history-event-history">Event History <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/event-history">./event-history/</a></a></h3>
 <p>On-chain audit history. Record event entries persistently and query them with cursor-based pagination and time filters.</p>
 <h2 id="key-concepts-4"><a class="header" href="#key-concepts-4">Key Concepts:</a></h2>
 <ul>
@@ -264,7 +264,7 @@ fn require_not_paused(env: &amp;Env) -&gt; Result&lt;(), PauseError&gt; {
 <li>Time-based filtering</li>
 <li>Storage cap trimming</li>
 </ul>
-<h3 id="iterable-mapping-canonical-iterable-mapping"><a class="header" href="#iterable-mapping-canonical-iterable-mapping">Iterable Mapping (canonical) <a href="../examples/intermediate/iterable-mapping/">./iterable-mapping/</a></a></h3>
+<h3 id="iterable-mapping-canonical-iterable-mapping"><a class="header" href="#iterable-mapping-canonical-iterable-mapping">Iterable Mapping (canonical) <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mapping">./iterable-mapping/</a></a></h3>
 <p>Enumerating key-value state. A map that stores keys in a side list to support paginated iteration.</p>
 <h2 id="key-concepts-5"><a class="header" href="#key-concepts-5">Key Concepts:</a></h2>
 <ul>
@@ -282,17 +282,17 @@ client.set(&amp;key, &amp;value);
 let page = client.keys(&amp;0, &amp;10);
 <span class="boring">}</span></code></pre>
 <blockquote>
-<p><strong>Advanced companion</strong>: <a href="../examples/intermediate/iterable-mappings/"><code>iterable-mappings</code></a> reuses this pattern to demonstrate filtering, mapping, and reducing over an iterable map.</p>
+<p><strong>Advanced companion</strong>: <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mappings"><code>iterable-mappings</code></a> reuses this pattern to demonstrate filtering, mapping, and reducing over an iterable map.</p>
 </blockquote>
 <h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
 <ul>
-<li><a href=".e/basics.html">Basics</a></li>
+<li><a href="./basics.html">Basics</a></li>
 </ul>
 <h2 id="-run"><a class="header" href="#-run">❰ Run</a></h2>
 <pre><code class="language-bash">cd examples/intermediate/multi-sig-patterns
 cargo test
 </code></pre>
-<h2 id="next-advanced"><a class="header" href="#next-advanced">Next: <a href=".e/advanced.html">Advanced</a></a></h2>
+<h2 id="next-advanced"><a class="header" href="#next-advanced">Next: <a href="./advanced.html">Advanced</a></a></h2>
 
                     </main>
 

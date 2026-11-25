@@ -1,0 +1,659 @@
+<!DOCTYPE HTML>
+<html lang="en" class="rust sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Solana to Soroban - Soroban Cookbook</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A comprehensive guide to building smart contracts on Stellar with Soroban">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-e96d0476.css">
+        <link rel="stylesheet" href="../css/chrome-d279d366.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "rust";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-4c08ce7c.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Soroban Cookbook</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/src/guides/solana-to-soroban.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="migrating-from-solana-to-soroban"><a class="header" href="#migrating-from-solana-to-soroban">Migrating from Solana to Soroban</a></h1>
+<p>A guide for Solana (native and Anchor) developers moving to Soroban smart
+contracts on Stellar. You already write Rust, so the language carries over.
+What changes is the execution model: how state is stored, how callers are
+authorized, and how contracts talk to each other.</p>
+<blockquote>
+<p>Coming from Solidity instead? See <a href="./ethereum-to-soroban.html">Ethereum to Soroban</a>.</p>
+</blockquote>
+<h2 id="quick-comparison"><a class="header" href="#quick-comparison">Quick Comparison</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Concept</th><th>Solana / Anchor</th><th>Soroban</th></tr>
+</thead>
+<tbody>
+<tr><td>Code unit</td><td>Program (BPF/SBF)</td><td>Contract (WASM)</td></tr>
+<tr><td>State</td><td>Separate accounts passed into every instruction</td><td>Key-value storage owned by the contract</td></tr>
+<tr><td>Deterministic addresses</td><td>PDAs (<code>find_program_address</code>)</td><td>Storage keys; contract addresses from deployer + salt</td></tr>
+<tr><td>Caller identity</td><td><code>is_signer</code> on an account</td><td><code>Address::require_auth()</code></td></tr>
+<tr><td>Framework</td><td>Anchor (<code>#[program]</code>, <code>#[derive(Accounts)]</code>)</td><td><code>soroban-sdk</code> (<code>#[contract]</code>, <code>#[contractimpl]</code>)</td></tr>
+<tr><td>Keeping state alive</td><td>Rent / rent-exempt minimum balance</td><td>TTL and state archival</td></tr>
+<tr><td>Calling other programs</td><td>CPI (<code>invoke</code>, <code>invoke_signed</code>)</td><td>Typed cross-contract clients</td></tr>
+<tr><td>Tokens</td><td>SPL Token / Token-2022</td><td>Stellar Asset Contract (SAC) and the token interface</td></tr>
+<tr><td>Errors</td><td><code>#[error_code]</code>, <code>require!</code></td><td><code>#[contracterror]</code>, <code>Result&lt;T, E&gt;</code></td></tr>
+<tr><td>Costs</td><td>Compute units + priority fees</td><td>Resource fees (CPU, memory, ledger I/O, events)</td></tr>
+<tr><td>Upgrades</td><td>Upgrade authority on the program</td><td><code>update_current_contract_wasm</code> behind your own auth</td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="1-accounts-vs-contract-storage"><a class="header" href="#1-accounts-vs-contract-storage">1. Accounts vs Contract Storage</a></h2>
+<p>On Solana a program is stateless. Every piece of data lives in an account that
+the client must find and pass into the instruction, and the program checks
+ownership and layout.</p>
+<p><strong>Anchor:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[account]
+pub struct Counter {
+    pub count: u64,
+}
+
+#[derive(Accounts)]
+pub struct Increment&lt;'info&gt; {
+    #[account(mut)]
+    pub counter: Account&lt;'info, Counter&gt;,
+}
+
+pub fn increment(ctx: Context&lt;Increment&gt;) -&gt; Result&lt;()&gt; {
+    ctx.accounts.counter.count += 1;
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p>On Soroban the contract owns its state. Clients pass plain arguments; the
+contract reads and writes its own storage. There is no account list to
+validate and no account size to allocate.</p>
+<p><strong>Soroban:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{contract, contractimpl, symbol_short, Env, Symbol};
+
+const COUNTER: Symbol = symbol_short!("COUNTER");
+
+#[contract]
+pub struct CounterContract;
+
+#[contractimpl]
+impl CounterContract {
+    pub fn increment(env: Env) -&gt; u64 {
+        let count: u64 = env.storage().instance().get(&amp;COUNTER).unwrap_or(0) + 1;
+        env.storage().instance().set(&amp;COUNTER, &amp;count);
+        count
+    }
+}
+<span class="boring">}</span></code></pre>
+<p>What this means in practice:</p>
+<ul>
+<li>No <code>space = 8 + ...</code> calculations and no <code>realloc</code>. Values are serialized for
+you and can grow.</li>
+<li>No owner checks on input accounts. Another contract cannot write your
+storage.</li>
+<li>The transaction footprint (which entries are read or written) is computed
+by simulation, not by the client listing accounts by hand.</li>
+</ul>
+<h2 id="2-pdas-vs-storage-keys-and-contract-addresses"><a class="header" href="#2-pdas-vs-storage-keys-and-contract-addresses">2. PDAs vs Storage Keys and Contract Addresses</a></h2>
+<p>PDAs serve two purposes on Solana: a deterministic address for per-user data,
+and a “signer” a program controls. Soroban splits these.</p>
+<p><strong>Per-user data.</strong> Use a typed storage key instead of deriving an address.</p>
+<p><strong>Anchor:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Accounts)]
+pub struct InitVault&lt;'info&gt; {
+    #[account(
+        init,
+        payer = user,
+        space = 8 + Vault::INIT_SPACE,
+        seeds = [b"vault", user.key().as_ref()],
+        bump
+    )]
+    pub vault: Account&lt;'info, Vault&gt;,
+    #[account(mut)]
+    pub user: Signer&lt;'info&gt;,
+    pub system_program: Program&lt;'info, System&gt;,
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Soroban:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{contracttype, Address};
+
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Vault(Address),
+}
+
+pub fn init_vault(env: Env, user: Address) {
+    user.require_auth();
+    let key = DataKey::Vault(user.clone());
+    if env.storage().persistent().has(&amp;key) {
+        panic!("vault exists");
+    }
+    env.storage().persistent().set(&amp;key, &amp;0i128);
+}
+<span class="boring">}</span></code></pre>
+<p>The <code>DataKey::Vault(user)</code> key plays the role of the <code>[b"vault", user]</code> seeds,
+with no bump to store and no canonical-bump check to get wrong.</p>
+<p><strong>Program-controlled authority.</strong> A PDA lets a program sign with
+<code>invoke_signed</code>. A Soroban contract has its own <code>Address</code>
+(<code>env.current_contract_address()</code>) and is automatically authorized for calls it
+makes directly, so it can move tokens it holds without any seeds.</p>
+<p><strong>Deterministic contract addresses.</strong> When you need a predictable address for
+a whole contract (for example one pool per pair), deploy it from a factory with
+a salt:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::{Address, BytesN, Env};
+
+pub fn deploy_pool(env: Env, wasm_hash: BytesN&lt;32&gt;, salt: BytesN&lt;32&gt;) -&gt; Address {
+    env.deployer()
+        .with_current_contract(salt)
+        .deploy_v2(wasm_hash, ())
+}
+<span class="boring">}</span></code></pre>
+<p>The same <code>(deployer, salt)</code> always yields the same address, so clients can
+compute it ahead of time.</p>
+<h2 id="3-signers-vs-require_auth"><a class="header" href="#3-signers-vs-require_auth">3. Signers vs <code>require_auth</code></a></h2>
+<p><strong>Anchor:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[derive(Accounts)]
+pub struct Withdraw&lt;'info&gt; {
+    #[account(mut, has_one = owner)]
+    pub vault: Account&lt;'info, Vault&gt;,
+    pub owner: Signer&lt;'info&gt;,
+}
+<span class="boring">}</span></code></pre>
+<p><strong>Soroban:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn withdraw(env: Env, owner: Address, amount: i128) {
+    owner.require_auth();
+    let key = DataKey::Vault(owner.clone());
+    let balance: i128 = env.storage().persistent().get(&amp;key).unwrap_or(0);
+    if amount &lt;= 0 || amount &gt; balance {
+        panic!("invalid amount");
+    }
+    env.storage().persistent().set(&amp;key, &amp;(balance - amount));
+}
+<span class="boring">}</span></code></pre>
+<p>Differences to keep in mind:</p>
+<ul>
+<li><code>require_auth</code> works for any address type: a classic Stellar account, a
+multisig account, or another contract (including custom smart wallets).</li>
+<li>Authorization covers the specific contract, function and arguments, plus a
+nonce, so a signature cannot be replayed for a different call.</li>
+<li>Use <code>require_auth_for_args</code> when the payload a user signs should differ from
+the full argument list.</li>
+<li>There is no <code>msg.sender</code> or implicit fee payer identity. Pass the acting
+<code>Address</code> explicitly and call <code>require_auth</code> on it.</li>
+</ul>
+<h2 id="4-anchor-macros-vs-soroban-sdk-macros"><a class="header" href="#4-anchor-macros-vs-soroban-sdk-macros">4. Anchor Macros vs soroban-sdk Macros</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Anchor</th><th>Soroban</th></tr>
+</thead>
+<tbody>
+<tr><td><code>#[program]</code> module</td><td><code>#[contract]</code> struct + <code>#[contractimpl]</code> impl block</td></tr>
+<tr><td><code>#[account]</code> data struct</td><td><code>#[contracttype]</code> struct or enum</td></tr>
+<tr><td><code>#[derive(Accounts)]</code> + constraints</td><td>Explicit checks in the function body</td></tr>
+<tr><td><code>#[error_code]</code></td><td><code>#[contracterror]</code></td></tr>
+<tr><td><code>#[event]</code> + <code>emit!</code></td><td><code>env.events().publish(...)</code> or <code>#[contractevent]</code></td></tr>
+<tr><td>IDL (generated)</td><td>Contract spec embedded in the WASM (generates typed clients)</td></tr>
+<tr><td><code>initialize</code> instruction</td><td><code>__constructor</code> or an <code>initialize</code> function</td></tr>
+</tbody>
+</table>
+</div>
+<p>Anchor constraints like <code>has_one</code>, <code>constraint = ...</code> and <code>close = ...</code> become
+plain Rust in Soroban. That is more code, but every check is visible in one
+place:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>pub fn close_vault(env: Env, owner: Address) -&gt; i128 {
+    owner.require_auth();
+    let key = DataKey::Vault(owner.clone());
+    let balance: i128 = env
+        .storage()
+        .persistent()
+        .get(&amp;key)
+        .expect("no vault");
+    env.storage().persistent().remove(&amp;key);
+    balance
+}
+<span class="boring">}</span></code></pre>
+<h2 id="5-rent-vs-ttl-and-state-archival"><a class="header" href="#5-rent-vs-ttl-and-state-archival">5. Rent vs TTL and State Archival</a></h2>
+<p>On Solana an account must hold a rent-exempt balance or it can be purged, and
+closing an account refunds the lamports.</p>
+<p>On Soroban every ledger entry has a time-to-live (TTL) measured in ledgers.
+When it expires, persistent and instance entries are archived (and can be
+restored), and temporary entries are deleted. You extend TTL explicitly:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>const DAY_IN_LEDGERS: u32 = 17_280;
+
+pub fn touch_vault(env: Env, owner: Address) {
+    let key = DataKey::Vault(owner);
+    env.storage()
+        .persistent()
+        .extend_ttl(&amp;key, 7 * DAY_IN_LEDGERS, 30 * DAY_IN_LEDGERS);
+}
+<span class="boring">}</span></code></pre>
+<p>Pick the storage type by lifetime:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Use</th><th>Solana habit</th><th>Soroban</th></tr>
+</thead>
+<tbody>
+<tr><td>Config, admin</td><td>Singleton PDA</td><td><code>instance()</code> storage</td></tr>
+<tr><td>User balances</td><td>One PDA per user</td><td><code>persistent()</code> storage</td></tr>
+<tr><td>Short-lived data (nonces, locks)</td><td>Account closed after use</td><td><code>temporary()</code> storage</td></tr>
+</tbody>
+</table>
+</div>
+<p>See <a href="../docs/storage-pitfalls.html">Storage Pitfalls</a> for common mistakes.</p>
+<h2 id="6-cpi-vs-cross-contract-calls"><a class="header" href="#6-cpi-vs-cross-contract-calls">6. CPI vs Cross-Contract Calls</a></h2>
+<p><strong>Anchor CPI:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>let cpi_ctx = CpiContext::new(
+    ctx.accounts.token_program.to_account_info(),
+    Transfer {
+        from: ctx.accounts.from.to_account_info(),
+        to: ctx.accounts.to.to_account_info(),
+        authority: ctx.accounts.owner.to_account_info(),
+    },
+);
+token::transfer(cpi_ctx, amount)?;
+<span class="boring">}</span></code></pre>
+<p><strong>Soroban cross-contract call:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::token;
+
+pub fn deposit(env: Env, from: Address, token_id: Address, amount: i128) {
+    from.require_auth();
+    let client = token::Client::new(&amp;env, &amp;token_id);
+    client.transfer(&amp;from, &amp;env.current_contract_address(), &amp;amount);
+}
+<span class="boring">}</span></code></pre>
+<ul>
+<li>Calls are typed: <code>contractimport!</code> or a shared client trait gives you a
+generated client with real Rust signatures, not raw instruction bytes.</li>
+<li>The user’s authorization flows through nested calls. A single signature can
+cover <code>deposit</code> and the inner <code>transfer</code>.</li>
+<li>Re-entrancy into a contract that is already on the call stack is rejected by
+the host.</li>
+</ul>
+<h2 id="7-spl-token-vs-stellar-asset-contract"><a class="header" href="#7-spl-token-vs-stellar-asset-contract">7. SPL Token vs Stellar Asset Contract</a></h2>
+<p>Solana keeps balances in per-owner token accounts (often an Associated Token
+Account per mint). On Soroban a token is a contract and balances live inside
+it, so there is nothing for the user to create before receiving tokens.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>SPL Token</th><th>Soroban</th></tr>
+</thead>
+<tbody>
+<tr><td>Mint account</td><td>Token contract address</td></tr>
+<tr><td>Token account / ATA</td><td>Balance entry inside the token contract</td></tr>
+<tr><td><code>spl_token::transfer</code></td><td><code>token::Client::transfer(from, to, amount)</code></td></tr>
+<tr><td><code>approve</code> delegate</td><td><code>approve(from, spender, amount, expiration_ledger)</code></td></tr>
+<tr><td>Native SOL</td><td>Native XLM through its own SAC address</td></tr>
+</tbody>
+</table>
+</div>
+<p>Every Stellar classic asset, including XLM, has a Stellar Asset Contract
+(SAC) that implements the same token interface, so your contract can accept
+any of them through <code>token::Client</code>.</p>
+<h2 id="8-errors"><a class="header" href="#8-errors">8. Errors</a></h2>
+<p><strong>Anchor:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[error_code]
+pub enum VaultError {
+    #[msg("Insufficient funds")]
+    InsufficientFunds,
+}
+
+require!(vault.amount &gt;= amount, VaultError::InsufficientFunds);
+<span class="boring">}</span></code></pre>
+<p><strong>Soroban:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::contracterror;
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[repr(u32)]
+pub enum VaultError {
+    InsufficientFunds = 1,
+}
+
+pub fn spend(env: Env, owner: Address, amount: i128) -&gt; Result&lt;(), VaultError&gt; {
+    owner.require_auth();
+    let balance: i128 = env
+        .storage()
+        .persistent()
+        .get(&amp;DataKey::Vault(owner.clone()))
+        .unwrap_or(0);
+    if balance &lt; amount {
+        return Err(VaultError::InsufficientFunds);
+    }
+    env.storage()
+        .persistent()
+        .set(&amp;DataKey::Vault(owner), &amp;(balance - amount));
+    Ok(())
+}
+<span class="boring">}</span></code></pre>
+<p>Error codes are stable <code>u32</code> values that clients see as <code>Error(Contract, #1)</code>.
+Do not renumber them once deployed.</p>
+<h2 id="9-events"><a class="header" href="#9-events">9. Events</a></h2>
+<p><strong>Anchor:</strong> <code>emit!(Deposited { user, amount });</code></p>
+<p><strong>Soroban:</strong></p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>use soroban_sdk::symbol_short;
+
+env.events()
+    .publish((symbol_short!("deposit"), user.clone()), amount);
+<span class="boring">}</span></code></pre>
+<p>Topics (the first tuple) are indexed and filterable by RPC; the data value is
+not. Put addresses you want to filter by into the topics.</p>
+<h2 id="10-testing"><a class="header" href="#10-testing">10. Testing</a></h2>
+<p>Solana tests usually spin up <code>solana-program-test</code>, LiteSVM or a local
+validator. Soroban tests run the contract in-process with a full host:</p>
+<pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[cfg(test)]
+mod test {
+    use super::*;
+    use soroban_sdk::Env;
+
+    #[test]
+    fn test_increment() {
+        let env = Env::default();
+        env.mock_all_auths();
+        let id = env.register(CounterContract, ());
+        let client = CounterContractClient::new(&amp;env, &amp;id);
+        assert_eq!(client.increment(), 1);
+        assert_eq!(client.increment(), 2);
+    }
+}
+<span class="boring">}</span></code></pre>
+<p><code>env.ledger().set_sequence_number(...)</code> and <code>set_timestamp(...)</code> replace
+warping the clock in a test validator. See the <a href="./testing.html">Testing Guide</a>.</p>
+<h2 id="migration-checklist"><a class="header" href="#migration-checklist">Migration Checklist</a></h2>
+<ul>
+<li><input disabled="" type="checkbox"> Replace each account type with a <code>#[contracttype]</code> value and a storage key</li>
+<li><input disabled="" type="checkbox"> Replace PDA seeds with <code>DataKey</code> variants</li>
+<li><input disabled="" type="checkbox"> Replace <code>Signer</code> checks and Anchor constraints with <code>require_auth</code> and explicit checks</li>
+<li><input disabled="" type="checkbox"> Choose instance, persistent or temporary storage for each value and plan TTL extension</li>
+<li><input disabled="" type="checkbox"> Replace CPIs with typed cross-contract clients</li>
+<li><input disabled="" type="checkbox"> Replace SPL token handling with <code>token::Client</code></li>
+<li><input disabled="" type="checkbox"> Convert <code>#[error_code]</code> to <code>#[contracterror]</code> with fixed numeric codes</li>
+<li><input disabled="" type="checkbox"> Port tests to <code>soroban_sdk::testutils</code></li>
+</ul>
+<h2 id="appendix-cosmwasm-at-a-glance"><a class="header" href="#appendix-cosmwasm-at-a-glance">Appendix: CosmWasm at a Glance</a></h2>
+<p>CosmWasm developers will find Soroban closer to home: both run WASM and
+contracts own their storage.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>CosmWasm</th><th>Soroban</th></tr>
+</thead>
+<tbody>
+<tr><td><code>instantiate</code> / <code>execute</code> / <code>query</code> entry points</td><td>Public functions on a <code>#[contractimpl]</code> block</td></tr>
+<tr><td><code>ExecuteMsg</code> enum dispatch</td><td>One function per action; the client calls it by name</td></tr>
+<tr><td><code>cw-storage-plus</code> <code>Item</code> / <code>Map</code></td><td><code>instance()</code> / <code>persistent()</code> storage with typed keys</td></tr>
+<tr><td><code>info.sender</code></td><td>Explicit <code>Address</code> argument + <code>require_auth()</code></td></tr>
+<tr><td>Submessages and replies</td><td>Synchronous cross-contract calls that return values</td></tr>
+<tr><td>CW20</td><td>SAC / token interface</td></tr>
+<tr><td><code>migrate</code> entry point</td><td><code>update_current_contract_wasm</code></td></tr>
+</tbody>
+</table>
+</div>
+<h2 id="resources"><a class="header" href="#resources">Resources</a></h2>
+<ul>
+<li><a href="https://developers.stellar.org/docs/build/smart-contracts">Soroban smart contract docs</a></li>
+<li><a href="https://developers.stellar.org/docs/build/guides/storage/choosing-the-right-storage">Choosing the right storage</a></li>
+<li><a href="https://developers.stellar.org/docs/tokens/stellar-asset-contract">Stellar Asset Contract</a></li>
+<li><a href="https://docs.rs/soroban-sdk/latest/soroban_sdk/">soroban-sdk API reference</a></li>
+<li><a href="https://github.com/stellar/soroban-examples">Soroban examples</a></li>
+<li><a href="./ethereum-to-soroban.html">Ethereum to Soroban</a></li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../guides/ethereum-to-soroban.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../docs/project-templates.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../guides/ethereum-to-soroban.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../docs/project-templates.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
+
+
+
+    </div>
+    </body>
+</html>

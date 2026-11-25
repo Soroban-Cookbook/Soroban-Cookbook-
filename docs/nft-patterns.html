@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-bcdb59af.js";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-5c19c24f.js"></script>
+        <script src="../toc-4c08ce7c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -241,7 +241,7 @@ pub fn owner_of(env: Env, token_id: u32) -&gt; Result&lt;Address, NftError&gt; {
         .ok_or(NftError::TokenNotFound)
 }
 <span class="boring">}</span></code></pre>
-<p><strong>Why <code>Persistent</code>?</strong> Owner records must survive ledger entry expiry. Soroban’s <code>Temporary</code> and <code>Instance</code> tiers have shorter TTLs and are unsuitable for long-lived ownership claims. See <a href="./storage-types.html">docs/storage-types.md</a>.</p>
+<p><strong>Why <code>Persistent</code>?</strong> Owner records must survive ledger entry expiry. Soroban’s <code>Temporary</code> and <code>Instance</code> tiers have shorter TTLs and are unsuitable for long-lived ownership claims. See <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/storage-types.md">docs/storage-types.md</a>.</p>
 <p><strong>TTL extension</strong>: Every write to a <code>Persistent</code> owner record should extend its TTL:</p>
 <pre class="playground"><code class="language-rust edition2021"><span class="boring">#![allow(unused)]
 </span><span class="boring">fn main() {
@@ -533,10 +533,10 @@ transfer seller_nets  → listing.seller
 <tr><th>Example</th><th>Directory</th><th>Key concept</th></tr>
 </thead>
 <tbody>
-<tr><td>Basic NFT</td><td><a href="../examples/nfts/01-basic-nft/">examples/nfts/01-basic-nft</a></td><td>Ownership, enumeration, approvals</td></tr>
-<tr><td>NFT Metadata</td><td><a href="../examples/nfts/02-nft-metadata/">examples/nfts/02-nft-metadata</a></td><td><code>token_uri</code>, hybrid on/off-chain</td></tr>
-<tr><td>Metadata Standards</td><td><a href="../examples/nfts/03-nft-metadata-standards/">examples/nfts/03-nft-metadata-standards</a></td><td>JSON-schema validation, attribute system</td></tr>
-<tr><td>NFT Marketplace</td><td><a href="../examples/nfts/04-nft-marketplace/">examples/nfts/04-nft-marketplace</a></td><td>Listings, auctions, bundles, royalties</td></tr>
+<tr><td>Basic NFT</td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/01-basic-nft">examples/nfts/01-basic-nft</a></td><td>Ownership, enumeration, approvals</td></tr>
+<tr><td>NFT Metadata</td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/02-nft-metadata">examples/nfts/02-nft-metadata</a></td><td><code>token_uri</code>, hybrid on/off-chain</td></tr>
+<tr><td>Metadata Standards</td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/03-nft-metadata-standards">examples/nfts/03-nft-metadata-standards</a></td><td>JSON-schema validation, attribute system</td></tr>
+<tr><td>NFT Marketplace</td><td><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/04-nft-marketplace">examples/nfts/04-nft-marketplace</a></td><td>Listings, auctions, bundles, royalties</td></tr>
 </tbody>
 </table>
 </div>

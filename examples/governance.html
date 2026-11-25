@@ -36,10 +36,10 @@
             const path_to_root = "../";
             const default_light_theme = "rust";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-bcdb59af.js";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-5c19c24f.js"></script>
+        <script src="../toc-4c08ce7c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -188,23 +188,23 @@
 </blockquote>
 <h2 id="core-learning-path"><a class="header" href="#core-learning-path">Core Learning Path</a></h2>
 <ol>
-<li><a href="../../examples/governance/01-simple-voting/"><code>01-simple-voting</code></a> — Proposal creation, one-address-one-vote, time-based deadlines</li>
-<li><a href="../../examples/governance/02-token-voting/"><code>02-token-voting</code></a> — Balance snapshots, token-weighted voting, flash-loan resistance</li>
-<li><a href="../../examples/governance/03-voting-time-constraints/"><code>03-voting-time-constraints</code></a> — Voting periods, grace periods, quorum thresholds, early closure</li>
-<li><a href="../../examples/governance/04-proposal-lifecycle/"><code>04-proposal-lifecycle</code></a> — Full state machine: Draft → Active → Queued → Executed</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/01-simple-voting"><code>01-simple-voting</code></a> — Proposal creation, one-address-one-vote, time-based deadlines</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/02-token-voting"><code>02-token-voting</code></a> — Balance snapshots, token-weighted voting, flash-loan resistance</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/03-voting-time-constraints"><code>03-voting-time-constraints</code></a> — Voting periods, grace periods, quorum thresholds, early closure</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/04-proposal-lifecycle"><code>04-proposal-lifecycle</code></a> — Full state machine: Draft → Active → Queued → Executed</li>
 </ol>
 <h2 id="delegation--authority"><a class="header" href="#delegation--authority">Delegation &amp; Authority</a></h2>
 <ul>
-<li><a href="../../examples/governance/05-proposal-validation/"><code>05-proposal-validation</code></a> — Proposal creation gates and pre-voting checks</li>
-<li><a href="../../examples/governance/06-vote-delegation/"><code>06-vote-delegation</code></a> — Liquid delegation with cycle detection and recursion limits</li>
-<li><a href="../../examples/governance/07-delegation/"><code>07-delegation</code></a> — Enhanced delegation with revocation and time-bounds</li>
-<li><a href="../../examples/governance/08-delegation-marketplace/"><code>08-delegation-marketplace</code></a> — Marketplace for renting voting power</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/05-proposal-validation"><code>05-proposal-validation</code></a> — Proposal creation gates and pre-voting checks</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/06-vote-delegation"><code>06-vote-delegation</code></a> — Liquid delegation with cycle detection and recursion limits</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/07-delegation"><code>07-delegation</code></a> — Enhanced delegation with revocation and time-bounds</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/08-delegation-marketplace"><code>08-delegation-marketplace</code></a> — Marketplace for renting voting power</li>
 </ul>
 <h2 id="advanced-governance"><a class="header" href="#advanced-governance">Advanced Governance</a></h2>
 <ul>
-<li><a href="../../examples/governance/09-timelock-governance/"><code>09-timelock-governance</code></a> — Mandatory delays, veto windows, emergency bypass</li>
-<li><a href="../../examples/governance/10-dao-treasury/"><code>10-dao-treasury</code></a> — Multisig fund management with role-based access</li>
-<li><a href="../../examples/governance/11-automatic-snapshot-triggers/"><code>11-automatic-snapshot-triggers</code></a> — Automated voting-power snapshots</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/09-timelock-governance"><code>09-timelock-governance</code></a> — Mandatory delays, veto windows, emergency bypass</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/10-dao-treasury"><code>10-dao-treasury</code></a> — Multisig fund management with role-based access</li>
+<li><a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/11-automatic-snapshot-triggers"><code>11-automatic-snapshot-triggers</code></a> — Automated voting-power snapshots</li>
 </ul>
 <h2 id="playground-use-cases"><a class="header" href="#playground-use-cases">Playground Use Cases</a></h2>
 <p>Try governance flows interactively in the <a href="../playground.html">Playground</a>. The playground use-case examples mirror the contracts in this section, so you can experiment with proposal creation, voting, and delegation before deploying.</p>
@@ -214,11 +214,11 @@
 <p>Swap in <code>02-token-voting</code>, <code>06-vote-delegation</code>, or <code>09-timelock-governance</code> to explore token-weighted voting, delegation, and timelocks. See the <a href="../playground.html#use-cases">Playground use cases</a> for the full set of DeFi, NFT, governance, and token examples.</p>
 <h2 id="prerequisites"><a class="header" href="#prerequisites">Prerequisites</a></h2>
 <ul>
-<li><a href="../basics.html">Basics</a>, <a href="../tokens.html">Tokens</a></li>
+<li><a href="./basics.html">Basics</a>, <a href="./tokens.html">Tokens</a></li>
 </ul>
 <h2 id="testing"><a class="header" href="#testing">Testing</a></h2>
 <p>Building a frontend or TypeScript bindings for these governance contracts? See the <a href="../docs/testing-best-practices.html#frontend--typescript-testing">Frontend / TypeScript Testing</a> section for <code>soroban-spec-typescript</code> client generation, Jest/Vitest tests, and RPC mocking.</p>
-<h2 id="next-tokens"><a class="header" href="#next-tokens">Next: <a href="../tokens.html">Tokens</a></a></h2>
+<h2 id="next-tokens"><a class="header" href="#next-tokens">Next: <a href="./tokens.html">Tokens</a></a></h2>
 
                     </main>
 

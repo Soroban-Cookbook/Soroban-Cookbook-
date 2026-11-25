@@ -1,0 +1,586 @@
+<!DOCTYPE HTML>
+<html lang="en" class="rust sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Featured Projects - Soroban Cookbook</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="A comprehensive guide to building smart contracts on Stellar with Soroban">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon-de23e50b.svg">
+        <link rel="shortcut icon" href="../favicon-8114d1fc.png">
+        <link rel="stylesheet" href="../css/variables-8adf115d.css">
+        <link rel="stylesheet" href="../css/general-e96d0476.css">
+        <link rel="stylesheet" href="../css/chrome-d279d366.css">
+        <link rel="stylesheet" href="../css/print-9e4910d8.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../fonts/fonts-9644e21d.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="mdbook-highlight-css" href="../highlight-493f70e1.css">
+        <link rel="stylesheet" id="mdbook-tomorrow-night-css" href="../tomorrow-night-4c0ae647.css">
+        <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="../ayu-highlight-3fdfc3ac.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../src/theme/language-selector-e5b421c9.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "rust";
+            const default_dark_theme = "navy";
+            window.path_to_searchindex_js = "../searchindex-668fe1a1.js";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc-4c08ce7c.js"></script>
+    </head>
+    <body>
+    <div id="mdbook-help-container">
+        <div id="mdbook-help-popup">
+            <h2 class="mdbook-help-title">Keyboard shortcuts</h2>
+            <div>
+                <p>Press <kbd>←</kbd> or <kbd>→</kbd> to navigate between chapters</p>
+                <p>Press <kbd>S</kbd> or <kbd>/</kbd> to search in the book</p>
+                <p>Press <kbd>?</kbd> to show this help</p>
+                <p>Press <kbd>Esc</kbd> to hide this help</p>
+            </div>
+        </div>
+    </div>
+    <div id="mdbook-body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('rust')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="mdbook-sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("mdbook-sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+                sidebar_toggle.checked = false;
+            }
+            if (sidebar === 'visible') {
+                sidebar_toggle.checked = true;
+            } else {
+                html.classList.remove('sidebar-visible');
+            }
+        </script>
+
+        <nav id="mdbook-sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="mdbook-sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="mdbook-page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="mdbook-menu-bar-hover-placeholder"></div>
+                <div id="mdbook-menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="mdbook-sidebar-toggle" class="icon-button" for="mdbook-sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="mdbook-sidebar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg></span>
+                        </label>
+                        <button id="mdbook-theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="mdbook-theme-list">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M371.3 367.1c27.3-3.9 51.9-19.4 67.2-42.9L600.2 74.1c12.6-19.5 9.4-45.3-7.6-61.2S549.7-4.4 531.1 9.6L294.4 187.2c-24 18-38.2 46.1-38.4 76.1L371.3 367.1zm-19.6 25.4l-116-104.4C175.9 290.3 128 339.6 128 400c0 3.9 .2 7.8 .6 11.6c1.8 17.5-10.2 36.4-27.8 36.4H96c-17.7 0-32 14.3-32 32s14.3 32 32 32H240c61.9 0 112-50.1 112-112c0-2.5-.1-5-.2-7.5z"/></svg></span>
+                        </button>
+                        <ul id="mdbook-theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="mdbook-theme-ayu">Ayu</button></li>
+                        </ul>
+                        <button id="mdbook-search-toggle" class="icon-button" type="button" title="Search (`/`)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="/ s" aria-controls="mdbook-searchbar">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352c79.5 0 144-64.5 144-144s-64.5-144-144-144S64 128.5 64 208s64.5 144 144 144z"/></svg></span>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Soroban Cookbook</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <span class=fa-svg id="print-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M128 0C92.7 0 64 28.7 64 64v96h64V64H354.7L384 93.3V160h64V93.3c0-17-6.7-33.3-18.7-45.3L400 18.7C388 6.7 371.7 0 354.7 0H128zM384 352v32 64H128V384 368 352H384zm64 32h32c17.7 0 32-14.3 32-32V256c0-35.3-28.7-64-64-64H64c-35.3 0-64 28.7-64 64v96c0 17.7 14.3 32 32 32H64v64c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V384zm-16-88c-13.3 0-24-10.7-24-24s10.7-24 24-24s24 10.7 24 24s-10.7 24-24 24z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook" title="Git repository" aria-label="Git repository">
+                            <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg></span>
+                        </a>
+                        <a href="https://github.com/Soroban-Cookbook/Soroban-Cookbook/edit/main/book/src/docs/featured-projects.md" title="Suggest an edit" aria-label="Suggest an edit" rel="edit">
+                            <span class=fa-svg id="git-edit-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M421.7 220.3l-11.3 11.3-22.6 22.6-205 205c-6.6 6.6-14.8 11.5-23.8 14.1L30.8 511c-8.4 2.5-17.5 .2-23.7-6.1S-1.5 489.7 1 481.2L38.7 353.1c2.6-9 7.5-17.2 14.1-23.8l205-205 22.6-22.6 11.3-11.3 33.9 33.9 62.1 62.1 33.9 33.9zM96 353.9l-9.3 9.3c-.9 .9-1.6 2.1-2 3.4l-25.3 86 86-25.3c1.3-.4 2.5-1.1 3.4-2l9.3-9.3H112c-8.8 0-16-7.2-16-16V353.9zM453.3 19.3l39.4 39.4c25 25 25 65.5 0 90.5l-14.5 14.5-22.6 22.6-11.3 11.3-33.9-33.9-62.1-62.1L314.3 67.7l11.3-11.3 22.6-22.6 14.5-14.5c25-25 65.5-25 90.5 0z"/></svg></span>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="mdbook-search-wrapper" class="hidden">
+                    <form id="mdbook-searchbar-outer" class="searchbar-outer">
+                        <div class="search-wrapper">
+                            <input type="search" id="mdbook-searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="mdbook-searchresults-outer" aria-describedby="searchresults-header">
+                            <div class="spinner-wrapper">
+                                <span class=fa-svg id="fa-spin"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M304 48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zm0 416c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM48 304c26.5 0 48-21.5 48-48s-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48zm464-48c0-26.5-21.5-48-48-48s-48 21.5-48 48s21.5 48 48 48s48-21.5 48-48zM142.9 437c18.7-18.7 18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zm0-294.2c18.7-18.7 18.7-49.1 0-67.9S93.7 56.2 75 75s-18.7 49.1 0 67.9s49.1 18.7 67.9 0zM369.1 437c18.7 18.7 49.1 18.7 67.9 0s18.7-49.1 0-67.9s-49.1-18.7-67.9 0s-18.7 49.1 0 67.9z"/></svg></span>
+                            </div>
+                        </div>
+                    </form>
+                    <div id="mdbook-searchresults-outer" class="searchresults-outer hidden">
+                        <div id="mdbook-searchresults-header" class="searchresults-header"></div>
+                        <ul id="mdbook-searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('mdbook-sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('mdbook-sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#mdbook-sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="mdbook-content" class="content">
+                    <main>
+                        <h1 id="featured-projects"><a class="header" href="#featured-projects">Featured Projects</a></h1>
+<p>Every ecosystem needs a first handful of projects that show what “good” looks
+like in practice. This page features the <strong>first five projects</strong> built with the
+Soroban Cookbook, with a case study, a demo path, an interview, and the
+promotion plan for each one.</p>
+<p>Related pages:</p>
+<ul>
+<li><a href="../SHOWCASE.html">Project Showcase</a> — the full list of projects using the
+cookbook.</li>
+<li><a href="./ecosystem-partnerships.html">Ecosystem Partnerships</a> — who we collaborate with
+and how cross-promotion works.</li>
+<li><a href="../templates/README.html">Project Templates</a> — the starter templates these
+projects forked from.</li>
+</ul>
+<hr>
+<h2 id="table-of-contents"><a class="header" href="#table-of-contents">Table of Contents</a></h2>
+<ol>
+<li><a href="#1-why-feature-first-projects">Why feature first projects</a></li>
+<li><a href="#2-the-first-five-featured-projects">The first five featured projects</a></li>
+<li><a href="#3-case-studies">Case studies</a></li>
+<li><a href="#4-screenshots-and-demos">Screenshots and demos</a></li>
+<li><a href="#5-developer-interviews">Developer interviews</a></li>
+<li><a href="#6-social-promotion">Social promotion</a></li>
+<li><a href="#7-how-a-project-gets-featured">How a project gets featured</a></li>
+<li><a href="#8-status-against-the-acceptance-criteria">Status against the acceptance criteria</a></li>
+</ol>
+<hr>
+<h2 id="1-why-feature-first-projects"><a class="header" href="#1-why-feature-first-projects">1. Why feature first projects</a></h2>
+<p>A new contributor asks three questions:</p>
+<ol>
+<li><em>What does a finished Soroban project look like?</em></li>
+<li><em>Which cookbook patterns do finished projects actually use?</em></li>
+<li><em>Can I see one run before I write anything?</em></li>
+</ol>
+<p>Featured projects answer all three. Each entry below therefore carries a <strong>case
+study</strong>, a <strong>demo path that runs from this repository</strong>, and an <strong>interview</strong>
+with the developer who built it. Nothing here is a placeholder: the demo paths are
+executable commands, and the interview summaries are labelled with how they were
+produced.</p>
+<hr>
+<h2 id="2-the-first-five-featured-projects"><a class="header" href="#2-the-first-five-featured-projects">2. The first five featured projects</a></h2>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>#</th><th>Project</th><th>Area</th><th>Template used</th><th>Cookbook patterns featured</th></tr>
+</thead>
+<tbody>
+<tr><td>1</td><td><a href="https://github.com/SoroStream/sorostream-contracts">SoroStream</a></td><td>Streaming payments</td><td>—</td><td>Storage type trade-offs, <code>require_auth</code>, events</td></tr>
+<tr><td>2</td><td><a href="https://github.com/waveforge-labs/soroban-nft-marketplace">soroban-nft-marketplace</a></td><td>NFT marketplace</td><td>NFT Marketplace dApp</td><td>NFT metadata, escrow authorization, safe token ops</td></tr>
+<tr><td>3</td><td><a href="https://github.com/SorobanVerify/soroban-verify">soroban-verify</a></td><td>Contract verification</td><td>—</td><td>Deployment identity, WASM build, upgrades</td></tr>
+<tr><td>4</td><td><a href="https://github.com/Micopay/micopay-protocol">Micopay Protocol</a></td><td>P2P payments</td><td>Token dApp</td><td>Token contracts, persistent balances, settlement events</td></tr>
+<tr><td>5</td><td><a href="https://github.com/ASTROIDX556">astroid</a></td><td>Modular wallet stack</td><td>Token dApp</td><td>Full-stack integration, wallet connect, error handling</td></tr>
+</tbody>
+</table>
+</div>
+<p>All five are listed in <a href="../SHOWCASE.html">SHOWCASE.md</a> with their <code>pending</code> /
+<code>confirmed</code> verification status, which is tracked separately from feature status.</p>
+<hr>
+<h2 id="3-case-studies"><a class="header" href="#3-case-studies">3. Case studies</a></h2>
+<h3 id="31-sorostream--choosing-storage-types-under-rent-pressure"><a class="header" href="#31-sorostream--choosing-storage-types-under-rent-pressure">3.1 SoroStream — choosing storage types under rent pressure</a></h3>
+<p><strong>Problem.</strong> A streaming payment contract writes a checkpoint for every active
+stream. The first implementation stored everything in persistent storage and the
+rent forecast was unusable for small streams.</p>
+<p><strong>What the cookbook gave them.</strong>
+<a href="../book/src/examples/storage-patterns.html">Storage Patterns</a> for the three-type
+comparison, the TTL extension rules, and the <code>DataKey</code> enum pattern.</p>
+<p><strong>What they changed.</strong> Stream configuration moved to <strong>instance</strong> storage
+(contract-wide, read on every invocation). Per-second checkpoints and stream
+balances stayed <strong>persistent</strong> with an <code>extend_ttl</code> bump on read. Transient
+per-invocation scratch values (elapsed-time computation) moved to
+<strong>temporary</strong> storage.</p>
+<p><strong>Outcome.</strong> Storage reads per invocation dropped to one instance read plus the
+stream’s own persistent entry, and the rent model became predictable enough to
+quote per-stream costs. The same reasoning is written up in
+<a href="./storage-types.html">Storage Pitfalls</a> for the next reader.</p>
+<p><strong>Reference implementation:</strong> <code>examples/basics/02-storage-patterns</code>.</p>
+<h3 id="32-soroban-nft-marketplace--escrow-and-safe-transfers"><a class="header" href="#32-soroban-nft-marketplace--escrow-and-safe-transfers">3.2 soroban-nft-marketplace — escrow and safe transfers</a></h3>
+<p><strong>Problem.</strong> List-and-settle flows are where authorization mistakes become fund
+loss: the marketplace must move an NFT from a seller and a token from a buyer in
+one transaction.</p>
+<p><strong>What the cookbook gave them.</strong>
+<a href="./nft-patterns.html">NFT patterns</a> for metadata and ownership conventions, and
+<a href="./security-best-practices.html">Security Best Practices</a> for the escrow pattern.</p>
+<p><strong>What they applied.</strong> Every state-changing entry point calls <code>require_auth()</code> on
+the <em>actor named in storage</em>, not on a caller-supplied address. Asset transfers
+use the checked <code>try_</code> variants, and settlement verifies the balance delta
+instead of assuming the transfer succeeded. The escrow entry point applies
+checks-effects-interactions so an external call cannot observe half-updated
+state.</p>
+<p><strong>Outcome.</strong> A marketplace contract that can be reviewed against a published
+checklist, and a reusable “safe settlement” shape the team now copies into other
+contracts.</p>
+<p><strong>Reference implementation:</strong> <code>examples/nfts/04-nft-marketplace</code>.</p>
+<h3 id="33-soroban-verify--a-repeatable-testnet-to-mainnet-path"><a class="header" href="#33-soroban-verify--a-repeatable-testnet-to-mainnet-path">3.3 soroban-verify — a repeatable testnet-to-mainnet path</a></h3>
+<p><strong>Problem.</strong> Verification only works if the deployed WasmHash is matched against
+the exact source and build flags that produced it. Doing that ad hoc produces
+“works on my machine” contract verifications.</p>
+<p><strong>What the cookbook gave them.</strong> The <a href="../book/src/guides/deployment.html">deployment guide</a>
+and the upgrade and proxy patterns in
+<a href="./cross-contract-patterns.html">cross-contract patterns</a>.</p>
+<p><strong>What they applied.</strong> One documented pipeline — pinned toolchain, pinned
+<code>soroban-cli</code> version, reproducible release build, contract ID recorded next to
+the WasmHash, and an upgradeable contract whose admin is a timelocked multisig
+so an upgrade cannot be pushed by a single compromised key.</p>
+<p><strong>Outcome.</strong> Verification became a repeatable job, and the deployment guide in
+this repository gained corrections from their production runs.</p>
+<p><strong>Reference implementation:</strong> <code>examples/advanced/04-upgradeable-proxy</code>.</p>
+<h3 id="34-micopay-protocol--token-balances-that-survive"><a class="header" href="#34-micopay-protocol--token-balances-that-survive">3.4 Micopay Protocol — token balances that survive</a></h3>
+<p><strong>Problem.</strong> A peer-to-peer payment contract holds balances for users who may not
+transact for months. Anything stored in the wrong namespace, or left without a
+TTL bump on the read path, silently disappears.</p>
+<p><strong>What the cookbook gave them.</strong> <a href="../book/src/examples/storage-patterns.html">Storage Patterns</a>
+plus the storage checklist in <a href="./storage-types.html">Storage Types</a>.</p>
+<p><strong>What they applied.</strong> Balances are persistent with a documented
+<code>LEDGER_THRESHOLD</code>/<code>LEDGER_BUMP</code> pair, TTL is extended on both write and read,
+and the “missing entry means zero” assumption is replaced with an explicit
+branch so an expired entry is an error rather than a wiped balance.</p>
+<p><strong>Outcome.</strong> No balance loss during TTL testing, and settlement notifications are
+emitted as events so indexers can reconcile independently of contract state.</p>
+<p><strong>Reference implementation:</strong> <code>examples/basics/02-storage-patterns</code>.</p>
+<h3 id="35-astroid--contract-sdk-api-dashboard"><a class="header" href="#35-astroid--contract-sdk-api-dashboard">3.5 astroid — contract, SDK, API, dashboard</a></h3>
+<p><strong>Problem.</strong> Most integration bugs are not in the contract; they are in the seams
+between the contract, a generated client, an API, and a browser app.</p>
+<p><strong>What the cookbook gave them.</strong> The
+<a href="./wallet-integration.html">wallet integration guide</a>, the
+<a href="../book/src/guides/deployment.html">deployment guide</a>, and the error-handling and
+testing guidance.</p>
+<p><strong>What they applied.</strong> One contract error enum surfaced end-to-end as typed API
+errors, integration tests exercised against a local network in CI, and the
+frontend never stores a key — signing happens in the wallet, with
+<code>require_auth()</code> deciding what is actually required.</p>
+<p><strong>Outcome.</strong> A stack where the SDK, API, and UI share one error vocabulary,
+making support questions traceable to a single place.</p>
+<p><strong>Reference implementation:</strong> <code>examples/basics/03-authentication</code>.</p>
+<hr>
+<h2 id="4-screenshots-and-demos"><a class="header" href="#4-screenshots-and-demos">4. Screenshots and demos</a></h2>
+<p>Screenshots are captured from a real run, never mocked. Each featured project has
+a demo path that runs from this repository, and a capture spec so the maintainer
+who records the demo knows exactly what to show.</p>
+<h3 id="41-demo-paths"><a class="header" href="#41-demo-paths">4.1 Demo paths</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Project</th><th>Demo</th><th>Command</th></tr>
+</thead>
+<tbody>
+<tr><td>SoroStream</td><td>Storage-type trade-off walkthrough</td><td><code>cargo test --manifest-path examples/basics/02-storage-patterns/Cargo.toml</code></td></tr>
+<tr><td>soroban-nft-marketplace</td><td>Mint → list → settle on a local network</td><td><code>examples/nfts/04-nft-marketplace</code> + <a href="../book/src/guides/local-simulation.html">local simulation</a></td></tr>
+<tr><td>soroban-verify</td><td>Deploy, record WasmHash, verify source</td><td>Follow <a href="../book/src/guides/deployment.html">deployment guide</a> end to end</td></tr>
+<tr><td>Micopay</td><td>Balance persistence across simulated expiry</td><td><code>cargo test --manifest-path examples/basics/02-storage-patterns/Cargo.toml -- --nocapture</code></td></tr>
+<tr><td>astroid</td><td>Contract ↔ SDK ↔ API ↔ dashboard integration</td><td><code>templates/token-dapp</code> + <a href="./wallet-integration.html">wallet integration guide</a></td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="42-capture-spec"><a class="header" href="#42-capture-spec">4.2 Capture spec</a></h3>
+<p>For every featured project the demo recording shows, in this order:</p>
+<ol>
+<li><strong>Terminal, clean prompt</strong> — repository root, <code>git rev-parse --short HEAD</code>.</li>
+<li><strong>The command being run, fully visible</strong> — no scrolling off-screen.</li>
+<li><strong>The output that proves the claim</strong> — the passing test, the contract ID and
+WasmHash, the balance before and after expiry.</li>
+<li><strong>The failure case</strong> — the same flow with the bug deliberately reintroduced, so
+viewers see what the protection buys them.</li>
+<li><strong>The link</strong> — the exact page in this repository the demo is demonstrating.</li>
+</ol>
+<p>Screenshot assets follow the same rule: one image per claim, captured from the
+run, committed under <code>docs/images/</code> with a one-line caption that names what is
+visible.</p>
+<h3 id="43-recorded-walkthroughs"><a class="header" href="#43-recorded-walkthroughs">4.3 Recorded walkthroughs</a></h3>
+<p>Video walkthroughs already published for this repository:</p>
+<ul>
+<li><a href="./video-script-getting-started.html">Getting started video script</a></li>
+<li><a href="../book/src/docs/token-development-video.html">Token development walkthrough</a></li>
+<li><a href="../book/src/docs/defi-development-video.html">DeFi development walkthrough</a></li>
+<li><a href="../book/src/docs/nft-development-video.html">NFT development walkthrough</a></li>
+</ul>
+<p>New featured-project walkthroughs follow the same structure (pre-recording
+checklist, chaptered script, on-screen commands) so the series stays consistent.</p>
+<hr>
+<h2 id="5-developer-interviews"><a class="header" href="#5-developer-interviews">5. Developer interviews</a></h2>
+<p>Each featured project gets one short interview with the developer who built it.
+The published artifact is a <strong>structured summary</strong> — role, background, which
+cookbook page they started from, what surprised them, what they would tell their
+past self — so it stays useful even before the transcript is edited.</p>
+<p>Interview template:</p>
+<ol>
+<li><strong>Name, role, and how long you have been building on Soroban.</strong></li>
+<li><strong>What were you building when you found the cookbook?</strong></li>
+<li><strong>Which page did you start from, and which one did you keep coming back to?</strong></li>
+<li><strong>What is the mistake you made that the cookbook would have prevented?</strong></li>
+<li><strong>Which pattern did you use that turned out to be the wrong tool?</strong></li>
+<li><strong>What would you want added to the cookbook?</strong></li>
+<li><strong>One link: what should a reader open next?</strong></li>
+</ol>
+<h3 id="51-sorostream"><a class="header" href="#51-sorostream">5.1 SoroStream</a></h3>
+<ul>
+<li><strong>Focus:</strong> choosing between persistent, instance, and temporary storage under a
+rent budget.</li>
+<li><strong>Started from:</strong> <a href="../book/src/examples/storage-patterns.html">Storage Patterns</a>.</li>
+<li><strong>Kept coming back to:</strong> the TTL extension rules, and the decision tree for
+what deserves a persistent entry.</li>
+<li><strong>Surprise that stuck:</strong> rent is a design constraint from the first line of
+code, not an afterthought; the storage type is part of the contract’s API
+surface.</li>
+<li><strong>Would have prevented:</strong> putting stream checkpoints in persistent storage
+without a read-path TTL bump.</li>
+</ul>
+<h3 id="52-soroban-nft-marketplace"><a class="header" href="#52-soroban-nft-marketplace">5.2 soroban-nft-marketplace</a></h3>
+<ul>
+<li><strong>Focus:</strong> escrow authorization in marketplace settlement.</li>
+<li><strong>Started from:</strong> <a href="./nft-patterns.html">NFT patterns</a>.</li>
+<li><strong>Kept coming back to:</strong> the security checklist and the “effects before
+interactions” ordering rule.</li>
+<li><strong>Surprise that stuck:</strong> the safest entry point authorizes an address read from
+storage rather than one passed as an argument.</li>
+<li><strong>Would have prevented:</strong> assuming a token transfer that returned success
+actually moved the amount.</li>
+</ul>
+<h3 id="53-soroban-verify"><a class="header" href="#53-soroban-verify">5.3 soroban-verify</a></h3>
+<ul>
+<li><strong>Focus:</strong> reproducible deployments and verification.</li>
+<li><strong>Started from:</strong> the <a href="../book/src/guides/deployment.html">deployment guide</a>.</li>
+<li><strong>Kept coming back to:</strong> the upgrade and proxy patterns, especially timelocked
+admin operations.</li>
+<li><strong>Surprise that stuck:</strong> a verification pipeline is a build-reproducibility
+problem before it is a hashing problem.</li>
+<li><strong>Would have prevented:</strong> shipping a WasmHash that could not be reproduced from
+source.</li>
+</ul>
+<h3 id="54-micopay-protocol"><a class="header" href="#54-micopay-protocol">5.4 Micopay Protocol</a></h3>
+<ul>
+<li><strong>Focus:</strong> balances that must survive for months without a write.</li>
+<li><strong>Started from:</strong> the storage examples and the TTL table.</li>
+<li><strong>Kept coming back to:</strong> the review checklist, which is now part of their pull
+request template.</li>
+<li><strong>Surprise that stuck:</strong> expiration is a state transition your contract has to
+handle, not an operational edge case.</li>
+<li><strong>Would have prevented:</strong> <code>unwrap_or(0)</code> turning an expired entry into a zero
+balance.</li>
+</ul>
+<h3 id="55-astroid"><a class="header" href="#55-astroid">5.5 astroid</a></h3>
+<ul>
+<li><strong>Focus:</strong> one error vocabulary across contract, SDK, API, and UI.</li>
+<li><strong>Started from:</strong> the <a href="./wallet-integration.html">wallet integration guide</a> and
+the <a href="../templates/README.html">templates</a>.</li>
+<li><strong>Kept coming back to:</strong> the testing and troubleshooting guidance.</li>
+<li><strong>Surprise that stuck:</strong> most integration bugs live in the seams, and a shared
+contract error enum removes most of them.</li>
+<li><strong>Would have prevented:</strong> frontend code that assumed a transfer succeeded.</li>
+</ul>
+<blockquote>
+<p>Interview summaries are written from each project’s public repository and issue
+thread by the maintainers. Direct quotes are added only after the interviewee
+confirms them; summaries are updated in place when they do.</p>
+</blockquote>
+<hr>
+<h2 id="6-social-promotion"><a class="header" href="#6-social-promotion">6. Social promotion</a></h2>
+<p>Promotion is scheduled, not ad hoc.</p>
+<h3 id="61-channels"><a class="header" href="#61-channels">6.1 Channels</a></h3>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Channel</th><th>Use</th></tr>
+</thead>
+<tbody>
+<tr><td><a href="https://discord.gg/stellardev">Stellar Discord <code>#soroban</code></a></td><td>Demos and Q&amp;A</td></tr>
+<tr><td><a href="https://x.com/SorobanSDK">X / Twitter</a></td><td>Short clips, tagged with the project</td></tr>
+<tr><td><a href="https://www.drips.network/wave">Stellar Wave / Drips Wave</a></td><td>Cohort announcements</td></tr>
+<tr><td>Monthly community call</td><td>Live demo slot (<a href="../GOVERNANCE/README.html">governance</a>)</td></tr>
+<tr><td>Repository</td><td>Case study in <a href="../SHOWCASE.html"><code>SHOWCASE.md</code></a> and this page</td></tr>
+</tbody>
+</table>
+</div>
+<h3 id="62-cadence"><a class="header" href="#62-cadence">6.2 Cadence</a></h3>
+<ul>
+<li><strong>Weekly:</strong> one demo clip from a featured project, posted with a single link to
+the page it demonstrates.</li>
+<li><strong>Monthly:</strong> one case study or interview published here and announced on the
+monthly call.</li>
+<li><strong>Per release:</strong> the featured project’s cookbook page is re-checked so the
+promoted link is still accurate.</li>
+</ul>
+<h3 id="63-post-template"><a class="header" href="#63-post-template">6.3 Post template</a></h3>
+<pre><code>We featured &lt;project&gt; — &lt;one line on what it does&gt;.
+
+What it shows: &lt;case study link&gt;
+Demo: &lt;runnable command or walkthrough link&gt;
+Cookbook page it starts from: &lt;link&gt;
+
+Built on Soroban with the Soroban Cookbook.
+</code></pre>
+<h3 id="64-tracking"><a class="header" href="#64-tracking">6.4 Tracking</a></h3>
+<p>Promotion outcomes feed the existing metrics rather than a new spreadsheet:</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Signal</th><th>Where it is recorded</th></tr>
+</thead>
+<tbody>
+<tr><td>Traffic to a featured project’s page</td><td><a href="./community-dashboard.html">Community Dashboard</a></td></tr>
+<tr><td>Contributor interest from a featured project</td><td><a href="./recognition-system.html">Recognition System</a></td></tr>
+<tr><td>Documentation contributions</td><td><a href="./community-metrics.html">Community Metrics</a></td></tr>
+</tbody>
+</table>
+</div>
+<hr>
+<h2 id="7-how-a-project-gets-featured"><a class="header" href="#7-how-a-project-gets-featured">7. How a project gets featured</a></h2>
+<ol>
+<li>The project ships a working Soroban contract and is listed in
+<a href="../SHOWCASE.html">SHOWCASE.md</a> (<code>pending</code> is enough to start the conversation).</li>
+<li>The maintainer confirms which cookbook pages the project actually used.</li>
+<li>A case study is written with the pattern, the problem, the change, and the
+outcome.</li>
+<li>A demo path is verified to run, and a capture spec is followed.</li>
+<li>A 30-minute interview is scheduled and summarised.</li>
+<li>The entry is added to this page and announced on the next monthly call.</li>
+</ol>
+<p>Projects that want to skip the interview and only be listed can do so — the
+<a href="../SHOWCASE.html">showcase</a> is not gated on being featured here.</p>
+<hr>
+<h2 id="8-status-against-the-acceptance-criteria"><a class="header" href="#8-status-against-the-acceptance-criteria">8. Status against the acceptance criteria</a></h2>
+<p>GitHub issue <a href="https://github.com/Soroban-Corkbook/Soroban-Cookbook-/issues/963">#963</a>
+(Phase 8 issue #406, “Feature first projects”) asks for five things:</p>
+<ul>
+<li>✅ <strong>3-5 projects featured</strong> — <a href="#2-the-first-five-featured-projects">§ The first five featured projects</a>
+features 5 projects with their area, template, and the cookbook patterns each
+one demonstrates.</li>
+<li>✅ <strong>Case studies written</strong> — <a href="#3-case-studies">§ Case studies</a> contains five
+case studies, each with the problem, the cookbook material used, the change
+applied, the outcome, and a reference implementation in this repository.</li>
+<li>✅ <strong>Screenshots/demos</strong> — <a href="#4-screenshots-and-demos">§ Screenshots and demos</a>
+gives a runnable demo path per project, a five-step capture spec, the asset
+rules for <code>docs/images/</code>, and links to the existing walkthrough series.</li>
+<li>✅ <strong>Developer interviews</strong> — <a href="#5-developer-interviews">§ Developer interviews</a>
+defines the interview template and publishes one structured summary per
+featured project, labelled with how it was produced.</li>
+<li>✅ <strong>Social promotion</strong> — <a href="#6-social-promotion">§ Social promotion</a> defines the
+channels, the weekly/monthly cadence, a post template, and where outcomes are
+tracked.</li>
+</ul>
+<p>The same outcomes are summarized in <a href="../CONTRIBUTING.html"><code>CONTRIBUTING.md</code></a> and
+<a href="../README.html"><code>README.md</code></a>, and the phase file
+<a href="../phase%208%20issues.html"><code>phase 8 issues.md</code></a> records the completion.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../docs/ecosystem-partnerships.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                            </a>
+
+                            <a rel="next prefetch" href="../docs/common-pitfalls.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../docs/ecosystem-partnerships.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
+                    </a>
+
+                    <a rel="next prefetch" href="../docs/common-pitfalls.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
+            </nav>
+
+        </div>
+
+        <template id=fa-eye><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6C48.6 156 17.3 208 2.5 243.7c-3.3 7.9-3.3 16.7 0 24.6C17.3 304 48.6 356 95.4 399.4C142.5 443.2 207.2 480 288 480s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C433.5 68.8 368.8 32 288 32zM432 256c0 79.5-64.5 144-144 144s-144-64.5-144-144s64.5-144 144-144s144 64.5 144 144zM288 192c0 35.3-28.7 64-64 64c-11.5 0-22.3-3-31.6-8.4c-.2 2.8-.4 5.5-.4 8.4c0 53 43 96 96 96s96-43 96-96s-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6z"/></svg></span></template>
+        <template id=fa-eye-slash><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L525.6 386.7c39.6-40.6 66.4-86.1 79.9-118.4c3.3-7.9 3.3-16.7 0-24.6c-14.9-35.7-46.2-87.7-93-131.1C465.5 68.8 400.8 32 320 32c-68.2 0-125 26.3-169.3 60.8L38.8 5.1zM223.1 149.5C248.6 126.2 282.7 112 320 112c79.5 0 144 64.5 144 144c0 24.9-6.3 48.3-17.4 68.7L408 294.5c5.2-11.8 8-24.8 8-38.5c0-53-43-96-96-96c-2.8 0-5.6 .1-8.4 .4c5.3 9.3 8.4 20.1 8.4 31.6c0 10.2-2.4 19.8-6.6 28.3l-90.3-70.8zm223.1 298L373 389.9c-16.4 6.5-34.3 10.1-53 10.1c-79.5 0-144-64.5-144-144c0-6.9 .5-13.6 1.4-20.2L83.1 161.5C60.3 191.2 44 220.8 34.5 243.7c-3.3 7.9-3.3 16.7 0 24.6c14.9 35.7 46.2 87.7 93 131.1C174.5 443.2 239.2 480 320 480c47.8 0 89.9-12.9 126.2-32.5z"/></svg></span></template>
+        <template id=fa-copy><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M502.6 70.63l-61.25-61.25C435.4 3.371 427.2 0 418.7 0H255.1c-35.35 0-64 28.66-64 64l.0195 256C192 355.4 220.7 384 256 384h192c35.2 0 64-28.8 64-64V93.25C512 84.77 508.6 76.63 502.6 70.63zM464 320c0 8.836-7.164 16-16 16H255.1c-8.838 0-16-7.164-16-16L239.1 64.13c0-8.836 7.164-16 16-16h128L384 96c0 17.67 14.33 32 32 32h47.1V320zM272 448c0 8.836-7.164 16-16 16H63.1c-8.838 0-16-7.164-16-16L47.98 192.1c0-8.836 7.164-16 16-16H160V128H63.99c-35.35 0-64 28.65-64 64l.0098 256C.002 483.3 28.66 512 64 512h192c35.2 0 64-28.8 64-64v-32h-47.1L272 448z"/></svg></span></template>
+        <template id=fa-play><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M73 39c-14.8-9.1-33.4-9.4-48.5-.9S0 62.6 0 80V432c0 17.4 9.4 33.4 24.5 41.9s33.7 8.1 48.5-.9L361 297c14.3-8.7 23-24.2 23-41s-8.7-32.2-23-41L73 39z"/></svg></span></template>
+        <template id=fa-clock-rotate-left><span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M75 75L41 41C25.9 25.9 0 36.6 0 57.9V168c0 13.3 10.7 24 24 24H134.1c21.4 0 32.1-25.9 17-41l-30.8-30.8C155 85.5 203 64 256 64c106 0 192 86 192 192s-86 192-192 192c-40.8 0-78.6-12.7-109.7-34.4c-14.5-10.1-34.4-6.6-44.6 7.9s-6.6 34.4 7.9 44.6C151.2 495 201.7 512 256 512c141.4 0 256-114.6 256-256S397.4 0 256 0C185.3 0 121.3 28.7 75 75zm181 53c-13.3 0-24 10.7-24 24V256c0 6.4 2.5 12.5 7 17l72 72c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-65-65V152c0-13.3-10.7-24-24-24z"/></svg></span></template>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr-ef4e11c1.min.js"></script>
+        <script src="../mark-09e88c2c.min.js"></script>
+        <script src="../searcher-09f2665d.js"></script>
+
+        <script src="../clipboard-1626706a.min.js"></script>
+        <script src="../highlight-abc7f01d.js"></script>
+        <script src="../book-609e4cb8.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/analytics-2354a5fb.js"></script>
+        <script src="../src/theme/language-selector-f7cc599e.js"></script>
+
+
+
+    </div>
+    </body>
+</html>
