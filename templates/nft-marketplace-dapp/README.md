@@ -20,7 +20,6 @@ A full-stack digital collectible and marketplace template on Stellar using Sorob
 nft-marketplace-dapp/
 ├── contracts/
 │   └── marketplace/
-│       ├── Cargo.toml
 │       └── src/
 │           ├── lib.rs       # NFT & Marketplace contract logic
 │           └── test.rs      # Unit test suite
@@ -32,7 +31,7 @@ nft-marketplace-dapp/
 │       └── styles.css       # Dark-mode marketplace styling
 ├── scripts/
 │   └── deploy.sh            # Automated deployment script
-├── Cargo.toml               # Rust workspace configuration
+├── Cargo.toml               # Rust package configuration
 └── README.md                # Project documentation
 ```
 
@@ -41,8 +40,18 @@ nft-marketplace-dapp/
 ## 🚀 Getting Started
 
 ### 1. Test Contracts
+This template is a single package that is a member of the cookbook Cargo
+workspace, so it is built and tested by `cargo build --workspace` /
+`cargo test --workspace`. Run it directly from the repository root:
+
 ```bash
-cd contracts/marketplace
+cargo test -p nft-marketplace-dapp
+```
+
+Or from inside the template directory:
+
+```bash
+cd templates/nft-marketplace-dapp
 cargo test
 ```
 

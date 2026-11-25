@@ -5,13 +5,15 @@ extern crate std;
 
 use soroban_sdk::{
     symbol_short,
-    testutils::{Address as _, Ledger},
-    Address, Env, IntoVal, Symbol, Vec,
+    testutils::{Address as _, Events as _},
+    Address, Env, String, Symbol, TryFromVal, Vec,
 };
 
-use crate::CustomTokenContractClient;
+use soroban_validation::test_events::EventList;
 
-fn setup() -> (Env, Address, Address, Address, CustomTokenContractClient<'static>) {
+use crate::CustomTokenClient;
+
+fn setup() -> (Env, Address, Address, Address, CustomTokenClient<'static>) {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -21,8 +23,8 @@ fn setup() -> (Env, Address, Address, Address, CustomTokenContractClient<'static
 
     let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), user1.clone()]);
 
-    let contract_id = env.register_contract(None, crate::CustomTokenContract);
-    let client = CustomTokenContractClient::new(&env, &contract_id);
+    let contract_id = env.register_contract(None, crate::CustomToken);
+    let client = CustomTokenClient::new(&env, &contract_id);
 
     client.initialize(
         &admin,
@@ -55,14 +57,14 @@ fn test_initialize_twice_fails() {
 
     let result = client.try_initialize(
         &admin,
-        &String::from_str(&std::vec!["Duplicate"].into()),
+        &String::from_str(&_env, "Duplicate"),
         &symbol_short!("DUP"),
         &7u32,
         &500i128,
         &2u32,
         &Vec::from_array(&_env, [admin.clone(), Address::generate(&_env)]),
     );
-    assert_eq!(result.err().unwrap().to_string(), "AlreadyInitialized");
+    assert_eq!(result, Err(Ok(crate::TokenError::AlreadyInitialized)));
 }
 
 #[test]
@@ -80,7 +82,7 @@ fn test_transfer_insufficient_balance() {
     let (_env, admin, user1, _user2, client) = setup();
 
     let result = client.try_transfer(&admin, &user1, &2000);
-    assert_eq!(result.err().unwrap().to_string(), "InsufficientBalance");
+    assert_eq!(result, Err(Ok(crate::TokenError::InsufficientBalance)));
 }
 
 #[test]
@@ -88,10 +90,10 @@ fn test_transfer_invalid_amount() {
     let (_env, admin, user1, _user2, client) = setup();
 
     let result = client.try_transfer(&admin, &user1, &0);
-    assert_eq!(result.err().unwrap().to_string(), "InvalidAmount");
+    assert_eq!(result, Err(Ok(crate::TokenError::InvalidAmount)));
 
     let result = client.try_transfer(&admin, &user1, &(-100));
-    assert_eq!(result.err().unwrap().to_string(), "InvalidAmount");
+    assert_eq!(result, Err(Ok(crate::TokenError::InvalidAmount)));
 }
 
 #[test]
@@ -115,7 +117,7 @@ fn test_transfer_from_exceeds_allowance() {
 
     client.approve(&admin, &user1, &100);
     let result = client.try_transfer_from(&user1, &admin, &user2, &200);
-    assert_eq!(result.err().unwrap().to_string(), "AllowanceExceeded");
+    assert_eq!(result, Err(Ok(crate::TokenError::AllowanceExceeded)));
 }
 
 #[test]
@@ -133,7 +135,7 @@ fn test_mint_unauthorized() {
     let (_env, _admin, user1, _user2, client) = setup();
 
     let result = client.try_mint(&user1, &user1, &500);
-    assert_eq!(result.err().unwrap().to_string(), "Unauthorized");
+    assert_eq!(result, Err(Ok(crate::TokenError::Unauthorized)));
 }
 
 #[test]
@@ -148,10 +150,10 @@ fn test_burn() {
 
 #[test]
 fn test_burn_insufficient_balance() {
-    let (_env, admin, _user1, user2, client) = setup();
+    let (_env, _admin, _user1, user2, client) = setup();
 
     let result = client.try_burn(&user2, &100);
-    assert_eq!(result.err().unwrap().to_string(), "InsufficientBalance");
+    assert_eq!(result, Err(Ok(crate::TokenError::InsufficientBalance)));
 }
 
 #[test]
@@ -163,7 +165,7 @@ fn test_pause_lifecycle() {
     assert!(client.is_paused());
 
     let result = client.try_transfer(&admin, &user1, &100);
-    assert_eq!(result.err().unwrap().to_string(), "Paused");
+    assert_eq!(result, Err(Ok(crate::TokenError::Paused)));
 
     client.set_pause(&admin, &false);
     assert!(!client.is_paused());
@@ -181,10 +183,11 @@ fn test_multi_sig_transfer() {
     let signer2 = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
+    let signers: Vec<Address> =
+        Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
 
-    let contract_id = env.register_contract(None, crate::CustomTokenContract);
-    let client = CustomTokenContractClient::new(&env, &contract_id);
+    let contract_id = env.register_contract(None, crate::CustomToken);
+    let client = CustomTokenClient::new(&env, &contract_id);
 
     client.initialize(
         &admin,
@@ -195,6 +198,7 @@ fn test_multi_sig_transfer() {
         &3u32,
         &signers,
     );
+    client.transfer(&admin, &contract_id, &500);
 
     let approving_signers: Vec<Address> =
         Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
@@ -215,10 +219,11 @@ fn test_multi_sig_insufficient_signers() {
     let signer2 = Address::generate(&env);
     let recipient = Address::generate(&env);
 
-    let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
+    let signers: Vec<Address> =
+        Vec::from_array(&env, [admin.clone(), signer1.clone(), signer2.clone()]);
 
-    let contract_id = env.register_contract(None, crate::CustomTokenContract);
-    let client = CustomTokenContractClient::new(&env, &contract_id);
+    let contract_id = env.register_contract(None, crate::CustomToken);
+    let client = CustomTokenClient::new(&env, &contract_id);
 
     client.initialize(
         &admin,
@@ -232,7 +237,7 @@ fn test_multi_sig_insufficient_signers() {
 
     let partial_signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone()]);
     let result = client.try_multi_sig_transfer(&partial_signers, &recipient, &500);
-    assert_eq!(result.err().unwrap().to_string(), "InsufficientApprovals");
+    assert_eq!(result, Err(Ok(crate::TokenError::InsufficientApprovals)));
 }
 
 #[test]
@@ -247,8 +252,8 @@ fn test_multi_sig_unauthorized_signer() {
 
     let signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), signer1.clone()]);
 
-    let contract_id = env.register_contract(None, crate::CustomTokenContract);
-    let client = CustomTokenContractClient::new(&env, &contract_id);
+    let contract_id = env.register_contract(None, crate::CustomToken);
+    let client = CustomTokenClient::new(&env, &contract_id);
 
     client.initialize(
         &admin,
@@ -262,12 +267,12 @@ fn test_multi_sig_unauthorized_signer() {
 
     let bad_signers: Vec<Address> = Vec::from_array(&env, [admin.clone(), stranger.clone()]);
     let result = client.try_multi_sig_transfer(&bad_signers, &recipient, &500);
-    assert_eq!(result.err().unwrap().to_string(), "NotSigner");
+    assert_eq!(result, Err(Ok(crate::TokenError::NotSigner)));
 }
 
 #[test]
 fn test_update_signers() {
-    let (_env, admin, user1, user2, client) = setup();
+    let (_env, admin, _user1, user2, client) = setup();
 
     let new_signers: Vec<Address> = Vec::from_array(&_env, [admin.clone(), user2.clone()]);
     client.update_signers(&admin, &2u32, &new_signers);
@@ -284,8 +289,8 @@ fn test_initialize_with_invalid_threshold() {
     let env = Env::default();
     let admin = Address::generate(&env);
 
-    let contract_id = env.register_contract(None, crate::CustomTokenContract);
-    let client = CustomTokenContractClient::new(&env, &contract_id);
+    let contract_id = env.register_contract(None, crate::CustomToken);
+    let client = CustomTokenClient::new(&env, &contract_id);
 
     let result = client.try_initialize(
         &admin,
@@ -296,7 +301,7 @@ fn test_initialize_with_invalid_threshold() {
         &0u32,
         &Vec::from_array(&env, [admin.clone()]),
     );
-    assert_eq!(result.err().unwrap().to_string(), "InvalidThreshold");
+    assert_eq!(result, Err(Ok(crate::TokenError::InvalidThreshold)));
 }
 
 #[test]
@@ -305,22 +310,21 @@ fn test_events_emitted() {
 
     client.transfer(&admin, &user1, &100);
 
-    let events = env.events().all();
-    let transfer_event = events
+    let events = EventList::new(&env, env.events().all());
+    let (_, topics, _) = events
         .iter()
-        .find(|e| {
-            let topics = e.0.clone();
-            let topic2: Symbol = topics.get(1).unwrap().unwrap();
+        .find(|(_, topics, _)| {
+            let topic2: Symbol = Symbol::try_from_val(&env, &topics.get(1).unwrap()).unwrap();
             topic2 == symbol_short!("transfer")
         })
         .unwrap();
 
     assert_eq!(
-        transfer_event.0.get(2).unwrap().unwrap(),
-        admin.clone().into_val(&env)
+        Address::try_from_val(&env, &topics.get(2).unwrap()).unwrap(),
+        admin
     );
     assert_eq!(
-        transfer_event.0.get(3).unwrap().unwrap(),
-        user1.clone().into_val(&env)
+        Address::try_from_val(&env, &topics.get(3).unwrap()).unwrap(),
+        user1
     );
 }

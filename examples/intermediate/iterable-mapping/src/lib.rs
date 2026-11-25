@@ -1,26 +1,31 @@
-#no_std
+#![no_std]
 
-use soroban_sdk::{contract, contractimpl, vec, Env, Symbol, Vec};
+use soroban_sdk::{
+    contract, contractimpl, contracttype, vec, Env, IntoVal, Symbol, TryFromVal, Val, Vec,
+};
 
 const MAX_PAGE_SIZE: u32 = 100;
 
-#derive(Clone)
+#[contracttype]
+#[derive(Clone)]
 enum DataKey {
     Value(Symbol),
     Keys,
 }
 
-#contract
+#[contract]
 pub struct IterableMapping;
 
-#contractimpl
-impl TerableMapping {
+#[contractimpl]
+impl IterableMapping {
     /// Insert or update a key-value pair. If the key is new, it is appended
     /// to the iteration order.
     pub fn set(env: Env, key: Symbol, value: u32) {
-        env.storage().instance().set(&DataKey::Value(key.clone()), &value);
+        env.storage()
+            .instance()
+            .set(&DataKey::Value(key.clone()), &value);
         let mut keys: Vec<Symbol> = read_keys(&env);
-        if ! keys.iter().any(| k | k == key) {
+        if !keys.iter().any(|existing| existing == key) {
             keys.push_back(key);
             write_keys(&env, &keys);
         }
@@ -40,9 +45,11 @@ impl TerableMapping {
     pub fn remove(env: Env, key: Symbol) -> bool {
         let mut removed = false;
         if env.storage().instance().has(&DataKey::Value(key.clone())) {
-            env.storage().instance().remove(&DataKey::Value(key.clone()));
-            let mut keys: Vec<Symbol> = read_keys(&env);
-            let mut new_keys = vec[&env];
+            env.storage()
+                .instance()
+                .remove(&DataKey::Value(key.clone()));
+            let keys: Vec<Symbol> = read_keys(&env);
+            let mut new_keys = vec![&env];
             for k in keys.iter() {
                 if k != key {
                     new_keys.push_back(k);
@@ -64,13 +71,13 @@ impl TerableMapping {
     /// Return values for all keys, in the same order as `keys`, paginated.
     pub fn values(env: Env, page: u32, page_size: u32) -> Vec<u32> {
         let all_keys = read_keys(&env);
-        let mut result = vec[&env];
+        let mut result = vec![&env];
         for key in paginate(&env, all_keys, page, page_size).iter() {
             let value: u32 = env
                 .storage()
                 .instance()
-                .get(&DataKey::Value(key))
-                .unwrap_or_else(<| panic!("missing value for key"));
+                .get(&DataKey::Value(key.clone()))
+                .unwrap_or_else(|| panic!("missing value for key"));
             result.push_back(value);
         }
         result
@@ -79,13 +86,13 @@ impl TerableMapping {
     /// Return key-value pairs, paginated.
     pub fn entries(env: Env, page: u32, page_size: u32) -> Vec<(Symbol, u32)> {
         let all_keys = read_keys(&env);
-        let mut result = vec[&env];
+        let mut result = vec![&env];
         for key in paginate(&env, all_keys, page, page_size).iter() {
             let value: u32 = env
                 .storage()
                 .instance()
-                .get(&DataKey::Value(key))
-                .unwrap_or_else(<? panic!("missing value for key"));
+                .get(&DataKey::Value(key.clone()))
+                .unwrap_or_else(|| panic!("missing value for key"));
             result.push_back((key, value));
         }
         result
@@ -101,21 +108,24 @@ fn read_keys(env: &Env) -> Vec<Symbol> {
     env.storage()
         .instance()
         .get(&DataKey::Keys)
-        .unwrap_or_else(<| vec[env])
+        .unwrap_or_else(|| vec![env])
 }
 
 fn write_keys(env: &Env, keys: &Vec<Symbol>) {
     env.storage().instance().set(&DataKey::Keys, keys);
 }
 
-fn paginate<T: Clone>(env: &Env, items: Vec<T>, page: u32, page_size: u32) -> Vec<T> {
-    if page_size == 0 || items.len() == 0 {
-        return vec[env];
+fn paginate<T>(env: &Env, items: Vec<T>, page: u32, page_size: u32) -> Vec<T>
+where
+    T: Clone + IntoVal<Env, Val> + TryFromVal<Env, Val>,
+{
+    if page_size == 0 || items.is_empty() {
+        return vec![env];
     }
     let page_size = page_size.min(MAX_PAGE_SIZE);
-    let start = (page * page_size).min(items.len());
-    let end = ((page + 1) * page_size).min(items.len());
-    let mut result = vec[env];
+    let start = page.saturating_mul(page_size).min(items.len());
+    let end = start.saturating_add(page_size).min(items.len());
+    let mut result = vec![env];
     for i in start..end {
         result.push_back(items.get(i).expect("index out of bounds"));
     }
@@ -124,53 +134,58 @@ fn paginate<T: Clone>(env: &Env, items: Vec<T>, page: u32, page_size: u32) -> Ve
 
 #[cfg(test)]
 mod test {
-    use super:*;
-    use soroban_sdk::{Env, Symbol, vec};
+    use super::*;
 
-    #test
+    #[test]
     fn test_set_get_remove() {
         let env = Env::default();
-        let contract_id = env.register_contract(None, TerableMapping);
-        let client = TerableMappingClient::new(&env, &contract_id);
+        let contract_id = env.register_contract(None, IterableMapping);
+        let client = IterableMappingClient::new(&env, &contract_id);
 
         client.set(&Symbol::new(&env, "a"), &1);
         client.set(&Symbol::new(&env, "b"), &2);
-        assert_eq(client.get(&Symbol::new(&env, "a")), Some(1));
-        assert_eq(client.len(), 2);
+        assert_eq!(client.get(&Symbol::new(&env, "a")), Some(1));
+        assert_eq!(client.len(), 2);
         assert!(client.contains(&Symbol::new(&env, "a")));
 
         assert!(client.remove(&Symbol::new(&env, "a")));
-        assert!(client.contains(&Symbol::new(&env, "a")));
-        assert_eq(client.len(), 1);
-        assert!(client.remove(&Symbol::new(&env, "a")));
+        assert!(!client.contains(&Symbol::new(&env, "a")));
+        assert_eq!(client.len(), 1);
+        assert!(!client.remove(&Symbol::new(&env, "a")));
     }
 
-    #test
+    #[test]
     fn test_pagination() {
         let env = Env::default();
-        let contract_id = env.register_contract(None, TerableMapping);
-        let client = TerableMappingClient::new(&env, &contract_id);
+        let contract_id = env.register_contract(None, IterableMapping);
+        let client = IterableMappingClient::new(&env, &contract_id);
 
-        for i in 0..5 {
-            client.set(&Symbol::new(&env, &format!("key{}", i)), &i);
+        for (key, value) in [
+            ("key0", 0),
+            ("key1", 1),
+            ("key2", 2),
+            ("key3", 3),
+            ("key4", 4),
+        ] {
+            client.set(&Symbol::new(&env, key), &value);
         }
 
         let page1 = client.keys(&0, &2);
-        assert_eq(page1.len(), 2);
-        assert_eq(page1.get(0).unwrap(), Symbol::new(&env, "key0"));
-        assert_eq(page1.get(1).unwrap(), Symbol::new(&env, "key1"));
+        assert_eq!(page1.len(), 2);
+        assert_eq!(page1.get(0).unwrap(), Symbol::new(&env, "key0"));
+        assert_eq!(page1.get(1).unwrap(), Symbol::new(&env, "key1"));
 
         let page2 = client.keys(&1, &2);
-        assert_eq(page2.len(), 2);
-        assert_eq(page2.get(0).unwrap(), Symbol::new(&env, "key2"));
+        assert_eq!(page2.len(), 2);
+        assert_eq!(page2.get(0).unwrap(), Symbol::new(&env, "key2"));
 
         let page3 = client.keys(&2, &2);
-        assert_eq(page3.len(), 1);
-        assert_eq(page3.get(0).unwrap(), Symbol::new(&env, "key4"));
+        assert_eq!(page3.len(), 1);
+        assert_eq!(page3.get(0).unwrap(), Symbol::new(&env, "key4"));
 
         let values = client.values(&0, &2);
-        assert_eq(values.len(), 2);
-        assert_eq(values.get(0).unwrap(), 0);
-        assert_eq(values.get(1).unwrap(), 1);
+        assert_eq!(values.len(), 2);
+        assert_eq!(values.get(0).unwrap(), 0);
+        assert_eq!(values.get(1).unwrap(), 1);
     }
 }

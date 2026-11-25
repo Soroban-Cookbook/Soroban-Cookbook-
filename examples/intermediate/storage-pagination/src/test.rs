@@ -60,7 +60,7 @@ fn test_first_page() {
         client.add_item(&item(i));
     }
 
-    let page = client.list(&5, &None).unwrap();
+    let page = client.list(&5, &None);
     assert_eq!(page.items.len(), 5);
     assert_eq!(page.items.get(0).unwrap(), item(0));
     assert_eq!(page.items.get(4).unwrap(), item(4));
@@ -74,11 +74,11 @@ fn test_returned_cursor_and_second_page() {
         client.add_item(&item(i));
     }
 
-    let first = client.list(&4, &None).unwrap();
+    let first = client.list(&4, &None);
     assert_eq!(first.items.len(), 4);
     let cursor = first.next_cursor.clone().expect("expected next cursor");
 
-    let second = client.list(&4, &Some(cursor)).unwrap();
+    let second = client.list(&4, &Some(cursor));
     assert_eq!(second.items.len(), 4);
     assert_eq!(second.items.get(0).unwrap(), item(4));
     assert_eq!(second.items.get(3).unwrap(), item(7));
@@ -92,9 +92,9 @@ fn test_partial_final_page() {
         client.add_item(&item(i));
     }
 
-    let first = client.list(&8, &None).unwrap();
+    let first = client.list(&8, &None);
     let cursor = first.next_cursor.expect("expected next cursor");
-    let last = client.list(&8, &Some(cursor)).unwrap();
+    let last = client.list(&8, &Some(cursor));
 
     assert_eq!(last.items.len(), 2);
     assert_eq!(last.items.get(0).unwrap(), item(8));
@@ -105,7 +105,7 @@ fn test_partial_final_page() {
 #[test]
 fn test_empty_collection() {
     let (_env, client) = setup();
-    let page = client.list(&10, &None).unwrap();
+    let page = client.list(&10, &None);
     assert_eq!(page.items.len(), 0);
     assert!(page.next_cursor.is_none());
 }
@@ -118,7 +118,7 @@ fn test_cursor_beyond_collection() {
     }
 
     let cursor = client.cursor_from_index(&10);
-    let page = client.list(&5, &Some(cursor)).unwrap();
+    let page = client.list(&5, &Some(cursor));
     assert_eq!(page.items.len(), 0);
     assert!(page.next_cursor.is_none());
 }
@@ -131,7 +131,7 @@ fn test_cursor_exactly_at_end() {
     }
 
     let cursor = client.cursor_from_index(&5);
-    let page = client.list(&5, &Some(cursor)).unwrap();
+    let page = client.list(&5, &Some(cursor));
     assert_eq!(page.items.len(), 0);
     assert!(page.next_cursor.is_none());
 }
@@ -148,12 +148,10 @@ fn test_page_size_zero_errors() {
 fn test_page_size_cap() {
     let (_env, client) = setup();
     client.add_item(&item(0));
-    let err = client
-        .try_list(&(MAX_PAGE_SIZE + 1), &None)
-        .unwrap_err();
+    let err = client.try_list(&(MAX_PAGE_SIZE + 1), &None).unwrap_err();
     assert_eq!(err, Ok(PaginationError::InvalidPageSize));
 
-    let page = client.list(&MAX_PAGE_SIZE, &None).unwrap();
+    let page = client.list(&MAX_PAGE_SIZE, &None);
     assert_eq!(page.items.len(), 1);
 }
 
@@ -207,19 +205,23 @@ fn test_full_pagination_no_duplicates_or_gaps() {
     }
 
     let mut cursor: Option<Bytes> = None;
-    let mut collected: [Option<Symbol>; N as usize] = [None; N as usize];
+    let mut collected: [Option<Symbol>; N as usize] = core::array::from_fn(|_| None);
     let mut count = 0u32;
     let mut pages = 0u32;
 
     loop {
-        let page = client.list(&PAGE, &cursor).unwrap();
+        let page = client.list(&PAGE, &cursor);
         pages += 1;
         assert!(page.items.len() <= PAGE);
 
         for i in 0..page.items.len() {
             let value = page.items.get(i).unwrap();
             let expected_index = count;
-            assert_eq!(value, item(expected_index), "unexpected item at position {count}");
+            assert_eq!(
+                value,
+                item(expected_index),
+                "unexpected item at position {count}"
+            );
             assert!(
                 collected[expected_index as usize].is_none(),
                 "duplicate at index {expected_index}"

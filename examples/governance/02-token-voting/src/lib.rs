@@ -1,7 +1,13 @@
+#![no_std]
+
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env};
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, Address, Env, String, Symbol, Val, Vec};
+use soroban_sdk::{
+    contract, contracterror, contractevent, contractimpl, contracttype, symbol_short, Address, Env,
+    String, Symbol, Val, Vec,
+};
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -51,6 +57,112 @@ pub struct Proposal {
 #[derive(Clone)]
 pub enum DataKey {
     Admin,
+    Balance(Address),
+}
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum TokenVotingError {
+    AlreadyInitialized = 1,
+    NotInitialized = 2,
+    Unauthorized = 3,
+    InvalidAmount = 4,
+    InsufficientBalance = 5,
+    Overflow = 6,
+}
+
+#[contract]
+pub struct TokenVoting;
+
+#[contractimpl]
+impl TokenVoting {
+    pub fn initialize(env: Env, admin: Address) -> Result<(), TokenVotingError> {
+        if env.storage().instance().has(&DataKey::Admin) {
+            return Err(TokenVotingError::AlreadyInitialized);
+        }
+
+        admin.require_auth();
+        env.storage().instance().set(&DataKey::Admin, &admin);
+        Ok(())
+    }
+
+    pub fn mint(env: Env, to: Address, amount: i128) -> Result<(), TokenVotingError> {
+        require_positive(amount)?;
+        let admin = read_admin(&env)?;
+        admin.require_auth();
+
+        let new_balance = read_balance(&env, &to)
+            .checked_add(amount)
+            .ok_or(TokenVotingError::Overflow)?;
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to), &new_balance);
+        Ok(())
+    }
+
+    pub fn transfer(
+        env: Env,
+        from: Address,
+        to: Address,
+        amount: i128,
+    ) -> Result<(), TokenVotingError> {
+        require_positive(amount)?;
+        from.require_auth();
+
+        let from_balance = read_balance(&env, &from);
+        let to_balance = read_balance(&env, &to);
+        let new_from_balance = from_balance
+            .checked_sub(amount)
+            .filter(|balance| *balance >= 0)
+            .ok_or(TokenVotingError::InsufficientBalance)?;
+
+        if from == to {
+            return Ok(());
+        }
+
+        let new_to_balance = to_balance
+            .checked_add(amount)
+            .ok_or(TokenVotingError::Overflow)?;
+
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(from), &new_from_balance);
+        env.storage()
+            .persistent()
+            .set(&DataKey::Balance(to), &new_to_balance);
+        Ok(())
+    }
+
+    pub fn balance(env: Env, owner: Address) -> i128 {
+        read_balance(&env, &owner)
+    }
+
+    pub fn admin(env: Env) -> Result<Address, TokenVotingError> {
+        read_admin(&env)
+    }
+}
+
+fn require_positive(amount: i128) -> Result<(), TokenVotingError> {
+    if amount <= 0 {
+        Err(TokenVotingError::InvalidAmount)
+    } else {
+        Ok(())
+    }
+}
+
+fn read_admin(env: &Env) -> Result<Address, TokenVotingError> {
+    env.storage()
+        .instance()
+        .get(&DataKey::Admin)
+        .ok_or(TokenVotingError::NotInitialized)
+}
+
+fn read_balance(env: &Env, owner: &Address) -> i128 {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Balance(owner.clone()))
+        .unwrap_or(0)
     MinQuorum,
     TotalSupply,
     Balance(Address),
@@ -80,6 +192,7 @@ pub enum VotingError {
     QuorumNotMet = 12,
     ProposalNotFound = 13,
     ProposalFailed = 14,
+    ArithmeticOverflow = 15,
 }
 
 #[contractevent]
@@ -162,19 +275,16 @@ impl TokenVotingContract {
         admin.require_auth();
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::ProposalCount, &0u32);
-        env.storage().instance().set(&DataKey::MinQuorum, &min_quorum);
+        env.storage()
+            .instance()
+            .set(&DataKey::MinQuorum, &min_quorum);
         env.storage().instance().set(&DataKey::TotalSupply, &0i128);
 
         GovernanceInitialized { admin, min_quorum }.publish(&env);
         Ok(())
     }
 
-    pub fn mint(
-        env: Env,
-        admin: Address,
-        to: Address,
-        amount: i128,
-    ) -> Result<(), VotingError> {
+    pub fn mint(env: Env, admin: Address, to: Address, amount: i128) -> Result<(), VotingError> {
         admin.require_auth();
         Self::require_admin(&env, &admin)?;
         if amount <= 0 {
@@ -186,22 +296,24 @@ impl TokenVotingContract {
             .instance()
             .get(&DataKey::TotalSupply)
             .unwrap_or(0);
-        let new_supply = old_supply + amount;
-        env.storage().instance().set(&DataKey::TotalSupply, &new_supply);
+        let new_supply = old_supply
+            .checked_add(amount)
+            .ok_or(VotingError::ArithmeticOverflow)?;
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalSupply, &new_supply);
 
         let current_balance = Self::current_balance(&env, &to);
-        Self::set_balance(&env, &to, current_balance + amount);
+        let new_balance = current_balance
+            .checked_add(amount)
+            .ok_or(VotingError::ArithmeticOverflow)?;
+        Self::set_balance(&env, &to, new_balance);
 
         TokenMinted { to, amount }.publish(&env);
         Ok(())
     }
 
-    pub fn transfer(
-        env: Env,
-        from: Address,
-        to: Address,
-        amount: i128,
-    ) -> Result<(), VotingError> {
+    pub fn transfer(env: Env, from: Address, to: Address, amount: i128) -> Result<(), VotingError> {
         from.require_auth();
         if amount <= 0 {
             return Err(VotingError::InsufficientBalance);
@@ -228,30 +340,28 @@ impl TokenVotingContract {
         Self::balance_at(&env, &account, ledger)
     }
 
-    pub fn delegate(
-        env: Env,
-        delegator: Address,
-        delegatee: Address,
-    ) -> Result<(), VotingError> {
+    pub fn delegate(env: Env, delegator: Address, delegatee: Address) -> Result<(), VotingError> {
         delegator.require_auth();
         if delegator == delegatee {
             return Err(VotingError::AlreadyDelegated);
         }
 
         Self::record_delegate(&env, &delegator, &delegatee);
-        DelegationSet { delegator, delegatee }.publish(&env);
+        DelegationSet {
+            delegator,
+            delegatee,
+        }
+        .publish(&env);
         Ok(())
     }
 
     pub fn get_delegate(env: Env, account: Address) -> Option<Address> {
-        env.storage().persistent().get(&DataKey::DelegatedTo(account))
+        env.storage()
+            .persistent()
+            .get(&DataKey::DelegatedTo(account))
     }
 
-    pub fn get_delegate_at(
-        env: Env,
-        account: Address,
-        ledger: u32,
-    ) -> Option<Address> {
+    pub fn get_delegate_at(env: Env, account: Address, ledger: u32) -> Option<Address> {
         Self::delegate_at(&env, &account, ledger)
     }
 
@@ -475,20 +585,14 @@ impl TokenVotingContract {
         Ok(())
     }
 
-    pub fn get_proposal(
-        env: Env,
-        proposal_id: u32,
-    ) -> Result<Proposal, VotingError> {
+    pub fn get_proposal(env: Env, proposal_id: u32) -> Result<Proposal, VotingError> {
         env.storage()
             .persistent()
             .get(&DataKey::Proposal(proposal_id))
             .ok_or(VotingError::ProposalNotFound)
     }
 
-    pub fn get_proposal_state(
-        env: Env,
-        proposal_id: u32,
-    ) -> Result<ProposalState, VotingError> {
+    pub fn get_proposal_state(env: Env, proposal_id: u32) -> Result<ProposalState, VotingError> {
         let proposal = env
             .storage()
             .persistent()
@@ -511,14 +615,18 @@ impl TokenVotingContract {
             .ok_or(VotingError::ProposalNotFound)?;
 
         let current_state = Self::resolve_proposal_state(&env, &proposal);
+        if current_state == ProposalState::Expired {
+            return Err(VotingError::ExecutionEnded);
+        }
         if current_state != ProposalState::Passed {
             return Err(VotingError::InvalidState);
         }
-        if env.ledger().sequence() > proposal.execution_end_ledger {
-            return Err(VotingError::ExecutionEnded);
-        }
 
-        env.invoke_contract::<()>(&proposal.target_contract, &proposal.action, proposal.action_args.clone());
+        env.invoke_contract::<()>(
+            &proposal.target_contract,
+            &proposal.action,
+            proposal.action_args.clone(),
+        );
 
         proposal.state = ProposalState::Executed;
         env.storage()
@@ -534,11 +642,7 @@ impl TokenVotingContract {
         Ok(())
     }
 
-    pub fn cancel_proposal(
-        env: Env,
-        caller: Address,
-        proposal_id: u32,
-    ) -> Result<(), VotingError> {
+    pub fn cancel_proposal(env: Env, caller: Address, proposal_id: u32) -> Result<(), VotingError> {
         caller.require_auth();
 
         let mut proposal: Proposal = env
@@ -713,3 +817,6 @@ impl TokenVotingContract {
         proposal.votes_yes + proposal.votes_no >= min_quorum
     }
 }
+
+#[cfg(test)]
+mod test;

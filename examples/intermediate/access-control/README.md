@@ -1,6 +1,27 @@
 # Access Control Guide
 
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../../advanced/32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates how to **combine RBAC + Multisig + Timelock** in a single contract for comprehensive governance.
+
 This intermediate example demonstrates a complete access control system combining **Role-Based Access Control (RBAC)**, **Multi-Signature (Multisig)** approval workflows, and **Timelock** delays in a single Soroban smart contract.
+
+## What This Example Adds
+
+This example extends the canonical RBAC pattern by **layering three access control mechanisms**:
+
+1. **RBAC** — Who can configure (Admin, Auditor, Operator, User)
+2. **Multisig** — M-of-N threshold approvals via signers list
+3. **Timelock** — Mandatory delay between proposal and execution
+
+**When to use this pattern:**
+- ✅ You need layered governance with multiple approval gates
+- ✅ You want time-delayed execution for sensitive operations
+- ✅ You need defense-in-depth against compromised keys
+- ✅ You're building DAO governance or treasury management
+
+**When to use the canonical pattern instead:**
+- 🔄 You only need role-based access control
+- 🔄 Single-key authorization is sufficient
+- 🔄 Immediate execution without delays is acceptable
 
 ## What You'll Learn
 
@@ -117,6 +138,8 @@ cargo build --target wasm32v1-none --release -p access-control
 
 ## Related Examples
 
-- [`02-role-based-access-control`](../02-role-based-access-control/) — Basic RBAC patterns
-- [`multi-sig-patterns`](../multi-sig-patterns/) — Multi-party authorization
-- [`02-timelock`](../../advanced/02-timelock/) — Time-delayed execution
+- **[32-rbac-modifiers](../../advanced/32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards (use this as foundation before adding multisig/timelock)
+- [`02-role-based-access-control`](../02-role-based-access-control/) — Basic RBAC with numeric hierarchy
+- [`multi-sig-patterns`](../multi-sig-patterns/) — Multi-party authorization patterns
+- [`02-timelock`](../../advanced/02-timelock/) — Time-delayed execution patterns
+- [16-hierarchical-access-control](../../advanced/16-hierarchical-access-control/) — RBAC with dynamic permissions

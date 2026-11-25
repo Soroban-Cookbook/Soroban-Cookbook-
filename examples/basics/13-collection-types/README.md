@@ -5,7 +5,7 @@ This example demonstrates `Vec<T>` and `Map<K, V>` — Soroban's two built-in co
 ## Project Structure
 
 ```text
-examples/basics/11-collection-types/
+examples/basics/13-collection-types/
 ├── Cargo.toml
 ├── README.md
 └── src/

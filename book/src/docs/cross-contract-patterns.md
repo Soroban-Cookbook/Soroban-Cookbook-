@@ -38,6 +38,33 @@ sequenceDiagram
     Factory-->>User: child address
 ```
 
+### Factory Code
+
+```rust
+/// Deploy a child contract from the stored template hash and initialize it
+/// in the same transaction.
+pub fn create(env: Env, creator: Address, salt: BytesN<32>, config: u32) -> Result<Address, FactoryError> {
+    creator.require_auth();
+
+    let wasm_hash: BytesN<32> = env
+        .storage()
+        .instance()
+        .get(&DataKey::TemplateWasm)
+        .ok_or(FactoryError::NotInitialized)?;
+
+    // Deterministic address: same creator + same salt => same child.
+    let address = env.deployer().with_current_contract(salt).deploy(wasm_hash);
+
+    // Initialize immediately - never leave the child uninitialized.
+    ChildClient::new(&env, &address).initialize(&creator, &config);
+
+    env.storage().instance().set(&DataKey::Deployed(address.clone()), &true);
+    Ok(address)
+}
+```
+
+> **Example:** [`examples/intermediate/ajo-factory`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory)
+
 ### Factory Checklist
 
 - Store the child Wasm hash in instance storage and protect updates with admin
@@ -79,6 +106,36 @@ sequenceDiagram
     Implementation-->>Proxy: result
     Proxy-->>User: result
 ```
+
+### Proxy Code
+
+```rust
+/// Forward a call to the implementation registered for this module.
+pub fn perform_action(env: Env, caller: Address, args: Vec<Val>) -> Result<Val, ProxyError> {
+    caller.require_auth();
+
+    let implementation: Address = env
+        .storage()
+        .persistent()
+        .get(&DataKey::Implementation(MODULE))
+        .ok_or(ProxyError::NotRegistered)?;
+
+    // The downstream contract performs its own authorization checks.
+    Ok(env.invoke_contract::<Val>(&implementation, &symbol_short!("perform_action"), args))
+}
+
+/// Swap the implementation, guarded by the stored admin and a timelock.
+pub fn upgrade(env: Env, new_implementation: Address) -> Result<(), ProxyError> {
+    read_admin(&env)?.require_auth();
+    env.storage()
+        .persistent()
+        .set(&DataKey::Implementation(MODULE), &new_implementation);
+    Ok(())
+}
+```
+
+> **Examples:** [`examples/advanced/04-upgradeable-proxy`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/04-upgradeable-proxy),
+> [`examples/advanced/37-beacon-management`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/37-beacon-management)
 
 ### Proxy Variants
 
@@ -133,6 +190,32 @@ sequenceDiagram
     Registry-->>App: address and metadata
     App->>Target: call using returned address
 ```
+
+### Registry Code
+
+```rust
+/// Register a contract address under a typed key.
+pub fn register(env: Env, key: Symbol, implementation: Address) -> Result<(), RegistryError> {
+    read_admin(&env)?.require_auth();
+    if env.storage().persistent().has(&DataKey::Contract(key.clone())) {
+        return Err(RegistryError::AlreadyRegistered);
+    }
+    env.storage()
+        .persistent()
+        .set(&DataKey::Contract(key.clone()), &implementation);
+    Ok(())
+}
+
+/// Look up a registered address and metadata.
+pub fn get(env: Env, key: Symbol) -> Result<Address, RegistryError> {
+    env.storage()
+        .persistent()
+        .get(&DataKey::Contract(key))
+        .ok_or(RegistryError::NotFound)
+}
+```
+
+> **Example:** [`examples/advanced/contract-registry`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/contract-registry)
 
 ### Registry Design Tips
 
@@ -252,3 +335,5 @@ For detailed benchmark data, see the integration test reports in `tests/integrat
   and events.
 - [`docs/best-practices`](./best-practices.md) covers security and storage
   recommendations that apply to multi-contract systems.
+- [`docs/code-examples`](./code-examples.md) is the index of tested snippets for
+  every topic in the cookbook.

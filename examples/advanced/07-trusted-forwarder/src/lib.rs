@@ -64,6 +64,7 @@ impl TrustedForwarder {
         if env.storage().instance().has(&ForwarderDataKey::Initialized) {
             return Err(ForwarderError::AlreadyInitialized);
         }
+        admin.require_auth();
         env.storage()
             .instance()
             .set(&ForwarderDataKey::Initialized, &true);
@@ -98,6 +99,12 @@ impl TrustedForwarder {
     }
 
     pub fn fund(env: Env, owner: Address, amount: i128) -> Result<(), ForwarderError> {
+        let admin: Address = env
+            .storage()
+            .instance()
+            .get(&ForwarderDataKey::Admin)
+            .ok_or(ForwarderError::NotInitialized)?;
+        admin.require_auth();
         owner.require_auth();
         if amount <= 0 {
             return Err(ForwarderError::InvalidAmount);
@@ -107,9 +114,12 @@ impl TrustedForwarder {
             .instance()
             .get(&ForwarderDataKey::Balance(owner.clone()))
             .unwrap_or(0);
+        let updated = current
+            .checked_add(amount)
+            .ok_or(ForwarderError::InvalidAmount)?;
         env.storage()
             .instance()
-            .set(&ForwarderDataKey::Balance(owner), &(current + amount));
+            .set(&ForwarderDataKey::Balance(owner), &updated);
         Ok(())
     }
 
@@ -126,9 +136,12 @@ impl TrustedForwarder {
         if current < amount {
             return Err(ForwarderError::InsufficientBalance);
         }
+        let updated = current
+            .checked_sub(amount)
+            .ok_or(ForwarderError::InvalidAmount)?;
         env.storage()
             .instance()
-            .set(&ForwarderDataKey::Balance(owner), &(current - amount));
+            .set(&ForwarderDataKey::Balance(owner), &updated);
         Ok(())
     }
 
@@ -143,6 +156,14 @@ impl TrustedForwarder {
         }
 
         if tx.fee < 0 || tx.data.is_empty() {
+            return Err(ForwarderError::InvalidAmount);
+        }
+        let stored_fee: i128 = env
+            .storage()
+            .instance()
+            .get(&ForwarderDataKey::Fee)
+            .unwrap_or(0);
+        if tx.fee != stored_fee {
             return Err(ForwarderError::InvalidAmount);
         }
 
@@ -187,14 +208,18 @@ impl TrustedForwarder {
             .instance()
             .get(&ForwarderDataKey::Balance(relayer.clone()))
             .unwrap_or(0);
-        env.storage().instance().set(
-            &ForwarderDataKey::Balance(tx.from.clone()),
-            &(balance - tx.fee),
-        );
-        env.storage().instance().set(
-            &ForwarderDataKey::Balance(relayer.clone()),
-            &(relayer_balance + tx.fee),
-        );
+        let next_balance = balance
+            .checked_sub(tx.fee)
+            .ok_or(ForwarderError::InvalidAmount)?;
+        let next_relayer = relayer_balance
+            .checked_add(tx.fee)
+            .ok_or(ForwarderError::InvalidAmount)?;
+        env.storage()
+            .instance()
+            .set(&ForwarderDataKey::Balance(tx.from.clone()), &next_balance);
+        env.storage()
+            .instance()
+            .set(&ForwarderDataKey::Balance(relayer.clone()), &next_relayer);
 
         env.storage().instance().set(&nonce_key, &tx.nonce);
         env.storage().instance().set(&used_key, &true);

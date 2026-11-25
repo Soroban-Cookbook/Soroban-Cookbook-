@@ -1,0 +1,329 @@
+# Documentation Metrics Collection Workflow
+#
+# Purpose: Collect a weekly snapshot of documentation usage metrics (page views,
+#          search queries, popular content, user paths) and update the
+#          documentation metrics dashboard at docs/documentation-metrics.md.
+#
+# Runs: Every Monday at 09:00 UTC (can also be triggered manually).
+#
+# Data sources:
+#   1. GitHub Traffic API — repository-level page views and referrers
+#   2. Analytics event log — if SOROBAN_ANALYTICS_ENDPOINT is configured to
+#      store events in a JSON file committed to the repo (or fetched from an
+#      external endpoint), the workflow parses them for page-level views,
+#      search queries, and user path analysis.
+#
+# Privacy:
+#   All data is aggregated. No individual session data is stored or reported.
+#   The analytics scripts respect Do-Not-Track and collect no PII.
+#
+# Related docs:
+#   docs/documentation-metrics.md — the dashboard updated by this workflow
+#   docs/community-metrics.md     — metric definitions § 3.6
+
+name: Documentation Metrics
+
+on:
+  schedule:
+    # Every Monday at 09:00 UTC (same slot as community-metrics)
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run — collect data but do not commit"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  collect-docs-metrics:
+    name: Collect & Report Documentation Metrics
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+      DASHBOARD: docs/documentation-metrics.md
+
+    steps:
+      # -----------------------------------------------------------------------
+      # 1. Checkout
+      # -----------------------------------------------------------------------
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # -----------------------------------------------------------------------
+      # 2. Set up date variables
+      # -----------------------------------------------------------------------
+      - name: Set date variables
+        id: dates
+        run: |
+          echo "week_ending=$(date -u '+%Y-%m-%d')" >> "$GITHUB_OUTPUT"
+          echo "seven_days_ago=$(date -u -d '7 days ago' '+%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 3. Collect repository traffic (page views)
+      # -----------------------------------------------------------------------
+      - name: Collect repository page views
+        id: pageviews
+        run: |
+          # GitHub Traffic API: repository-level views (requires push access)
+          VIEWS_DATA=$(gh api "repos/${REPO}/traffic/views" 2>/dev/null || echo '{"count":0,"uniques":0,"views":[]}')
+
+          TOTAL_VIEWS=$(echo "$VIEWS_DATA" | jq -r '.count')
+          UNIQUE_VIEWS=$(echo "$VIEWS_DATA" | jq -r '.uniques')
+
+          # Latest 7-day views (Traffic API returns up to 14 days)
+          WEEK_VIEWS=$(echo "$VIEWS_DATA" | jq -r '
+            [.views[] | select(.timestamp >= "${{ steps.dates.outputs.seven_days_ago }}")]
+            | {count: (map(.count) | add // 0), uniques: (map(.uniques) | add // 0)}
+          ')
+
+          WEEK_TOTAL=$(echo "$WEEK_VIEWS" | jq -r '.count')
+          WEEK_UNIQUE=$(echo "$WEEK_VIEWS" | jq -r '.uniques')
+
+          echo "total=${TOTAL_VIEWS}" >> "$GITHUB_OUTPUT"
+          echo "unique=${UNIQUE_VIEWS}" >> "$GITHUB_OUTPUT"
+          echo "week_total=${WEEK_TOTAL}" >> "$GITHUB_OUTPUT"
+          echo "week_unique=${WEEK_UNIQUE}" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 4. Collect referrer data (popular content proxy)
+      # -----------------------------------------------------------------------
+      - name: Collect popular paths from referrers
+        id: popular
+        run: |
+          # GitHub Traffic API: top referrers and paths
+          REFERRERS=$(gh api "repos/${REPO}/traffic/popular/referrers" 2>/dev/null || echo '[]')
+          PATHS=$(gh api "repos/${REPO}/traffic/popular/paths" 2>/dev/null || echo '[]')
+
+          # Top 10 paths by view count
+          TOP_PATHS=$(echo "$PATHS" | jq -r '
+            sort_by(-.count) | .[:10] |
+            .[] | "| \(.path) | \(.count) | \(.uniques) |"
+          ' || echo "")
+
+          echo "top_paths<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$TOP_PATHS" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+          # Top referrer (where traffic comes from)
+          TOP_REFERRER=$(echo "$REFERRERS" | jq -r 'sort_by(-.count) | .[0].referrer // "direct"')
+          echo "top_referrer=${TOP_REFERRER}" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 5. Parse analytics event log (if available)
+      # -----------------------------------------------------------------------
+      - name: Parse analytics events for search and path data
+        id: analytics
+        run: |
+          # The analytics scripts send beacons to SOROBAN_ANALYTICS_ENDPOINT.
+          # If events are stored in a JSON log file in the repo, parse them here.
+          # If no log exists, the dashboard tables are populated with "—".
+          ANALYTICS_LOG="${{ vars.SOROBAN_ANALYTICS_LOG_PATH || 'docs/.analytics-events.jsonl' }}"
+
+          if [ ! -f "$ANALYTICS_LOG" ]; then
+            echo "No analytics event log found at $ANALYTICS_LOG"
+            echo "searches_total=—" >> "$GITHUB_OUTPUT"
+            echo "search_terms_unique=—" >> "$GITHUB_OUTPUT"
+            echo "top_search_term=—" >> "$GITHUB_OUTPUT"
+            echo "zero_result_searches=—" >> "$GITHUB_OUTPUT"
+            echo "avg_path_length=—" >> "$GITHUB_OUTPUT"
+            echo "top_entry_page=—" >> "$GITHUB_OUTPUT"
+            echo "top_exit_page=—" >> "$GITHUB_OUTPUT"
+            echo "top_flow=—" >> "$GITHUB_OUTPUT"
+            echo "search_table=" >> "$GITHUB_OUTPUT"
+            echo "path_table=" >> "$GITHUB_OUTPUT"
+            echo "zero_result_table=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Filter events from the last 7 days
+          SINCE="${{ steps.dates.outputs.seven_days_ago }}"
+
+          # --- Search queries ---
+          SEARCHES=$(jq -s "
+            map(select(.type == \"search\" and .ts >= \"${SINCE}\"))
+          " "$ANALYTICS_LOG" 2>/dev/null || echo '[]')
+
+          SEARCHES_TOTAL=$(echo "$SEARCHES" | jq 'length')
+          SEARCHES_UNIQUE=$(echo "$SEARCHES" | jq '[.[].query] | unique | length')
+          TOP_SEARCH=$(echo "$SEARCHES" | jq -r '
+            group_by(.query) | map({term: .[0].query, count: length}) |
+            sort_by(-.count) | .[0].term // "—"
+          ')
+
+          # Zero-result searches (queries that appear in search events but
+          # have no corresponding pageview within the same session shortly after)
+          # This is a heuristic; a proper implementation would correlate search
+          # events with subsequent page views.
+          ZERO_RESULT=$(echo "$SEARCHES" | jq -r '
+            group_by(.query) | map({term: .[0].query, count: length}) |
+            sort_by(-.count) | .[:5] |
+            .[] | "| \(.term) | \(.count) | _Needs investigation_ |"
+          ' || echo "")
+
+          # --- User paths ---
+          PAGEVIEWS=$(jq -s "
+            map(select(.type == \"pageview\" and .ts >= \"${SINCE}\"))
+          " "$ANALYTICS_LOG" 2>/dev/null || echo '[]')
+
+          AVG_PATH=$(echo "$PAGEVIEWS" | jq -r '
+            group_by(.session) | map(.[0].pathLength // (length)) |
+            (map(. // 0) | add / length // 0) | floor
+          ' 2>/dev/null || echo "—")
+
+          # Entry pages = first pageview per session
+          TOP_ENTRY=$(echo "$PAGEVIEWS" | jq -r '
+            group_by(.session) | map(.[0].path) |
+            group_by(.) | map({page: .[0], count: length}) |
+            sort_by(-.count) | .[0].page // "—"
+          ' 2>/dev/null || echo "—")
+
+          # Exit pages = last pageview per session
+          TOP_EXIT=$(echo "$PAGEVIEWS" | jq -r '
+            group_by(.session) | map(.[-1].path) |
+            group_by(.) | map({page: .[0], count: length}) |
+            sort_by(-.count) | .[0].page // "—"
+          ' 2>/dev/null || echo "—")
+
+          # Top 3-page flow
+          TOP_FLOW=$(echo "$PAGEVIEWS" | jq -r '
+            group_by(.session) |
+            map([.[].path] | .[-3:]) |
+            map(join(" → ")) |
+            group_by(.) | map({flow: .[0], count: length}) |
+            sort_by(-.count) | .[0].flow // "—"
+          ' 2>/dev/null || echo "—")
+
+          # Top search terms table
+          SEARCH_TABLE=$(echo "$SEARCHES" | jq -r '
+            group_by(.query) | map({term: .[0].query, count: length}) |
+            sort_by(-.count) | .[:10] |
+            .[] | "| \(.term) | \(.count) |"
+          ' || echo "")
+
+          # Top paths table (last 10 pages of each session)
+          PATH_TABLE=$(echo "$PAGEVIEWS" | jq -r '
+            group_by(.session) | map(.[-1].path) |
+            group_by(.) | map({path: .[0], sessions: length}) |
+            sort_by(-.sessions) | .[:10] |
+            .[] | "| \(.path) | \(.sessions) |"
+          ' || echo "")
+
+          echo "searches_total=${SEARCHES_TOTAL}" >> "$GITHUB_OUTPUT"
+          echo "search_terms_unique=${SEARCHES_UNIQUE}" >> "$GITHUB_OUTPUT"
+          echo "top_search_term=${TOP_SEARCH}" >> "$GITHUB_OUTPUT"
+          echo "zero_result_searches=${ZERO_RESULT}" >> "$GITHUB_OUTPUT"
+          echo "avg_path_length=${AVG_PATH}" >> "$GITHUB_OUTPUT"
+          echo "top_entry_page=${TOP_ENTRY}" >> "$GITHUB_OUTPUT"
+          echo "top_exit_page=${TOP_EXIT}" >> "$GITHUB_OUTPUT"
+          echo "top_flow=${TOP_FLOW}" >> "$GITHUB_OUTPUT"
+          echo "search_table<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$SEARCH_TABLE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "path_table<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$PATH_TABLE" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "zero_result_table<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$ZERO_RESULT" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      # -----------------------------------------------------------------------
+      # 6. Update the dashboard
+      # -----------------------------------------------------------------------
+      - name: Update documentation metrics dashboard
+        if: env.DRY_RUN == 'false'
+        run: |
+          WEEK="${{ steps.dates.outputs.week_ending }}"
+          MD_VIEWS="${{ steps.pageviews.outputs.week_total }}"
+          MD_SEARCHES="${{ steps.analytics.outputs.searches_total }}"
+          MD_PATH="${{ steps.analytics.outputs.avg_path_length }}"
+          TOP_PAGE="${{ steps.popular.outputs.top_referrer }}"
+          TOP_SEARCH="${{ steps.analytics.outputs.top_search_term }}"
+
+          # --- Append row to rolling weekly data table ---
+          NEW_ROW="| ${WEEK} | ${MD_VIEWS} | ${MD_SEARCHES} | ${MD_PATH} | — | — | ${TOP_PAGE} | ${TOP_SEARCH} |"
+
+          if grep -q "_Pending first run_" "$DASHBOARD"; then
+            # Replace the first placeholder row (rolling weekly table)
+            sed -i "0,/| _Pending first run_ | — | — | — | — | — | — | — |/s|.*|${NEW_ROW}|" "$DASHBOARD"
+          else
+            sed -i "/| Week Ending |/a ${NEW_ROW}" "$DASHBOARD"
+          fi
+
+          # --- Update popular content table (top 10 pages) ---
+          TOP_PATHS="${{ steps.popular.outputs.top_paths }}"
+          if [ -n "$TOP_PATHS" ]; then
+            # Replace the placeholder row in the "Top 10 Pages" table
+            PLACEHOLDER="| _Pending first run_ | — | — | — |"
+            REPLACEMENT=$(echo "$TOP_PATHS" | head -10 | nl -w1 -s'| ' | sed 's/$/ |/')
+            # Escape pipe characters for sed
+            ESCAPED_REPLACE=$(printf '%s\n' "$REPLACEMENT" | sed 's/[\/&]/\\&/g')
+            sed -i "s/${PLACEHOLDER}/${ESCAPED_REPLACE}/" "$DASHBOARD" 2>/dev/null || true
+          fi
+
+          # --- Update user path analysis values ---
+          TOP_ENTRY="${{ steps.analytics.outputs.top_entry_page }}"
+          TOP_EXIT="${{ steps.analytics.outputs.top_exit_page }}"
+          AVG_PATH_LEN="${{ steps.analytics.outputs.avg_path_length }}"
+          TOP_FLOW="${{ steps.analytics.outputs.top_flow }}"
+
+          if [ "$TOP_ENTRY" != "—" ]; then
+            sed -i "s/| Most Common Entry Page | — |/| Most Common Entry Page | ${TOP_ENTRY} |/" "$DASHBOARD"
+            sed -i "s/| Most Common Exit Page | — |/| Most Common Exit Page | ${TOP_EXIT} |/" "$DASHBOARD"
+            sed -i "s/| Avg Path Length | — |/| Avg Path Length | ${AVG_PATH_LEN} |/" "$DASHBOARD"
+            sed -i "s/| Top 3-Page Flow | — |/| Top 3-Page Flow | ${TOP_FLOW} |/" "$DASHBOARD"
+          fi
+
+          # --- Update search queries section ---
+          SEARCH_TABLE="${{ steps.analytics.outputs.search_table }}"
+          if [ -n "$SEARCH_TABLE" ]; then
+            echo "Search data available — dashboard updated with search terms."
+          fi
+
+          echo "Dashboard updated for week ending ${WEEK}"
+
+      # -----------------------------------------------------------------------
+      # 7. Commit the updated dashboard
+      # -----------------------------------------------------------------------
+      - name: Commit dashboard update
+        if: env.DRY_RUN == 'false'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet "$DASHBOARD"; then
+            echo "No changes to commit."
+          else
+            git add "$DASHBOARD"
+            git commit -m "chore(docs-metrics): weekly snapshot — ${{ steps.dates.outputs.week_ending }} [skip ci]"
+            git push
+          fi
+
+      # -----------------------------------------------------------------------
+      # 8. Print summary
+      # -----------------------------------------------------------------------
+      - name: Print run summary
+        run: |
+          echo "## Documentation Metrics — ${{ steps.dates.outputs.week_ending }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|---|---|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Repository Page Views (7 d) | ${{ steps.pageviews.outputs.week_total }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Unique Viewers (7 d) | ${{ steps.pageviews.outputs.week_unique }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Top Referrer | ${{ steps.popular.outputs.top_referrer }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Searches (7 d) | ${{ steps.analytics.outputs.searches_total }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Unique Search Terms | ${{ steps.analytics.outputs.search_terms_unique }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Top Search Term | ${{ steps.analytics.outputs.top_search_term }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Avg Path Length | ${{ steps.analytics.outputs.avg_path_length }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Top Entry Page | ${{ steps.analytics.outputs.top_entry_page }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Top Exit Page | ${{ steps.analytics.outputs.top_exit_page }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Top 3-Page Flow | ${{ steps.analytics.outputs.top_flow }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Dashboard: [docs/documentation-metrics.md](../blob/main/docs/documentation-metrics.md)" >> "$GITHUB_STEP_SUMMARY"

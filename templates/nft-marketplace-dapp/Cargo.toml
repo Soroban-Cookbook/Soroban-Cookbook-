@@ -1,29 +1,15 @@
-[workspace]
-resolver = "2"
-members = [
-    "contracts/marketplace",
-]
-
-[workspace.package]
-version = "0.1.0"
-edition = "2021"
+[package]
+name = "nft-marketplace-dapp"
+version.workspace = true
+edition.workspace = true
 publish = false
 
-[workspace.dependencies]
-soroban-sdk = "26.0.0-rc.1"
+[lib]
+crate-type = ["cdylib", "rlib"]
+path = "contracts/marketplace/src/lib.rs"
 
-[profile.release]
-opt-level = "z"
-overflow-checks = true
-debug = 0
-strip = "symbols"
-debug-assertions = false
-panic = "abort"
-codegen-units = 1
-lto = true
+[dependencies]
+soroban-sdk = { workspace = true }
 
-[profile.test]
-opt-level = 3
-debug = true
-overflow-checks = true
-debug-assertions = true
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

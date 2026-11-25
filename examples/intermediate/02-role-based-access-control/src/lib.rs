@@ -81,9 +81,8 @@ impl RoleBasedAccessControl {
     ) -> Result<(), RbacError> {
         caller.require_auth();
         Self::require_initialized(&env)?;
-        Self::require_can_manage(&env, &caller, &role)?;
-
         let old_role = Self::get_role_internal(&env, &account);
+        Self::require_can_manage(&env, &caller, old_role, role)?;
         env.storage()
             .persistent()
             .set(&DataKey::UserRole(account.clone()), &role);
@@ -171,9 +170,17 @@ impl RoleBasedAccessControl {
             .unwrap_or(Role::User)
     }
 
-    fn require_can_manage(env: &Env, caller: &Address, target: &Role) -> Result<(), RbacError> {
+    /// A caller may only change an account's role if it outranks both the
+    /// account's current role and the new role. Checking only the new role
+    /// would let an Admin "grant" `User` to the Owner, silently demoting it.
+    fn require_can_manage(
+        env: &Env,
+        caller: &Address,
+        current: Role,
+        target: Role,
+    ) -> Result<(), RbacError> {
         let caller_role = Self::get_role_internal(env, caller);
-        if Self::can_grant(caller_role, *target) {
+        if Self::can_revoke(caller_role, current) && Self::can_grant(caller_role, target) {
             Ok(())
         } else {
             Err(RbacError::Unauthorized)
@@ -196,3 +203,6 @@ impl RoleBasedAccessControl {
         }
     }
 }
+
+#[cfg(test)]
+mod test;

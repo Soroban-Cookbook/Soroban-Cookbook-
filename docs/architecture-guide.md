@@ -26,9 +26,9 @@ Use this decision tree to select the right architectural pattern before you writ
 |-------------|---------|---------|
 | Single admin | `admin.require_auth()` | `examples/tokens/04-mint-burn` |
 | M-of-N signers | Multi-party auth with threshold | `examples/advanced/01-multi-party-auth` |
-| Role-based (owner/minter/pauser) | RBAC with role bitmap | `examples/advanced/03-rbac-modifiers` |
+| Role-based (owner/minter/pauser) | RBAC with role bitmap | `examples/advanced/32-rbac-modifiers` |
 | Delegated spending | Allowance pattern | `examples/tokens/01-sep41-token` |
-| Gasless UX | Permit / trusted forwarder | `examples/advanced/03-permit-pattern` |
+| Gasless UX | Permit / trusted forwarder | `examples/advanced/30-permit-pattern` |
 
 ### Execution Timing
 
@@ -43,7 +43,7 @@ Use this decision tree to select the right architectural pattern before you writ
 | Requirement | Pattern | Example |
 |-------------|---------|---------|
 | On-chain price feeds | Oracle pattern | `examples/advanced/03-oracle-pattern` |
-| Off-chain data relay | Gasless relayer | `examples/advanced/03-gasless-relayer` |
+| Off-chain data relay | Gasless relayer | `examples/advanced/27-gasless-relayer` |
 | Historical balances | Snapshot token | `examples/tokens/04-snapshot-token` |
 
 ### Upgradability
@@ -52,7 +52,7 @@ Use this decision tree to select the right architectural pattern before you writ
 |-------------|---------|---------|
 | Minimal proxy | Beacon proxy | `examples/advanced/02-beacon-proxy` |
 | Logic separation | Proxy + admin | `examples/advanced/04-upgradeable-proxy` |
-| Modular extensions | Diamond pattern | `examples/advanced/06-diamond-pattern` |
+| Modular extensions | Diamond pattern | `examples/advanced/38-diamond-pattern` |
 
 ---
 
@@ -83,11 +83,11 @@ Soroban offers three storage tiers. Choosing the wrong tier is the most common c
 ```rust
 #[contracttype]
 pub enum DataKey {
-    Admin,           // instance — single entry, always needed
-    PoolCount,       // instance — cheap counter
-    Pool(u32),       // persistent — only loaded on demand
-    Balance(Address),// persistent — per-user, loaded on demand
-    Claimed(Address, u32), // persistent — per-user-per-pool
+    Admin,           // instance â€” single entry, always needed
+    PoolCount,       // instance â€” cheap counter
+    Pool(u32),       // persistent â€” only loaded on demand
+    Balance(Address),// persistent â€” per-user, loaded on demand
+    Claimed(Address, u32), // persistent â€” per-user-per-pool
 }
 ```
 
@@ -118,7 +118,7 @@ Assign roles (minter, pauser, upgrader) to separate addresses. Each role is stor
 
 **When to use:** DeFi protocols, tokens with separate operator roles, DAOs with specialized committees.
 
-**Example:** `examples/advanced/03-rbac-modifiers`
+**Example:** `examples/advanced/32-rbac-modifiers`
 
 ### Multi-Party Authorization (M-of-N)
 
@@ -167,7 +167,10 @@ A single contract address routes to many facet contracts based on function selec
 - **Pros:** Modular; bypass contract size limits; granular upgrades.
 - **Cons:** High complexity; careful storage layout management required.
 
-**Example:** `examples/advanced/06-diamond-pattern`
+**Examples:** 
+- **Canonical:** [`examples/advanced/38-diamond-pattern`](../examples/advanced/38-diamond-pattern/) â€” Full EIP-2535 adaptation with diamond-cut and loupe
+- **Security-focused:** [`examples/advanced/05-diamond-security`](../examples/advanced/05-diamond-security/) â€” Hardened with access controls and interface verification
+- **Router orchestration:** [`examples/advanced/05-diamond-facets`](../examples/advanced/05-diamond-facets/) â€” Atomic cross-facet operations
 
 ### No-Upgrade (Immutable)
 
@@ -203,7 +206,7 @@ let mem = env.budget().memory_bytes_cost();
 
 Each cross-contract call incurs overhead. Batch calls where possible using `batch-operations` patterns:
 
-**Example:** `examples/advanced/08-batch-operations`
+**Example:** `examples/advanced/39-batch-operations`
 
 ### Event-Driven Off-Chain Processing
 
@@ -292,7 +295,7 @@ A token that supports multiple independent reward pools. Users accumulate reward
 **Key architectural decisions:**
 - Pool metadata (`rate_per_token`, `total_deposited`) in `persistent` storage keyed by pool ID
 - Per-user claim tracking in `persistent` storage keyed by `(user, pool_id)`
-- Reward formula: `balance * rate_per_token / 1_000_000` — fixed-point, no floating point
+- Reward formula: `balance * rate_per_token / 1_000_000` â€” fixed-point, no floating point
 
 ### Multi-Party Auth Treasury
 

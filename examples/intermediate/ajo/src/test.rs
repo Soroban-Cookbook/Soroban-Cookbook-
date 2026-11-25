@@ -5,6 +5,7 @@ use soroban_sdk::{testutils::Address as _, Address, Env};
 #[test]
 fn test_ajo_initialize() {
     let env = Env::default();
+    env.mock_all_auths();
     let contract_id = env.register_contract(None, Ajo);
     let client = AjoClient::new(&env, &contract_id);
 

@@ -1,4 +1,4 @@
-use soroban_sdk::{Env, testutils::Budget};
+use soroban_sdk::Env;
 use std::time::Instant;
 
 pub struct PerfMetrics {
@@ -21,14 +21,15 @@ pub fn measure_execution<F, R>(env: &Env, f: F) -> (R, PerfMetrics)
 where
     F: FnOnce() -> R,
 {
-    env.budget().reset_unlimited();
+    let mut budget = env.cost_estimate().budget();
+    budget.reset_unlimited();
 
     let start = Instant::now();
     let result = f();
     let elapsed = start.elapsed();
 
-    let cpu = env.budget().cpu_instruction_cost();
-    let mem = env.budget().memory_bytes_cost();
+    let cpu = budget.cpu_instruction_cost();
+    let mem = budget.memory_bytes_cost();
 
     let metrics = PerfMetrics {
         execution_time_ns: elapsed.as_nanos(),

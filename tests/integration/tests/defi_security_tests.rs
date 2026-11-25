@@ -45,7 +45,9 @@ fn test_lending_pool_collateral_check_on_withdraw() {
 
     let pool_id = env.register_contract(None, LendingPool);
     let pool = LendingPoolClient::new(&env, &pool_id);
-    pool.initialize(&5, &10, &80);
+    let (asset, _) = create_token(&env, &Address::generate(&env));
+    token::StellarAssetClient::new(&env, &asset).mint(&user, &1000);
+    pool.initialize(&asset, &5, &10, &80);
 
     // User deposits 1000
     pool.deposit(&user, &1000);
@@ -211,7 +213,8 @@ fn test_amm_router_robustness_zero_reserves() {
 
     let router_id = env.register_contract(None, AMMRouter);
     let router = AMMRouterClient::new(&env, &router_id);
-    router.initialize();
+    let admin = Address::generate(&env);
+    router.initialize(&admin);
 
     // Add pool with 0 reserves
     router.add_pool(&RouterPool {
@@ -248,7 +251,13 @@ fn test_collateralized_lending_liquidation_cap_and_adjust() {
     // liquidation_threshold = 75
     // liquidation_incentive = 10 (10%)
     // partial_liquidation_ratio = 50 (50%)
-    client.initialize(&80, &75, &10, &50);
+    let (collateral, _) = create_token(&env, &Address::generate(&env));
+    let (loan, _) = create_token(&env, &Address::generate(&env));
+    token::StellarAssetClient::new(&env, &collateral).mint(&borrower, &1000);
+    token::StellarAssetClient::new(&env, &loan).mint(&contract_id, &800);
+    token::StellarAssetClient::new(&env, &loan).mint(&liquidator, &1000);
+    let admin = Address::generate(&env);
+    client.initialize(&admin, &collateral, &loan, &80, &75, &10, &50);
 
     // Deposit collateral & borrow max
     client.deposit_collateral(&borrower, &1000);

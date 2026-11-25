@@ -181,7 +181,7 @@ fn test_prune_nothing_to_remove() {
 
 #[test]
 fn test_set_frequency_updates_config() {
-    let (env, admin, client) = setup();
+    let (_env, admin, client) = setup();
     client.set_frequency(&admin, &25);
     let (freq, ..) = client.get_config();
     assert_eq!(freq, 25);

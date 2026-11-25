@@ -85,6 +85,11 @@ impl SimpleSwapContract {
         rate_num: i128,
         rate_den: i128,
     ) {
+        assert!(
+            !env.storage().instance().has(&DataKey::Owner),
+            "contract already initialized"
+        );
+        owner.require_auth();
         assert!(rate_num > 0 && rate_den > 0, "rate must be positive");
         assert!(token_a != token_b, "tokens must differ");
 

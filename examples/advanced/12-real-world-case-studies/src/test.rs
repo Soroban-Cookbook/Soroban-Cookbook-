@@ -23,7 +23,10 @@ fn test_claim_reward_zeroes_balance_and_prevents_double_claim() {
     let (_, client) = setup(&env);
 
     client.try_initialize(&admin).unwrap().unwrap();
-    client.try_fund_reward(&admin, &alice, &500).unwrap().unwrap();
+    client
+        .try_fund_reward(&admin, &alice, &500)
+        .unwrap()
+        .unwrap();
     assert_eq!(client.reward_balance(&alice), 500);
 
     let claimed = client.try_claim_reward(&alice).unwrap().unwrap();
@@ -65,10 +68,7 @@ fn test_fund_reward_requires_admin_and_positive_amount() {
 #[test]
 fn test_calculate_fee_matches_expected_value() {
     // 2.5% of 1_000_000 units.
-    assert_eq!(
-        CaseStudies::calculate_fee(1_000_000, 250).unwrap(),
-        25_000
-    );
+    assert_eq!(CaseStudies::calculate_fee(1_000_000, 250).unwrap(), 25_000);
     assert_eq!(CaseStudies::calculate_fee(0, 250).unwrap(), 0);
 }
 

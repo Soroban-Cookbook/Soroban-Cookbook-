@@ -438,6 +438,7 @@ there is no dependency on a specific vendor.
 
 ## Additional Resources
 
+- [Deployment Best Practices](../docs/deployment-best-practices.md): pre-deployment checklist, network selection, monitoring, and upgrade strategies
 - [Soroban CLI Reference](https://developers.stellar.org/docs/tools/developer-tools/cli)
 - [Network Configuration](https://developers.stellar.org/docs/networks)
 - [Fee Documentation](https://developers.stellar.org/docs/smart-contracts/fees)

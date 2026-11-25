@@ -224,7 +224,11 @@ impl StateChannelContract {
         }
 
         let dispute = dispute_period.unwrap_or(DEFAULT_DISPUTE_PERIOD);
-        let channel_id: u64 = env.storage().instance().get(&DataKey::NextChannelId).unwrap();
+        let channel_id: u64 = env
+            .storage()
+            .instance()
+            .get(&DataKey::NextChannelId)
+            .unwrap();
 
         let channel = Channel {
             party_a: party_a.clone(),
@@ -283,6 +287,8 @@ impl StateChannelContract {
         challenger.require_auth();
 
         let mut channel = Self::load_channel(&env, channel_id)?;
+        channel.party_a.require_auth();
+        channel.party_b.require_auth();
 
         // Only Open or Disputed channels can be challenged.
         if channel.status == ChannelStatus::Closed {
@@ -310,8 +316,7 @@ impl StateChannelContract {
         channel.balance_a = balance_a;
         channel.balance_b = balance_b;
         channel.status = ChannelStatus::Disputed;
-        channel.challenge_expiry =
-            env.ledger().sequence() + channel.dispute_period;
+        channel.challenge_expiry = env.ledger().sequence() + channel.dispute_period;
 
         env.storage()
             .persistent()

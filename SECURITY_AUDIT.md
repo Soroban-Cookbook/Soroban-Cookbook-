@@ -242,8 +242,8 @@ All tests passing in GitHub Actions:
 **Authorization (High Priority):**
 - [x] 01-multi-party-auth - Auth vector encoding, threshold validation
 - [x] 02-timelock - Admin authorization, operation state machine
-- [x] 03-data-aggregation-oracle - Source authorization, admin controls
-- [x] 03-rbac-modifiers - Role-based access control
+- [x] 26-data-aggregation-oracle - Source authorization, admin controls
+- [x] 32-rbac-modifiers - Role-based access control
 
 **Storage (High Priority):**
 - [x] Storage patterns - All storage types tested

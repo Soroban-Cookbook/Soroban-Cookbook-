@@ -162,3 +162,6 @@ fn remove_cached_entry(env: &Env, metadata: &mut CacheMetadata, id: u32) {
     }
     metadata.ids = remaining;
 }
+
+#[cfg(test)]
+mod test;

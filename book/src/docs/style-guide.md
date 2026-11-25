@@ -1,110 +1,143 @@
-# Soroban Cookbook Style Guide
+# Documentation Style Guide
 
-This guide outlines the coding standards and best practices for the Soroban Cookbook. Adhering to these guidelines ensures consistency, readability, and high quality across all examples.
+This guide defines the standards for writing and maintaining documentation in this project. Following these guidelines keeps our documentation consistent, accurate, and approachable for all readers.
 
-## 1. Naming Conventions
+## Writing Standards
 
-Follow standard [Rust naming conventions](https://rust-lang.github.io/api-guidelines/naming.html) with Soroban-specific refinements:
+### Tone and Voice
 
-### Contracts and Types
-- **Contract Structs**: `PascalCase` (e.g., `HelloContract`, `LiquidityPool`).
-- **Custom Types/Enums**: `PascalCase` (e.g., `DataKey`, `ContractError`).
-- **Traits**: `PascalCase` (e.g., `VestingInterface`).
+- Write in a **clear, direct, and friendly** tone.
+- Prefer the **active voice**: "The compiler checks the type" rather than "The type is checked by the compiler."
+- Address the reader as **"you"**. Refer to the project as **"we"** when describing team decisions or conventions.
+- Keep sentences short. Aim for one idea per sentence.
+- Avoid jargon unless it is defined on first use. Link to a glossary entry or explain inline.
 
-### Functions and Variables
-- **Contract Functions**: `snake_case` (e.g., `get_balance`, `initialize`).
-- **Internal Variables**: `snake_case` (e.g., `user_address`, `token_amount`).
-- **Constants**: `SCREAMING_SNAKE_CASE` (e.g., `MAX_SUPPLY`).
+### Terminology
 
-### Events and Symbols
-- **Event Tags**: `snake_case` (e.g., `transfer`, `mint`). Usually defined using `symbol_short!`.
-- **Storage Keys**: Descriptive names using `Symbol` or `DataKey` enums.
+Use the following terms consistently throughout the documentation:
 
----
+| Preferred term | Avoid |
+| -------------- | ----- |
+| function | method (unless referring to a trait method) |
+| crate | package, library |
+| command | instruction |
+| configuration | config (in prose) |
+| directory | folder |
 
-## 2. Documentation Standards
+- Capitalize product names exactly as the project does.
+- Use code formatting for identifiers, file names, commands, and literal values (for example, `Cargo.toml`, `cargo build`).
+- Spell out acronyms on first use, for example, "Application Programming Interface (API)".
 
-Documentation is critical for a cookbook. Every example must be self-explanatory.
+### Inclusive Language
 
-### Module-Level Documentation (`//!`)
-Every `lib.rs` must start with module-level docs:
-- **Title**: Clear name of the example.
-- **Description**: What the contract does and why it matters.
-- **Key Concepts**: List of Soroban features demonstrated (e.g., "Instance Storage", "Custom Errors").
-- **Design Decisions**: Explanation of *why* specific patterns were used (e.g., "Using `Persistent` storage for user balances to prevent expiration").
+- Use gender-neutral language. Prefer "they" over "he/she".
+- Avoid idioms, slang, and culture-specific references that may not translate well.
+- Use "allowlist"/"denylist" instead of "whitelist"/"blacklist".
+- Avoid ableist terms such as "crazy", "insane", or "dummy" when describing code or behavior. Prefer "unexpected", "placeholder", or "stub".
+- Refer to people by their roles rather than descriptors where possible.
 
-### Function-Level Documentation (`///`)
-Public contract functions must include:
-- **Summary**: A single line describing the action.
-- **Arguments**: Detailed list of parameters.
-- **Returns**: Explanation of the return value.
-- **Errors**: List of possible `contracterror` variants the function might return.
-- **Example**: A short snippet or description of how to call the function.
+## Code Example Standards
 
-### Example `README.md` Structure
-Every example folder must contain a `README.md` with:
-1. **Overview**: Brief description.
-2. **Key Soroban Patterns**: Technical highlights.
-3. **Usage**: Step-by-step commands to build and test.
-4. **Code Deep Dive**: Explanation of the most important logic blocks.
+### Complete and Runnable
 
----
+- Every code example should be **complete enough to compile and run** unless it is explicitly marked as a fragment.
+- Include necessary imports, `fn main()`, and any required setup.
+- If an example is intentionally partial, indicate this with a comment such as `// ...` and explain what is omitted.
 
-## 3. Testing Standards
-
-High-quality examples require robust testing.
-
-### Structure
-- **Unit Tests**: Place in a dedicated `src/test.rs` file.
-- **Integration Tests**: Place in the workspace `tests/` directory if they involve multiple contracts.
-- **Separation**: Use `#[cfg(test)] mod test;` in `lib.rs` to keep the testing logic separate from implementation.
-
-### Best Practices
-- **Naming**: Use descriptive test names: `test_transfer_insufficient_funds_fails`.
-- **Coverage**: Aim for 100% path coverage for business logic.
-- **Mocking Auth**: Always use `env.mock_all_auths()` for testing authorization-protected functions.
-- **Assertions**: Use `assert_eq!`, `assert!`, and `expect_err` to verify state and failures.
-
----
-
-## 4. Clippy and Lints
-
-Clean code is enforced through Clippy and standard Rust lints.
-
-### Mandatory Directives
 ```rust
-#![no_std] // All contracts must be no_std
+use std::collections::HashMap;
+
+fn main() {
+    let mut counts: HashMap<&str, u32> = HashMap::new();
+    for word in ["apple", "banana", "apple"] {
+        *counts.entry(word).or_insert(0) += 1;
+    }
+    println!("{counts:?}");
+}
 ```
 
-### Recommended Lints
-In CI, we run:
-```bash
-cargo clippy --workspace --all-targets --all-features -- -D warnings
+### `no_std` Compatibility
+
+- When an example is intended for `no_std` environments, state this explicitly and avoid the standard library.
+- Use `#![no_std]` at the crate root and document any required `extern crate alloc;` usage.
+
+```rust
+#![no_std]
+
+pub fn add(a: u32, b: u32) -> u32 {
+    a + b
+}
 ```
-
-### Developer Flow
-1. Run `cargo fmt` before every commit.
-2. Ensure `cargo clippy` has zero warnings.
-3. Use `cargo fix` for automated improvements where possible.
-
----
-
-## 5. Soroban Specifics
 
 ### Error Handling
-- Use `#[contracterror]` for all user-facing errors.
-- Prefer `Result<T, ContractError>` return types over `panic!`.
-- Assign explicit error codes (e.g., `InvalidAmount = 1`).
 
-### Storage Optimization
-- **Instance**: Use for configuration and contract metadata.
-- **Persistent**: Use for user data and balances.
-- **Temporary**: Use for short-lived state like nonces or temporary locks.
-- **TTL**: Always consider the Time-To-Live for storage and include bump logic where necessary.
+- Demonstrate idiomatic error handling. Prefer `Result` and the `?` operator over `unwrap()` or `expect()` in examples unless the example specifically illustrates panics.
+- When `unwrap()` is used for brevity, add a comment explaining that real code should handle the error.
 
-### Best Practices
-- **Type Safety**: Use custom enums for storage keys (`DataKey`) rather than raw symbols.
-- **Events**: Emit events for all significant state changes.
-- **Validation**: Validate all inputs at the entry point of the function.
-### Best Practices Reference
-For security-specific patterns and performance optimization, refer to the [Best Practices Guide](./best-practices.md). The Style Guide and Best Practices Guide together form the full standard for Soroban Cookbook contributions.
+```rust
+use std::fs;
+
+fn read_config(path: &str) -> Result<String, std::io::Error> {
+    let contents = fs::read_to_string(path)?;
+    Ok(contents)
+}
+```
+
+### Comments
+
+- Use comments to explain **why**, not **what**. The code itself should make the "what" clear.
+- Keep comments up to date with the code they describe.
+- Use `//` for inline comments and `///` for documentation comments on public items.
+
+## Formatting Guidelines
+
+### Headings
+
+- Use **sentence case** for headings: "Getting started", not "Getting Started".
+- Do not skip heading levels. A document should start with a single `#` title, followed by `##` sections, then `###` subsections.
+- Keep headings short and descriptive.
+
+### Lists
+
+- Use `-` for unordered lists and `1.` for ordered lists.
+- Keep list items parallel in structure.
+- End list items with a period only when they are complete sentences.
+
+### Code Fences
+
+- Always specify a language tag on fenced code blocks so syntax highlighting works correctly.
+
+````markdown
+```rust
+fn main() {
+    println!("Hello, world!");
+}
+```
+````
+
+- Use `text` for plain output or non-code content.
+- Keep lines within code blocks reasonably short to avoid horizontal scrolling.
+
+### Links
+
+- Use descriptive link text. Prefer "[the configuration guide](configuration.md)" over "[click here](configuration.md)".
+- Use relative links for pages within the book so they work in all deployment targets.
+- Verify that links resolve before submitting changes.
+
+## Tool Recommendations
+
+The following tools help maintain consistent, high-quality documentation:
+
+- **mdBook** — builds this documentation site. Run `mdbook build` in the `book/` directory to verify changes compile without errors, and `mdbook serve` for a live preview.
+- **rustfmt** — formats Rust code examples consistently. Run `cargo fmt` before committing.
+- **typos** — catches spelling mistakes in prose and code. Run `typos` across the repository.
+- **markdownlint** — enforces Markdown formatting rules such as heading structure and list style. Run `markdownlint 'book/src/**/*.md'`.
+
+### Pre-submission Checklist
+
+Before opening a pull request that changes documentation:
+
+1. Run `cd book && mdbook build` and confirm it succeeds without warnings.
+2. Run `typos` and fix any reported issues.
+3. Run `markdownlint` on changed files.
+4. Confirm all code examples compile and all links resolve.

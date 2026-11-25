@@ -52,14 +52,16 @@ fn full_batched_migration_v1_to_v2() {
         client.migration_state(),
         MigrationState::InProgress(VERSION_V2, 2)
     ));
-    assert!(client.get_account(&alice).is_some());
-    assert!(client.get_account(&bob).is_some());
+    // Staged records stay invisible until the final commit.
+    assert!(client.get_account(&alice).is_none());
+    assert!(client.get_account(&bob).is_none());
     assert!(client.get_account(&carol).is_none());
     assert_eq!(client.balance_of(&carol), 50_000);
 
     assert_eq!(client.migrate_batch(&2), 1);
     assert_eq!(client.migration_state(), MigrationState::None);
     assert_eq!(client.get_version(), VERSION_V2);
+    assert!(client.migration_complete());
 
     let carol_acct = client.get_account(&carol).unwrap();
     assert_eq!(carol_acct.balance, 50_000);
@@ -128,4 +130,37 @@ fn rejects_bad_batch_and_duplicate_init() {
         client.try_migrate_batch(&101),
         Err(Ok(MigrationError::InvalidBatchSize))
     );
+}
+
+#[test]
+fn mid_migration_failure_rolls_back_to_v1() {
+    let (env, _admin, client) = setup();
+    let alice = Address::generate(&env);
+    let bob = Address::generate(&env);
+    client.add_user(&alice, &500);
+    client.add_user(&bob, &5_000);
+
+    client.prepare_migration(&VERSION_V2);
+    assert_eq!(client.migrate_batch(&1), 1); // alice is staged
+
+    // Simulate a mid-migration failure: roll back instead of committing.
+    // Staged v2 records are dropped; legacy data was never touched.
+    client.rollback_migration();
+    assert_eq!(client.migration_state(), MigrationState::None);
+    assert_eq!(client.get_version(), VERSION_V1);
+    assert!(!client.migration_complete());
+    assert!(client.get_account(&alice).is_none());
+    assert_eq!(client.balance_of(&alice), 500);
+    assert_eq!(
+        client.try_credit(&alice, &10),
+        Err(Ok(MigrationError::MigrationRequired))
+    );
+
+    // The migration can be prepared again and completed cleanly.
+    client.prepare_migration(&VERSION_V2);
+    assert_eq!(client.migrate_batch(&10), 2);
+    assert_eq!(client.get_version(), VERSION_V2);
+    assert!(client.migration_complete());
+    assert_eq!(client.get_account(&alice).unwrap().balance, 500);
+    assert_eq!(client.get_account(&bob).unwrap().balance, 5_000);
 }

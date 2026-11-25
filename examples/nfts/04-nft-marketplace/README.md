@@ -14,7 +14,8 @@ Builds on the authorization and event patterns from the basics and the ownership
 | English auctions | `create_auction_listing` — time-bounded, highest-bid-wins |
 | Bundle sales | `items: Vec<ListingItem>` — multiple NFTs from any contract in one listing |
 | Royalty payments | `royalty_bps` — basis-point royalty split on every settlement |
-| Competitive bidding | `place_bid` — new bid must exceed the current highest bid |
+| Competitive bidding | `place_bid` — new bid must exceed the current highest bid; previous bid is refunded |
+| Bid escrow | `place_bid` transfers the bid amount into the marketplace contract immediately |
 | Auction finalization | `finalize_auction` — callable by anyone after `end_ledger` |
 | Trade history | `TradeRecord` — immutable log of every settled sale |
 | Typed errors | `MarketplaceError` enum covering all invalid-state cases |
@@ -96,34 +97,49 @@ pub fn place_bid(env: Env, bidder: Address, listing_id: u32, amount: i128)
 
 The admin is only needed for `initialize`; all subsequent marketplace actions are permissionless (any address can list, bid, or buy).
 
-### Event Emission (`04-events` pattern)
+### Payment Token (escrow model)
 
-Every state transition emits a structured event. Topics follow `(action, "market", listing_id)` so indexers can reconstruct the full lifecycle of any listing:
+The marketplace uses a single SEP-41 token for all payments, configured at `initialize`:
 
 ```rust
-// New listing created
-env.events().publish(
-    (symbol_short!("list"), symbol_short!("market"), listing_id),
-    (seller, price),
-);
+fn initialize(env: Env, admin: Address, payment_token: Address) -> Result<(), MarketplaceError>
+```
 
-// Bid placed on auction
-env.events().publish(
-    (symbol_short!("bid"), symbol_short!("market"), listing_id),
-    (bidder, amount),
-);
+Before calling `buy` or `place_bid`, the buyer/bidder must call `approve` on the payment token contract to allow the marketplace to pull funds:
 
-// Fixed-price sale completed
-env.events().publish(
-    (symbol_short!("sale"), symbol_short!("market"), listing_id),
-    (buyer, seller, amount, royalty_paid),
-);
+```
+token_contract.approve(&bidder, &marketplace_contract, &bid_amount, &expiry_ledger);
+marketplace_contract.place_bid(&bidder, &listing_id, &bid_amount);
+```
 
-// Auction finalized
-env.events().publish(
-    (symbol_short!("finalize"), symbol_short!("market"), listing_id),
-    (winner, amount),
-);
+### Bid Escrow Flow
+
+`place_bid` enforces binding bids by locking the token amount immediately:
+
+1. Validate the bid meets the reserve/current-minimum.
+2. **Refund** the previous highest bidder (if any) back from contract escrow.
+3. **Transfer** the new bid amount from the bidder into the contract via `transfer_from`.
+4. Record the new highest bid in persistent storage.
+
+```
+bidder ──transfer_from──► marketplace_contract  (new bid locked)
+marketplace_contract ──transfer──► prev_bidder  (previous bid returned)
+```
+
+### Settlement Flow
+
+When a sale completes (either via `buy` or `finalize_auction`), `settle_sale` disburses
+the escrowed funds from the contract to the recipients:
+
+```
+marketplace_contract ──transfer──► royalty_recipient  (royalty_paid)
+marketplace_contract ──transfer──► seller             (amount − royalty_paid)
+```
+
+Fixed-price buys pull from buyer → contract → seller in the same transaction:
+
+```
+buyer ──transfer_from──► marketplace_contract ──transfer──► seller/royalty
 ```
 
 ### Royalty Calculation
@@ -137,13 +153,37 @@ let seller_proceeds = amount - royalty_paid;
 // transfer seller_proceeds → seller
 ```
 
-Royalties are bounded to `royalty_bps <= 10_000` (100%) at listing creation.
+Royalties are bounded to `royalty_bps <= 1_000` (10%) at listing creation.
+
+### Event Emission (`04-events` pattern)
+
+Every state transition emits a structured event. Topics follow `(action, "market")` so indexers can reconstruct the full lifecycle of any listing:
+
+```rust
+// New listing created
+env.events().publish(
+    (symbol_short!("listing"), symbol_short!("fixed"), listing_id),
+    (seller, price),
+);
+
+// Bid placed on auction
+env.events().publish(
+    (symbol_short!("bid"), symbol_short!("auction"), listing_id),
+    (bidder, amount),
+);
+
+// Sale completed (fixed-price or auction)
+env.events().publish(
+    (symbol_short!("trade"), symbol_short!("mkt"), listing_id),
+    (buyer, seller, amount, royalty_paid),
+);
+```
 
 ### Storage Layout
 
 | Key | Tier | Rationale |
 |-----|------|-----------|
-| `Admin`, `ListingCount`, `TradeCount` | `Instance` | Global counters; read on every operation |
+| `Admin`, `PaymentToken`, `ListingCount`, `TradeCount` | `Instance` | Global state; read on every operation |
 | `Listing(id)`, `HighestBid(id)` | `Persistent` | Active listings and bids must survive ledger gaps |
 | `Trade(id)` | `Persistent` | Trade history is permanent; should not expire |
 
@@ -152,7 +192,7 @@ Royalties are bounded to `royalty_bps <= 10_000` (100%) at listing creation.
 ## Contract Interface
 
 ```rust
-fn initialize(env, admin: Address) -> Result<(), MarketplaceError>
+fn initialize(env, admin: Address, payment_token: Address) -> Result<(), MarketplaceError>
 
 fn create_fixed_price_listing(
     env, seller, items, price, royalty_recipient, royalty_bps
@@ -193,18 +233,19 @@ cargo build --target wasm32-unknown-unknown --release
 | File | Purpose |
 |------|---------|
 | `src/lib.rs` | Marketplace contract — listing creation, bidding, settlement, royalties |
-| `src/test.rs` | Tests for fixed-price buys, auction flows, royalty splits, error cases |
+| `src/test.rs` | Tests for fixed-price buys, auction flows, royalty splits, bid escrow, refunds |
 | `Cargo.toml` | Crate metadata (`nft-marketplace`) and workspace dependency references |
 
 ---
 
 ## Security Notes
 
+- **Payment token approval required**: Buyers and bidders must call `approve` on the payment token contract before interacting with the marketplace. The marketplace uses `transfer_from` to pull funds, which requires a prior allowance.
 - **Royalty enforcement**: Royalties are only enforced by this marketplace contract. Peer-to-peer transfers using the NFT contract directly bypass the royalty split. This is a known limitation of contract-level royalty systems.
 - **Auction sniping**: The `end_ledger` is fixed at listing creation. Consider adding a buffer (e.g. extend `end_ledger` if a bid arrives in the last N ledgers) to prevent last-second snipe exploits.
 - **Bundle atomicity**: All items in a bundle listing are transferred together during settlement. A failure to transfer any single item reverts the entire transaction.
-- **Bid refunds**: Outbid participants must be refunded before recording a new highest bid. Always handle refunds before accepting the new bid to avoid locking funds.
 - **Price validation**: `price` and `reserve_price` must be `> 0` to prevent zero-cost acquisition.
+- **Single payment token**: The marketplace is initialized with one payment token and cannot be changed. Deploy separate instances for different currencies.
 
 ---
 

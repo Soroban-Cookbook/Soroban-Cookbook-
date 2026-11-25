@@ -35,4 +35,4 @@ cd examples/governance/01-simple-voting
 cargo test
 ```
 
-## Next: [02 · Voting Time Constraints](./02-voting-time-constraints.md)
+## Next: [02 · Voting Time Constraints](./03-voting-time-constraints.md)

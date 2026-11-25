@@ -99,7 +99,9 @@ impl RewardDistributor {
         env.storage()
             .instance()
             .set(&DataKey::TotalReward, &total_reward);
-        env.storage().instance().set(&DataKey::StartTime, &start_time);
+        env.storage()
+            .instance()
+            .set(&DataKey::StartTime, &start_time);
         env.storage().instance().set(&DataKey::Duration, &duration);
         env.storage().instance().set(&DataKey::DecayBps, &decay_bps);
         env.storage()
@@ -143,7 +145,9 @@ impl RewardDistributor {
         env.storage()
             .persistent()
             .set(&DataKey::Weight(participant.clone()), &weight);
-        env.storage().instance().set(&DataKey::TotalWeight, &new_total);
+        env.storage()
+            .instance()
+            .set(&DataKey::TotalWeight, &new_total);
         env.events().publish((EVENT_REGISTER, participant), weight);
         Ok(())
     }
@@ -206,15 +210,35 @@ impl RewardDistributor {
         let pool_released = match strategy {
             Strategy::PerformanceBased => total_reward,
             Strategy::Linear => {
-                let start_time: u64 = env.storage().instance().get(&DataKey::StartTime).unwrap_or(0);
-                let duration: u64 = env.storage().instance().get(&DataKey::Duration).unwrap_or(0);
+                let start_time: u64 = env
+                    .storage()
+                    .instance()
+                    .get(&DataKey::StartTime)
+                    .unwrap_or(0);
+                let duration: u64 = env
+                    .storage()
+                    .instance()
+                    .get(&DataKey::Duration)
+                    .unwrap_or(0);
                 let elapsed = elapsed_capped(now, start_time, duration);
                 mul_div(total_reward, elapsed as i128, duration as i128)?
             }
             Strategy::ExponentialDecay => {
-                let start_time: u64 = env.storage().instance().get(&DataKey::StartTime).unwrap_or(0);
-                let duration: u64 = env.storage().instance().get(&DataKey::Duration).unwrap_or(0);
-                let decay_bps: u32 = env.storage().instance().get(&DataKey::DecayBps).unwrap_or(0);
+                let start_time: u64 = env
+                    .storage()
+                    .instance()
+                    .get(&DataKey::StartTime)
+                    .unwrap_or(0);
+                let duration: u64 = env
+                    .storage()
+                    .instance()
+                    .get(&DataKey::Duration)
+                    .unwrap_or(0);
+                let decay_bps: u32 = env
+                    .storage()
+                    .instance()
+                    .get(&DataKey::DecayBps)
+                    .unwrap_or(0);
                 let period_length: u64 = env
                     .storage()
                     .instance()

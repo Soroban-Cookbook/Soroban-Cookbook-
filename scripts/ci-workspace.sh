@@ -19,9 +19,11 @@ shift
 if [ "$SUBCMD" = "clippy" ]; then
   RUSTFLAGS="${RUSTFLAGS:-} -A deprecated" cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
 elif [ "$SUBCMD" = "build" ]; then
-  # Host-only test crates and proptest cannot compile for wasm32v1-none.
+  # Host-only test crates, proptest, and the fuzz harness cannot compile for
+  # wasm32v1-none.
   cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" \
-    --exclude integration-tests --exclude security-tests "$@"
+    --exclude integration-tests --exclude security-tests \
+    --exclude soroban-cookbook-fuzz "$@"
 else
   cargo "$SUBCMD" --workspace "${EXCLUDE_ARGS[@]}" "$@"
 fi

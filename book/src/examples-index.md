@@ -15,7 +15,7 @@ Search-optimized index of all examples with formatted code snippets and live dem
 use soroban_sdk::{contract, contractimpl, symbol_short, vec, Env, Symbol, Vec};
 
 #[contract]
-pub struct HelloContract;          // (1) plain unit struct — no fields needed
+pub struct HelloContract;          // (1) plain unit struct â€” no fields needed
 
 #[contractimpl]
 impl HelloContract {
@@ -68,7 +68,7 @@ pub fn transfer_from(
         .get(&DataKey::Allowance(from.clone(), spender.clone()))
         .unwrap_or(0);
     if allowance < amount { return Err(AuthError::Unauthorized); }
-    // … update balances and reduce allowance …
+    // â€¦ update balances and reduce allowance â€¦
     Ok(())
 }
 ```
@@ -159,10 +159,10 @@ ValidationError::StringTooLong = 106,
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
-// native → Val
+// native â†’ Val
 let val: Val = 42u32.into_val(&env);
 
-// Val → native (safe, returns Result)
+// Val â†’ native (safe, returns Result)
 let n: u32 = u32::try_from_val(&env, &val).unwrap_or(0);
 ```
 
@@ -172,31 +172,31 @@ let n: u32 = u32::try_from_val(&env, &val).unwrap_or(0);
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
-// ✅ Use Symbol for short identifiers
+// âœ… Use Symbol for short identifiers
 let token_symbol = symbol_short!("USDC");
 let action = Symbol::from_str(&env, "transfer");
 
-// ✅ Use String for longer text
+// âœ… Use String for longer text
 let message = String::from_str(&env, "Transaction completed successfully");
 let username = String::from_str(&env, "alice_blockchain_dev");
 
-// ✅ Use Bytes for variable binary data
+// âœ… Use Bytes for variable binary data
 let signature = Bytes::from_slice(&env, &signature_data);
 let serialized_object = Bytes::from_slice(&env, &encoded_data);
 
-// ✅ Use BytesN for fixed-size data
+// âœ… Use BytesN for fixed-size data
 let hash = BytesN::<32>::from_array(&env, &sha256_result);
 let address_hash = BytesN::<20>::from_array(&env, &address_bytes);
 
-// ✅ Use Address for accounts and contracts
+// âœ… Use Address for accounts and contracts
 let user = Address::generate(&env);
 let contract_address = env.current_contract_address();
 
-// ✅ Use Vec for ordered collections
+// âœ… Use Vec for ordered collections
 let mut numbers = Vec::new(&env);
 numbers.push_back(1);
 
-// ✅ Use Map for key-value associations
+// âœ… Use Map for key-value associations
 let mut settings = Map::new(&env);
 settings.set(symbol_short!("theme"), 1);
 ```
@@ -288,7 +288,7 @@ items.push_back(10);
 items.push_back(20);
 items.push_back(30);
 
-// Random access — O(1)
+// Random access â€” O(1)
 let first = items.get(0); // Some(10)
 let len   = items.len();  // 3
 
@@ -399,14 +399,16 @@ factory_client.register_template(
 // Code snippet coming soon
 ```
 
-### Iterable Mappings
-[View Source](../examples/intermediate/iterable-mappings)
+### Iterable Mapping (canonical)
+[View Source](../examples/intermediate/iterable-mapping)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
 ```rust
 // Code snippet coming soon
 ```
+
+Companion example adding filtering, mapping, and reducing over the same pattern: [View Source](../examples/intermediate/iterable-mappings)
 
 ### Multi Sig Patterns
 [View Source](../examples/intermediate/multi-sig-patterns)
@@ -461,7 +463,7 @@ client.initialize(&admin_address);
 ```
 
 ### 03 Cross Contract Optimization
-[View Source](../examples/advanced/03-cross-contract-optimization)
+[View Source](../examples/advanced/25-cross-contract-optimization)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -484,7 +486,7 @@ pub fn submit(env: Env, updater: Address, value: i128) -> Result<(), OracleError
 ```
 
 ### 03 Proxy Admin
-[View Source](../examples/advanced/03-proxy-admin)
+[View Source](../examples/advanced/31-proxy-admin)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -497,7 +499,7 @@ pub fn deposit(env: Env, user: Address, amount: i128) -> Result<(), Error> {
 ```
 
 ### 03 Rbac Modifiers
-[View Source](../examples/advanced/03-rbac-modifiers)
+[View Source](../examples/advanced/32-rbac-modifiers)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -506,7 +508,7 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 ```
 
 ### 03 Registry Access Controls
-[View Source](../examples/advanced/03-registry-access-controls)
+[View Source](../examples/advanced/33-registry-access-controls)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -523,8 +525,8 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 // Code snippet coming soon
 ```
 
-### 05 Batch Transfer
-[View Source](../examples/advanced/05-batch-transfer)
+### 20 Batch Transfer
+[View Source](../examples/advanced/20-batch-transfer)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -535,8 +537,8 @@ pub struct Transfer {
 }
 ```
 
-### 05 Bridge Security
-[View Source](../examples/advanced/05-bridge-security)
+### 17 Bridge Security
+[View Source](../examples/advanced/17-bridge-security)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -544,8 +546,8 @@ pub struct Transfer {
 // Code snippet coming soon
 ```
 
-### 05 Diamond Facets
-[View Source](../examples/advanced/05-diamond-facets)
+### 18 Diamond Facets (Router Orchestration)
+[View Source](../examples/advanced/18-diamond-facets)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -553,6 +555,31 @@ pub struct Transfer {
 // Router atomically calls TokenFacet then RegistryFacet.
 // If either fails, the whole transaction reverts.
 router.mint_and_register(&admin, &recipient, &750, &key, &"metadata");
+```
+
+### 05 Diamond Security (Security-Focused)
+[View Source](../examples/advanced/05-diamond-security)
+
+[Live Demo](https://soroban.stellar.org/docs)
+
+```rust
+// Access control: facets can only be invoked through the Diamond Proxy
+diamond.add_facet(&admin, &facet_addr, &functions)?;
+diamond.execute(&function_name, &args)?; // Routes to authorized facet
+```
+
+### 06 Diamond Pattern (Canonical EIP-2535)
+[View Source](../examples/advanced/38-diamond-pattern)
+
+[Live Demo](https://soroban.stellar.org/docs)
+
+```rust
+// Full diamond-cut: Add, Replace, Remove selectors
+diamond.diamond_cut(&admin, &cuts);
+
+// Diamond-loupe introspection
+let facets = diamond.facets(); // All facets + selectors
+let addr = diamond.facet_address(&selector); // Fallback dispatch
 ```
 
 ### Contract Registry
@@ -865,7 +892,7 @@ manager.register_token(
 // Decimals are set once and never exposed through an update path.
 // Changing decimals after tokens are in circulation would mean that
 // a balance of 1_000_0000000 (7 decimals = 1000.0) silently becomes
-// 1_000_0000000 (6 decimals = 10000.0) — a 10× reinterpretation with
+// 1_000_0000000 (6 decimals = 10000.0) â€” a 10Ã— reinterpretation with
 // no on-chain record of the change.
 pub fn decimals(env: Env) -> Result<u32, MetadataError> {
     read_decimals(&env)
@@ -889,8 +916,4 @@ pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, WrapperError>
     Ok(new_balance)
 }
 ```
-
-## Storage
-
-## Hello-world
 

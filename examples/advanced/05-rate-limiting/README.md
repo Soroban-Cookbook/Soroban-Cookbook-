@@ -113,7 +113,7 @@ cargo test -p rate-limiting
 
 ## Related Examples
 
-- [05-bridge-security](../05-bridge-security/) — Applies a *global*, amount-only
+- [17-bridge-security](../17-bridge-security/) — Applies a *global*, amount-only
   rate limit inside a bridge contract. This example is the standalone,
   **per-user** counterpart that also caps call frequency.
 - [02-timelock](../02-timelock/) — Delaying execution with ledger timestamps

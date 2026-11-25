@@ -1,7 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Map, Vec};
+use soroban_sdk::{contract, contractimpl, contracttype, Address, Env, Vec};
 
 #[contracttype]
 pub struct Pool {
@@ -11,54 +11,64 @@ pub struct Pool {
     pub reserve_b: i128,
 }
 
+/// Per-pool storage key: every pool lives in its own persistent entry, so no
+/// single value can grow into Soroban's 64 KiB per-entry limit.
+#[contracttype]
+#[derive(Clone)]
+pub enum DataKey {
+    Pool(Address, Address),
+}
+
+// Ledgers tick ~every 5s: ~1 day ≈ 17_280 ledgers, ~30 days ≈ 518_400.
+const POOL_TTL_THRESHOLD: u32 = 17_280;
+const POOL_TTL_EXTEND_TO: u32 = 518_400;
+
 #[contract]
 pub struct AMMRouter;
 
 #[contractimpl]
 impl AMMRouter {
-    pub fn initialize(env: Env) {
+    pub fn initialize(env: Env, admin: Address) {
         if env
             .storage()
             .instance()
-            .has(&soroban_sdk::Symbol::new(&env, "pools"))
+            .has(&soroban_sdk::Symbol::new(&env, "admin"))
         {
             panic!("already initialized");
         }
-        env.storage().instance().set(
-            &soroban_sdk::Symbol::new(&env, "pools"),
-            &Map::<(Address, Address), Pool>::new(&env),
-        );
+        admin.require_auth();
+        env.storage()
+            .instance()
+            .set(&soroban_sdk::Symbol::new(&env, "admin"), &admin);
     }
 
     pub fn add_pool(env: Env, pool: Pool) {
-        let mut pools: Map<(Address, Address), Pool> = env
+        let admin: Address = env
             .storage()
             .instance()
-            .get(&soroban_sdk::Symbol::new(&env, "pools"))
-            .unwrap();
+            .get(&soroban_sdk::Symbol::new(&env, "admin"))
+            .expect("not initialized");
+        admin.require_auth();
         let key = if pool.token_a < pool.token_b {
-            (pool.token_a.clone(), pool.token_b.clone())
+            DataKey::Pool(pool.token_a.clone(), pool.token_b.clone())
         } else {
-            (pool.token_b.clone(), pool.token_a.clone())
+            DataKey::Pool(pool.token_b.clone(), pool.token_a.clone())
         };
-        pools.set(key, pool);
+        // One persistent entry per pool: reads are direct lookups and the
+        // pool count can grow without bound.
+        env.storage().persistent().set(&key, &pool);
         env.storage()
-            .instance()
-            .set(&soroban_sdk::Symbol::new(&env, "pools"), &pools);
+            .persistent()
+            .extend_ttl(&key, POOL_TTL_THRESHOLD, POOL_TTL_EXTEND_TO);
     }
 
     pub fn get_pool(env: Env, token_a: Address, token_b: Address) -> Option<Pool> {
-        let pools: Map<(Address, Address), Pool> = env
-            .storage()
-            .instance()
-            .get(&soroban_sdk::Symbol::new(&env, "pools"))
-            .unwrap();
         let key = if token_a < token_b {
-            (token_a, token_b)
+            DataKey::Pool(token_a, token_b)
         } else {
-            (token_b, token_a)
+            DataKey::Pool(token_b, token_a)
         };
-        pools.get(key)
+        env.storage().persistent().get(&key)
     }
 
     fn calculate_swap_output(reserve_in: i128, reserve_out: i128, amount_in: i128) -> i128 {
@@ -68,10 +78,16 @@ impl AMMRouter {
         if amount_in <= 0 {
             panic!("amount_in must be positive");
         }
-        let amount_in_with_fee = amount_in * 997;
-        let numerator = amount_in_with_fee * reserve_out;
-        let denominator = reserve_in * 1000 + amount_in_with_fee;
-        numerator / denominator
+        let amount_in_with_fee = amount_in.checked_mul(997).expect("overflow");
+        let numerator = amount_in_with_fee
+            .checked_mul(reserve_out)
+            .expect("overflow");
+        let denominator = reserve_in
+            .checked_mul(1000)
+            .expect("overflow")
+            .checked_add(amount_in_with_fee)
+            .expect("overflow");
+        numerator.checked_div(denominator).expect("overflow")
     }
 
     pub fn swap_exact_tokens_for_tokens(

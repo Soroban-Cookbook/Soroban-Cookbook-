@@ -33,9 +33,7 @@
 
 #![cfg_attr(target_family = "wasm", no_std)]
 
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Bytes, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Bytes, Env, Symbol, Vec};
 
 /// Hard cap on items returned by a single `list` call.
 pub const MAX_PAGE_SIZE: u32 = 50;
@@ -92,11 +90,7 @@ impl StoragePagination {
     /// - `page_size` must be in `1..=MAX_PAGE_SIZE`.
     /// - A well-formed cursor at or past the end yields an empty page and
     ///   `next_cursor = None` (not an error).
-    pub fn list(
-        env: Env,
-        page_size: u32,
-        cursor: Option<Bytes>,
-    ) -> Result<Page, PaginationError> {
+    pub fn list(env: Env, page_size: u32, cursor: Option<Bytes>) -> Result<Page, PaginationError> {
         if page_size == 0 || page_size > MAX_PAGE_SIZE {
             return Err(PaginationError::InvalidPageSize);
         }
@@ -118,7 +112,10 @@ impl StoragePagination {
         let mut items = Vec::new(&env);
         let mut index = start;
         while index < end {
-            if let Some(item) = env.storage().persistent().get::<_, Symbol>(&DataKey::Item(index))
+            if let Some(item) = env
+                .storage()
+                .persistent()
+                .get::<_, Symbol>(&DataKey::Item(index))
             {
                 items.push_back(item);
             }

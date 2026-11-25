@@ -26,6 +26,14 @@ Users call `wrap(user, amount)` to deposit underlying tokens into the wrapper co
 
 ## Core Flow
 
+> ⚠️ **UNAUdITED EXAMPLE — NOT FOR PRODUCTION USE**
+>
+> This example code is educational and has **not** been audited. Do not deploy it verbatim with real funds. Before any production deployment, obtain a formal security audit, review edge cases for your specific underlying token, and perform your own validation.
+>
+> **Reentrancy:** This wrapper cross-contract-calls the underlying token on `wrap`, `unwrap`, and `backing`-style reads. A reentrancy guard (`DataKey::Entered`) is applied on state-changing entry points. Without it, a malicious or hook-bearing underlying token could call back mid-operation and mint unbacked wrapped shares. Soroban reentrancy is limited to the same invocation stack (a cross-contract call cannot outlive the caller's frame), but shared-state re-entry within that frame must be blocked explicitly.
+>
+> **Storage TTL / Data Expiry:** Per-user wrapped balances are in **persistent** storage (per-key TTL). High-traffic wrappers must explicitly `extend_ttl` on balance writes or via a maintenance call to avoid unexpected expiry. `TotalSupply` and the underlying token address live in **instance** storage, which is tied to the contract instance TTL and will reset if the instance expires and is restored — critical accounting belongs in persistent storage.
+
 ```rust
 pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, WrapperError> {
     user.require_auth();
@@ -43,7 +51,7 @@ pub fn wrap(env: Env, user: Address, amount: i128) -> Result<i128, WrapperError>
 
 `wrap`, `unwrap`, and `transfer` share a reentrancy guard (`DataKey::Entered`,
 following the same pattern as
-[`examples/advanced/05-reentrancy-guard`](../../advanced/05-reentrancy-guard/)).
+[`examples/advanced/15-reentrancy-guard`](../../advanced/15-reentrancy-guard/)).
 Without it, a hook-bearing or malicious `underlying` token's `transfer` (or
 even its read-only `balance`, checked by `unwrap` before the guard used to be
 set) could call back into `wrap` mid-flight and mint wrapped shares against

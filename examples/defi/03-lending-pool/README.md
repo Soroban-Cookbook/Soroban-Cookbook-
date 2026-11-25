@@ -15,8 +15,12 @@ A basic Soroban smart contract implementing a lending pool.
 ### Initialize
 
 ```rust
-client.initialize(&base_rate, &kink_rate, &kink_utilization);
+client.initialize(&token, &base_rate, &kink_rate, &kink_utilization);
 ```
+
+`token` is the SEP-41 asset the pool holds. Deposits and repayments transfer
+`token` from the user into the pool contract; withdrawals and borrows transfer
+it back out.
 
 ### Deposit
 

@@ -34,7 +34,7 @@ regression coverage rather than as a fix for a bug.
   call sites in any state-mutating function, so classic reentrancy doesn't
   apply to it directly).
 
-Reference patterns used: `examples/advanced/05-reentrancy-guard` (the
+Reference patterns used: `examples/advanced/15-reentrancy-guard` (the
 guard pattern applied to `06-token-wrapper` below), and
 `examples/intermediate/multi-sig-patterns` /
 `examples/intermediate/ajo-factory` (access-control and factory/multi-contract
@@ -74,7 +74,7 @@ test-setup conventions), per this issue's implementation hints.
   built-in Stellar Asset Contract, which has no hooks), but a live risk
   the moment `initialize` points at any token that does.
 * **Remediation:** Added a shared `DataKey::Entered` guard (mirroring
-  `examples/advanced/05-reentrancy-guard`) checked and set before any
+  `examples/advanced/15-reentrancy-guard`) checked and set before any
   storage mutation or external call in `wrap` and `unwrap`, and checked
   (read-only, since it makes no external call itself) at the top of
   `transfer` so a malicious underlying token can't use `transfer` as an
@@ -145,7 +145,7 @@ Added `tests/integration/tests/token_security_tests.rs`:
    a normal deposit against a non-attacking underlying token still works
    after the guard was added.
 5. **`wrap_reentrancy_attack_is_blocked`** — a `MaliciousUnderlyingToken`
-   test double (mirroring `05-reentrancy-guard`'s `MaliciousContract`
+   test double (mirroring `15-reentrancy-guard`'s `MaliciousContract`
    pattern) whose `transfer` calls back into `wrap` for the same deposit;
    asserts the whole transaction panics rather than double-minting.
 

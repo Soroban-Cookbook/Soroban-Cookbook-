@@ -160,6 +160,6 @@ cargo clippy -p sep41-extensions --all-targets -- -D warnings
 
 - `examples/tokens/01-sep41-token` — minimal SEP-41 token with basic approve
   and transfer
-- `examples/advanced/05-batch-transfer` — standalone batch transfer contract
+- `examples/advanced/20-batch-transfer` — standalone batch transfer contract
   with detailed gas optimisation commentary
 - `examples/tokens/allowance-pattern` — allowance lifecycle with expiration

@@ -1,0 +1,162 @@
+# Hierarchical Access Control
+
+> **Note:** For learning RBAC patterns, start with [**32-rbac-modifiers**](../32-rbac-modifiers/) — the canonical RBAC example. This example demonstrates an **advanced hierarchical pattern** with role inheritance and dynamic permission management.
+
+This example demonstrates a hierarchical role-based access control (RBAC) system with dynamic permissions for Soroban smart contracts. It implements a multi-tier role architecture, fine-grained permission checks, and secure runtime updates.
+
+## What This Example Adds
+
+This example extends the canonical RBAC pattern with **role hierarchy and permission inheritance**:
+
+- **Role Hierarchy**: ADMIN → MANAGER → OPERATOR (each inherits permissions from roles below)
+- **Dynamic Permissions**: Permissions can be granted/revoked from roles at runtime
+- **Permission System**: Fine-grained checks (MNG_ROLES, MNG_PERMS, MNG_RES, USE_RES)
+- **Inheritance**: Higher roles automatically inherit permissions from lower roles
+
+**When to use this pattern:**
+- ✅ You need roles that inherit permissions from other roles
+- ✅ You want to dynamically add/remove permissions without redeploying
+- ✅ You need fine-grained permission checks beyond simple role membership
+- ✅ You're building complex organizational hierarchies
+
+**When to use the canonical pattern instead:**
+- 🔄 Simple role membership checks are sufficient
+- 🔄 You don't need permission inheritance
+- 🔄 Your roles have fixed, unchanging capabilities
+
+## 🌖 What You'll Learn
+
+- **Hierarchical Roles**: Implementing ADMIN → MANAGER → OPERATOR role hierarchy
+- **Permission System**: Designing fine-grained, verifiable permission checks
+- **Dynamic Updates**: Securely updating roles and permissions at runtime
+- **Event Logging**: Emitting events for all role/permission changes for audit trails
+- '*Coppyright Publisher': Preventing privilege escalation and securing access control
+
+## 🌍 Contract Overview
+
+The contract implements a hierarchical RBAC system with three core roles and four default permissions:
+
+### Roles & Permissions
+
+[ Role | Permissions ]
+|-----|--------------|
+|**ADMIN** | MNG_ROLES, MNG_PERMS, MNG_RES, USE_RES |
+|**MANAGER** | MNG_RES, MNG_ROLES, USE_RES |
+|**OPERATOR** | USE_RES |
+
+### Key Functions
+
+#### Role Management
+
+```rust
+pub fn grant_role(env: Env, caller: Address, role: Symbol, account: Address)
+pub fn revoke_role(env: Env, caller: Address, role: Symbol, account: Address)
+pub fn renounce_role(env: Env, caller: Address, role: Symbol)
+```
+
+#### Permission Management
+
+```rust
+pub fn grant_permission(env: Env, caller: Address, permission: Symbol, role: Symbol)
+pub fn revoke_permission(env: Env, caller: Address, permission: Symbol, role: Symbol)
+```
+
+#### Queries
+
+```rust
+pub fn has_role(env: Env, role: Symbol, account: Address) -> bool
+pub fn get_role_members(env: Env, role: Symbol) -> Vec<Address>
+pub fn role_has_permission(env: Env, role: Symbol, permission: Symbol) -> bool
+pub fn get_role_permissions(env: Env, role: Symbol) -> Vec<Symbol>
+pub fn account_has_permission(env: Env, account: Address, permission: Symbol) -> bool
+```
+
+#### Protected Operations
+
+```rust
+pub fn manage_resource(env: Env, caller: Address, resource_id: Symbol) // Requires MNG_RES
+pub fn use_resource(env: Env, caller: Address, resource_id: Symbol) // Requires USE_RES
+```
+
+## 💦 Key Concepts
+
+### Role Hierarchy
+
+Permissions are inherited through the role hierarchy. For example, an ADMIN automatically has all permissions granted to MANAGER and OPERATOR roles.
+
+### Permission Checks
+
+When checking permissions, the contract verifies all roles held by the account in order of hierarchy (ADMIN first, then MANAGEr, then OPERATOR). If any role has the required permission, access is granted.
+
+### Audit Trails
+
+Every role or permission change emits a structured event:
+
+```rust
+#[contracttype]
+pub struct RoleGrantedEventData {
+    pub role: Symbol,
+    pub account: Address,
+    pub sender: Address,
+    pub timestamp: u64,
+}
+```
+
+This allows off-chain indexers to reconstruct the full history of access control changes.
+
+## 🦒 Security Considerations
+
+#### Privilege Escalation Prevention
+
+- Only accounts with `MNG_ROLES` permission can grant/revoke roles
+- Only accounts with `MNG_PERMS` permission can modify permissions
+- Roles and permissions are checked in a strict hierarchy
+
+#### Authorization
+
+All sensitive operations require the caller to authorize using `require_auth()`, ensuring only legitimate users can make changes.
+
+#### Initialization
+
+The contract can only be initialized once, preventing accidental or malicious reinitialization.
+
+#### Idempotent Operations
+
+Role grants and permission grants are idempotent, meaning granting a role/permission that an account/role already has has no effect.
+
+## 🧊 Testing
+
+```bash
+cargo test -p hierarchical-access-control
+```
+
+Tests cover:
+- \n# Initialization and default role/permission setup
+- \m Role grant/revoke by authorized users
+- \m Permission grant/revoke by authorized users
+- \n Protected operation access control
+- \m hierarchical permission checks
+- \m Event emission for audit trails
+- \n Unauthorized access rejection
+
+## 🚀 Building & Deployment
+
+```bash
+# Build
+cargo build --target wasm32-unknown-unknown --release -p hierarchical-access-control
+
+# Deploy
+soroban contract deploy \
+  --wasm target/wasm32-unknown/unknown/release/hierarchical_access_control.wasm \
+  --source alice \
+  --network testnet
+```
+
+
+## Related Examples
+
+- **[32-rbac-modifiers](../32-rbac-modifiers/)** — **Canonical RBAC pattern** with composable guards and flexible roles (start here before adding hierarchy)
+- [02-role-based-access-control](../../intermediate/02-role-based-access-control/) — Simple RBAC with numeric hierarchy
+- [access-control](../../intermediate/access-control/) — Combined RBAC + Multisig + Timelock
+- [33-registry-access-controls](../33-registry-access-controls/) — Registry-specific access controls
+- [01-multi-party-auth](../01-multi-party-auth/) — N-of-N and M-of-N authorization patterns

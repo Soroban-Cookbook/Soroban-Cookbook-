@@ -1,1 +1,0 @@
-Computation optimization example with algorithm, loop, and caching optimization. Tests and gas measurements included.

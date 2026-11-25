@@ -1,5 +1,7 @@
 # Proxy Admin Controls
 
+Related decisions: [ADR-006: Guard Contract Code Upgrades](../../../docs/adr/006-guard-contract-upgrades.md) and [ADR-007: Versioned State Migrations](../../../docs/adr/007-version-state-migrations.md).
+
 Governance and safety controls around Soroban contract upgrades. The example
 combines four independent safety layers so that no single mistake can result
 in an irreversible bad upgrade.

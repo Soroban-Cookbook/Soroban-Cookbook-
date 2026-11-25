@@ -27,11 +27,12 @@ Welcome to the Soroban Cookbook documentation. This page gathers quick links, re
 
 - [Best Practices](./best-practices.md) — Security, storage, and code quality guidelines
 - [Style Guide](./style-guide.md) — Naming, documentation, and testing standards
+- [Documentation Style Guide](./doc-style-guide.md) — Writing standards, code example standards, formatting guidelines, and tool recommendations for docs
 - [Quick Reference](./quick-reference.md) — Cheat sheet for common Soroban patterns
 - [Common Patterns](./common-patterns.md) — Reusable patterns with when-to-use guidance
 - [Wallet Integration Guide](./wallet-integration.md) — Connecting Freighter, xBull, Albedo, and WalletConnect-compatible flows to Soroban apps
 - [Token Patterns](./token-patterns.md) — Metadata, mint/burn, wrapping, and access control for tokens
-- [Gas Benchmarks](./gas-benchmarks.md) — CPU and memory cost comparison across examples
+- [RBAC Pattern Comparison](./rbac-pattern-comparison.md) — Guide to choosing the right access control pattern
 - [Governance & Authorization Patterns](./governance-rbac-multisig-timelock.md) — RBAC, multisig, and timelock guidance for secure deployments
 - [Glossary](./glossary.md) — Key terms and concepts
 - [Troubleshooting](./troubleshooting.md) — Build errors, test failures, deployment issues, and workarounds

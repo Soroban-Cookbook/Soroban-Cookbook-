@@ -38,6 +38,24 @@ token-dapp/
 
 ---
 
+## 🧩 Why this is a standalone workspace
+
+This template declares its **own** `[workspace]` in `templates/token-dapp/Cargo.toml` (that is the "Rust workspace config" in the tree above) and resolves `soroban-sdk` from its own `[workspace.dependencies]` table instead of inheriting it from the cookbook root. It is therefore listed in the root `Cargo.toml` under `exclude`, not `members` — a package cannot belong to two workspaces at once.
+
+What that means in practice:
+
+- **Build it from inside this directory.** `cargo build --workspace` run at the repository root does **not** cover this template, because the root cannot own it. Copy this folder out of the repository and it still builds on its own — that is the point of the template.
+- **Its `soroban-sdk` pin is local to this workspace**, not the root workspace's `workspace.dependencies`. This is the documented exception to "every crate inherits the workspace SDK".
+- **CI still checks it.** Since the root workspace structurally cannot, the dedicated `.github/workflows/templates.yml` job runs `cargo check` and `cargo test` here on every push and pull request, so this template cannot rot while still looking official.
+
+```bash
+cd templates/token-dapp
+cargo check
+cargo test
+```
+
+---
+
 ## 🚀 Getting Started
 
 ### 1. Test the Smart Contract

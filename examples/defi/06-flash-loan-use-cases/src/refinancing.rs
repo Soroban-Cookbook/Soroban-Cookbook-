@@ -44,6 +44,7 @@ pub enum DataKey {
     NewPool,
     Collateral,
     DebtAmount,
+    FlashLoan,
 }
 
 // ---------------------------------------------------------------------------
@@ -59,6 +60,7 @@ impl RefinancingContract {
         if env.storage().instance().has(&DataKey::Owner) {
             panic!("already initialized");
         }
+        owner.require_auth();
         env.storage().instance().set(&DataKey::Owner, &owner);
     }
 
@@ -83,6 +85,9 @@ impl RefinancingContract {
         env.storage()
             .temporary()
             .set(&DataKey::DebtAmount, &debt_amount);
+        env.storage()
+            .temporary()
+            .set(&DataKey::FlashLoan, &flash_loan);
 
         FlashLoanClient::new(&env, &flash_loan).flash_loan(
             &env.current_contract_address(),
@@ -99,6 +104,15 @@ impl RefinancingContract {
     /// Flash loan callback: repay old loan → redeposit collateral → borrow
     /// enough from new pool to repay the flash loan.
     pub fn on_flash_loan(env: Env, initiator: Address, token: Address, amount: i128, fee: i128) {
+        let provider: Address = env
+            .storage()
+            .temporary()
+            .get(&DataKey::FlashLoan)
+            .expect("flash loan provider missing");
+        if initiator != provider {
+            panic!("unauthorized initiator");
+        }
+
         let old_pool: Address = env.storage().temporary().get(&DataKey::OldPool).unwrap();
         let new_pool: Address = env.storage().temporary().get(&DataKey::NewPool).unwrap();
         let collateral_token: Address =
@@ -120,7 +134,7 @@ impl RefinancingContract {
         new_pool_client.deposit_collateral(&collateral_token, &collateral_returned);
 
         // Step 3: borrow from new pool to cover flash loan repayment
-        let repay = amount + fee;
+        let repay = amount.checked_add(fee).expect("repay overflow");
         new_pool_client.borrow(&token, &repay);
 
         // Step 4: approve flash loan to pull repayment

@@ -15,6 +15,7 @@ Soroban fungible token contracts from a minimal SEP-41 implementation to advance
 | 07 | [Token Metadata](./tokens/07-token-metadata.md) | Mutable and immutable on-chain metadata | Beginner |
 | 08 | [Multi-Token Balance Manager](./tokens/08-multi-token-balance-manager.md) | Portfolio contract across multiple tokens | Intermediate |
 | 09 | [Optimized Token Ops](./tokens/09-optimized-token-ops.md) | Micro-optimization patterns for transfers | Intermediate |
+| 11 | [Authorized Token](./tokens/11-authorized-token.md) | SEP-41 `authorized` flag for compliance / freeze functionality | Intermediate |
 
 ## Gas Cost Benchmarks
 
@@ -23,5 +24,9 @@ See [docs/gas-benchmarks.md](23../../../docs/gas-benchmarks.md) for gas cost com
 ## Prerequisites
 
 - [Basics](./basics.md)
+
+## Testing
+
+Building a frontend for these token contracts? See [Frontend / TypeScript Testing](../docs/testing-best-practices.md#frontend--typescript-testing) for `soroban-spec-typescript` client generation, Jest/Vitest contract invocation tests, and RPC mocking.
 
 ## End of Examples Section

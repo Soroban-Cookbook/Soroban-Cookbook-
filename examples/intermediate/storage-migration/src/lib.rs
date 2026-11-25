@@ -151,7 +151,9 @@ impl StorageMigration {
             env.storage()
                 .persistent()
                 .set(&DataKey::Profile(user.clone()), &profile);
-            env.storage().persistent().remove(&DataKey::LegacyBalance(user));
+            env.storage()
+                .persistent()
+                .remove(&DataKey::LegacyBalance(user));
 
             processed += 1;
             index += 1;

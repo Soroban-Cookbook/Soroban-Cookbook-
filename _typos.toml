@@ -33,6 +33,7 @@ contracttype = "contracttype"
 soroban-sdk = "soroban-sdk"
 wasm-opt = "wasm-opt"
 wasm32-unknown-unknown = "wasm32-unknown-unknown"
+astroid = "astroid"
 
 [default.extend-identifiers]
 set_thr = "set_thr"

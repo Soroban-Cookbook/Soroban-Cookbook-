@@ -7,7 +7,9 @@ Advanced example of migrating live contract storage across schema versions witho
 - **Prepare → batch → finalize** migration lifecycle
 - **Gas-bounded batches** so large user sets can migrate over multiple transactions
 - **Dual-read** during migration (v2 preferred, v1 fallback)
-- **Version gates** so v2-only entry points refuse unmigrated state
+- **Staging keys**: v2 records are written aside and promoted only at commit
+- **`rollback_migration()`** discards a failed migration with no v1 data loss
+- **Version/`MigrationComplete` gates** so v2-only entry points refuse unmigrated state
 - **Admin-gated WASM upgrade** hook (`upgrade`) to pair with schema migration
 
 ## Schema Change
@@ -31,15 +33,17 @@ add_user × N          ← seed legacy accounts
 prepare_migration(2)
     │
     ▼
-migrate_batch(k) ──┐  ← repeat until user list exhausted
+migrate_batch(k) ──┐  ← stages v2 records; repeat until exhausted
     │              │
     └──────────────┘
     │
     ▼
-Version = 2, MigrationState = None
+commit: Staged → Account, Version = 2, MigrationComplete = true
     │
     ▼
 credit / get_account  ← v2-only APIs now allowed
+
+rollback_migration() ← meanwhile: drop staged records, keep v1 data intact
 ```
 
 ## Run Tests

@@ -1,17 +1,15 @@
-[workspace]
-
 [package]
 name = "snapshot-triggers-defi"
-version = "0.1.0"
-edition = "2021"
+version.workspace = true
+edition.workspace = true
 publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-soroban-sdk = "26.0.0-rc.1"
+soroban-sdk = { workspace = true }
 
 [dev-dependencies]
 soroban-validation = { path = "../../../shared", features = ["testutils"] }
-soroban-sdk = { version = "26.0.0-rc.1", features = ["testutils"] }
+soroban-sdk = { workspace = true, features = ["testutils"] }

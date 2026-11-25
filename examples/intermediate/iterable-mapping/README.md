@@ -1,6 +1,8 @@
 # Iterable Mapping
 
-A key-value map that supports iteration over keys and values via an indexed key list, including pagination helpers.
+**The canonical iterable map example used by the Soroban Cookbook** — a key-value map that supports iteration over keys and values via an indexed key list, including pagination helpers.
+
+> **Advanced variant**: To apply filtering, mapping, and reducing helpers on top of this pattern, see [`iterable-mappings`](../iterable-mappings/).
 
 ## Overview
 
