@@ -18,8 +18,9 @@ use soroban_sdk::{
     contract, contracterror, contractimpl, contracttype, symbol_short, Address, Env, Vec,
 };
 
-/// Maximum delegation depth allowed to prevent gas exhaustion.
-const MAX_DEPTH: u32 = 5;
+/// Maximum delegation depth allowed to prevent instruction-budget exhaustion
+/// and denial-of-service via arbitrarily deep chains.
+const MAX_DELEGATION_DEPTH: u32 = 5;
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -30,7 +31,7 @@ pub enum DelegationError {
     NotAdmin = 3,
     SelfDelegation = 4,
     DelegationCycle = 5,
-    MaxDelegationDepthExceeded = 6,
+    ChainTooDeep = 6,
     NegativeAmount = 7,
 }
 
@@ -135,9 +136,9 @@ impl VoteDelegationContract {
         // Calculate max back depth of 'from''s delegators tree
         let back_depth = Self::get_max_back_depth(&env, from.clone());
 
-        // Check if the total combined depth exceeds MAX_DEPTH
-        if back_depth + forward_depth > MAX_DEPTH {
-            return Err(DelegationError::MaxDelegationDepthExceeded);
+        // Check if the total combined depth exceeds MAX_DELEGATION_DEPTH
+        if back_depth + forward_depth > MAX_DELEGATION_DEPTH {
+            return Err(DelegationError::ChainTooDeep);
         }
 
         // If 'from' already has a delegate, clean up their record first
@@ -268,7 +269,7 @@ impl VoteDelegationContract {
     }
 
     fn calculate_power_rec(env: &Env, current: Address, depth: u32) -> i128 {
-        if depth > MAX_DEPTH {
+        if depth > MAX_DELEGATION_DEPTH {
             return 0;
         }
 

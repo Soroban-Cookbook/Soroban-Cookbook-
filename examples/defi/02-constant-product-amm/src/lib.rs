@@ -959,3 +959,6 @@ mod test {
         assert_eq!(f.token_y.balance(&f.bob), 3_000);
     }
 }
+
+#[cfg(test)]
+mod prop_test;

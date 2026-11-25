@@ -318,3 +318,120 @@ fn test_tie_results_in_rejected() {
     let status = client.execute(&1);
     assert_eq!(status, ProposalStatus::Rejected);
 }
+
+// ---------------------------------------------------------------------------
+// Property-based tests (#1484)
+// ---------------------------------------------------------------------------
+//
+// Properties verified:
+//   1. The final tally always equals the number of votes cast for each choice.
+//   2. Double-vote rejection is enforced regardless of vote order.
+//   3. `prop_count` always equals the number of successful `create_prop` calls.
+
+#[cfg(test)]
+mod proptest_voting {
+    use super::*;
+    use proptest::prelude::*;
+    use soroban_sdk::{
+        testutils::{Address as _, Ledger},
+        Env, String,
+    };
+
+    /// Helpers ------------------------------------------------------------------
+
+    fn make_env() -> Env {
+        let env = Env::default();
+        env.mock_all_auths();
+        env.ledger().set_timestamp(1_000);
+        env
+    }
+
+    fn make_client(env: &Env) -> (VotingContractClient<'_>, Address) {
+        let id = env.register_contract(None, VotingContract);
+        let client = VotingContractClient::new(env, &id);
+        let admin = Address::generate(env);
+        client.initialize(&admin);
+        (client, admin)
+    }
+
+    fn choice_from_u8(env: &Env, v: u8) -> (VoteChoice, usize) {
+        match v % 3 {
+            0 => (VoteChoice::For, 0),
+            1 => (VoteChoice::Against, 1),
+            _ => (VoteChoice::Abstain, 2),
+        }
+    }
+
+    fn title(env: &Env, s: &str) -> soroban_sdk::String {
+        soroban_sdk::String::from_str(env, s)
+    }
+
+    /// Property 1 ---------------------------------------------------------------
+    /// The vote tally for every choice is exactly the count of voters who chose it.
+    proptest! {
+        #![proptest_config(proptest::test_runner::Config::with_cases(32))]
+        #[test]
+        fn tally_equals_sum_of_individual_votes(
+            choices in prop::collection::vec(0u8..3, 1..=20usize)
+        ) {
+            let env = make_env();
+            let (client, admin) = make_client(&env);
+            client.create_prop(&admin, &title(&env, "P"), &2_000);
+
+            let mut counts = [0u32; 3];
+            for raw in &choices {
+                let voter = Address::generate(&env);
+                let (choice, idx) = choice_from_u8(&env, *raw);
+                client.cast_vote(&voter, &1, &choice);
+                counts[idx] += 1;
+            }
+
+            let (f, a, ab) = client.tally(&1);
+            prop_assert_eq!(f,  counts[0]);
+            prop_assert_eq!(a,  counts[1]);
+            prop_assert_eq!(ab, counts[2]);
+        }
+    }
+
+    /// Property 2 ---------------------------------------------------------------
+    /// A second vote from the same address always fails, regardless of which
+    /// choice is submitted first or second.
+    proptest! {
+        #![proptest_config(proptest::test_runner::Config::with_cases(32))]
+        #[test]
+        fn double_vote_always_rejected(
+            first  in 0u8..3,
+            second in 0u8..3,
+        ) {
+            let env = make_env();
+            let (client, admin) = make_client(&env);
+            client.create_prop(&admin, &title(&env, "P"), &2_000);
+            let voter = Address::generate(&env);
+
+            let (c1, _) = choice_from_u8(&env, first);
+            let (c2, _) = choice_from_u8(&env, second);
+
+            client.cast_vote(&voter, &1, &c1);
+            let res = client.try_cast_vote(&voter, &1, &c2);
+            prop_assert!(res.is_err(), "expected AlreadyVoted but got Ok");
+        }
+    }
+
+    /// Property 3 ---------------------------------------------------------------
+    /// `prop_count` always equals the number of proposals successfully created
+    /// regardless of how many are created.
+    proptest! {
+        #![proptest_config(proptest::test_runner::Config::with_cases(16))]
+        #[test]
+        fn prop_count_tracks_created_proposals(n in 1u32..=15) {
+            let env = make_env();
+            let (client, admin) = make_client(&env);
+            for i in 0..n {
+                let t = soroban_sdk::String::from_str(&env, "P");
+                // Each proposal gets a unique far-future deadline.
+                client.create_prop(&admin, &t, &(2_000 + i as u64 * 10));
+            }
+            prop_assert_eq!(client.prop_count(), n);
+        }
+    }
+}
