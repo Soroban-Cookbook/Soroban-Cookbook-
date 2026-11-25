@@ -194,12 +194,9 @@ impl SimpleSwapContract {
 
         let contract_addr = this.contract_address(&env);
 
-        token::Client::new(&env, &sell_token).transfer_from(
-            &contract_addr,
-            &trader,
-            &contract_addr,
-            &sell_amount,
-        );
+        // Pull the sell token straight from the trader. `trader.require_auth()`
+        // above covers this transfer, so no `approve` / allowance is needed.
+        token::Client::new(&env, &sell_token).transfer(&trader, &contract_addr, &sell_amount);
         token::Client::new(&env, &buy_token).transfer(&contract_addr, &recipient, &buy_amount);
 
         env.events().publish(
@@ -225,3 +222,6 @@ impl SimpleSwapContract {
         this.rate(&env)
     }
 }
+
+#[cfg(test)]
+mod test;

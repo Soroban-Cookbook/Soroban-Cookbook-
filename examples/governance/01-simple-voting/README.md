@@ -10,6 +10,7 @@ A foundational on-chain governance contract for Soroban that demonstrates the co
 - **Time-based deadline enforcement** with `env.ledger().timestamp()`
 - **Event emission** for every vote and execution (indexer-friendly, from `04-events` pattern)
 - **Typed custom errors** with `#[contracterror]`
+- **Overflow-safe tallies**: vote counters are `i128` and incremented with `checked_add`; an overflow returns `VotingError::Overflow` instead of wrapping
 
 ## Key Concepts
 
@@ -26,7 +27,7 @@ A foundational on-chain governance contract for Soroban that demonstrates the co
 ```rust
 fn create_proposal(env, admin, title, deadline_unix) -> u32
 fn cast_vote(env, voter, proposal_id, choice: VoteChoice) -> ()
-fn tally(env, proposal_id) -> VoteTally
+fn tally(env, proposal_id) -> (i128, i128, i128) // (for, against, abstain)
 fn execute(env, proposal_id) -> VoteResult
 fn get_proposal(env, proposal_id) -> Proposal
 ```

@@ -567,7 +567,7 @@ fn test_timelock_governance_queue_and_execute() {
     let client = timelock_governance::TimelockGovernanceClient::new(&env, &id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let args = Vec::from_array(&env, [7u32.into_val(&env)]);
     let proposal_id = client.queue(&target_id, &symbol_short!("run"), &args, &100);
@@ -607,7 +607,7 @@ fn test_timelock_governance_can_cancel_a_proposal() {
     let client = timelock_governance::TimelockGovernanceClient::new(&env, &id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &10);
+    client.init(&admin, &10, &100);
     let proposal_id = client.queue(&target_id, &symbol_short!("run"), &Vec::new(&env), &10);
     client.cancel(&proposal_id);
     assert_eq!(
