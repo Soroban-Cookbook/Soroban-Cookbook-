@@ -1,0 +1,129 @@
+name: Mutation Testing
+
+# cargo-mutants verifies that tests actually assert on logic, not just
+# execute code paths. It is intentionally slow, so it runs weekly and on
+# PRs that touch the security-critical example crates.
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "examples/defi/**"
+      - "examples/tokens/**"
+      - "examples/governance/**"
+      - "tests/integration/**"
+      - "tests/security/**"
+      - "scripts/mutation-test.sh"
+      - ".github/workflows/mutation-testing.yml"
+
+jobs:
+  mutants:
+    name: Mutation Score (${{ matrix.package }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - constant-product-amm
+          - lending-pool
+          - staking-pool
+          - simple-voting
+          - sep41-token
+    env:
+      # Enforce the 70% threshold only on PRs; scheduled runs report so the
+      # baseline can be improved without blocking merges.
+      MIN_MUTATION_SCORE: ${{ github.event_name == 'pull_request' && '0.7' || '' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+          target: wasm32-unknown-unknown
+
+      - name: Install cargo-mutants
+        run: cargo install cargo-mutants --locked
+
+      - name: Run mutation tests
+        run: ./scripts/mutation-test.sh "${{ matrix.package }}"
+
+      - name: Upload mutation results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutants-${{ matrix.package }}
+          path: mutants.out/
+          if-no-files-found: ignore
+
+  report:
+    name: Mutation Score Summary
+    needs: mutants
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Download mutation results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: mutants-*
+          path: mutants-results
+          merge-multiple: true
+
+      - name: Summarize scores
+        run: |
+          {
+            echo "## Mutation Testing Summary"
+            echo ""
+            echo "| Package | Caught | Missed | Timeout | Unviable | Score |"
+            echo "|---|---:|---:|---:|---:|---:|"
+            python3 - <<'PY'
+          import json, glob, os
+
+          for path in sorted(glob.glob("mutants-results/**/outcomes.json", recursive=True)):
+              pkg = os.path.basename(os.path.dirname(path))
+              try:
+                  with open(path) as f:
+                      data = json.load(f)
+              except (OSError, json.JSONDecodeError):
+                  continue
+              c, m = data.get("caught", 0), data.get("missed", 0)
+              t, u = data.get("timeout", 0), data.get("unviable", 0)
+              denom = c + m + t
+              score = f"{c / denom:.1%}" if denom else "n/a"
+              print(f"| {pkg} | {c} | {m} | {t} | {u} | {score} |")
+          PY
+            echo ""
+            echo "Missed mutants are listed in each package's \`outcomes.json\`."
+            echo "See CONTRIBUTING.md for the mutation-testing workflow."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: File tracking issue for surviving mutants
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          missed=$(python3 - <<'PY'
+          import json, glob
+          total = 0
+          for path in glob.glob("mutants-results/**/outcomes.json", recursive=True):
+              try:
+                  with open(path) as f:
+                      total += json.load(f).get("missed", 0)
+              except (OSError, json.JSONDecodeError):
+                  continue
+          print(total)
+          PY
+          )
+          if [ "${missed}" -gt 0 ]; then
+            gh issue create \
+              --title "Mutation testing: ${missed} surviving mutants need test improvements" \
+              --label "enhancement" --label "testing" \
+              --body "The weekly cargo-mutants run found ${missed} surviving mutants across the security-critical examples. See the latest Mutation Testing workflow run for per-package details in mutants.out/*/outcomes.json. Each surviving mutant should be killed with a targeted test or explicitly justified as equivalent." \
+              || echo "Could not file tracking issue (may already exist or gh unavailable)"
+          fi
