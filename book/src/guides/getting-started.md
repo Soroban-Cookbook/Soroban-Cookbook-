@@ -331,11 +331,11 @@ Here is a quick map of the pieces:
 ## Next Steps
 
 1. **Explore the examples** — start with the basics:
-   - [01-hello-world](../../examples/basics/01-hello-world/) — the contract you just wrote, fully annotated
-   - [02-storage-patterns](../../examples/basics/02-storage-patterns/) — persistent, instance, and temporary storage
-   - [03-authentication](../../examples/basics/03-authentication/) — `require_auth()`, admin checks, RBAC
-   - [04-events](../../examples/basics/04-events/) — structured event emission
-   - [05-error-handling](../../examples/basics/05-error-handling/) — `Result` vs `panic!`
+   - [01-hello-world](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world) — the contract you just wrote, fully annotated
+   - [02-storage-patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns) — persistent, instance, and temporary storage
+   - [03-authentication](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication) — `require_auth()`, admin checks, RBAC
+   - [04-events](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events) — structured event emission
+   - [05-error-handling](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-error-handling) — `Result` vs `panic!`
 
 2. **Learn to test well** — read the [Testing Guide](./testing.md)
 

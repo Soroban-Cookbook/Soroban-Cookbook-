@@ -8,7 +8,7 @@ Advanced patterns, real-world use cases, and more complex contracts.
 
 ## 🍍 Examples
 
-### Multi-Sig Patterns [./multi-sig-patterns/](../examples/intermediate/multi-sig-patterns/)
+### Multi-Sig Patterns [./multi-sig-patterns/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/multi-sig-patterns)
 
 Threshold signatures & multi-party auth. N-of-M signers, sequential approvals, and single-transaction multi-auth.
 
@@ -29,9 +29,9 @@ for signer in signers.iter() {
 }
 ```
 
-## Checklist: [CHECKLIST.md](../examples/intermediate/multi-sig-patterns/CHECKLIST.md)
+## Checklist: [CHECKLIST.md](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/examples/intermediate/multi-sig-patterns/CHECKLIST.md)
 
-### Ajo Factory [./ajo-factory/](../examples/intermediate/ajo-factory/)
+### Ajo Factory [./ajo-factory/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory)
 
 Contract deployment from within a contract. Spawn isolated instances from Wasm hash.
 
@@ -49,7 +49,7 @@ let address = env.deployer()
 AjoClient::new(&env, &address).initialize(...);
 ```
 
-### Pause / Unpause [./03-pause-unpause/](../examples/intermediate/03-pause-unpause/)
+### Pause / Unpause [./03-pause-unpause/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/03-pause-unpause)
 
 Emergency shutdown mechanism. Admin-controlled pause toggle that halts sensitive operations while keeping read-only functions available.
 
@@ -68,7 +68,7 @@ fn require_not_paused(env: &Env) -> Result<(), PauseError> {
     Ok()
 }
 ```
-### Storage Migration [./storage-migration/](../examples/intermediate/storage-migration/)
+### Storage Migration [./storage-migration/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/storage-migration)
 
 Versioned storage upgrades. Stage migrations, transform legacy storage, and execute in safe batches with explicit version checks and rollback-friendly state.
 
@@ -78,7 +78,7 @@ Versioned storage upgrades. Stage migrations, transform legacy storage, and exec
 - Concrete legacy-to-new data transforms such as `migrate_v1_to_v2()`
 - Safe rollback/cancellation and migration-safety tests
 
-### Event History [./event-history/](../examples/intermediate/event-history/)
+### Event History [./event-history/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/event-history)
 
 On-chain audit history. Record event entries persistently and query them with cursor-based pagination and time filters.
 
@@ -88,7 +88,7 @@ On-chain audit history. Record event entries persistently and query them with cu
 - Time-based filtering
 - Storage cap trimming
 
-### Iterable Mapping (canonical) [./iterable-mapping/](../examples/intermediate/iterable-mapping/)
+### Iterable Mapping (canonical) [./iterable-mapping/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mapping)
 
 Enumerating key-value state. A map that stores keys in a side list to support paginated iteration.
 
@@ -106,11 +106,11 @@ client.set(&key, &value);
 let page = client.keys(&0, &10);
 ```
 
-> **Advanced companion**: [`iterable-mappings`](../examples/intermediate/iterable-mappings/) reuses this pattern to demonstrate filtering, mapping, and reducing over an iterable map.
+> **Advanced companion**: [`iterable-mappings`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mappings) reuses this pattern to demonstrate filtering, mapping, and reducing over an iterable map.
 
 ## Prerequisites
 
-- [Basics](.e/basics.md)
+- [Basics](./basics.md)
 
 ## ❰ Run
 ```bash
@@ -118,4 +118,4 @@ cd examples/intermediate/multi-sig-patterns
 cargo test
 ```
 
-## Next: [Advanced](.e/advanced.md)
+## Next: [Advanced](./advanced.md)

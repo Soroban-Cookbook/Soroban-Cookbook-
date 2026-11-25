@@ -15,7 +15,7 @@ Why Crowdin fits the project:
 
 ## i18n Framework Configuration
 
-The repository now includes a Crowdin configuration file at [.crowdin.yml](../../.crowdin.yml) to define the translation source and target layout for the mdBook content.
+The repository now includes a Crowdin configuration file at [.crowdin.yml](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/.crowdin.yml) to define the translation source and target layout for the mdBook content.
 
 The current configuration targets the Markdown sources under the mdBook tree so that translations can be managed independently from the build output.
 

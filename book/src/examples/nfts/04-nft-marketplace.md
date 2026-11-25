@@ -39,5 +39,5 @@ cargo test
 
 ## See Also
 
-- [NFT Patterns Reference](../docs/nft-patterns.md)
+- [NFT Patterns Reference](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/nft-patterns.md)
 - [01 · Basic NFT](./01-basic-nft.md)

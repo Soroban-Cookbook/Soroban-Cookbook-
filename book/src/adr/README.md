@@ -44,7 +44,7 @@ ADRs are immutable once accepted. If a decision changes, a new ADR is written to
 2. Fill in all sections — context, decision, and consequences
 3. Set the status to `Proposed`
 4. Open a PR; once merged and agreed upon, update the status to `Accepted`
-5. Add the new ADR to the index table above and in [`docs/adr/README.md`](../../docs/adr/README.md)
+5. Add the new ADR to the index table above and in [`docs/adr/README.md`](./README.md)
 
 ## ADR Statuses
 

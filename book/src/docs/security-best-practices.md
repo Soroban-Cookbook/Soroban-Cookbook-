@@ -565,6 +565,6 @@ See `examples/advanced/02-timelock` for a contract demonstrating:
 
 - [Best Practices](./best-practices.md) — general coding and performance guidelines
 - [Common Pitfalls](./common-pitfalls.md) — mistakes to avoid when writing Soroban contracts
-- [Security Audit Prep Checklist](./security-audit/audit-prep-checklist.md) — full pre-audit readiness guide
+- [Security Audit Prep Checklist](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/security-audit/audit-prep-checklist.md) — full pre-audit readiness guide
 - [Soroban SDK Documentation](https://docs.rs/soroban-sdk)
 - [Stellar Security Disclosure Policy](https://www.stellar.org/security)
