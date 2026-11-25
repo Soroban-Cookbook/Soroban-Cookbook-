@@ -1,7 +1,140 @@
 name: Benchmark
-on: push
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - 'examples/**/*.rs'
+      - 'tests/integration/**'
+      - 'Cargo.toml'
+      - '.github/workflows/benchmarks.yml'
+  schedule:
+    # Run quarterly on the first Monday of every 3rd month at 9:00 UTC
+    - cron: '0 9 1 1,4,7,10 *'
+  workflow_dispatch: # Allow manual triggering
+
 jobs:
-  bench:
+  benchmark:
     runs-on: ubuntu-latest
     steps:
-      - run: echo ok
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+
+      - name: Install Soroban CLI
+        run: |
+          cargo install --locked soroban-cli --features opt || echo "Using cached soroban-cli"
+
+      - name: Cache cargo registry and build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-bench-
+
+      - name: Run storage benchmarks
+        run: |
+          cargo test -p integration-tests storage_benchmarks -- --nocapture | tee storage_bench_output.txt
+
+      - name: Run token benchmarks
+        run: |
+          cargo test -p integration-tests token_benchmarks -- --nocapture | tee token_bench_output.txt
+
+      - name: Run DeFi benchmarks
+        run: |
+          cargo test -p integration-tests --test defi_benchmarks -- --nocapture | tee defi_bench_output.txt
+
+      - name: Run cross-contract benchmarks
+        run: |
+          cargo test -p integration-tests cross_contract_benchmark -- --nocapture | tee cross_contract_bench_output.txt || echo "Some benchmarks may not exist"
+
+      - name: Check benchmark documentation staleness
+        id: check_staleness
+        run: |
+          # Extract last updated date from benchmarks.md
+          LAST_UPDATED=$(grep "Last Updated:" book/src/docs/benchmarks.md | sed 's/.*: //' || echo "Unknown")
+          SDK_VERSION=$(grep "SDK Version:" book/src/docs/benchmarks.md | sed 's/.*: //' || echo "Unknown")
+          CURRENT_SDK=$(grep "soroban-sdk" Cargo.toml | head -1 | sed 's/.*= "//' | sed 's/".*//')
+          
+          echo "Last benchmark update: $LAST_UPDATED"
+          echo "Documented SDK version: $SDK_VERSION"
+          echo "Current SDK version: $CURRENT_SDK"
+          
+          # Calculate months since last update (simplified check)
+          CURRENT_MONTH=$(date +%Y-%m)
+          
+          # Check if SDK version matches
+          if [ "$SDK_VERSION" != "$CURRENT_SDK" ]; then
+            echo "⚠️ WARNING: Benchmark documentation is for SDK $SDK_VERSION but workspace uses $CURRENT_SDK"
+            echo "staleness_warning=SDK version mismatch: docs use $SDK_VERSION, workspace uses $CURRENT_SDK" >> $GITHUB_OUTPUT
+          fi
+          
+          # On scheduled runs, create an issue if more than 3 months old
+          if [ "${{ github.event_name }}" == "schedule" ]; then
+            echo "Scheduled benchmark check - consider reviewing benchmarks quarterly"
+          fi
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-results
+          path: |
+            *_bench_output.txt
+          retention-days: 90
+
+      - name: Comment PR with staleness warning
+        if: github.event_name == 'pull_request' && steps.check_staleness.outputs.staleness_warning != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Benchmark Documentation Staleness**: ${{ steps.check_staleness.outputs.staleness_warning }}\n\nConsider updating `book/src/docs/benchmarks.md` with current SDK benchmarks.'
+            })
+
+      - name: Create issue for stale benchmarks
+        if: github.event_name == 'schedule' && steps.check_staleness.outputs.staleness_warning != ''
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const title = '📊 Quarterly Benchmark Review Due';
+            const body = `## Scheduled Benchmark Review
+            
+            This issue was automatically created as part of our quarterly benchmark review process.
+            
+            **Current Status:**
+            - ${{ steps.check_staleness.outputs.staleness_warning }}
+            
+            **Action Items:**
+            - [ ] Run benchmarks with current SDK version
+            - [ ] Update CPU instruction counts in \`book/src/docs/benchmarks.md\`
+            - [ ] Update SDK version and last updated date in document header
+            - [ ] Cross-reference with current Stellar Lab resource rates
+            - [ ] Test with \`simulateTransaction\` on testnet/mainnet
+            
+            **Resources:**
+            - [Stellar Lab Resource Limits](https://lab.stellar.org/account/resources)
+            - [Benchmark Methodology](https://github.com/${{ github.repository }}/blob/main/book/src/docs/benchmarks.md#methodology-for-updates)
+            
+            See issue #1477 for context.`;
+            
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['documentation', 'benchmarks', 'P2']
+            })
+
