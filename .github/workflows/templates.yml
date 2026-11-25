@@ -6,12 +6,12 @@ name: Templates
 # this repository and build it on its own. Because a package cannot belong to two
 # workspaces at once, they are listed in the root `exclude` table instead of
 # `members`, so `cargo ... --workspace` (and scripts/ci-workspace.sh) never
-# touches them. Without a dedicated job like this one, a broken template would
-# still ship looking official. See #1184.
+# touches them. `templates/nft-marketplace-dapp` is a root workspace member.
+# Without a dedicated job like this one, a broken template would still ship
+# looking official. See #1184 and #1469.
 #
-# `templates/nft-marketplace-dapp` is a single package (not a standalone
-# workspace) and is a root workspace member, so the main "Test and Lint"
-# workflow (`cargo ... --workspace`) covers it; it is not built by this job.
+# This job builds and tests the contracts of all three templates and verifies
+# that each frontend's dependencies install and build.
 
 on:
   push:
@@ -21,30 +21,54 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  # actions-rust-lang/setup-rust-toolchain@v1 defaults its `rustflags` input to
-  # "-D warnings", which would turn the template's legitimate uses of the
-  # deprecated `Events::publish` API into hard errors. Set RUSTFLAGS here so the
-  # action's guard (`! -v RUSTFLAGS`) leaves our value alone. This matches the
-  # policy already used by .github/workflows/test.yml.
-  RUSTFLAGS: "-D warnings -A deprecated"
+  # Templates are learner starter kits and intentionally tolerate warnings
+  # (deprecated APIs, unused imports, unused workspace keys). Setting this
+  # also prevents setup-rust-toolchain from injecting its `-D warnings` default.
+  RUSTFLAGS: "-A warnings"
 
 jobs:
-  token-dapp:
-    name: token-dapp (standalone workspace)
+  templates:
+    name: ${{ matrix.template }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - template: dao-governance-dapp
+            package: dao-governance
+          - template: token-dapp
+            package: token-contract
+          - template: nft-marketplace-dapp
+            package: nft-marketplace-dapp
     defaults:
       run:
-        working-directory: templates/token-dapp
+        working-directory: templates/${{ matrix.template }}
     steps:
       - uses: actions/checkout@v7
 
       - name: Install Rust
         uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: stable
+          # Match rust-toolchain.toml; the repo's other jobs use `stable`,
+          # which drifts ahead of the pinned SDK versions used by templates.
+          toolchain: 1.96.0
 
-      - name: Check the template workspace
-        run: cargo check
+      - name: Build template contract (release)
+        run: cargo build --release -p ${{ matrix.package }}
 
-      - name: Run the template test suite
-        run: cargo test
+      - name: Run template contract tests
+        run: cargo test -p ${{ matrix.package }}
+
+      - name: Setup Bun
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install frontend dependencies
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: bun install
+
+      - name: Build frontend
+        if: hashFiles(format('templates/{0}/frontend/package.json', matrix.template)) != ''
+        working-directory: templates/${{ matrix.template }}/frontend
+        run: bun run build
