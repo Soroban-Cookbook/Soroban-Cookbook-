@@ -1,6 +1,6 @@
 #![allow(deprecated)]
 
-use crate::{SwapLiquidityContract, SwapLiquidityContractClient};
+use crate::{AmmError, SwapLiquidityContract, SwapLiquidityContractClient};
 use soroban_sdk::testutils::Address as _;
 use soroban_sdk::testutils::Events as _;
 use soroban_sdk::{token, Address, Env};
@@ -133,6 +133,29 @@ fn test_pool_share_reflects_lp_holdings() {
     client.add_liquidity(&alice, &100i128, &100i128);
     let share = client.pool_share(&alice);
     assert!(share > 0);
+}
+
+#[test]
+fn test_add_liquidity_rejects_off_ratio_deposit() {
+    let (
+        env, _owner, alice, _bob, _token_a_id, _token_b_id, _lp_token_id, token_a_admin,
+        token_b_admin, client,
+    ) = setup();
+
+    env.mock_all_auths();
+    token_a_admin.mint(&alice, &2000i128);
+    token_b_admin.mint(&alice, &4000i128);
+
+    client.add_liquidity(&alice, &1000i128, &2000i128);
+
+    // Pool ratio is now 1:2; a 1:5 deposit must be rejected.
+    assert_eq!(
+        client.try_add_liquidity(&alice, &100i128, &500i128),
+        Err(Ok(AmmError::RatioMismatch))
+    );
+
+    // An on-ratio deposit still succeeds.
+    assert!(client.try_add_liquidity(&alice, &100i128, &200i128).is_ok());
 }
 
 #[test]

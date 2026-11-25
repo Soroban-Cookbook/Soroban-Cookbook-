@@ -3,7 +3,8 @@
 
 use core::cmp;
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, token, Address, Env, Symbol,
+    contract, contracterror, contractimpl, contracttype, symbol_short, token, Address, Env,
+    Symbol,
 };
 
 #[contract]
@@ -18,6 +19,14 @@ pub enum DataKey {
     ReserveA,
     ReserveB,
     TotalShares,
+}
+
+#[contracterror]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[repr(u32)]
+pub enum AmmError {
+    RatioMismatch = 1,
+    ArithmeticOverflow = 2,
 }
 
 #[contracttype]
@@ -115,7 +124,12 @@ impl SwapLiquidityContract {
         env.storage().instance().set(&DataKey::TotalShares, &0i128);
     }
 
-    pub fn add_liquidity(env: Env, provider: Address, amount_a: i128, amount_b: i128) {
+    pub fn add_liquidity(
+        env: Env,
+        provider: Address,
+        amount_a: i128,
+        amount_b: i128,
+    ) -> Result<i128, AmmError> {
         provider.require_auth();
         assert!(
             amount_a > 0 && amount_b > 0,
@@ -128,6 +142,28 @@ impl SwapLiquidityContract {
         let reserve_a = this.reserve_a(&env);
         let reserve_b = this.reserve_b(&env);
         let total_shares = this.total_shares(&env);
+
+        // Once the pool holds reserves, deposits must keep the current price
+        // ratio. Otherwise the "extra" tokens shift the spot price and transfer
+        // value from existing LPs to the depositor. A small tolerance absorbs
+        // integer-rounding differences in the cross-multiplied products.
+        if total_shares != 0 {
+            let lhs = amount_a
+                .checked_mul(reserve_b)
+                .ok_or(AmmError::ArithmeticOverflow)?;
+            let rhs = amount_b
+                .checked_mul(reserve_a)
+                .ok_or(AmmError::ArithmeticOverflow)?;
+            let diff = if lhs > rhs { lhs - rhs } else { rhs - lhs };
+            let tolerance = if reserve_a > reserve_b {
+                reserve_a
+            } else {
+                reserve_b
+            };
+            if diff > tolerance {
+                return Err(AmmError::RatioMismatch);
+            }
+        }
 
         let (take_a, take_b, minted_shares) = if total_shares == 0 {
             (
@@ -192,6 +228,8 @@ impl SwapLiquidityContract {
                 shares: minted_shares,
             },
         );
+
+        Ok(minted_shares)
     }
 
     pub fn remove_liquidity(env: Env, provider: Address, shares: i128) {
