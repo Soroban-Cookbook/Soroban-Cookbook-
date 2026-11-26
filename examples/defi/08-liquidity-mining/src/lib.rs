@@ -31,7 +31,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Symbol};
+use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Symbol, Vec};
 
 // ─── Storage keys ────────────────────────────────────────────────────────────
 
@@ -40,8 +40,10 @@ use soroban_sdk::{contract, contractimpl, contracttype, token, Address, Env, Sym
 pub enum DataKey {
     /// Contract administrator
     Admin,
-    /// Pool configuration keyed by pool id (u32)
-    Pool(u32),
+    /// Number of pools stored in the paginated registry
+    PoolCount,
+    /// One page of the pool registry (page index)
+    PoolPage(u32),
     /// Per-user staking state: (pool_id, user_address)
     UserInfo(u32, Address),
 }
@@ -66,6 +68,14 @@ pub struct PoolInfo {
     pub last_update_ledger: u32,
     /// Whether this pool is active (accepting stakes / distributing rewards)
     pub active: bool,
+}
+
+/// One entry in a pool registry page.
+#[contracttype]
+#[derive(Clone, Debug, PartialEq)]
+pub struct PoolEntry {
+    pub pool_id: u32,
+    pub pool: PoolInfo,
 }
 
 /// Per-user staking record for a specific pool.
@@ -94,6 +104,13 @@ const MAX_REWARD_RATE: i128 = 1_000_000_000_000_000; // 1e15
 const TTL_MIN: u32 = 17_280; // ~1 day at 5 s/ledger
 /// Maximum TTL extension for persistent storage entries (in ledgers).
 const TTL_MAX: u32 = 120_960; // ~7 days
+
+/// Number of pools in each persistent storage page.
+///
+/// The paginated layout trades a small linear scan for bounded storage writes:
+/// all pools fit in fixed-size pages, and updating one pool extends only its
+/// containing page instead of a separate TTL for every pool.
+const POOL_PAGE_SIZE: u32 = 20;
 
 // ─── Contract ────────────────────────────────────────────────────────────────
 
@@ -131,7 +148,7 @@ impl LiquidityMining {
     ) {
         Self::require_admin(&env);
 
-        if env.storage().persistent().has(&DataKey::Pool(pool_id)) {
+        if Self::find_pool(&env, pool_id).is_some() {
             panic!("Pool already exists");
         }
         if reward_rate <= 0 || reward_rate > MAX_REWARD_RATE {
@@ -365,6 +382,11 @@ impl LiquidityMining {
             .expect("Not initialized")
     }
 
+    /// Return the number of pools in the paginated registry.
+    pub fn get_pool_count(env: Env) -> u32 {
+        Self::pool_count(&env)
+    }
+
     // ── Internal helpers ─────────────────────────────────────────────────────
 
     /// Advance the pool's reward accumulator to the current ledger.
@@ -395,19 +417,83 @@ impl LiquidityMining {
 
     /// Load a pool, panicking if it does not exist.
     fn load_pool(env: &Env, pool_id: u32) -> PoolInfo {
-        env.storage()
-            .persistent()
-            .get(&DataKey::Pool(pool_id))
-            .expect("Pool not found")
+        match Self::find_pool(env, pool_id) {
+            Some((_, _, pool)) => pool,
+            None => panic!("Pool not found"),
+        }
     }
 
-    /// Persist a pool and extend its TTL.
+    /// Persist a pool in its registry page and extend the page TTL only.
     fn save_pool(env: &Env, pool_id: u32, pool: &PoolInfo) {
-        let key = DataKey::Pool(pool_id);
-        env.storage().persistent().set(&key, pool);
+        let existing = Self::find_pool(env, pool_id);
+        let (page_index, entry_index) = match existing {
+            Some((page_index, entry_index, _)) => (page_index, entry_index),
+            None => {
+                let count = Self::pool_count(env);
+                (count / POOL_PAGE_SIZE, count % POOL_PAGE_SIZE)
+            }
+        };
+
+        let key = DataKey::PoolPage(page_index);
+        let mut page: Vec<PoolEntry> = env
+            .storage()
+            .persistent()
+            .get(&key)
+            .unwrap_or_else(|| Vec::new(env));
+        let entry = PoolEntry {
+            pool_id,
+            pool: pool.clone(),
+        };
+
+        if entry_index < page.len() {
+            page.set(entry_index, entry);
+        } else {
+            page.push_back(entry);
+        }
+
+        env.storage().persistent().set(&key, &page);
         env.storage()
             .persistent()
             .extend_ttl(&key, TTL_MIN, TTL_MAX);
+
+        if existing.is_none() {
+            env.storage()
+                .instance()
+                .set(&DataKey::PoolCount, &(Self::pool_count(env) + 1));
+        }
+    }
+
+    /// Find a pool by scanning the fixed-size registry pages.
+    fn find_pool(env: &Env, pool_id: u32) -> Option<(u32, u32, PoolInfo)> {
+        let count = Self::pool_count(env);
+        let page_count = if count == 0 {
+            0
+        } else {
+            count.div_ceil(POOL_PAGE_SIZE)
+        };
+
+        for page_index in 0..page_count {
+            let page: Vec<PoolEntry> = env
+                .storage()
+                .persistent()
+                .get(&DataKey::PoolPage(page_index))
+                .unwrap_or_else(|| Vec::new(env));
+            for entry_index in 0..page.len() {
+                if let Some(entry) = page.get(entry_index) {
+                    if entry.pool_id == pool_id {
+                        return Some((page_index, entry_index, entry.pool));
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    fn pool_count(env: &Env) -> u32 {
+        env.storage()
+            .instance()
+            .get(&DataKey::PoolCount)
+            .unwrap_or(0)
     }
 
     /// Load a user's staking record, returning a zeroed default if absent.

@@ -137,6 +137,43 @@ fn test_multiple_pools_independent() {
     assert_ne!(pool1.lp_token, pool2.lp_token);
 }
 
+#[test]
+fn test_twenty_plus_pools_use_paginated_registry() {
+    let t = setup();
+
+    for pool_id in 1..=25u32 {
+        t.mining
+            .add_pool(&pool_id, &t.lp_token, &t.reward_token, &(pool_id as i128));
+    }
+
+    assert_eq!(t.mining.get_pool_count(), 25);
+
+    for pool_id in 1..=25u32 {
+        assert_eq!(
+            t.mining.get_pool(&pool_id).reward_rate,
+            pool_id as i128
+        );
+    }
+
+    t.env.as_contract(&t.mining.address, || {
+        let page0: Vec<PoolEntry> = t
+            .env
+            .storage()
+            .persistent()
+            .get(&DataKey::PoolPage(0))
+            .expect("first pool page missing");
+        let page1: Vec<PoolEntry> = t
+            .env
+            .storage()
+            .persistent()
+            .get(&DataKey::PoolPage(1))
+            .expect("second pool page missing");
+
+        assert_eq!(page0.len(), POOL_PAGE_SIZE);
+        assert_eq!(page1.len(), 5);
+    });
+}
+
 // ─── 3. Staking ───────────────────────────────────────────────────────────────
 
 #[test]

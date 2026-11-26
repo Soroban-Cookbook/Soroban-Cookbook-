@@ -28,6 +28,14 @@ user_pending          = user_staked × acc_reward_per_share − user_reward_debt
 This gives **O(1)** updates regardless of the number of stakers or ledgers
 elapsed.
 
+## Storage Layout
+
+Pool metadata is stored in persistent pages containing up to 20 pools. Updating
+a pool rewrites and extends TTL for only its page; pool lookups scan at most
+the registry pages rather than maintaining a separate TTL-bearing entry per
+pool. This trades linear lookup within the pool set for substantially fewer
+TTL calls, with bounded page sizes as the pool count grows.
+
 ## Contract Interface
 
 ### Admin
@@ -66,6 +74,7 @@ fn get_pool(env: Env, pool_id: u32) -> PoolInfo;
 fn get_user_info(env: Env, pool_id: u32, user: Address) -> UserInfo;
 fn pending_rewards(env: Env, pool_id: u32, user: Address) -> i128;
 fn get_admin(env: Env) -> Address;
+fn get_pool_count(env: Env) -> u32;
 ```
 
 ## Quick Start
