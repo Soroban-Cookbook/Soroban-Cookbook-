@@ -87,7 +87,7 @@ soroban-sdk = { workspace = true }
 
 - [soroban-sdk crates.io page](https://crates.io/crates/soroban-sdk)
 - [soroban-sdk GitHub releases](https://github.com/stellar/rs-soroban-sdk/releases)
-- Current workspace pin: [`Cargo.toml`](../../Cargo.toml)
+- Current workspace pin: [`Cargo.toml`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/Cargo.toml)
 
 ## Notes
 

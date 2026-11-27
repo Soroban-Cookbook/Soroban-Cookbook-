@@ -21,8 +21,8 @@ Non-Fungible Token contracts on Soroban — from a minimal mintable NFT through 
 
 ## See Also
 
-- [NFT Patterns Reference](./docs/nft-patterns.md) — deep-dive guide
-- [Security Best Practices](./docs/security-best-practices.md)
+- [NFT Patterns Reference](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/nft-patterns.md) — deep-dive guide
+- [Security Best Practices](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/security-best-practices.md)
 
 ## Prerequisites
 

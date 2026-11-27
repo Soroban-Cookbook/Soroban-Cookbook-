@@ -38,13 +38,13 @@ pub fn transfer(env: Env, amount: u64) -> Result<(), Error> {
 
 ## 🔬 Examples
 
-**[Primary: 03-custom-errors](../examples/basics/03-custom-errors/)**
+**[Primary: 03-custom-errors](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-custom-errors)**
 - 8 error types (table/mapping)
 - Events on failures
 - Complex multi-check ops
 - `cargo test -p custom-errors`
 
-**[Result patterns: 05-error-handling](../examples/basics/05-error-handling/)**
+**[Result patterns: 05-error-handling](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-error-handling)**
 - Good/bad patterns
 - `transfer()` vs `transfer_panic()`
 - Comprehensive `try_` client testing

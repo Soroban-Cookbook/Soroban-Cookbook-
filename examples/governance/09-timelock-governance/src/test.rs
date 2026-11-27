@@ -34,10 +34,10 @@ fn test_init() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     // Can't initialize twice
-    let res = client.try_init(&admin, &100);
+    let res = client.try_init(&admin, &100, &1_000);
     assert_eq!(res.err(), Some(Ok(Error::AlreadyInitialized)));
 }
 
@@ -50,7 +50,7 @@ fn test_queue() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "some_func");
@@ -73,7 +73,7 @@ fn test_queue_invalid_delay() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "some_func");
@@ -81,6 +81,51 @@ fn test_queue_invalid_delay() {
 
     let res = client.try_queue(&target, &func, &args, &50);
     assert_eq!(res.err(), Some(Ok(Error::InvalidDelay)));
+}
+
+#[test]
+fn test_queue_delay_bounds() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let contract_id = env.register(TimelockGovernance, ());
+    let client = TimelockGovernanceClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    // Allowed delays are 100..=1_000 seconds.
+    client.init(&admin, &100, &1_000);
+
+    let target = Address::generate(&env);
+    let func = Symbol::new(&env, "some_func");
+    let args = vec![&env];
+
+    // Too short.
+    let res = client.try_queue(&target, &func, &args, &99);
+    assert_eq!(res.err(), Some(Ok(Error::InvalidDelay)));
+
+    // Too long, including the "lock governance forever" case.
+    let res = client.try_queue(&target, &func, &args, &1_001);
+    assert_eq!(res.err(), Some(Ok(Error::InvalidDelay)));
+    let res = client.try_queue(&target, &func, &args, &u64::MAX);
+    assert_eq!(res.err(), Some(Ok(Error::InvalidDelay)));
+
+    // Both bounds are inclusive, and rejected calls queued nothing.
+    assert_eq!(client.queue(&target, &func, &args, &100), 1);
+    assert_eq!(client.queue(&target, &func, &args, &1_000), 2);
+}
+
+#[test]
+fn test_init_rejects_max_delay_below_min_delay() {
+    let env = Env::default();
+    let contract_id = env.register(TimelockGovernance, ());
+    let client = TimelockGovernanceClient::new(&env, &contract_id);
+    let admin = Address::generate(&env);
+
+    let res = client.try_init(&admin, &100, &99);
+    assert_eq!(res.err(), Some(Ok(Error::InvalidDelay)));
+
+    // min == max is a valid fixed delay, and a failed init does not stick.
+    client.init(&admin, &100, &100);
 }
 
 #[test]
@@ -92,7 +137,7 @@ fn test_execute_delay_not_met() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "some_func");
@@ -113,7 +158,7 @@ fn test_execute_success() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let dummy_id = env.register(Dummy, ());
 
@@ -143,7 +188,7 @@ fn test_cancel() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "some_func");
@@ -165,7 +210,7 @@ fn test_cancel_nonexistent() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let res = client.try_cancel(&1);
     assert_eq!(res.err(), Some(Ok(Error::ProposalNotFound)));
@@ -180,7 +225,7 @@ fn test_execute_canceled() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "some_func");
@@ -203,7 +248,7 @@ fn test_execute_already_executed() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let dummy_id = env.register(Dummy, ());
 
@@ -230,7 +275,7 @@ fn test_emergency_execute() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let dummy_id = env.register(DummyNinetyNine, ());
 
@@ -255,7 +300,7 @@ fn test_emergency_execute_already_executed() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let dummy_id = env.register(DummyNinetyNine, ());
 
@@ -282,7 +327,7 @@ fn test_emergency_execute_canceled() {
     let client = TimelockGovernanceClient::new(&env, &contract_id);
     let admin = Address::generate(&env);
 
-    client.init(&admin, &100);
+    client.init(&admin, &100, &1_000);
 
     let target = Address::generate(&env);
     let func = Symbol::new(&env, "run");

@@ -1,6 +1,6 @@
 # Vault Strategies
 
-**Source:** [`examples/defi/01-vault-strategies`](../../examples/defi/01-vault-strategies/)
+**Source:** [`examples/defi/01-vault-strategies`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/09-vault-strategies)
 
 A yield-bearing vault that supports multiple pluggable strategies with on-chain risk management.
 
@@ -100,4 +100,4 @@ let yield_amount = client.estimate_yield(&10_000, &365);
 
 ## Next
 
-- [Advanced: Timelock](../advanced.md) — combine with a timelock for governance-controlled strategy switches
+- [Advanced: Timelock](./advanced.md) — combine with a timelock for governance-controlled strategy switches

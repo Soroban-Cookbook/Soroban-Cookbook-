@@ -2,6 +2,8 @@
 
 A guide for Ethereum developers transitioning to Soroban smart contract development on Stellar.
 
+> Coming from Solana or CosmWasm instead? See [Solana to Soroban](./solana-to-soroban.md).
+
 ## 🔄 Overview
 
 If you're coming from Ethereum/Solidity development, this guide will help you understand the key differences and translate your knowledge to Soroban.
@@ -478,6 +480,7 @@ fn require_admin(env: &Env) -> Address {
 - [Soroban CLI Docs](https://developers.stellar.org/docs/tools/developer-tools/cli)
 - [Stellar Discord](https://discord.gg/stellardev)
 - [Rust vs Solidity](https://arxiv.org/abs/2106.12848)
+- [Solana to Soroban](./solana-to-soroban.md) - Companion guide for Solana and CosmWasm developers
 
 ## 💡 Tips for Ethereum Developers
 

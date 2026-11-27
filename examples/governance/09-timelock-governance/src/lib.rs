@@ -1,9 +1,7 @@
 #![cfg_attr(target_family = "wasm", no_std)]
 #![allow(deprecated)]
 
-use soroban_sdk::{
-    contract, contracterror, contractimpl, contracttype, Address, Env, Symbol, Vec,
-};
+use soroban_sdk::{contract, contracterror, contractimpl, contracttype, Address, Env, Symbol, Vec};
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -42,6 +40,7 @@ pub struct Proposal {
 pub enum DataKey {
     Admin,
     MinDelay,
+    MaxDelay,
     ProposalCount,
     Proposal(u64),
 }
@@ -51,13 +50,20 @@ pub struct TimelockGovernance;
 
 #[contractimpl]
 impl TimelockGovernance {
-    pub fn init(env: Env, admin: Address, min_delay: u64) -> Result<(), Error> {
+    /// Sets the admin and the allowed queue delay range, `min_delay..=max_delay`
+    /// (seconds). The upper bound stops a proposal from being queued so far in
+    /// the future that it can never be executed.
+    pub fn init(env: Env, admin: Address, min_delay: u64, max_delay: u64) -> Result<(), Error> {
         if env.storage().instance().has(&DataKey::Admin) {
             return Err(Error::AlreadyInitialized);
+        }
+        if max_delay < min_delay {
+            return Err(Error::InvalidDelay);
         }
 
         env.storage().instance().set(&DataKey::Admin, &admin);
         env.storage().instance().set(&DataKey::MinDelay, &min_delay);
+        env.storage().instance().set(&DataKey::MaxDelay, &max_delay);
         env.storage().instance().set(&DataKey::ProposalCount, &0u64);
 
         Ok(())
@@ -74,7 +80,8 @@ impl TimelockGovernance {
         admin.require_auth();
 
         let min_delay: u64 = env.storage().instance().get(&DataKey::MinDelay).unwrap();
-        if delay < min_delay {
+        let max_delay: u64 = env.storage().instance().get(&DataKey::MaxDelay).unwrap();
+        if delay < min_delay || delay > max_delay {
             return Err(Error::InvalidDelay);
         }
 

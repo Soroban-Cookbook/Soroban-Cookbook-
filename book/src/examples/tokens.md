@@ -19,7 +19,7 @@ Soroban fungible token contracts from a minimal SEP-41 implementation to advance
 
 ## Gas Cost Benchmarks
 
-See [docs/gas-benchmarks.md](23../../../docs/gas-benchmarks.md) for gas cost comparisons and CI baselines.
+See [docs/gas-benchmarks.md](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/gas-benchmarks.md) for gas cost comparisons and CI baselines.
 
 ## Prerequisites
 

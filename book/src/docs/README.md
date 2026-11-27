@@ -7,7 +7,7 @@ Welcome to the Soroban Cookbook documentation! This index helps you find the inf
 New to Soroban? Start here:
 
 1. **[Getting Started Guide](../guides/getting-started.md)** - Set up your development environment
-2. **[Your First Contract](../examples/basics/01-hello-world/)** - Write, test, and deploy
+2. **[Your First Contract](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world)** - Write, test, and deploy
 3. **[Testing Guide](../guides/testing.md)** - Learn to test effectively
 4. **[Deployment Guide](../guides/deployment.md)** - Deploy to testnet and mainnet
 5. **[Code Examples](./code-examples.md)** - Tested snippets for every topic
@@ -16,11 +16,11 @@ New to Soroban? Start here:
 
 ### For Beginners
 
-1. [Hello World](../examples/basics/01-hello-world/) - Basic structure
-2. [Storage Patterns](../examples/basics/02-storage-patterns/) - Data persistence
-3. [Authentication](../examples/basics/03-authentication/) - Security basics
-4. [Events](../examples/basics/04-events/) - Event emission
-5. [Error Handling](../examples/basics/05-error-handling/) - Proper errors
+1. [Hello World](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world) - Basic structure
+2. [Storage Patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns) - Data persistence
+3. [Authentication](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication) - Security basics
+4. [Events](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events) - Event emission
+5. [Error Handling](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-error-handling) - Proper errors
 6. [Data Types](../examples/basics/06-data-types/) - Soroban types
 
 ### For Ethereum Developers
@@ -31,10 +31,10 @@ New to Soroban? Start here:
 
 ### For Intermediate Developers
 
-- [Token Interactions](../examples/intermediate/) - Working with tokens
-- [Cross-Contract Patterns](../examples/intermediate/) - Multi-contract systems
-- [Access Control](../examples/intermediate/) - RBAC and multi-sig
-- [Data Structures](../examples/intermediate/) - Efficient storage
+- [Token Interactions](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate) - Working with tokens
+- [Cross-Contract Patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate) - Multi-contract systems
+- [Access Control](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate) - RBAC and multi-sig
+- [Data Structures](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate) - Efficient storage
 
 ### For Advanced Developers
 
@@ -69,16 +69,16 @@ All Rust code examples in this book are compiled and tested in CI using `mdbook 
 - **Failure reporting**: Failing snippets are reported with the source file, line number, and compiler error in the CI log, and the PR check is marked failed with a link to the log.
 - **Maintenance**: Keep snippets compilable — prefer complete, runnable examples; use `no_run` for code that compiles but should not execute, and `ignore` only for illustrative pseudocode. When updating the SDK, re-run `mdbook test` and fix any broken snippets.
 
-See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[Docs Audit Tests](../../tests/docs-audit/)** for automated checks on documentation links and structure.
+See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[Docs Audit Tests](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/tests/docs-audit)** for automated checks on documentation links and structure.
 
 
 ### Technical References
 =======
 
-- **[Storage Types](./storage-types.md)** - Persistent, Temporary, Instance
+- **[Storage Types](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/storage-types.md)** - Persistent, Temporary, Instance
 - **[Authorization](./authorization.md)** - Auth patterns and security
 - **[Events](./events.md)** - Event emission and monitoring
-- **[Error Handling](./error-handling.md)** - Error types and recovery
+- **[Error Handling](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/error-handling.md)** - Error types and recovery
 - **[Testing](./testing-reference.md)** - Testing utilities and patterns
 
 ### Standards & Specifications
@@ -92,7 +92,7 @@ See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[D
 ### By Difficulty Level
 
 - [Basic Examples](../examples/basics/) - Fundamentals
-- [Intermediate Examples](../examples/intermediate/) - Common patterns
+- [Intermediate Examples](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate) - Common patterns
 - [Advanced Examples](../examples/advanced/) - Complex systems
 
 ### By Use Case
@@ -105,18 +105,18 @@ See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[D
 ### By Feature
 
 - **Authentication & Authorization**
-  - [Basic Auth](../examples/basics/03-authentication/)
-  - [Multi-Sig](../examples/intermediate/)
-  - [Role-Based Access Control](../examples/intermediate/)
+  - [Basic Auth](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication)
+  - [Multi-Sig](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate)
+  - [Role-Based Access Control](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate)
 
 - **Token Operations**
   - [Token Basics](../examples/tokens/)
-  - [Token Wrapper](../examples/intermediate/)
+  - [Token Wrapper](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate)
   - [Custom Token](../examples/tokens/)
 
 - **Storage & Data**
-  - [Storage Patterns](../examples/basics/02-storage-patterns/)
-  - [Data Structures](../examples/intermediate/)
+  - [Storage Patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns)
+  - [Data Structures](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate)
   - [Efficient Storage](../examples/advanced/)
 
 - **Financial Operations**
@@ -129,9 +129,9 @@ See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[D
 
 ### Development Scripts
 
-- **[build.sh](../scripts/build.sh)** - Build contracts
-- **[test.sh](../scripts/test.sh)** - Run tests with options
-- **[deploy.sh](../scripts/deploy.sh)** - Deploy to networks
+- **[build.sh](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/scripts/build.sh)** - Build contracts
+- **[test.sh](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/scripts/test.sh)** - Run tests with options
+- **[deploy.sh](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/scripts/deploy.sh)** - Deploy to networks
 
 ### Testing Tools
 
@@ -176,8 +176,8 @@ See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[D
 
 - [Contributing Guide](../CONTRIBUTING.md) - How to contribute
 - [Code of Conduct](../CODE_OF_CONDUCT.md) - Community guidelines
-- [Issue Templates](../.github/ISSUE_TEMPLATE/) - Report issues
-- [Pull Request Template](../.github/PULL_REQUEST_TEMPLATE.md)
+- [Issue Templates](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/.github/ISSUE_TEMPLATE) - Report issues
+- [Pull Request Template](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/.github/pull_request_template.md)
 
 ## 🔗 External Resources
 
@@ -220,7 +220,7 @@ See the **[Style Guide](./style-guide.md)** for snippet conventions and the **[D
 | Topic             | Link                                          |
 | ----------------- | --------------------------------------------- |
 | Setup Environment | [Guide](../guides/getting-started.md)         |
-| First Contract    | [Example](../examples/basics/01-hello-world/) |
+| First Contract    | [Example](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world) |
 | Testing           | [Guide](../guides/testing.md)                 |
 | Deployment        | [Guide](../guides/deployment.md)              |
 | From Ethereum     | [Migration](../guides/ethereum-to-soroban.md) |

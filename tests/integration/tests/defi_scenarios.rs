@@ -98,17 +98,12 @@ impl ArbitrageReceiver {
             .get(&symbol_short!("swap2"))
             .unwrap();
 
-        // 1. Approve swap1 to spend the flash borrowed Token A
-        token_a_client.approve(
-            &env.current_contract_address(),
-            &swap1,
-            &amount,
-            &(env.ledger().sequence() + 1),
-        );
-
-        // 2. Swap A -> B on swap1 (invoker of swap is this contract)
+        // 1. Swap A -> B on swap1 (invoker of swap is this contract). swap
+        //    transfers the flash borrowed Token A from this contract directly,
+        //    so authorize that transfer instead of approving an allowance.
         let swap1_client = SimpleSwapContractClient::new(&env, &swap1);
         let quote1 = swap1_client.quote(&token, &amount);
+        authorize_transfer(&env, &token, &swap1, amount);
         swap1_client.swap(
             &env.current_contract_address(),
             &token,
@@ -117,18 +112,11 @@ impl ArbitrageReceiver {
             &env.current_contract_address(),
         );
 
-        // 3. Approve swap2 to spend the received Token B
+        // 2. Swap B -> A on swap2, authorizing its pull of the received Token B
         let balance_b = token_b_client.balance(&env.current_contract_address());
-        token_b_client.approve(
-            &env.current_contract_address(),
-            &swap2,
-            &balance_b,
-            &(env.ledger().sequence() + 1),
-        );
-
-        // 4. Swap B -> A on swap2
         let swap2_client = SimpleSwapContractClient::new(&env, &swap2);
         let quote2 = swap2_client.quote(&token_b_addr, &balance_b);
+        authorize_transfer(&env, &token_b_addr, &swap2, balance_b);
         swap2_client.swap(
             &env.current_contract_address(),
             &token_b_addr,
@@ -137,7 +125,7 @@ impl ArbitrageReceiver {
             &env.current_contract_address(),
         );
 
-        // 5. Approve flash loan contract to pull amount + fee
+        // 3. Approve flash loan contract to pull amount + fee
         let repayment = amount + fee;
         token_a_client.approve(
             &env.current_contract_address(),

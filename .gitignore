@@ -79,3 +79,7 @@ GEMINI.md
 .GITHUB_ISSUES_BATCH_REPORT.md
 issues.md
 .opencode
+
+# cargo-mutants output
+mutants.out/
+mutants.out.*.log

@@ -53,7 +53,7 @@ env.storage().temporary().set(&key, &value);
 
 ## 🔬 Full Example
 
-[examples/basics/02-storage-patterns/](../examples/basics/02-storage-patterns/)
+[examples/basics/02-storage-patterns/](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns)
 
 **Features:**
 - All CRUD operations

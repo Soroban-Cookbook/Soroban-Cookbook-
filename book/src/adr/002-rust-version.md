@@ -82,7 +82,7 @@ components = ["rust-src"]
 
 - [rust-toolchain.toml specification](https://rust-lang.github.io/rustup/overrides.html#the-toolchain-file)
 - [Soroban SDK 29.x changelog](https://github.com/stellar/rs-soroban-sdk/releases)
-- Current pin: [`rust-toolchain.toml`](../../rust-toolchain.toml)
+- Current pin: [`rust-toolchain.toml`](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/rust-toolchain.toml)
 
 ## Notes
 

@@ -5,7 +5,7 @@ Search-optimized index of all examples with formatted code snippets and live dem
 ## Basics
 
 ### 01 Hello World
-[View Source](../examples/basics/01-hello-world)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/01-hello-world)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -26,7 +26,7 @@ impl HelloContract {
 ```
 
 ### 02 Storage Patterns
-[View Source](../examples/basics/02-storage-patterns)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/02-storage-patterns)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -44,7 +44,7 @@ env.storage().temporary().set(&key, &value);
 ```
 
 ### 03 Authentication
-[View Source](../examples/basics/03-authentication)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-authentication)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -74,7 +74,7 @@ pub fn transfer_from(
 ```
 
 ### 03 Custom Errors
-[View Source](../examples/basics/03-custom-errors)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/03-custom-errors)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -102,7 +102,7 @@ impl MyContract {
 ```
 
 ### 04 Events
-[View Source](../examples/basics/04-events)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/04-events)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -114,7 +114,7 @@ env.events().publish(
 ```
 
 ### 05 Auth Context
-[View Source](../examples/basics/05-auth-context)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-auth-context)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -123,7 +123,7 @@ env.events().publish(
 ```
 
 ### 05 Error Handling
-[View Source](../examples/basics/05-error-handling)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/05-error-handling)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -139,7 +139,7 @@ pub enum Error {
 ```
 
 ### 06 Validation Patterns
-[View Source](../examples/basics/06-validation-patterns)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/06-validation-patterns)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -154,7 +154,7 @@ ValidationError::StringTooLong = 106,
 ```
 
 ### 07 Type Conversions
-[View Source](../examples/basics/07-type-conversions)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/07-type-conversions)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -167,7 +167,7 @@ let n: u32 = u32::try_from_val(&env, &val).unwrap_or(0);
 ```
 
 ### 08 Soroban Types
-[View Source](../examples/basics/08-soroban-types)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/08-soroban-types)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -202,7 +202,7 @@ settings.set(symbol_short!("theme"), 1);
 ```
 
 ### 09 Enum Types
-[View Source](../examples/basics/09-enum-types)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/09-enum-types)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -229,7 +229,7 @@ pub enum ContractState {
 ```
 
 ### 10 Custom Structs
-[View Source](../examples/basics/10-custom-structs)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/10-custom-structs)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -247,7 +247,7 @@ pub struct UserProfile {
 ```
 
 ### 11 Primitive Types
-[View Source](../examples/basics/11-primitive-types)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/11-primitive-types)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -266,7 +266,7 @@ let amount: i128 = -500; // Negative amount for refunds
 ```
 
 ### 12 Data Types
-[View Source](../examples/basics/12-data-types)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/12-data-types)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -277,7 +277,7 @@ let amount: i128 = 1_000_000_000; // 100 XLM in stroops
 ```
 
 ### 13 Collection Types
-[View Source](../examples/basics/13-collection-types)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/13-collection-types)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -297,7 +297,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### 13 Compressed Storage
-[View Source](../examples/basics/13-compressed-storage)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/13-compressed-storage)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -306,7 +306,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### 13 Queue Variants
-[View Source](../examples/basics/13-queue-variants)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/13-queue-variants)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -315,7 +315,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### 14 Event Filtering
-[View Source](../examples/basics/14-event-filtering)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/14-event-filtering)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -324,7 +324,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### 14 Fifo Queue
-[View Source](../examples/basics/14-fifo-queue)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/14-fifo-queue)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -333,7 +333,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### Lazy Cache
-[View Source](../examples/basics/lazy-cache)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/basics/lazy-cache)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -344,7 +344,7 @@ let last = items.pop_back(); // Some(30)
 ## Intermediate
 
 ### 02 Role Based Access Control
-[View Source](../examples/intermediate/02-role-based-access-control)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/02-role-based-access-control)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -353,7 +353,7 @@ let last = items.pop_back(); // Some(30)
 ```
 
 ### 03 Pause Unpause
-[View Source](../examples/intermediate/03-pause-unpause)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/03-pause-unpause)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -366,7 +366,7 @@ fn require_not_paused(env: &Env) -> Result<(), PauseError> {
 ```
 
 ### 03 Priority Queue
-[View Source](../examples/intermediate/03-priority-queue)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/03-priority-queue)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -375,7 +375,7 @@ fn require_not_paused(env: &Env) -> Result<(), PauseError> {
 ```
 
 ### Ajo Factory
-[View Source](../examples/intermediate/ajo-factory)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/ajo-factory)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -391,7 +391,7 @@ factory_client.register_template(
 ```
 
 ### Event History
-[View Source](../examples/intermediate/event-history)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/event-history)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -400,7 +400,7 @@ factory_client.register_template(
 ```
 
 ### Iterable Mapping (canonical)
-[View Source](../examples/intermediate/iterable-mapping)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mapping)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -408,10 +408,10 @@ factory_client.register_template(
 // Code snippet coming soon
 ```
 
-Companion example adding filtering, mapping, and reducing over the same pattern: [View Source](../examples/intermediate/iterable-mappings)
+Companion example adding filtering, mapping, and reducing over the same pattern: [View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/iterable-mappings)
 
 ### Multi Sig Patterns
-[View Source](../examples/intermediate/multi-sig-patterns)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/multi-sig-patterns)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -425,7 +425,7 @@ pub fn get_proposal(env: Env, proposal_id: u32) -> Option<Proposal>
 ```
 
 ### Storage Migration
-[View Source](../examples/intermediate/storage-migration)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/storage-migration)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -434,7 +434,7 @@ pub fn get_proposal(env: Env, proposal_id: u32) -> Option<Proposal>
 ```
 
 ### Storage Pagination
-[View Source](../examples/intermediate/storage-pagination)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/intermediate/storage-pagination)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -445,7 +445,7 @@ pub fn get_proposal(env: Env, proposal_id: u32) -> Option<Proposal>
 ## Advanced
 
 ### 01 Multi Party Auth
-[View Source](../examples/advanced/01-multi-party-auth)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/01-multi-party-auth)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -454,7 +454,7 @@ pub fn multi_sig_transfer(env: Env, signers: Vec<Address>, to: Address, amount: 
 ```
 
 ### 02 Timelock
-[View Source](../examples/advanced/02-timelock)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/02-timelock)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -463,7 +463,7 @@ client.initialize(&admin_address);
 ```
 
 ### 03 Cross Contract Optimization
-[View Source](../examples/advanced/25-cross-contract-optimization)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/25-cross-contract-optimization)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -472,7 +472,7 @@ client.initialize(&admin_address);
 ```
 
 ### 03 Oracle Pattern
-[View Source](../examples/advanced/03-oracle-pattern)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/03-oracle-pattern)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -486,7 +486,7 @@ pub fn submit(env: Env, updater: Address, value: i128) -> Result<(), OracleError
 ```
 
 ### 03 Proxy Admin
-[View Source](../examples/advanced/31-proxy-admin)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/31-proxy-admin)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -499,7 +499,7 @@ pub fn deposit(env: Env, user: Address, amount: i128) -> Result<(), Error> {
 ```
 
 ### 03 Rbac Modifiers
-[View Source](../examples/advanced/32-rbac-modifiers)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/32-rbac-modifiers)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -508,7 +508,7 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 ```
 
 ### 03 Registry Access Controls
-[View Source](../examples/advanced/33-registry-access-controls)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/33-registry-access-controls)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -517,7 +517,7 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 ```
 
 ### 04 Upgradeable Proxy
-[View Source](../examples/advanced/04-upgradeable-proxy)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/04-upgradeable-proxy)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -526,7 +526,7 @@ client.grant_role(&admin, &ROLE_MINTER, &alice);
 ```
 
 ### 20 Batch Transfer
-[View Source](../examples/advanced/20-batch-transfer)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/20-batch-transfer)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -538,7 +538,7 @@ pub struct Transfer {
 ```
 
 ### 17 Bridge Security
-[View Source](../examples/advanced/17-bridge-security)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/17-bridge-security)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -547,7 +547,7 @@ pub struct Transfer {
 ```
 
 ### 18 Diamond Facets (Router Orchestration)
-[View Source](../examples/advanced/18-diamond-facets)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/18-diamond-facets)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -569,7 +569,7 @@ diamond.execute(&function_name, &args)?; // Routes to authorized facet
 ```
 
 ### 06 Diamond Pattern (Canonical EIP-2535)
-[View Source](../examples/advanced/38-diamond-pattern)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/38-diamond-pattern)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -583,7 +583,7 @@ let addr = diamond.facet_address(&selector); // Fallback dispatch
 ```
 
 ### Contract Registry
-[View Source](../examples/advanced/contract-registry)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/contract-registry)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -594,7 +594,7 @@ let addr = diamond.facet_address(&selector); // Fallback dispatch
 ## Defi
 
 ### 01 Simple Swap
-[View Source](../examples/defi/01-simple-swap)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/01-simple-swap)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -603,7 +603,7 @@ let addr = diamond.facet_address(&selector); // Fallback dispatch
 ```
 
 ### 01 Vault Strategies
-[View Source](../examples/defi/01-vault-strategies)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/09-vault-strategies)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -617,7 +617,7 @@ pub struct StrategyParams {
 ```
 
 ### 02 Constant Product Amm
-[View Source](../examples/defi/02-constant-product-amm)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/02-constant-product-amm)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -658,7 +658,7 @@ pub fn add_pool(env: Env, admin: Address, ...) {
 ```
 
 ### 03 Lending Pool
-[View Source](../examples/defi/03-lending-pool)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/03-lending-pool)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -667,7 +667,7 @@ client.initialize(&base_rate, &kink_rate, &kink_utilization);
 ```
 
 ### 04 Collateralized Lending
-[View Source](../examples/defi/04-collateralized-lending)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/04-collateralized-lending)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -685,7 +685,7 @@ client.initialize();
 ```
 
 ### 05 Flash Loans
-[View Source](../examples/defi/05-flash-loans)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/05-flash-loans)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -696,7 +696,7 @@ pub trait FlashLoanReceiver {
 ```
 
 ### 06 Flash Loan Use Cases
-[View Source](../examples/defi/06-flash-loan-use-cases)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/06-flash-loan-use-cases)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -705,7 +705,7 @@ pub trait FlashLoanReceiver {
 ```
 
 ### 07 Staking Pool
-[View Source](../examples/defi/07-staking-pool)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/07-staking-pool)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -714,7 +714,7 @@ pub trait FlashLoanReceiver {
 ```
 
 ### 08 Liquidity Mining
-[View Source](../examples/defi/08-liquidity-mining)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/08-liquidity-mining)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -735,7 +735,7 @@ fn set_pool_active(env: Env, pool_id: u32, active: bool);
 ## Nfts
 
 ### 01 Basic Nft
-[View Source](../examples/nfts/01-basic-nft)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/01-basic-nft)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -768,7 +768,7 @@ pub fn initialize(
 ```
 
 ### 02 Nft Metadata
-[View Source](../examples/nfts/02-nft-metadata)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/02-nft-metadata)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -788,7 +788,7 @@ pub fn initialize(
 ```
 
 ### 04 Proposal Lifecycle
-[View Source](../examples/governance/04-proposal-lifecycle)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/governance/04-proposal-lifecycle)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -799,7 +799,7 @@ pub fn initialize(
 ## Tokens
 
 ### 01 Sep41 Token
-[View Source](../examples/tokens/01-sep41-token)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/01-sep41-token)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -808,7 +808,7 @@ pub fn initialize(
 ```
 
 ### 02 Sep41 Extensions
-[View Source](../examples/tokens/02-sep41-extensions)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/02-sep41-extensions)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -820,7 +820,7 @@ pub struct Transfer {
 ```
 
 ### 03 Optimized Operations
-[View Source](../examples/tokens/03-optimized-operations)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/03-optimized-operations)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -839,7 +839,7 @@ pub fn batch_transfer(
 ```
 
 ### Allowance Pattern
-[View Source](../examples/tokens/allowance-pattern)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/05-allowance-pattern)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -848,7 +848,7 @@ pub fn batch_transfer(
 ```
 
 ### Mint Burn
-[View Source](../examples/tokens/mint-burn)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/04-mint-burn)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -857,7 +857,7 @@ pub fn batch_transfer(
 ```
 
 ### Multi Token Balance Manager
-[View Source](../examples/tokens/multi-token-balance-manager)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/08-multi-token-balance-manager)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -875,7 +875,7 @@ manager.register_token(
 ```
 
 ### Optimized Token Ops
-[View Source](../examples/tokens/optimized-token-ops)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/09-optimized-token-ops)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -884,7 +884,7 @@ manager.register_token(
 ```
 
 ### Token Metadata
-[View Source](../examples/tokens/token-metadata)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/07-token-metadata)
 
 [Live Demo](https://soroban.stellar.org/docs)
 
@@ -900,7 +900,7 @@ pub fn decimals(env: Env) -> Result<u32, MetadataError> {
 ```
 
 ### Token Wrapper
-[View Source](../examples/tokens/token-wrapper)
+[View Source](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/tokens/06-token-wrapper)
 
 [Live Demo](https://soroban.stellar.org/docs)
 

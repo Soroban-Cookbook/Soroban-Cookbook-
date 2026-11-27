@@ -4,10 +4,11 @@ Helper scripts for building, testing, and deploying Stellar smart contracts.
 
 ## Overview
 
-This directory contains three essential utility scripts that streamline the Stellar smart contract development workflow:
+This directory contains utility scripts that streamline the Stellar smart contract development workflow:
 
 - **build.sh** - Compile contracts to optimized WASM binaries
 - **test.sh** - Run tests with comprehensive validation options
+- **mutation-test.sh** - Run cargo-mutants mutation testing on security-critical examples
 - **deploy.sh** - Deploy contracts to Stellar networks (testnet/mainnet)
 
 These scripts provide consistent, automated workflows for common development tasks and are used in CI/CD pipelines.
@@ -91,6 +92,33 @@ Run tests for smart contracts with comprehensive options and coverage reporting.
 - **Error Handling**: Comprehensive error checking and informative messages
 - **Flexible Targeting**: Test individual contracts, directories, or entire workspace
 - **Performance Optimized**: Uses workspace-level testing when possible
+
+### 🧬 mutation-test.sh
+
+Run mutation testing with `cargo-mutants` on the security-critical example crates (DeFi, tokens, governance). Mutants are tested against the package's own tests plus the shared `integration-tests` and `security-tests` suites.
+
+**Usage:**
+
+```bash
+# Test the default package set (constant-product-amm, lending-pool,
+# staking-pool, simple-voting, sep41-token)
+./scripts/mutation-test.sh
+
+# Test specific packages
+./scripts/mutation-test.sh constant-product-amm lending-pool
+
+# Enforce a minimum mutation score (e.g. 70%)
+MIN_MUTATION_SCORE=0.7 ./scripts/mutation-test.sh
+```
+
+**Environment variables:**
+
+- `MIN_MUTATION_SCORE` - Fail if the overall score is below this value (unset = report only)
+- `MUTANTS_JOBS` - Parallelism for cargo-mutants (default: `nproc`)
+- `MUTANTS_TIMEOUT` - Per-mutant test timeout in seconds (default: 300)
+- `MUTANTS_OUTPUT` - Output root for `outcomes.json` files (default: `./mutants.out`)
+
+Requires `cargo-mutants` (`cargo install cargo-mutants`) and `python3`. CI runs this weekly and on PRs touching the security-critical examples; see `.github/workflows/mutation-testing.yml` and the "Mutation Testing" section in `CONTRIBUTING.md`.
 
 ### 🚀 deploy.sh
 
