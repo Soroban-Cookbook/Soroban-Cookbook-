@@ -289,6 +289,7 @@ All contributions must follow these guidelines:
 3. **Documentation**: Update relevant documentation when adding or modifying examples
 4. **Commits**: Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`)
 5. **PR Process**: Link related issues using `Closes #<issue-number>` in the PR description
+6. **Lock Files (`Cargo.lock`)**: Lock files are always committed in this repository (root workspace and template sub-workspaces). This ensures reproducible builds for runnable example and application crates, consistent CI behavior, and reliable vulnerability auditing via `cargo-audit`. Never remove or add `Cargo.lock` to `.gitignore`.
 
 ### 🗓️ Community Office Hours
 
@@ -358,6 +359,18 @@ make clean   # cargo clean + remove book/book-output
 
 Run `make lint test` before opening a PR. To work on a single example, `cd`
 into it and use `cargo test` as shown below.
+
+### Lock File Policy (`Cargo.lock`)
+
+This repository contains both library-style contract examples and application-style runnable crates/templates (e.g. starter dApps in `templates/`). To guarantee:
+1. **Reproducible builds**: `cargo build` and `cargo install` produce deterministic binaries across local environments and CI on any date.
+2. **Reliable security audits**: `cargo-audit` accurately checks all committed transitive dependencies against the advisory database.
+3. **CI cache stability**: Workflow cache keys are tied to `hashFiles('**/Cargo.lock')`.
+
+**Policy rules:**
+- `Cargo.lock` files are **always committed** for the root workspace and standalone template workspaces (`templates/dao-governance-dapp`, `templates/token-dapp`).
+- When adding or upgrading dependencies, always include the updated `Cargo.lock` in your pull request.
+- `Cargo.lock` must never be added to `.gitignore`.
 
 ## 🧪 Testing Requirements
 
