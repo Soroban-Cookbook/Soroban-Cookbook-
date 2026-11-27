@@ -7,14 +7,24 @@ Complex protocols & optimizations for production systems.
 Follow these examples in order, from a single implementation pointer to fleet
 management and lower-level WASM and storage upgrade techniques:
 
-1. [Upgradeable Proxy](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/04-upgradeable-proxy) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
-2. [Proxy Admin Controls](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/31-proxy-admin) — timelock, cancellation, and pause controls; no call forwarding or beacon.
-3. [Beacon Proxy](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/02-beacon-proxy) — multiple proxies can share one implementation through a beacon; no fleet factory.
-4. [Beacon Proxy Factory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/23-beacon-proxy-factory) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
-5. [Beacon Management](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/37-beacon-management) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
-6. [Upgrade Patterns](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/07-upgrade-patterns) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
+1. [Upgradeable Proxy](../examples/advanced/04-upgradeable-proxy/) — one proxy with proxy-owned state; no beacon or upgrade-governance workflow.
+2. [Proxy Admin Controls](../examples/advanced/31-proxy-admin/) — timelock, cancellation, and pause controls; no call forwarding or beacon.
+3. [Beacon Proxy](../examples/advanced/02-beacon-proxy/) — multiple proxies can share one implementation through a beacon; no fleet factory.
+4. [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) — deploy and track a fleet sharing one beacon; no independent named-beacon registry.
 
-## ðŸ“‹ Examples
+> **Beacon Proxy vs. Beacon Proxy Factory:** Use the single [Beacon Proxy](../examples/advanced/02-beacon-proxy/) example when you need one or a few proxies managed manually. Use the [Beacon Proxy Factory](../examples/advanced/23-beacon-proxy-factory/) when you need to deploy and track a fleet of proxies that share one beacon. The two examples implement overlapping delegation logic; bug fixes to one should be mirrored in the other.
+
+| Aspect | Beacon Proxy (02) | Beacon Proxy Factory (23) |
+|---|---|---|
+| Number of proxies | One or a few, created manually | Many, deployed on demand |
+| Proxy lifecycle | Caller-managed | Factory-tracked |
+| Shared implementation | Via a single beacon | Via a single beacon |
+| Typical use case | Simple shared-logic upgrades | Fleet deployment and management |
+| Overlap | Delegation logic | Delegation logic (see 02) |
+5. [Beacon Management](../examples/advanced/37-beacon-management/) — version and roll back multiple named beacons; no proxy deployment or call forwarding.
+6. [Upgrade Patterns](../examples/advanced/07-upgrade-patterns/) — direct WASM upgrades, schema migration, and initialization guards; not a proxy or beacon system.
+
+## 📋 Examples
 
 ### [01-multi-party-auth](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/01-multi-party-auth)
 **Advanced multi-party authorization** beyond simple multisig.
@@ -82,8 +92,8 @@ let value = client.get_value_strict(); // errors if stale
 
 ---
 
-### [38-diamond-pattern](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/38-diamond-pattern) â­ Canonical
-**Diamond Pattern (EIP-2535)** â€” Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
+### [38-diamond-pattern](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/advanced/38-diamond-pattern) ⭐ Canonical
+**Diamond Pattern (EIP-2535)** — Full implementation with dynamic diamond-cut operations and diamond-loupe introspection.
 
 **Key Concepts:**
 - Diamond storage pattern with namespaced `DataKey` enum
@@ -102,7 +112,7 @@ let value = client.get_value_strict(); // errors if stale
 - Upgrade safeguards with duplicate detection
 
 ### [05-diamond-facets](../examples/advanced/05-diamond-facets/)
-**Diamond Facets** â€” Router orchestration patterns demonstrating inter-facet communication.
+**Diamond Facets** — Router orchestration patterns demonstrating inter-facet communication.
 
 **Key Concepts:**
 - Atomic cross-facet operations (e.g., mint + register metadata)
@@ -172,7 +182,7 @@ let value = client.get_value_strict(); // errors if stale
 
 **[More coming...]** Factories, bonding curves, merkle proofs.
 
-## âš ï¸ Warning
+## ⚠️ Warning
 Advanced patterns increase complexity - audit thoroughly!
 
 ## Prerequisites

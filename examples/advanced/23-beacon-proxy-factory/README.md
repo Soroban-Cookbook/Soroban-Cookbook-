@@ -1,5 +1,7 @@
 # Beacon Proxy Factory
 
+> **Beacon Proxy vs. Beacon Proxy Factory:** [`02-beacon-proxy`](../02-beacon-proxy/) shows a single beacon proxy contract deployed directly. This example (`23-beacon-proxy-factory`) builds on the same beacon mechanism but adds a factory that deploys and tracks many beacon proxies. Use the single beacon pattern when you manage one proxy; use this factory pattern when you need to deploy and batch-upgrade a fleet of proxies. Both implement the same delegation logic, so bug fixes must be applied to both examples (see [CONTRIBUTING.md](../../../CONTRIBUTING.md#keeping-beacon-proxy-examples-in-sync)).
+
 Factory-managed beacon proxies with shared upgrades. One beacon controls many proxy instances.
 
 ## Role in Learning Path
@@ -11,7 +13,7 @@ This is the **second step** in the [upgrade patterns learning path](../README.md
 - Cost-efficient multi-proxy management
 - Decoupling proxy deployment from implementation
 
-**Prerequisites:** Start with [`02-beacon-proxy`](../02-beacon-proxy/) to understand beacon basics.
+**Prerequisites:** Start with [`02-beacon-proxy`](../02-beacon-proxy/) to understand beacon basics. For a side-by-side comparison of the two patterns, see the comparison table in the book's Upgrade Patterns guide.
 
 **Next steps:**
 - **[`31-proxy-admin`](../31-proxy-admin/)** — Add governance and safety checks
@@ -174,6 +176,7 @@ cargo test -p beacon-proxy-factory
 
 - **Sequence step 4 of 6:** follows [Beacon Proxy](../02-beacon-proxy/) and
     demonstrates factory deployment of multiple proxies sharing one beacon.
+- **Single beacon proxy (no factory):** [`02-beacon-proxy`](../02-beacon-proxy/) — the overlapping pattern without fleet management. Keep the two in sync when fixing bugs.
 - **In scope:** deploying and tracking a proxy fleet with one shared beacon.
 - **Out of scope:** managing multiple independent named beacons; continue to
     [Beacon Management](../06-beacon-management/).

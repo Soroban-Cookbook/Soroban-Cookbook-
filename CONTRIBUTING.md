@@ -289,6 +289,7 @@ All contributions must follow these guidelines:
 3. **Documentation**: Update relevant documentation when adding or modifying examples
 4. **Commits**: Use conventional commit messages (e.g., `feat:`, `fix:`, `docs:`)
 5. **PR Process**: Link related issues using `Closes #<issue-number>` in the PR description
+6. **Paired Examples**: Some examples implement overlapping patterns (for example, `advanced/02-beacon-proxy` and `advanced/23-beacon-proxy-factory`). When you fix a bug or change behavior in one, check the other and update both, and keep their cross-reference doc comments accurate. The two examples are intentionally distinct, so note any remaining difference in your PR description.
 
 ### 🗓️ Community Office Hours
 

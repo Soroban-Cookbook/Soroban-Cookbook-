@@ -2,6 +2,10 @@
 //! # Beacon Proxy Pattern
 //!
 //! This example demonstrates the **Beacon Proxy** upgradeability pattern adapted for
+//!
+//! > **Distinction:** This example is a *single* beacon proxy (one beacon, proxies bound
+//! > to it directly). For a factory that deploys beacon proxies on demand, see
+//! > `examples/advanced/23-beacon-proxy-factory`. Keep both implementations in sync.
 //! Soroban smart contracts on the Stellar network.
 //!
 //! ## Architecture
