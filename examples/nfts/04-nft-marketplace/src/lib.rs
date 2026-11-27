@@ -402,7 +402,12 @@ impl NftMarketplaceContract {
         amount: i128,
         listing_id: u32,
     ) -> Result<(), MarketplaceError> {
-        let royalty_paid = amount * (listing.royalty_bps as i128) / 10000;
+        // `amount * royalty_bps` can exceed i128::MAX for very large prices, so
+        // fail with a typed error instead of overflowing.
+        let royalty_paid = amount
+            .checked_mul(listing.royalty_bps as i128)
+            .ok_or(MarketplaceError::InvalidPrice)?
+            / 10000;
         let seller_proceeds = amount - royalty_paid;
 
         let token = payment_token_client(env);

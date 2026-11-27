@@ -19,6 +19,7 @@
 - [Deployment Guide](./guides/deployment.md)
 - [Deployment Best Practices](./docs/deployment-best-practices.md)
 - [Ethereum to Soroban](./guides/ethereum-to-soroban.md)
+- [Solana to Soroban](./guides/solana-to-soroban.md)
 - [Project Templates](./docs/project-templates.md)
 - [Video Creation Tools](./guides/video-creation.md)
 - [Introduction Video](./guides/introduction-video.md)
@@ -41,15 +42,16 @@
 - [All Examples Index](./examples-index.md)
 
 ## Basics
-- [01 · Hello World (canonical intro)](../examples/basics/01-hello-world/README.md)
+- [01 · Hello World (canonical intro)](./examples/basics/01-hello-world.md)
 - [Overview & listing](./examples/basics.md)
 - [Interactive Playground](./examples/playground.md)
 - [Storage Patterns](./examples/storage-patterns.md)
 - [Error Handling](./examples/error-handling.md)
 - [Events](./examples/events.md)
 
-## Intermediate (3 examples)
+## Intermediate (4 examples)
 - [Multi-sig patterns](./examples/intermediate.md)
+- [Multi-Contract Testing](../examples/intermediate/multi-contract-testing/README.md)
 - [Ajo Factory](./examples/ajo-factory.md)
 - [Pause / Unpause](./examples/pause-unpause.md)
 
@@ -57,9 +59,9 @@
 - [Multi-party auth](./examples/advanced.md)
 - [Oracle Pattern](./examples/oracle-pattern.md)
 - [Off-chain Signatures](./examples/off-chain-signatures.md)
-- [Diamond Pattern (canonical)](./examples/advanced/38-diamond-pattern/README.md)
-- [Diamond Security (security-focused)](./examples/advanced/19-diamond-security/README.md)
-- [Diamond Facets (router orchestration)](./examples/advanced/18-diamond-facets/README.md)
+- [Diamond Pattern (canonical)](./examples/advanced/38-diamond-pattern.md)
+- [Diamond Security (security-focused)](./examples/advanced/19-diamond-security.md)
+- [Diamond Facets (router orchestration)](./examples/advanced/18-diamond-facets.md)
 
 # Use Cases
 
@@ -138,14 +140,15 @@
 - [Best Practices](./docs/best-practices.md)
 - [Code Review Checklist](./docs/review-checklist.md)
 - [Testing Best Practices](./docs/testing-best-practices.md)
+- [Multi-Contract Testing Patterns](../examples/intermediate/multi-contract-testing/README.md)
 - [Testing Pitfalls](./docs/testing-pitfalls.md)
 - [Documentation Platform Evaluation](./docs/documentation-platform-evaluation.md)
 - [DeFi Best Practices](./docs/defi-best-practices.md)
 - [DeFi Security Checklist](./docs/defi-security-checklist.md)
 - [Security Pitfalls](./docs/security-pitfalls.md)
 - [Storage Pitfalls](./docs/storage-pitfalls.md)
-- [Ecosystem Partnerships](./../docs/ecosystem-partnerships.md)
-- [Featured Projects](./../docs/featured-projects.md)
+- [Ecosystem Partnerships](./docs/ecosystem-partnerships.md)
+- [Featured Projects](./docs/featured-projects.md)
 - [Common Pitfalls](./docs/common-pitfalls.md)
 - [Style Guide](./docs/style-guide.md)
 - [Performance Benchmarks](./docs/benchmarks.md)

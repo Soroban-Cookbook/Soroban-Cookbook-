@@ -135,10 +135,58 @@ higher role.
 ## Running
 
 ```bash
-cargo test -p security-tests                        # full suite
-cargo test -p security-tests --test access_control  # access control only
+cargo test -p security-tests                         # full suite
+cargo test -p security-tests --test access_control   # access control only
+cargo test -p security-tests --test arithmetic        # overflow / underflow tests
+cargo test -p security-tests --test timestamp_manipulation  # time-gated logic tests
+cargo test -p security-tests --test storage_limits   # storage exhaustion tests
 ```
+
+---
+
+### 5. Arithmetic Overflow & Underflow
+
+Tests in [`tests/arithmetic.rs`](tests/arithmetic.rs) target the constant-product AMM and the staking pool with boundary inputs:
+
+| Threat | Test |
+| ------ | ---- |
+| `swap` with `i128::MAX` sell amount | `amm_swap_i128_max_returns_overflow_error` |
+| `swap` with negative amount | `amm_swap_negative_amount_rejected` |
+| `swap` with zero amount | `amm_swap_zero_amount_rejected` |
+| `add_liquidity` with product-overflowing amounts | `amm_add_liquidity_product_overflow_rejected` |
+| `remove_liquidity` with more LP than held | `amm_remove_liquidity_exceeds_balance_rejected` |
+| `stake` with zero amount | `staking_zero_amount_rejected` |
+| `stake` with negative amount | `staking_negative_amount_rejected` |
+| `unstake` more than staked balance | `unstake_more_than_balance_rejected` |
+
+---
+
+### 6. Timestamp Manipulation
+
+Tests in [`tests/timestamp_manipulation.rs`](tests/timestamp_manipulation.rs) set `env.ledger().timestamp` to boundary values:
+
+| Threat | Test |
+| ------ | ---- |
+| Vote cast at exact proposal deadline | `vote_rejected_at_exact_deadline_timestamp` |
+| Execute one second before deadline | `execute_rejected_one_second_before_deadline` |
+| Execute at exact deadline (must succeed) | `execute_succeeds_at_exact_deadline` |
+| Reward-per-token after a ~136-year clock jump | `reward_per_token_monotonic_with_extreme_timestamp_jump` |
+| Earned rewards at zero elapsed time | `zero_elapsed_time_produces_no_new_rewards` |
+| Claim rewards after a large timestamp jump | `claim_rewards_after_large_timestamp_jump_does_not_panic` |
+
+---
+
+### 7. Storage Exhaustion
+
+Tests in [`tests/storage_limits.rs`](tests/storage_limits.rs) exercise contracts that maintain unbounded collections:
+
+| Threat | Test |
+| ------ | ---- |
+| Creating 50 proposals: `prop_count` stays accurate | `many_proposals_prop_count_stays_accurate` |
+| 50 voters on one proposal: tally is correct | `many_votes_on_one_proposal_tally_is_correct` |
+| 20 delegators accumulate to a single delegatee | `many_delegators_voting_power_accumulates_correctly` |
 
 ## Status
 
 - [x] Issue #799: Security tests for access control (RBAC, multisig, timelock)
+- [x] Issue #1486: Arithmetic overflow, timestamp manipulation, and storage limit tests

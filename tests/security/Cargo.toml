@@ -10,3 +10,7 @@ token_wrapper = { path = "../../examples/tokens/06-token-wrapper", package = "to
 role_based_access_control = { path = "../../examples/intermediate/02-role-based-access-control", package = "role-based-access-control" }
 multi_sig_patterns = { path = "../../examples/intermediate/multi-sig-patterns", package = "multi-sig-patterns" }
 timelock = { path = "../../examples/advanced/02-timelock", package = "timelock" }
+constant_product_amm = { path = "../../examples/defi/02-constant-product-amm", package = "constant-product-amm" }
+staking_pool = { path = "../../examples/defi/07-staking-pool", package = "staking-pool" }
+vote_delegation = { path = "../../examples/governance/06-vote-delegation", package = "vote-delegation" }
+simple_voting = { path = "../../examples/governance/01-simple-voting", package = "simple-voting" }

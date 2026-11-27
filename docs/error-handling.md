@@ -113,7 +113,7 @@ pub fn withdraw(env: Env, from: Address, amount: i128) -> Result<i128, ContractE
 |------|--------------|
 | [`src/lib.rs`](../examples/basics/05-error-handling/src/lib.rs) | Full contract: all three panic patterns + typed errors |
 | [`src/test.rs`](../examples/basics/05-error-handling/src/test.rs) | `try_*` usage for both failure modes |
-| [`ERROR_HANDLING_QUICK_REFERENCE.md`](../examples/basics/05-error-handling/ERROR_HANDLING_QUICK_REFERENCE.md) | One-page cheat sheet |
+| [`ERROR_HANDLING_QUICK_REFERENCE.md`](../ERROR_HANDLING_QUICK_REFERENCE.md) | One-page cheat sheet |
 
 Run the tests:
 

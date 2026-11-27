@@ -207,3 +207,89 @@ fn test_unauthorized_cannot_use_resources() {
 
     client.use_resource(&nobody, &resource_id);
 }
+
+// ---------------------------------------------------------------------------
+// Hierarchy enforcement (issue #1466)
+// ---------------------------------------------------------------------------
+
+fn add_manager(
+    env: &Env,
+    client: &HierarchicalAccessControlContractClient<'_>,
+    admin: &Address,
+) -> Address {
+    let manager = Address::generate(env);
+    client.grant_role(admin, &ROLE_MANAGER, &manager);
+    manager
+}
+
+#[test]
+fn test_manager_can_manage_operator_role() {
+    let (env, admin, client) = setup();
+    let manager = add_manager(&env, &client, &admin);
+    let user = Address::generate(&env);
+
+    client.grant_role(&manager, &ROLE_OPERATOR, &user);
+    assert!(client.has_role(&ROLE_OPERATOR, &user));
+
+    client.revoke_role(&manager, &ROLE_OPERATOR, &user);
+    assert!(!client.has_role(&ROLE_OPERATOR, &user));
+}
+
+#[test]
+#[should_panic(expected = "Caller cannot manage target role")]
+fn test_manager_cannot_grant_admin_role() {
+    let (env, admin, client) = setup();
+    let manager = add_manager(&env, &client, &admin);
+    let user = Address::generate(&env);
+
+    client.grant_role(&manager, &ROLE_ADMIN, &user);
+}
+
+#[test]
+#[should_panic(expected = "Caller cannot manage target role")]
+fn test_manager_cannot_grant_manager_role() {
+    let (env, admin, client) = setup();
+    let manager = add_manager(&env, &client, &admin);
+    let user = Address::generate(&env);
+
+    client.grant_role(&manager, &ROLE_MANAGER, &user);
+}
+
+#[test]
+#[should_panic(expected = "Caller cannot manage target role")]
+fn test_manager_cannot_revoke_admin_role() {
+    let (env, admin, client) = setup();
+    let manager = add_manager(&env, &client, &admin);
+
+    client.revoke_role(&manager, &ROLE_ADMIN, &admin);
+}
+
+#[test]
+#[should_panic(expected = "Caller cannot manage target role")]
+fn test_admin_cannot_grant_admin_role() {
+    let (env, admin, client) = setup();
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &ROLE_ADMIN, &user);
+}
+
+#[test]
+#[should_panic(expected = "Caller cannot manage target role")]
+fn test_unknown_role_cannot_be_granted() {
+    let (env, admin, client) = setup();
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &symbol_short!("SUPERUSER"), &user);
+}
+
+#[test]
+fn test_admin_can_grant_lower_roles() {
+    let (env, admin, client) = setup();
+    let user = Address::generate(&env);
+
+    client.grant_role(&admin, &ROLE_MANAGER, &user);
+    assert!(client.has_role(&ROLE_MANAGER, &user));
+
+    client.grant_role(&admin, &ROLE_OPERATOR, &user);
+    assert!(client.has_role(&ROLE_OPERATOR, &user));
+}

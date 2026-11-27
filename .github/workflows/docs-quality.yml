@@ -1,0 +1,97 @@
+name: Docs Quality
+
+# Link checking for the mdBook in book/.
+#
+# - Internal links (relative paths between book pages and SUMMARY.md
+#   entries) are checked by scripts/check_book_links.py. A broken internal
+#   link fails the job. Legacy breakage that is still being cleaned up is
+#   listed in book/linkcheck-baseline.txt and reported as a warning; the
+#   baseline may only shrink.
+# - External links are checked with lychee. They are reported as warnings
+#   and never block a merge or deployment, so an outage on a third-party
+#   site cannot break CI.
+# - The book is built with mdBook so missing chapters and bad includes are
+#   caught on the pull request instead of during deployment.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "book/**"
+      - "docs/**"
+      - "examples/**/README.md"
+      - "GOVERNANCE/**"
+      - "scripts/check_book_links.py"
+      - ".github/workflows/docs-quality.yml"
+  pull_request:
+    paths:
+      - "book/**"
+      - "docs/**"
+      - "examples/**/README.md"
+      - "GOVERNANCE/**"
+      - "scripts/check_book_links.py"
+      - ".github/workflows/docs-quality.yml"
+  schedule:
+    # Weekly external link sweep (Mondays 06:00 UTC).
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  internal-links:
+    name: Internal links (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check internal links
+        run: python3 scripts/check_book_links.py --root book/src --baseline book/linkcheck-baseline.txt
+
+  build-book:
+    name: Build book
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install mdBook
+        run: cargo install mdbook --locked
+
+      - name: Build documentation
+        working-directory: book
+        run: mdbook build
+
+  external-links:
+    name: External links (non-blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check external links
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          fail: false
+          args: >-
+            --no-progress
+            --scheme https
+            --scheme http
+            --max-retries 3
+            --timeout 20
+            --accept 200,204,206,301,302,403,429
+            --exclude-path book/src/zh
+            "book/src/**/*.md"
+
+      - name: Report external link status
+        if: always()
+        run: |
+          if [ "${{ steps.lychee.outputs.exit_code }}" != "0" ]; then
+            echo "::warning title=External links::Some external links in the book are unreachable. See the lychee report in the step above. This does not block CI."
+          else
+            echo "All external links reachable."
+          fi

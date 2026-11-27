@@ -60,7 +60,7 @@ pub fn owner_of(env: Env, token_id: u32) -> Result<Address, NftError> {
 }
 ```
 
-**Why `Persistent`?** Owner records must survive ledger entry expiry. Soroban's `Temporary` and `Instance` tiers have shorter TTLs and are unsuitable for long-lived ownership claims. See [docs/storage-types.md](./storage-types.md).
+**Why `Persistent`?** Owner records must survive ledger entry expiry. Soroban's `Temporary` and `Instance` tiers have shorter TTLs and are unsuitable for long-lived ownership claims. See [docs/storage-types.md](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/blob/main/docs/storage-types.md).
 
 **TTL extension**: Every write to a `Persistent` owner record should extend its TTL:
 
@@ -376,7 +376,7 @@ Placing the listing or token ID in topic slot 2 lets indexers query "all events 
 
 | Example | Directory | Key concept |
 |---------|-----------|------------|
-| Basic NFT | [examples/nfts/01-basic-nft](../examples/nfts/01-basic-nft/) | Ownership, enumeration, approvals |
-| NFT Metadata | [examples/nfts/02-nft-metadata](../examples/nfts/02-nft-metadata/) | `token_uri`, hybrid on/off-chain |
-| Metadata Standards | [examples/nfts/03-nft-metadata-standards](../examples/nfts/03-nft-metadata-standards/) | JSON-schema validation, attribute system |
-| NFT Marketplace | [examples/nfts/04-nft-marketplace](../examples/nfts/04-nft-marketplace/) | Listings, auctions, bundles, royalties |
+| Basic NFT | [examples/nfts/01-basic-nft](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/01-basic-nft) | Ownership, enumeration, approvals |
+| NFT Metadata | [examples/nfts/02-nft-metadata](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/02-nft-metadata) | `token_uri`, hybrid on/off-chain |
+| Metadata Standards | [examples/nfts/03-nft-metadata-standards](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/03-nft-metadata-standards) | JSON-schema validation, attribute system |
+| NFT Marketplace | [examples/nfts/04-nft-marketplace](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/nfts/04-nft-marketplace) | Listings, auctions, bundles, royalties |

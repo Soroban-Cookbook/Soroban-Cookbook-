@@ -402,3 +402,28 @@ both hooks during setup so these checks run automatically.
 - **Documentation consistency** (`tests/docs-audit/`): for checks that a maintained document (e.g. an audit-scope or checklist file) stays in sync with the filesystem it describes. See `tests/docs-audit/README.md`.
 
 Coverage is measured with `cargo tarpaulin` in CI and uploaded to Codecov; run `cargo tarpaulin` locally if you want to check coverage before pushing.
+
+### Mutation Testing
+
+Coverage tells you which lines ran; it does not tell you the tests assert on the right things. For the security-critical examples (DeFi, tokens, governance) we run [`cargo-mutants`](https://mutants.rs), which flips operators, deletes function bodies, and otherwise perturbs the code to check that the test suite catches the change.
+
+CI runs mutation testing weekly and on PRs that touch `examples/defi/**`, `examples/tokens/**`, or `examples/governance/**` (see `.github/workflows/mutation-testing.yml`). PRs touching those crates must keep a mutation score of at least 70%; scheduled runs report scores without blocking.
+
+To run it locally:
+
+```bash
+cargo install cargo-mutants
+./scripts/mutation-test.sh                          # all default packages
+./scripts/mutation-test.sh constant-product-amm     # one package
+MIN_MUTATION_SCORE=0.7 ./scripts/mutation-test.sh   # enforce a threshold
+```
+
+Results land in `mutants.out/<package>/outcomes.json` (per-mutant detail) and the script prints a per-package and overall score to stdout and `$GITHUB_STEP_SUMMARY`.
+
+**Handling surviving mutants.** A mutant that survives means no test distinguishes the mutated code from the original. To fix it:
+
+1. Reproduce the mutation locally (`cargo mutants -p <package> --test-package integration-tests --test-package security-tests --file <src-file>` narrows the search).
+2. Add a test that asserts the correct behavior — typically in `tests/integration/` or `tests/security/` — and confirm the mutant is now caught.
+3. If the mutant is genuinely equivalent (e.g. a redundant bounds check), document why in the test or an inline comment rather than weakening the assertion.
+
+Surviving mutants found by the weekly run are filed as tracking issues labeled `enhancement` and `testing`.

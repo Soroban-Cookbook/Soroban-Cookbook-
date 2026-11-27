@@ -248,3 +248,6 @@ impl StakingPoolContract {
         this.reward_per_token_internal(&env)
     }
 }
+
+#[cfg(test)]
+mod test;

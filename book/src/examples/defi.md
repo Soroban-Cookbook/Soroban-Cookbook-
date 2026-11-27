@@ -17,7 +17,7 @@ Decentralized finance on Soroban: AMMs, lending, yield protocols.
 ## 📋 Coming Soon
 ## 📋 Examples (1 currently)
 
-### [01-vault-strategies](../examples/vault-strategies/)
+### [01-vault-strategies](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/tree/main/examples/defi/09-vault-strategies)
 **Multi-strategy yield vault** with pluggable strategies and risk management.
 
 **Key Concepts:**
@@ -77,10 +77,10 @@ cd examples/defi/01-simple-swap && cargo test
 Swap in the example name for the one you want to explore (for example `examples/defi/vault-strategies`), then follow the matching playground use case to see the same flow step by step.
 
 ## Prerequisites
-- [Basics](../basics.md), [Tokens](../tokens.md)
+- [Basics](./basics.md), [Tokens](./tokens.md)
 
 ## Resources
 - [Uniswap V2 Math](https://uniswap.org/whitepaper.pdf)
 - Soroban token standards
 
-## Next: [NFTs](../nfts.md)
+## Next: [NFTs](./nfts.md)

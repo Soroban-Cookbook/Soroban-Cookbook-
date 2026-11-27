@@ -56,9 +56,11 @@ pub struct Proposal {
     pub title: String,
     pub proposer: Address,
     pub deadline: u64,
-    pub votes_for: u32,
-    pub votes_against: u32,
-    pub votes_abstain: u32,
+    /// Vote counters are `i128` and incremented with `checked_add`, so a
+    /// high-participation proposal can never silently wrap around.
+    pub votes_for: i128,
+    pub votes_against: i128,
+    pub votes_abstain: i128,
     pub status: ProposalStatus,
 }
 
@@ -99,6 +101,8 @@ pub enum VotingError {
     Executed = 7,
     /// Deadline must be in the future.
     BadDeadline = 8,
+    /// A vote counter would overflow.
+    Overflow = 9,
 }
 
 // ---------------------------------------------------------------------------
@@ -227,11 +231,12 @@ impl VotingContract {
             return Err(VotingError::VoteEnded);
         }
 
-        match choice {
-            VoteChoice::For => proposal.votes_for += 1,
-            VoteChoice::Against => proposal.votes_against += 1,
-            VoteChoice::Abstain => proposal.votes_abstain += 1,
-        }
+        let counter = match choice {
+            VoteChoice::For => &mut proposal.votes_for,
+            VoteChoice::Against => &mut proposal.votes_against,
+            VoteChoice::Abstain => &mut proposal.votes_abstain,
+        };
+        *counter = counter.checked_add(1).ok_or(VotingError::Overflow)?;
 
         env.storage()
             .persistent()
@@ -263,7 +268,7 @@ impl VotingContract {
     // ==================== TALLY ====================
 
     /// Get the current vote tally: (votes_for, votes_against, votes_abstain).
-    pub fn tally(env: Env, proposal_id: u32) -> Result<(u32, u32, u32), VotingError> {
+    pub fn tally(env: Env, proposal_id: u32) -> Result<(i128, i128, i128), VotingError> {
         let proposal: Proposal = env
             .storage()
             .persistent()

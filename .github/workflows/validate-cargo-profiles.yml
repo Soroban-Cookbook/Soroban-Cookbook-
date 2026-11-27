@@ -1,0 +1,106 @@
+name: Validate Cargo Profile Configuration
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate-profile-capitalization:
+    name: Validate Profile Capitalization
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check for incorrect [Profile.*] capitalization
+        run: |
+          echo "Checking for incorrect [Profile.*] capitalization in Cargo.toml files..."
+          
+          # Search for incorrect capitalization with capital P
+          INCORRECT_FILES=$(grep -r "\[Profile\." --include="Cargo.toml" . || true)
+          
+          if [ -n "$INCORRECT_FILES" ]; then
+            echo "::error::Found incorrect [Profile.*] capitalization (should be [profile.*]):"
+            echo "$INCORRECT_FILES"
+            echo ""
+            echo "The correct Cargo table name is [profile.release] (lowercase 'p')."
+            echo "Capitalized [Profile.release] is silently ignored by Cargo, causing"
+            echo "release profile optimizations (opt-level, lto, overflow-checks) to be skipped."
+            exit 1
+          fi
+          
+          echo "✓ All Cargo.toml files use correct [profile.*] capitalization"
+
+      - name: Verify release profile exists
+        run: |
+          echo "Verifying workspace Cargo.toml has [profile.release] configuration..."
+          
+          if ! grep -q "^\[profile\.release\]" Cargo.toml; then
+            echo "::error::Workspace Cargo.toml missing [profile.release] section"
+            exit 1
+          fi
+          
+          echo "✓ Workspace [profile.release] configuration found"
+
+      - name: Verify release profile optimizations
+        run: |
+          echo "Verifying release profile has required optimizations..."
+          
+          # Check for key optimization settings
+          if ! grep -A 10 "^\[profile\.release\]" Cargo.toml | grep -q 'opt-level = "z"'; then
+            echo "::error::Missing opt-level = \"z\" in [profile.release]"
+            exit 1
+          fi
+          
+          if ! grep -A 10 "^\[profile\.release\]" Cargo.toml | grep -q "overflow-checks = true"; then
+            echo "::error::Missing overflow-checks = true in [profile.release]"
+            exit 1
+          fi
+          
+          if ! grep -A 10 "^\[profile\.release\]" Cargo.toml | grep -q "lto = true"; then
+            echo "::error::Missing lto = true in [profile.release]"
+            exit 1
+          fi
+          
+          echo "✓ Release profile has required optimizations (opt-level=z, overflow-checks, lto)"
+
+  verify-wasm-optimization:
+    name: Verify WASM Size Optimization
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v2
+        with:
+          toolchain: stable
+          target: wasm32v1-none
+
+      - name: Build a sample contract and verify size
+        run: |
+          echo "Building sample contract to verify release optimizations are active..."
+          
+          # Build a representative example contract
+          cd examples/basics/01-hello-world
+          cargo build --release --target wasm32v1-none
+          
+          WASM_FILE=$(find target/wasm32v1-none/release -name "*.wasm" -type f | head -n1)
+          
+          if [ -z "$WASM_FILE" ]; then
+            echo "::error::No WASM file generated"
+            exit 1
+          fi
+          
+          WASM_SIZE=$(stat -c%s "$WASM_FILE" 2>/dev/null || stat -f%z "$WASM_FILE")
+          echo "WASM file size: $WASM_SIZE bytes"
+          
+          # With opt-level="z" and lto=true, a hello-world contract should be
+          # reasonably small (typically < 10KB for simple contracts).
+          # This is a sanity check that optimizations are being applied.
+          if [ "$WASM_SIZE" -gt 50000 ]; then
+            echo "::warning::WASM size seems large ($WASM_SIZE bytes). Release optimizations may not be active."
+            echo "Expected size with opt-level=z and lto=true: typically < 10-20KB for hello-world"
+          else
+            echo "✓ WASM size indicates release optimizations are active"
+          fi
