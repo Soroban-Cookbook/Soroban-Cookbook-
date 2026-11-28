@@ -62,8 +62,14 @@ publication and participant milestones only after they are verified.
 **Do not open a public GitHub issue for security vulnerabilities.**
 
 Use one of these private channels:
-1. **GitHub Security Advisory** (preferred): [Open a private advisory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new)
-2. **Email**: `security@soroban-cookbook.dev`
+
+1. **GitHub Security Advisory** (preferred): [Open a private advisory](https://github.com/Soroban-Cookbook/Soroban-Cookbook-/security/advisories/new), or use the **Security** tab → **Report a vulnerability**.
+   If that button is missing, private vulnerability reporting is not currently enabled for the repository — use channel 2.
+2. **Private channel request** (fallback): open a public issue titled `[SECURITY] Private channel request` containing **only** a request for a private channel and your GitHub handle.
+   A maintainer will reply and move the conversation to a private advisory or temporary private fork within the acknowledgment SLA below.
+   Keep every detail (description, affected files, PoC) out of the public issue.
+
+There is currently no working security e-mail address: `security@soroban-cookbook.dev` does not resolve (`soroban-cookbook.dev` has no DNS records), so do not send reports there. The GitHub channels above are the only supported routes; the policy's private-reporting instructions in [`SECURITY.md`](../../SECURITY.md) are canonical.
 
 ### Report Requirements
 
